@@ -7,6 +7,7 @@ import { Payable } from './payable.entity';
 @Index('UQ_fin_payable_entry_inventory_in_entry', ['inventoryInEntryId'], { unique: true, where: 'inventory_in_entry_id IS NOT NULL' })
 @Index('UQ_fin_payable_entry_purchase_return_entry', ['purchaseReturnEntryId'], { unique: true, where: 'purchase_return_entry_id IS NOT NULL' })
 @Index('UQ_fin_payable_entry_asset_acceptance', ['assetAcceptanceEntryId'], { unique: true, where: 'asset_acceptance_entry_id IS NOT NULL' })
+@Index('UQ_fin_payable_entry_expense_acceptance', ['expenseAcceptanceEntryId'], { unique: true, where: 'expense_acceptance_entry_id IS NOT NULL' })
 @Index('IDX_fin_payable_entry_order_entry', ['sourceOrderEntryId'])
 @Index('IDX_fin_payable_entry_request_entry', ['sourceRequestEntryId'])
 export class PayableEntry extends BaseEntity {
@@ -29,6 +30,9 @@ export class PayableEntry extends BaseEntity {
   @Column({ name: 'asset_acceptance_entry_id', length: 36, nullable: true, comment: '来源资产验收明细ID' })
   assetAcceptanceEntryId: string;
 
+  @Column({ name: 'expense_acceptance_entry_id', length: 36, nullable: true, comment: '来源费用验收明细ID' })
+  expenseAcceptanceEntryId: string;
+
   @Column({ name: 'source_receive_notice_entry_id', length: 36, comment: '来源收料通知明细ID' })
   sourceReceiveNoticeEntryId: string;
 
@@ -38,19 +42,25 @@ export class PayableEntry extends BaseEntity {
   @Column({ name: 'source_request_entry_id', length: 36, nullable: true, comment: '来源采购申请明细ID；手工订单可为空' })
   sourceRequestEntryId: string;
 
-  @Column({ name: 'material_id', length: 36, comment: '物料ID快照' })
+  @Column({ name: 'expense_item_code', length: 50, nullable: true, comment: '费用/服务项目文本编码快照' })
+  expenseItemCode: string;
+
+  @Column({ name: 'expense_item_name', length: 200, nullable: true, comment: '费用/服务项目文本名称快照' })
+  expenseItemName: string;
+
+  @Column({ name: 'material_id', length: 36, nullable: true, comment: '物料ID快照；费用采购可空' })
   materialId: string;
 
-  @Column({ name: 'material_code', length: 50, comment: '物料编码快照' })
+  @Column({ name: 'material_code', length: 50, nullable: true, comment: '物料编码快照；费用采购可空' })
   materialCode: string;
 
-  @Column({ name: 'material_name', length: 200, comment: '物料名称快照' })
+  @Column({ name: 'material_name', length: 200, nullable: true, comment: '物料名称快照；费用采购可空' })
   materialName: string;
 
   @Column({ name: 'material_model', length: 200, nullable: true, comment: '规格型号快照' })
   materialModel: string;
 
-  @Column({ name: 'unit_id', length: 36, comment: '计量单位ID快照' })
+  @Column({ name: 'unit_id', length: 36, nullable: true, comment: '计量单位ID快照；费用采购可空' })
   unitId: string;
 
   @Column({ name: 'unit_code', length: 50, nullable: true, comment: '计量单位编码快照' })

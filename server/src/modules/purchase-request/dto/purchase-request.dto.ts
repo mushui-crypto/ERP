@@ -21,27 +21,37 @@ export class PurchaseRequestEntryDto {
   @IsString()
   purchaseOrgId: string;
 
-  @IsNotEmpty()
+  @IsOptional()
   @IsString()
-  materialId: string;
+  materialId?: string;
 
-  @IsNotEmpty()
+  @IsOptional()
   @IsString()
   @MaxLength(50)
-  materialCode: string;
+  materialCode?: string;
 
-  @IsNotEmpty()
+  @IsOptional()
   @IsString()
   @MaxLength(200)
-  materialName: string;
+  materialName?: string;
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(50)
+  expenseItemCode?: string;
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(200)
+  expenseItemName?: string;
 
   @IsOptional()
   @IsString()
   materialModel?: string;
 
-  @IsNotEmpty()
+  @IsOptional()
   @IsString()
-  unitId: string;
+  unitId?: string;
 
   @IsOptional()
   @IsString()

@@ -38,19 +38,25 @@ export class PurchaseReceiveNoticeEntry extends BaseEntity {
   @Column({ name: 'source_purchase_return_entry_id', length: 36, nullable: true, comment: '补料来源采购退料明细ID' })
   sourcePurchaseReturnEntryId: string;
 
-  @Column({ name: 'material_id', length: 36, comment: '物料ID/FMaterialId' })
+  @Column({ name: 'expense_item_code', length: 50, nullable: true, comment: '费用/服务项目文本编码' })
+  expenseItemCode: string;
+
+  @Column({ name: 'expense_item_name', length: 200, nullable: true, comment: '费用/服务项目文本名称' })
+  expenseItemName: string;
+
+  @Column({ name: 'material_id', length: 36, nullable: true, comment: '物料ID/FMaterialId；费用采购可空' })
   materialId: string;
 
-  @Column({ name: 'material_code', length: 50, comment: '物料编码' })
+  @Column({ name: 'material_code', length: 50, nullable: true, comment: '物料编码；费用采购可空' })
   materialCode: string;
 
-  @Column({ name: 'material_name', length: 200, comment: '物料名称/FMaterialName' })
+  @Column({ name: 'material_name', length: 200, nullable: true, comment: '物料名称/FMaterialName；费用采购可空' })
   materialName: string;
 
   @Column({ name: 'material_model', length: 200, nullable: true, comment: '规格型号/FMateriaModel' })
   materialModel: string;
 
-  @Column({ name: 'unit_id', length: 36, comment: '收料单位/FUnitId' })
+  @Column({ name: 'unit_id', length: 36, nullable: true, comment: '收料单位/FUnitId；费用采购可空' })
   unitId: string;
 
   @Column({ name: 'unit_code', length: 50, nullable: true, comment: '收料单位编码' })
@@ -79,6 +85,9 @@ export class PurchaseReceiveNoticeEntry extends BaseEntity {
 
   @Column({ name: 'asset_accepted_qty', type: 'decimal', precision: 18, scale: 4, default: 0, comment: '累计已通过资产验收数量' })
   assetAcceptedQty: number;
+
+  @Column({ name: 'expense_accepted_qty', type: 'decimal', precision: 18, scale: 4, default: 0, comment: '累计已审核费用验收数量' })
+  expenseAcceptedQty: number;
 
   @Column({ name: 'returned_qty', type: 'decimal', precision: 18, scale: 4, default: 0, comment: '累计已审核采购退料数量' })
   returnedQty: number;

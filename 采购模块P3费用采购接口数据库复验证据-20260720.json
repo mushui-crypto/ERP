@@ -1,0 +1,318 @@
+{
+  "runTag": "P3VERIFY-1784542437829",
+  "api": "http://localhost:3003/api",
+  "startedAt": "2026-07-20T10:13:57.829Z",
+  "tests": [
+    {
+      "id": "P3-ROUTE-01",
+      "name": "P3 Swagger routes are complete",
+      "status": "PASS",
+      "detail": {
+        "routes": [
+          "/api/purchase-requests/import",
+          "/api/purchase-orders/from-request",
+          "/api/purchase-receive-notices/from-order",
+          "/api/expense-acceptances/from-receive-notice",
+          "/api/expense-acceptances/{id}/generate-estimated-payable"
+        ]
+      },
+      "at": "2026-07-20T10:13:57.913Z"
+    },
+    {
+      "id": "P3-QUERY-01",
+      "name": "unfiltered purchase request query includes expense requests",
+      "status": "PASS",
+      "detail": {
+        "total": 93,
+        "requestId": "6423433E-F36B-1410-8B47-0096A7B40922"
+      },
+      "at": "2026-07-20T10:13:58.617Z"
+    },
+    {
+      "id": "P3-TYPE-01",
+      "name": "manual expense request type propagated",
+      "status": "PASS",
+      "detail": {
+        "request": "EXPENSE_PURCHASE",
+        "order": "EXPENSE_PURCHASE",
+        "notice": "EXPENSE_PURCHASE"
+      },
+      "at": "2026-07-20T10:13:58.617Z"
+    },
+    {
+      "id": "P3-FIELD-01",
+      "name": "text expense item propagated with nullable material and unit",
+      "status": "PASS",
+      "detail": {
+        "id": "7A23433E-F36B-1410-8B47-0096A7B40922",
+        "createdBy": null,
+        "updatedBy": null,
+        "createdAt": "2026-07-20T02:13:58.373Z",
+        "updatedAt": "2026-07-20T02:13:58.373Z",
+        "isDeleted": 0,
+        "purchaseReceiveNoticeId": "7323433E-F36B-1410-8B47-0096A7B40922",
+        "lineNo": 1,
+        "sourceOrderId": "6623433E-F36B-1410-8B47-0096A7B40922",
+        "sourceOrderNo": "PO20260720181358261217",
+        "sourceOrderEntryId": "6C23433E-F36B-1410-8B47-0096A7B40922",
+        "sourceRequestId": "6423433E-F36B-1410-8B47-0096A7B40922",
+        "sourceRequestNo": "PR20260720181358148074",
+        "sourceRequestEntryId": "6523433E-F36B-1410-8B47-0096A7B40922",
+        "sourcePurchaseReturnEntryId": null,
+        "expenseItemCode": "EXP-MANUAL",
+        "expenseItemName": "Service-MANUAL",
+        "materialId": null,
+        "materialCode": null,
+        "materialName": null,
+        "materialModel": null,
+        "unitId": null,
+        "unitCode": null,
+        "unitName": null,
+        "receiveQty": 10,
+        "inspectedQty": 0,
+        "qualifiedQty": 0,
+        "concessionQty": 0,
+        "unqualifiedQty": 0,
+        "stockedQty": 0,
+        "assetAcceptedQty": 0,
+        "expenseAcceptedQty": 0,
+        "returnedQty": 0,
+        "checkIncoming": false,
+        "warehouseId": null,
+        "unitPrice": 100,
+        "amount": 1000,
+        "taxRate": 13,
+        "taxAmount": 130,
+        "netAmount": 1130,
+        "supplierLot": null,
+        "produceDate": null,
+        "expiryDate": null,
+        "remark": null,
+        "requiresInspection": false,
+        "remainingInspectQty": 0,
+        "availableInboundQty": 10
+      },
+      "at": "2026-07-20T10:13:58.617Z"
+    },
+    {
+      "id": "P3-SERVICE-01",
+      "name": "expense service completion forced inspection and warehouse off",
+      "status": "PASS",
+      "detail": {
+        "needCheck": false,
+        "checkIncoming": false,
+        "warehouseId": null
+      },
+      "at": "2026-07-20T10:13:58.617Z"
+    },
+    {
+      "id": "P3-QTY-01",
+      "name": "order approval and service completion quantities written back",
+      "status": "PASS",
+      "detail": {
+        "purchasedQty": 10,
+        "receivedQty": 10
+      },
+      "at": "2026-07-20T10:13:58.617Z"
+    },
+    {
+      "id": "P3-BOUNDARY-01",
+      "name": "expense service completion cannot create incoming inspection",
+      "status": "PASS",
+      "detail": {
+        "message": "该收料明细为免检，无需生成来料检验单"
+      },
+      "at": "2026-07-20T10:13:58.648Z"
+    },
+    {
+      "id": "P3-BOUNDARY-02",
+      "name": "expense service completion cannot create purchase inbound",
+      "status": "PASS",
+      "detail": {
+        "message": "费用采购流程禁止生成采购入库单"
+      },
+      "at": "2026-07-20T10:13:58.666Z"
+    },
+    {
+      "id": "P3-IDEM-01",
+      "name": "same idempotency key and payload returns same acceptance",
+      "status": "PASS",
+      "detail": {
+        "id": "7C23433E-F36B-1410-8B47-0096A7B40922"
+      },
+      "at": "2026-07-20T10:13:58.720Z"
+    },
+    {
+      "id": "P3-IDEM-02",
+      "name": "same idempotency key with different payload conflicts",
+      "status": "PASS",
+      "detail": {
+        "message": "幂等键已被不同请求载荷使用"
+      },
+      "at": "2026-07-20T10:13:58.729Z"
+    },
+    {
+      "id": "P3-ACCEPT-01",
+      "name": "expense acceptance approved and estimated payable generated",
+      "status": "PASS",
+      "detail": {
+        "statusCode": "APPROVED",
+        "payableGenerationStatus": "GENERATED",
+        "payableNo": "AP20260720181358785524"
+      },
+      "at": "2026-07-20T10:13:58.811Z"
+    },
+    {
+      "id": "P3-QTY-02",
+      "name": "approved acceptance quantity written to service completion",
+      "status": "PASS",
+      "detail": {
+        "expense_accepted_qty": 6
+      },
+      "at": "2026-07-20T10:13:58.815Z"
+    },
+    {
+      "id": "P3-PAYABLE-01",
+      "name": "one estimated payable traces to expense acceptance",
+      "status": "PASS",
+      "detail": {
+        "id": "8123433E-F36B-1410-8B47-0096A7B40922",
+        "source_type": "EXPENSE_ACCEPTANCE",
+        "source_id": "7C23433E-F36B-1410-8B47-0096A7B40922",
+        "amount": 678,
+        "payable_date": "2026-07-20T18:13:58.000Z",
+        "due_date": "2026-08-19T18:13:58.000Z"
+      },
+      "at": "2026-07-20T10:13:58.824Z"
+    },
+    {
+      "id": "P3-TRACE-01",
+      "name": "payable entry keeps expense item and source with nullable material",
+      "status": "PASS",
+      "detail": {
+        "expense_acceptance_entry_id": "7E23433E-F36B-1410-8B47-0096A7B40922",
+        "expense_item_code": "EXP-MANUAL",
+        "expense_item_name": "Service-MANUAL",
+        "material_id": null,
+        "unit_id": null,
+        "quantity": 6,
+        "total_amount": 678
+      },
+      "at": "2026-07-20T10:13:58.827Z"
+    },
+    {
+      "id": "P3-PAYABLE-02",
+      "name": "payable due date uses payment term credit days",
+      "status": "PASS",
+      "detail": {
+        "dueDays": 30
+      },
+      "at": "2026-07-20T10:13:58.827Z"
+    },
+    {
+      "id": "P3-PAYABLE-03",
+      "name": "estimated payable retry is idempotent",
+      "status": "PASS",
+      "detail": {
+        "payableId": "8123433E-F36B-1410-8B47-0096A7B40922",
+        "count": 1
+      },
+      "at": "2026-07-20T10:13:58.843Z"
+    },
+    {
+      "id": "P3-OVER-01",
+      "name": "acceptance cannot exceed remaining service quantity",
+      "status": "PASS",
+      "detail": {
+        "message": "服务完成明细可验收数量为 4，本次为 5"
+      },
+      "at": "2026-07-20T10:13:58.864Z"
+    },
+    {
+      "id": "P3-PARTIAL-01",
+      "name": "remaining quantity can be accepted separately",
+      "status": "PASS",
+      "detail": {
+        "id": "8723433E-F36B-1410-8B47-0096A7B40922"
+      },
+      "at": "2026-07-20T10:13:59.007Z"
+    },
+    {
+      "id": "P3-OA-01",
+      "name": "OA expense request import is idempotent",
+      "status": "PASS",
+      "detail": {
+        "id": "9C23433E-F36B-1410-8B47-0096A7B40922"
+      },
+      "at": "2026-07-20T10:13:59.074Z"
+    },
+    {
+      "id": "P3-OA-02",
+      "name": "OA source with different expense payload conflicts",
+      "status": "PASS",
+      "detail": {
+        "message": "OA 来源已被不同请求载荷使用"
+      },
+      "at": "2026-07-20T10:13:59.092Z"
+    },
+    {
+      "id": "P3-CONCURRENT-01",
+      "name": "concurrent same-key acceptance creates one record",
+      "status": "PASS",
+      "detail": {
+        "ids": [
+          "AA23433E-F36B-1410-8B47-0096A7B40922",
+          "AA23433E-F36B-1410-8B47-0096A7B40922"
+        ],
+        "count": 1
+      },
+      "at": "2026-07-20T10:13:59.875Z"
+    },
+    {
+      "id": "P3-RETRY-01",
+      "name": "payable failure does not roll back expense acceptance approval",
+      "status": "PASS",
+      "detail": {
+        "statusCode": "APPROVED",
+        "payableGenerationStatus": "FAILED",
+        "error": "付款条件不存在或未启用，无法生成暂估应付"
+      },
+      "at": "2026-07-20T10:14:01.202Z"
+    },
+    {
+      "id": "P3-RETRY-02",
+      "name": "failed payable keeps acceptance quantity writeback",
+      "status": "PASS",
+      "detail": {
+        "expense_accepted_qty": 3
+      },
+      "at": "2026-07-20T10:14:01.206Z"
+    },
+    {
+      "id": "P3-RETRY-03",
+      "name": "failed estimated payable can retry successfully",
+      "status": "PASS",
+      "detail": {
+        "statusCode": "APPROVED",
+        "payableGenerationStatus": "GENERATED",
+        "payableNo": "AP20260720181401225042"
+      },
+      "at": "2026-07-20T10:14:01.253Z"
+    }
+  ],
+  "defects": [],
+  "ids": {
+    "suffix": "4542437829",
+    "userId": "5423433E-F36B-1410-8B47-0096A7B40922",
+    "supplierId": "5923433E-F36B-1410-8B47-0096A7B40922",
+    "currencyId": "5E23433E-F36B-1410-8B47-0096A7B40922",
+    "paymentTermId": "6323433E-F36B-1410-8B47-0096A7B40922",
+    "orgId": "7b20a557-9b39-443f-97f7-c6da8323705f"
+  },
+  "completedAt": "2026-07-20T10:14:01.253Z",
+  "summary": {
+    "total": 24,
+    "passed": 24,
+    "failed": 0
+  }
+}

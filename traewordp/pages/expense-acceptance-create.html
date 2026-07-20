@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>费用验收详情 - 采购管理</title>
+<link rel="stylesheet" href="../common.css">
+<script src="../common.js"></script>
+<style>
+body{margin:0;background:#f0f2f5;color:#333}.doc-page{display:flex;min-height:100vh}.doc-sidebar{width:200px;background:#001529;color:#fff}.doc-sidebar-title{padding:16px 20px;font-weight:600;border-bottom:1px solid #002140}.doc-sidebar-menu{list-style:none;margin:0;padding:0}.doc-sidebar-menu a{display:block;padding:12px 20px;color:#bfbfbf;text-decoration:none}.doc-sidebar-menu a.active,.doc-sidebar-menu a:hover{background:#1890ff;color:#fff}.doc-content{flex:1}.doc-header{background:#fff;border-bottom:1px solid #e8e8e8;padding:16px 20px;display:flex;justify-content:space-between;align-items:center}.doc-header-title{font-size:20px;font-weight:600}.doc-body{padding:16px}.toolbar-btn{padding:6px 12px;border:1px solid #d9d9d9;background:#fff;border-radius:4px;cursor:pointer}
+</style>
+</head>
+<body>
+<div class="doc-page"><aside class="doc-sidebar"><div class="doc-sidebar-title">采购管理</div><ul class="doc-sidebar-menu"><li><a href="purchase-request.html">采购申请</a></li><li><a href="purchase-order.html">采购订单</a></li><li><a href="purchase-receive.html">收料/服务完成</a></li><li><a class="active" href="expense-acceptance.html">费用验收</a></li></ul></aside><main class="doc-content"><header class="doc-header"><div><div class="doc-header-title">费用验收详情</div><div>表头、明细、来源服务完成、暂估应付状态</div></div><button class="toolbar-btn" onclick="location.href='expense-acceptance.html'">返回列表</button></header><section class="doc-body"></section></main></div>
+<script>window.PURCHASE_P3_API_BASE=window.PURCHASE_P3_API_BASE||'http://localhost:3003/api';</script>
+<script src="../purchase-p3-expense-api.js"></script>
+</body>
+</html>

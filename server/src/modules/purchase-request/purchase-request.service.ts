@@ -30,12 +30,19 @@ export class PurchaseRequestService {
     private readonly dataSource: DataSource,
   ) {}
 
-  private normalizeEntries(dto: CreatePurchaseRequestDto): PurchaseRequestEntryDto[] {
-    if (dto.entries?.length) return dto.entries;
+  private normalizeEntries(
+    dto: CreatePurchaseRequestDto,
+    billType = dto.billType,
+    businessType = dto.businessType,
+  ): PurchaseRequestEntryDto[] {
+    if (dto.entries?.length) {
+      this.validateEntries(billType, businessType, dto.entries);
+      return dto.entries;
+    }
     if (!dto.purchaseOrgId || !dto.materialId || !dto.materialCode || !dto.materialName || !dto.unitId || !dto.quantity) {
       throw new BadRequestException('采购申请至少需要一条明细；旧接口必须完整提供采购组织、物料、单位和申请数量');
     }
-    return [{
+    const entries = [{
       purchaseOrgId: dto.purchaseOrgId,
       materialId: dto.materialId,
       materialCode: dto.materialCode,
@@ -52,6 +59,31 @@ export class PurchaseRequestService {
       supplierName: dto.supplierName,
       warehouseId: dto.warehouseId,
     }];
+    this.validateEntries(billType, businessType, entries);
+    return entries;
+  }
+
+  private validateEntries(
+    billType: string | undefined,
+    businessType: string | undefined,
+    entries: PurchaseRequestEntryDto[],
+  ) {
+    const isExpense = (billType || PurchaseBillType.STANDARD_PURCHASE) === PurchaseBillType.EXPENSE_PURCHASE
+      && (businessType || PurchaseBusinessType.STANDARD) === PurchaseBusinessType.EXPENSE_PURCHASE;
+    entries.forEach((entry, index) => {
+      if (!entry.purchaseOrgId?.trim()) {
+        throw new BadRequestException(`采购申请明细第${index + 1}行采购组织不能为空`);
+      }
+      if (isExpense) {
+        if (!entry.expenseItemName?.trim()) {
+          throw new BadRequestException(`费用采购申请明细第${index + 1}行费用项目名称不能为空`);
+        }
+        return;
+      }
+      if (!entry.materialId || !entry.materialCode || !entry.materialName || !entry.unitId) {
+        throw new BadRequestException(`采购申请明细第${index + 1}行物料和单位不能为空`);
+      }
+    });
   }
 
   private present(request: PurchaseRequest) {
@@ -155,6 +187,8 @@ export class PurchaseRequestService {
       const saved = await manager.save(request);
       const entries = sourceEntries.map((item, index) => manager.create(PurchaseRequestEntry, {
         ...item,
+        expenseItemCode: item.expenseItemCode?.trim() || null,
+        expenseItemName: item.expenseItemName?.trim() || null,
         purchaseRequestId: saved.id,
         lineNo: index + 1,
         requestQty: Number(item.requestQty),
@@ -180,7 +214,11 @@ export class PurchaseRequestService {
         throw new BadRequestException('只有草稿或已驳回状态的采购申请允许修改');
       }
       this.validatePurchaseType(dto.billType || request.billType, dto.businessType || request.businessType);
-      const sourceEntries = this.normalizeEntries(dto);
+      const sourceEntries = this.normalizeEntries(
+        dto,
+        dto.billType || request.billType,
+        dto.businessType || request.businessType,
+      );
       const duplicateIds = sourceEntries
         .map((item) => item.id)
         .filter((entryId): entryId is string => Boolean(entryId))
@@ -249,6 +287,8 @@ export class PurchaseRequestService {
         });
         Object.assign(entry, {
           purchaseOrgId: item.purchaseOrgId,
+          expenseItemCode: item.expenseItemCode?.trim() || null,
+          expenseItemName: item.expenseItemName?.trim() || null,
           materialId: item.materialId,
           materialCode: item.materialCode,
           materialName: item.materialName,
@@ -277,10 +317,14 @@ export class PurchaseRequestService {
   }
 
   async importFromExternal(dto: ImportPurchaseRequestDto) {
-    if (dto.externalSourceType !== 'OA') throw new BadRequestException('P2 资产采购申请只接受 OA 审批来源');
-    if (dto.billType !== PurchaseBillType.ASSET_PURCHASE) throw new BadRequestException('资产采购导入单据类型必须为 ASSET_PURCHASE');
-    if (![PurchaseBusinessType.ASSET_NO_INBOUND, PurchaseBusinessType.ASSET_INBOUND].includes(dto.businessType as PurchaseBusinessType)) {
-      throw new BadRequestException('资产采购导入业务类型必须为 ASSET_NO_INBOUND 或 ASSET_INBOUND');
+    if (dto.externalSourceType !== 'OA') throw new BadRequestException('采购申请外部导入只接受 OA 审批来源');
+    const isAsset = dto.billType === PurchaseBillType.ASSET_PURCHASE
+      && [PurchaseBusinessType.ASSET_NO_INBOUND, PurchaseBusinessType.ASSET_INBOUND]
+        .includes(dto.businessType as PurchaseBusinessType);
+    const isExpense = dto.billType === PurchaseBillType.EXPENSE_PURCHASE
+      && dto.businessType === PurchaseBusinessType.EXPENSE_PURCHASE;
+    if (!isAsset && !isExpense) {
+      throw new BadRequestException('OA 导入仅支持资产采购或费用采购申请');
     }
     const payloadHash = this.calculateImportPayloadHash(dto);
     const existing = await this.requestRepository.findOne({
@@ -335,6 +379,18 @@ export class PurchaseRequestService {
     ) {
       throw new BadRequestException('资产采购单据业务类型不正确');
     }
+    if (
+      normalizedBillType === PurchaseBillType.EXPENSE_PURCHASE
+      && normalizedBusinessType !== PurchaseBusinessType.EXPENSE_PURCHASE
+    ) {
+      throw new BadRequestException('费用采购单据只能使用 EXPENSE_PURCHASE 业务类型');
+    }
+    if (
+      normalizedBusinessType === PurchaseBusinessType.EXPENSE_PURCHASE
+      && normalizedBillType !== PurchaseBillType.EXPENSE_PURCHASE
+    ) {
+      throw new BadRequestException('EXPENSE_PURCHASE 业务类型只能用于费用采购单据');
+    }
   }
 
   private calculateImportPayloadHash(dto: ImportPurchaseRequestDto) {
@@ -354,6 +410,8 @@ export class PurchaseRequestService {
       remark: dto.remark || null,
       entries: [...(dto.entries || [])].map((entry) => ({
         purchaseOrgId: entry.purchaseOrgId,
+        expenseItemCode: entry.expenseItemCode || null,
+        expenseItemName: entry.expenseItemName || null,
         materialId: entry.materialId,
         materialCode: entry.materialCode,
         materialName: entry.materialName,
@@ -371,7 +429,9 @@ export class PurchaseRequestService {
         warehouseId: entry.warehouseId || null,
         contractNo: entry.contractNo || null,
         remark: entry.remark || null,
-      })).sort((a, b) => `${a.materialId}:${a.purchaseOrgId}`.localeCompare(`${b.materialId}:${b.purchaseOrgId}`)),
+      })).sort((a, b) =>
+        `${a.expenseItemCode || ''}:${a.expenseItemName || ''}:${a.materialId || ''}:${a.purchaseOrgId}`
+          .localeCompare(`${b.expenseItemCode || ''}:${b.expenseItemName || ''}:${b.materialId || ''}:${b.purchaseOrgId}`)),
     };
     return createHash('sha256').update(JSON.stringify(normalized)).digest('hex');
   }

@@ -17,9 +17,15 @@ export class PurchaseRequestController {
     @Query('pageSize') pageSize = 20,
     @Query('requestNo') requestNo?: string,
     @Query('materialCode') materialCode?: string,
-    @Query('status') status?: number,
+    @Query('status') status?: string,
   ) {
-    return this.purchaseRequestService.findAll(+page, +pageSize, requestNo, materialCode, status === undefined ? undefined : +status);
+    return this.purchaseRequestService.findAll(
+      +page,
+      +pageSize,
+      requestNo,
+      materialCode,
+      status === undefined || status === '' ? undefined : Number(status),
+    );
   }
 
   @Get('status/:status')
