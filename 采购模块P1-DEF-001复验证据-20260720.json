@@ -1,0 +1,62 @@
+{
+  "runTag": "P1DEF001-1784533682869",
+  "checks": [
+    {
+      "id": "P1-TC-006A",
+      "status": "PASS",
+      "detail": {
+        "a": "B711433E-F36B-1410-8B47-0096A7B40922",
+        "b": "B711433E-F36B-1410-8B47-0096A7B40922"
+      },
+      "at": "2026-07-20T07:48:03.659Z"
+    },
+    {
+      "id": "P1-TC-006B",
+      "status": "PASS",
+      "detail": {
+        "status": 400,
+        "message": "幂等键已用于不同的退料申请请求载荷"
+      },
+      "at": "2026-07-20T07:48:03.673Z"
+    },
+    {
+      "id": "P1-DB-001",
+      "status": "PASS",
+      "detail": {
+        "rows": [
+          {
+            "id": "B711433E-F36B-1410-8B47-0096A7B40922",
+            "request_no": "PRR20260720154803626432",
+            "idempotency_key": "RR-IDEM-P1DEF001-1784533682869",
+            "payload_hash": "00cb849795a860a1987c32eae3e1669e1cb3698ef9ee4fc1b541b8c937edcb3c"
+          }
+        ]
+      },
+      "at": "2026-07-20T07:48:03.683Z"
+    },
+    {
+      "id": "P1-TC-006C",
+      "status": "PASS",
+      "detail": {
+        "results": [
+          {
+            "ok": false,
+            "status": 400,
+            "message": "幂等键已用于不同的退料申请请求载荷"
+          },
+          {
+            "ok": true,
+            "id": "EA11433E-F36B-1410-8B47-0096A7B40922"
+          }
+        ]
+      },
+      "at": "2026-07-20T07:48:04.137Z"
+    }
+  ],
+  "defects": [],
+  "summary": {
+    "total": 4,
+    "pass": 4,
+    "fail": 0
+  }
+}

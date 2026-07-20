@@ -40,6 +40,10 @@ import { InventoryOutModule } from './modules/inventory-out/inventory-out.module
 import { PurchaseOrderModule } from './modules/purchase-order/purchase-order.module';
 import { PurchaseRequestModule } from './modules/purchase-request/purchase-request.module';
 import { PurchaseReceiveNoticeModule } from './modules/purchase-receive-notice/purchase-receive-notice.module';
+import { PurchaseReturnRequestModule } from './modules/purchase-return-request/purchase-return-request.module';
+import { PurchaseReturnModule } from './modules/purchase-return/purchase-return.module';
+import { AssetAcceptanceModule } from './modules/asset-acceptance/asset-acceptance.module';
+import { AssetOutRequestModule } from './modules/asset-out-request/asset-out-request.module';
 import { SalesOrderModule } from './modules/sales-order/sales-order.module';
 import { BomModule } from './modules/bom/bom.module';
 import { BomDetailModule } from './modules/bom-detail/bom-detail.module';
@@ -151,6 +155,10 @@ import { TaskModule } from './modules/task/task.module';
     PurchaseOrderModule,
     PurchaseRequestModule,
     PurchaseReceiveNoticeModule,
+    PurchaseReturnRequestModule,
+    PurchaseReturnModule,
+    AssetAcceptanceModule,
+    AssetOutRequestModule,
     SalesOrderModule,
     BomModule,
     BomDetailModule,

@@ -1,0 +1,142 @@
+{
+  "runTag": "P1FEBROWSER-1784532695913",
+  "startedAt": "2026-07-20T07:31:35.913Z",
+  "checks": [
+    {
+      "id": "P1-BROWSER-purchase-return-request.html",
+      "name": "P1 页面真实 API 浏览器验收",
+      "status": "FAIL",
+      "detail": {
+        "url": "http://127.0.0.1:8099/pages/purchase-return-request.html",
+        "title": "采购退货申请单 — 磐枢工业智能平台",
+        "text": "业务导航\n📋\n采购退货申请单列表\n✚\n采购退货申请单新增\n采购退货申请单\n管理采购退货申请单信息\n🔍\n过滤\n+\n新增\n✓\n批量提交\n✓\n批量审核\n↩️\n批量反审核\n🔒\n关闭\n🔓\n反关闭\n🗑️\n批量删除\n⚙️\n显示/隐藏列\n✖️\n退出\n\t单据编号\t日期\t供应商\t组织\t退货部门\t申请人\t金额\t状态\t创建时间\n上一页\n第 1 页 / 共 0 页\n下一页\n×\n单据编号\n供应商\n组织\n状态\n全部状态\n草稿\n待审核\n已审核\n已关闭\n开始日期\n结束日期\n取消\n重置\n确定",
+        "fetches": [
+          "http://localhost:3001/api/orgs"
+        ],
+        "hasApi": false,
+        "hasLocal": true
+      },
+      "at": "2026-07-20T07:31:39.883Z"
+    },
+    {
+      "id": "P1-BROWSER-purchase-return-request-create.html",
+      "name": "P1 页面真实 API 浏览器验收",
+      "status": "FAIL",
+      "detail": {
+        "url": "http://127.0.0.1:8099/pages/purchase-return-request-create.html",
+        "title": "采购退货申请单 - 新增/编辑",
+        "text": "业务导航\n📋\n采购退货申请单列表\n✚\n采购退货申请单新增\n采购退货申请单 - 新增\n新建采购退货申请单\n📋\n复制\n✓\n保存\n✓\n提交\n✓\n审核\n↩️\n反审核\n🔗\n选单\n⬇️\n下推\n⬅️\n上查\n➡️\n下查\n🔒\n关闭\n🔓\n反关闭\n📋\n列表\n⚙️\n打印设置\n🖨️\n打印\n✖️\n退出\n基本信息\n单据编号\n*日期\n供应商\n...\n组织\n...\n退货部门\n...\n申请人\n...\n币别\n请选择\n人民币\n美元\n欧元\n汇率\n请选择\n金额\n退货原因\n请选择\n质量问题\n库存积压\n采购错误\n其他\n状态\n创建时间\n备注\n明细信息\n+\n新增行\n删除选中行\n\t序号\t物料编码\t物料名称\t规格型号\t单位\t数量\t单价\t金额\t税率\t税额\t备注\n\t1\t\n...\n\t\t\t\t\t\t\t\n0%\n3%\n6%\n9%\n13%\n\t\t\n合计金额\t0.00\n合计金额:\n0.00",
+        "fetches": [
+          "http://localhost:3001/api/orgs"
+        ],
+        "hasApi": false,
+        "hasLocal": true
+      },
+      "at": "2026-07-20T07:31:41.142Z"
+    },
+    {
+      "id": "P1-BROWSER-purchase-return.html",
+      "name": "P1 页面真实 API 浏览器验收",
+      "status": "FAIL",
+      "detail": {
+        "url": "http://127.0.0.1:8099/pages/purchase-return.html",
+        "title": "采购退货单 — 磐枢工业智能平台",
+        "text": "业务导航\n📋\n采购退货单列表\n✚\n采购退货单新增\n采购退货单\n管理采购退货单信息\n🔍\n过滤\n+\n新增\n✓\n批量提交\n✓\n批量审核\n↩️\n批量反审核\n🗑️\n批量删除\n⚙️\n显示/隐藏列\n✖️\n退出\n\t单据编号\t日期\t供应商\t组织\t退货仓库\t退货人员\t金额\t状态\t创建时间\n上一页\n第 1 页 / 共 0 页\n下一页\n×\n单据编号\n供应商\n组织\n状态\n全部状态\n草稿\n待审核\n已审核\n已关闭\n开始日期\n结束日期\n取消\n重置\n确定",
+        "fetches": [
+          "http://localhost:3001/api/orgs"
+        ],
+        "hasApi": false,
+        "hasLocal": true
+      },
+      "at": "2026-07-20T07:31:42.446Z"
+    },
+    {
+      "id": "P1-BROWSER-purchase-return-create.html",
+      "name": "P1 页面真实 API 浏览器验收",
+      "status": "FAIL",
+      "detail": {
+        "url": "http://127.0.0.1:8099/pages/purchase-return-create.html",
+        "title": "采购退货单 - 新增/编辑",
+        "text": "业务导航\n📋\n采购退货单列表\n✚\n采购退货单新增\n采购退货单 - 新增\n新建采购退货单\n📋\n复制\n✓\n保存\n✓\n提交\n✓\n审核\n↩️\n反审核\n🔗\n选单\n⬇️\n下推\n⬅️\n上查\n➡️\n下查\n📋\n列表\n⚙️\n打印设置\n🖨️\n打印\n✖️\n退出\n基本信息\n单据编号\n*日期\n供应商\n...\n组织\n...\n退货仓库\n退货人员\n币别\n请选择\n人民币\n美元\n欧元\n汇率\n请选择\n金额\n退货原因\n请选择\n质量问题\n库存积压\n采购错误\n其他\n状态\n创建时间\n备注\n明细信息\n+\n新增行\n删除选中行\n\t序号\t物料编码\t物料名称\t规格型号\t单位\t数量\t单价\t金额\t税率\t税额\t备注\n\t1\t\n...\n\t\t\t\t\t\t\t\n0%\n3%\n6%\n9%\n13%\n\t\t\n合计金额\t0.00\n合计金额:\n0.00",
+        "fetches": [
+          "http://localhost:3001/api/orgs"
+        ],
+        "hasApi": false,
+        "hasLocal": true
+      },
+      "at": "2026-07-20T07:31:43.748Z"
+    }
+  ],
+  "defects": [
+    {
+      "id": "P1-BROWSER-purchase-return-request.html",
+      "name": "P1 页面真实 API 浏览器验收",
+      "status": "FAIL",
+      "detail": {
+        "url": "http://127.0.0.1:8099/pages/purchase-return-request.html",
+        "title": "采购退货申请单 — 磐枢工业智能平台",
+        "text": "业务导航\n📋\n采购退货申请单列表\n✚\n采购退货申请单新增\n采购退货申请单\n管理采购退货申请单信息\n🔍\n过滤\n+\n新增\n✓\n批量提交\n✓\n批量审核\n↩️\n批量反审核\n🔒\n关闭\n🔓\n反关闭\n🗑️\n批量删除\n⚙️\n显示/隐藏列\n✖️\n退出\n\t单据编号\t日期\t供应商\t组织\t退货部门\t申请人\t金额\t状态\t创建时间\n上一页\n第 1 页 / 共 0 页\n下一页\n×\n单据编号\n供应商\n组织\n状态\n全部状态\n草稿\n待审核\n已审核\n已关闭\n开始日期\n结束日期\n取消\n重置\n确定",
+        "fetches": [
+          "http://localhost:3001/api/orgs"
+        ],
+        "hasApi": false,
+        "hasLocal": true
+      },
+      "at": "2026-07-20T07:31:39.883Z"
+    },
+    {
+      "id": "P1-BROWSER-purchase-return-request-create.html",
+      "name": "P1 页面真实 API 浏览器验收",
+      "status": "FAIL",
+      "detail": {
+        "url": "http://127.0.0.1:8099/pages/purchase-return-request-create.html",
+        "title": "采购退货申请单 - 新增/编辑",
+        "text": "业务导航\n📋\n采购退货申请单列表\n✚\n采购退货申请单新增\n采购退货申请单 - 新增\n新建采购退货申请单\n📋\n复制\n✓\n保存\n✓\n提交\n✓\n审核\n↩️\n反审核\n🔗\n选单\n⬇️\n下推\n⬅️\n上查\n➡️\n下查\n🔒\n关闭\n🔓\n反关闭\n📋\n列表\n⚙️\n打印设置\n🖨️\n打印\n✖️\n退出\n基本信息\n单据编号\n*日期\n供应商\n...\n组织\n...\n退货部门\n...\n申请人\n...\n币别\n请选择\n人民币\n美元\n欧元\n汇率\n请选择\n金额\n退货原因\n请选择\n质量问题\n库存积压\n采购错误\n其他\n状态\n创建时间\n备注\n明细信息\n+\n新增行\n删除选中行\n\t序号\t物料编码\t物料名称\t规格型号\t单位\t数量\t单价\t金额\t税率\t税额\t备注\n\t1\t\n...\n\t\t\t\t\t\t\t\n0%\n3%\n6%\n9%\n13%\n\t\t\n合计金额\t0.00\n合计金额:\n0.00",
+        "fetches": [
+          "http://localhost:3001/api/orgs"
+        ],
+        "hasApi": false,
+        "hasLocal": true
+      },
+      "at": "2026-07-20T07:31:41.142Z"
+    },
+    {
+      "id": "P1-BROWSER-purchase-return.html",
+      "name": "P1 页面真实 API 浏览器验收",
+      "status": "FAIL",
+      "detail": {
+        "url": "http://127.0.0.1:8099/pages/purchase-return.html",
+        "title": "采购退货单 — 磐枢工业智能平台",
+        "text": "业务导航\n📋\n采购退货单列表\n✚\n采购退货单新增\n采购退货单\n管理采购退货单信息\n🔍\n过滤\n+\n新增\n✓\n批量提交\n✓\n批量审核\n↩️\n批量反审核\n🗑️\n批量删除\n⚙️\n显示/隐藏列\n✖️\n退出\n\t单据编号\t日期\t供应商\t组织\t退货仓库\t退货人员\t金额\t状态\t创建时间\n上一页\n第 1 页 / 共 0 页\n下一页\n×\n单据编号\n供应商\n组织\n状态\n全部状态\n草稿\n待审核\n已审核\n已关闭\n开始日期\n结束日期\n取消\n重置\n确定",
+        "fetches": [
+          "http://localhost:3001/api/orgs"
+        ],
+        "hasApi": false,
+        "hasLocal": true
+      },
+      "at": "2026-07-20T07:31:42.446Z"
+    },
+    {
+      "id": "P1-BROWSER-purchase-return-create.html",
+      "name": "P1 页面真实 API 浏览器验收",
+      "status": "FAIL",
+      "detail": {
+        "url": "http://127.0.0.1:8099/pages/purchase-return-create.html",
+        "title": "采购退货单 - 新增/编辑",
+        "text": "业务导航\n📋\n采购退货单列表\n✚\n采购退货单新增\n采购退货单 - 新增\n新建采购退货单\n📋\n复制\n✓\n保存\n✓\n提交\n✓\n审核\n↩️\n反审核\n🔗\n选单\n⬇️\n下推\n⬅️\n上查\n➡️\n下查\n📋\n列表\n⚙️\n打印设置\n🖨️\n打印\n✖️\n退出\n基本信息\n单据编号\n*日期\n供应商\n...\n组织\n...\n退货仓库\n退货人员\n币别\n请选择\n人民币\n美元\n欧元\n汇率\n请选择\n金额\n退货原因\n请选择\n质量问题\n库存积压\n采购错误\n其他\n状态\n创建时间\n备注\n明细信息\n+\n新增行\n删除选中行\n\t序号\t物料编码\t物料名称\t规格型号\t单位\t数量\t单价\t金额\t税率\t税额\t备注\n\t1\t\n...\n\t\t\t\t\t\t\t\n0%\n3%\n6%\n9%\n13%\n\t\t\n合计金额\t0.00\n合计金额:\n0.00",
+        "fetches": [
+          "http://localhost:3001/api/orgs"
+        ],
+        "hasApi": false,
+        "hasLocal": true
+      },
+      "at": "2026-07-20T07:31:43.748Z"
+    }
+  ],
+  "summary": {
+    "total": 4,
+    "pass": 0,
+    "fail": 4
+  },
+  "finishedAt": "2026-07-20T07:31:43.748Z"
+}

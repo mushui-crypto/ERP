@@ -1,8 +1,39 @@
 ﻿import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { EntityManager, Repository } from 'typeorm';
 import { FinFixedAsset } from '../../database/entities/fin-fixed-asset.entity';
 import { FinDepreciation } from '../../database/entities/fin-depreciation.entity';
+import { FinAssetCategory } from '../../database/entities/fin-asset-category.entity';
+import { generateDocumentNo } from '../purchase-common/purchase-status';
+import { CreateAssetCategoryDto } from './dto/fixed-asset.dto';
+
+export interface CreatePurchaseAssetCardEntryInput {
+  sourceEntryId: string;
+  assetAcceptanceId: string;
+  assetAcceptanceEntryId: string;
+  inventoryOutEntryId?: string;
+  purchaseOrderId: string;
+  purchaseOrderEntryId: string;
+  purchaseRequestId?: string;
+  purchaseRequestEntryId?: string;
+  assetName: string;
+  specification?: string;
+  categoryCode: string;
+  quantity: number;
+  unitPrice: number;
+  departmentId?: string;
+  location?: string;
+}
+
+export interface CreatePurchaseAssetCardsInput {
+  sourceType: 'ASSET_ACCEPTANCE' | 'ASSET_INVENTORY_OUT';
+  sourceId: string;
+  sourceNo: string;
+  purchaseDate: Date;
+  inventoryOutId?: string;
+  createdBy?: string;
+  entries: CreatePurchaseAssetCardEntryInput[];
+}
 
 @Injectable()
 export class FixedAssetService {
@@ -11,7 +42,86 @@ export class FixedAssetService {
     private assetRepository: Repository<FinFixedAsset>,
     @InjectRepository(FinDepreciation)
     private depreciationRepository: Repository<FinDepreciation>,
+    @InjectRepository(FinAssetCategory)
+    private categoryRepository: Repository<FinAssetCategory>,
   ) {}
+
+  async findCategories() {
+    return this.categoryRepository.find({ where: { isDeleted: 0 }, order: { categoryCode: 'ASC' } });
+  }
+
+  async createCategory(dto: CreateAssetCategoryDto) {
+    const existing = await this.categoryRepository.findOne({ where: { categoryCode: dto.categoryCode, isDeleted: 0 } });
+    if (existing) throw new BadRequestException('资产类别编码已存在');
+    return this.categoryRepository.save(this.categoryRepository.create({
+      ...dto,
+      depreciationMethod: dto.depreciationMethod || 'straight_line',
+      status: 1,
+    }));
+  }
+
+  async createCardsFromPurchase(input: CreatePurchaseAssetCardsInput, manager: EntityManager) {
+    if (!input.entries.length) throw new BadRequestException('没有可生成资产卡片的明细');
+    const cards: FinFixedAsset[] = [];
+    const assetRepository = manager.getRepository(FinFixedAsset);
+    const categoryRepository = manager.getRepository(FinAssetCategory);
+    for (const entry of input.entries) {
+      if (!Number.isInteger(Number(entry.quantity)) || Number(entry.quantity) <= 0) {
+        throw new BadRequestException(`资产 ${entry.assetName} 建卡数量必须为正整数`);
+      }
+      const category = await categoryRepository.findOne({
+        where: { categoryCode: entry.categoryCode, isDeleted: 0, status: 1 },
+        lock: { mode: 'pessimistic_read' },
+      });
+      if (!category) throw new BadRequestException(`资产类别 ${entry.categoryCode} 不存在或未启用`);
+      for (let sequence = 1; sequence <= Number(entry.quantity); sequence += 1) {
+        const existing = await assetRepository.findOne({
+          where: { sourceType: input.sourceType, sourceEntryId: entry.sourceEntryId, sourceSequence: sequence, isDeleted: 0 },
+          lock: { mode: 'pessimistic_write' },
+        });
+        if (existing) {
+          cards.push(existing);
+          continue;
+        }
+        const purchasePrice = this.round(Number(entry.unitPrice || 0), 2);
+        const salvageValue = this.round(purchasePrice * Number(category.salvageRate || 0) / 100, 2);
+        cards.push(await assetRepository.save(assetRepository.create({
+          assetNo: generateDocumentNo('FA'),
+          sourceType: input.sourceType,
+          sourceId: input.sourceId,
+          sourceNo: input.sourceNo,
+          sourceEntryId: entry.sourceEntryId,
+          sourceSequence: sequence,
+          assetAcceptanceId: entry.assetAcceptanceId,
+          assetAcceptanceEntryId: entry.assetAcceptanceEntryId,
+          inventoryOutId: input.inventoryOutId || null,
+          inventoryOutEntryId: entry.inventoryOutEntryId || null,
+          purchaseOrderId: entry.purchaseOrderId,
+          purchaseOrderEntryId: entry.purchaseOrderEntryId,
+          purchaseRequestId: entry.purchaseRequestId || null,
+          purchaseRequestEntryId: entry.purchaseRequestEntryId || null,
+          quantity: 1,
+          assetName: entry.assetName,
+          assetType: category.assetType,
+          categoryCode: category.categoryCode,
+          specification: entry.specification || null,
+          purchaseDate: input.purchaseDate,
+          purchasePrice,
+          salvageValue,
+          usefulLife: category.usefulLifeMonths,
+          accumulatedDepreciation: 0,
+          netValue: purchasePrice,
+          depreciationMethod: category.depreciationMethod,
+          departmentId: entry.departmentId || null,
+          location: entry.location || null,
+          status: 1,
+          createdBy: input.createdBy || null,
+          updatedBy: input.createdBy || null,
+        })));
+      }
+    }
+    return cards;
+  }
 
   async generateAssetNo(): Promise<string> {
     const now = new Date();
@@ -124,6 +234,11 @@ export class FixedAssetService {
     }
     
     return (Number(purchasePrice) - Number(salvageValue)) / Number(usefulLife);
+  }
+
+  private round(value: number, scale: number) {
+    const factor = 10 ** scale;
+    return Math.round((Number(value) + Number.EPSILON) * factor) / factor;
   }
 
   async calculateMonthlyDepreciation(period: string): Promise<FinDepreciation[]> {

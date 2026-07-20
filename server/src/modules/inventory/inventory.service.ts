@@ -17,6 +17,26 @@ export interface PostPurchaseInboundInput {
   expiryDate?: Date;
 }
 
+export interface PostPurchaseReturnInput {
+  sourceId: string;
+  sourceEntryId: string;
+  warehouseId: string;
+  materialId: string;
+  batchNo?: string;
+  quantity: number;
+  amount: number;
+}
+
+export interface PostAssetOtherOutboundInput {
+  sourceId: string;
+  sourceEntryId: string;
+  warehouseId: string;
+  materialId: string;
+  batchNo?: string;
+  quantity: number;
+  amount: number;
+}
+
 @Injectable()
 export class InventoryService {
   constructor(
@@ -193,6 +213,84 @@ export class InventoryService {
       postedAt: new Date(),
     });
     return postingRepository.save(posting);
+  }
+
+  async postPurchaseReturn(input: PostPurchaseReturnInput, manager: EntityManager): Promise<InventoryPosting> {
+    const postingRepository = manager.getRepository(InventoryPosting);
+    const inventoryRepository = manager.getRepository(Inventory);
+    const existingPosting = await postingRepository.findOne({
+      where: { sourceType: 'PURCHASE_RETURN', sourceEntryId: input.sourceEntryId, isDeleted: 0 },
+      lock: { mode: 'pessimistic_write' },
+    });
+    if (existingPosting) return existingPosting;
+
+    const quantity = this.round(Number(input.quantity), 4);
+    if (quantity <= 0) throw new BadRequestException('采购退料过账数量必须大于0');
+    const batchNo = input.batchNo || '';
+    const dimensionKey = this.buildDimensionKey(input.warehouseId, input.materialId, batchNo);
+    const inventory = await inventoryRepository.findOne({
+      where: { dimensionKey, isDeleted: 0 },
+      lock: { mode: 'pessimistic_write' },
+    });
+    if (!inventory) throw new BadRequestException('采购退料对应库存维度不存在');
+    if (Number(inventory.availableQty || 0) + 0.000001 < quantity) {
+      throw new BadRequestException(`采购退料可用库存不足，当前可用数量为 ${Number(inventory.availableQty || 0)}`);
+    }
+
+    const oldQuantity = Number(inventory.quantity || 0);
+    const oldTotalCost = Number(inventory.totalCost || 0);
+    const unitCost = Number(inventory.unitCost || 0);
+    const newQuantity = this.round(oldQuantity - quantity, 4);
+    const returnCost = this.round(unitCost * quantity, 2);
+    inventory.quantity = newQuantity;
+    inventory.availableQty = this.round(newQuantity - Number(inventory.lockedQty || 0), 4);
+    inventory.totalCost = this.round(Math.max(0, oldTotalCost - returnCost), 2);
+    inventory.unitCost = newQuantity > 0 ? this.round(inventory.totalCost / newQuantity, 6) : 0;
+    await inventoryRepository.save(inventory);
+
+    const posting = postingRepository.create({
+      sourceType: 'PURCHASE_RETURN',
+      sourceId: input.sourceId,
+      sourceEntryId: input.sourceEntryId,
+      inventoryId: inventory.id,
+      warehouseId: input.warehouseId,
+      materialId: input.materialId,
+      batchNo,
+      quantity: -quantity,
+      amount: -this.round(Number(input.amount || 0), 2),
+      postedAt: new Date(),
+    });
+    return postingRepository.save(posting);
+  }
+
+  async postAssetOtherOutbound(input: PostAssetOtherOutboundInput, manager: EntityManager): Promise<InventoryPosting> {
+    const postingRepository = manager.getRepository(InventoryPosting);
+    const inventoryRepository = manager.getRepository(Inventory);
+    const existing = await postingRepository.findOne({
+      where: { sourceType: 'ASSET_OTHER_OUTBOUND', sourceEntryId: input.sourceEntryId, isDeleted: 0 },
+      lock: { mode: 'pessimistic_write' },
+    });
+    if (existing) return existing;
+    const quantity = this.round(Number(input.quantity), 4);
+    if (quantity <= 0) throw new BadRequestException('资产其他出库过账数量必须大于0');
+    const batchNo = input.batchNo || '';
+    const dimensionKey = this.buildDimensionKey(input.warehouseId, input.materialId, batchNo);
+    const inventory = await inventoryRepository.findOne({ where: { dimensionKey, isDeleted: 0 }, lock: { mode: 'pessimistic_write' } });
+    if (!inventory) throw new BadRequestException('资产其他出库对应库存维度不存在');
+    if (Number(inventory.availableQty || 0) + 0.000001 < quantity) {
+      throw new BadRequestException(`资产其他出库可用库存不足，当前可用数量为 ${Number(inventory.availableQty || 0)}`);
+    }
+    const unitCost = Number(inventory.unitCost || 0);
+    inventory.quantity = this.round(Number(inventory.quantity || 0) - quantity, 4);
+    inventory.availableQty = this.round(Number(inventory.quantity) - Number(inventory.lockedQty || 0), 4);
+    inventory.totalCost = this.round(Math.max(0, Number(inventory.totalCost || 0) - unitCost * quantity), 2);
+    inventory.unitCost = Number(inventory.quantity) > 0 ? this.round(Number(inventory.totalCost) / Number(inventory.quantity), 6) : 0;
+    await inventoryRepository.save(inventory);
+    return postingRepository.save(postingRepository.create({
+      sourceType: 'ASSET_OTHER_OUTBOUND', sourceId: input.sourceId, sourceEntryId: input.sourceEntryId,
+      inventoryId: inventory.id, warehouseId: input.warehouseId, materialId: input.materialId, batchNo,
+      quantity: -quantity, amount: -this.round(Number(input.amount || 0), 2), postedAt: new Date(),
+    }));
   }
 
   async getStockSummary() {

@@ -44,6 +44,68 @@ export interface CreateEstimatedPayableFromPurchaseInboundInput {
   entries: CreateEstimatedPayableEntryFromPurchaseInboundInput[];
 }
 
+export interface CreateEstimatedPayableFromAssetAcceptanceInput {
+  assetAcceptanceId: string;
+  assetAcceptanceNo: string;
+  supplierId: string;
+  currencyId: string;
+  settleOrgId: string;
+  paymentTermId: string;
+  approvedAt: Date;
+  createdBy?: string;
+  entries: Array<{
+    assetAcceptanceEntryId: string;
+    sourceReceiveNoticeEntryId: string;
+    sourceOrderEntryId: string;
+    sourceRequestEntryId?: string;
+    materialId: string;
+    materialCode: string;
+    materialName: string;
+    materialModel?: string;
+    unitId: string;
+    unitCode?: string;
+    unitName?: string;
+    quantity: number;
+    unitPrice: number;
+    taxRate: number;
+    untaxedAmount: number;
+    taxAmount: number;
+    totalAmount: number;
+  }>;
+}
+
+export interface CreateRedPayableEntryFromPurchaseReturnInput {
+  purchaseReturnEntryId: string;
+  sourceReceiveNoticeEntryId: string;
+  sourceOrderEntryId: string;
+  sourceRequestEntryId?: string;
+  materialId: string;
+  materialCode: string;
+  materialName: string;
+  materialModel?: string;
+  unitId: string;
+  unitCode?: string;
+  unitName?: string;
+  quantity: number;
+  unitPrice: number;
+  taxRate: number;
+  untaxedAmount: number;
+  taxAmount: number;
+  totalAmount: number;
+}
+
+export interface CreateRedPayableFromPurchaseReturnInput {
+  purchaseReturnId: string;
+  purchaseReturnNo: string;
+  supplierId: string;
+  currencyId: string;
+  settleOrgId: string;
+  paymentTermId: string;
+  approvedAt: Date;
+  createdBy?: string;
+  entries: CreateRedPayableEntryFromPurchaseReturnInput[];
+}
+
 @Injectable()
 export class PayableService {
   constructor(
@@ -236,12 +298,195 @@ export class PayableService {
     return repository.save(entries);
   }
 
+  async createRedPayableFromPurchaseReturn(
+    input: CreateRedPayableFromPurchaseReturnInput,
+    manager: EntityManager,
+  ): Promise<Payable> {
+    const repository = manager.getRepository(Payable);
+    const existing = await repository.findOne({
+      where: {
+        payableType: 'RED',
+        sourceType: 'PURCHASE_RETURN',
+        sourceId: input.purchaseReturnId,
+        isDeleted: 0,
+      },
+      lock: { mode: 'pessimistic_write' },
+    });
+    if (existing) {
+      existing.entries = await this.ensureRedPayableEntries(existing.id, input, manager);
+      return existing;
+    }
+    if (!input.entries?.length) throw new BadRequestException('采购退料没有有效明细，无法生成红字应付');
+    if (!input.paymentTermId) throw new BadRequestException('采购退料缺少付款条件，无法生成红字应付');
+    if (!input.currencyId) throw new BadRequestException('采购退料缺少结算币别，无法生成红字应付');
+    if (!input.settleOrgId) throw new BadRequestException('采购退料缺少结算组织，无法生成红字应付');
+
+    const paymentTerm = await manager.findOne(PaymentTerm, {
+      where: { id: input.paymentTermId, isDeleted: 0, status: 1 },
+      lock: { mode: 'pessimistic_read' },
+    });
+    if (!paymentTerm) throw new BadRequestException('付款条件不存在或未启用，无法生成红字应付');
+    const payableDate = new Date(input.approvedAt);
+    const dueDate = new Date(payableDate);
+    dueDate.setDate(dueDate.getDate() + Number(paymentTerm.creditDays || 0));
+
+    const untaxedAmount = -Math.abs(this.round(input.entries.reduce((sum, entry) => sum + Number(entry.untaxedAmount || 0), 0), 2));
+    const taxAmount = -Math.abs(this.round(input.entries.reduce((sum, entry) => sum + Number(entry.taxAmount || 0), 0), 2));
+    const totalAmount = -Math.abs(this.round(input.entries.reduce((sum, entry) => sum + Number(entry.totalAmount || 0), 0), 2));
+    const payable = repository.create({
+      payableNo: this.generatePayableNo(),
+      payableType: 'RED',
+      supplierId: input.supplierId,
+      sourceType: 'PURCHASE_RETURN',
+      sourceId: input.purchaseReturnId,
+      sourceNo: input.purchaseReturnNo,
+      currencyId: input.currencyId,
+      settleOrgId: input.settleOrgId,
+      paymentTermId: input.paymentTermId,
+      untaxedAmount,
+      taxAmount,
+      amount: totalAmount,
+      paidAmount: 0,
+      balance: totalAmount,
+      payableDate,
+      dueDate,
+      period: this.formatPeriod(payableDate),
+      status: 0,
+      remark: `采购退料 ${input.purchaseReturnNo} 审核生成红字应付`,
+      createdBy: input.createdBy || null,
+      updatedBy: input.createdBy || null,
+    });
+    const saved = await repository.save(payable);
+    saved.entries = await this.ensureRedPayableEntries(saved.id, input, manager);
+    return saved;
+  }
+
+  private async ensureRedPayableEntries(
+    payableId: string,
+    input: CreateRedPayableFromPurchaseReturnInput,
+    manager: EntityManager,
+  ) {
+    const repository = manager.getRepository(PayableEntry);
+    const existing = await repository.find({ where: { payableId, isDeleted: 0 }, order: { lineNo: 'ASC' } });
+    if (existing.length) {
+      if (existing.length !== input.entries.length) throw new BadRequestException('红字应付明细与采购退料明细数量不一致');
+      return existing;
+    }
+    return repository.save(input.entries.map((entry, index) => repository.create({
+      payableId,
+      lineNo: index + 1,
+      inventoryInEntryId: null,
+      purchaseReturnEntryId: entry.purchaseReturnEntryId,
+      sourceReceiveNoticeEntryId: entry.sourceReceiveNoticeEntryId,
+      sourceOrderEntryId: entry.sourceOrderEntryId,
+      sourceRequestEntryId: entry.sourceRequestEntryId || null,
+      materialId: entry.materialId,
+      materialCode: entry.materialCode,
+      materialName: entry.materialName,
+      materialModel: entry.materialModel || null,
+      unitId: entry.unitId,
+      unitCode: entry.unitCode || null,
+      unitName: entry.unitName || null,
+      quantity: -Math.abs(Number(entry.quantity)),
+      unitPrice: Number(entry.unitPrice),
+      taxRate: Number(entry.taxRate || 0),
+      untaxedAmount: -Math.abs(this.round(Number(entry.untaxedAmount || 0), 2)),
+      taxAmount: -Math.abs(this.round(Number(entry.taxAmount || 0), 2)),
+      totalAmount: -Math.abs(this.round(Number(entry.totalAmount || 0), 2)),
+      createdBy: input.createdBy || null,
+      updatedBy: input.createdBy || null,
+    })));
+  }
+
+  async createEstimatedPayableFromAssetAcceptance(
+    input: CreateEstimatedPayableFromAssetAcceptanceInput,
+    manager: EntityManager,
+  ) {
+    const repository = manager.getRepository(Payable);
+    const existing = await repository.findOne({
+      where: { payableType: 'ESTIMATED', sourceType: 'ASSET_ACCEPTANCE', sourceId: input.assetAcceptanceId, isDeleted: 0 },
+      relations: { entries: true },
+      lock: { mode: 'pessimistic_write' },
+    });
+    if (existing) return existing;
+    if (!input.entries.length) throw new BadRequestException('资产验收没有通过明细，无法生成暂估应付');
+    if (!input.currencyId || !input.settleOrgId || !input.paymentTermId) {
+      throw new BadRequestException('资产验收缺少结算组织、币别或付款条件');
+    }
+    const paymentTerm = await manager.findOne(PaymentTerm, {
+      where: { id: input.paymentTermId, isDeleted: 0, status: 1 },
+      lock: { mode: 'pessimistic_read' },
+    });
+    if (!paymentTerm) throw new BadRequestException('付款条件不存在或未启用，无法生成暂估应付');
+    const payableDate = new Date(input.approvedAt);
+    const dueDate = new Date(payableDate);
+    dueDate.setDate(dueDate.getDate() + Number(paymentTerm.creditDays || 0));
+    const untaxedAmount = this.round(input.entries.reduce((sum, entry) => sum + Number(entry.untaxedAmount || 0), 0), 2);
+    const taxAmount = this.round(input.entries.reduce((sum, entry) => sum + Number(entry.taxAmount || 0), 0), 2);
+    const totalAmount = this.round(input.entries.reduce((sum, entry) => sum + Number(entry.totalAmount || 0), 0), 2);
+    const payable = await repository.save(repository.create({
+      payableNo: this.generatePayableNo(),
+      payableType: 'ESTIMATED',
+      supplierId: input.supplierId,
+      sourceType: 'ASSET_ACCEPTANCE',
+      sourceId: input.assetAcceptanceId,
+      sourceNo: input.assetAcceptanceNo,
+      currencyId: input.currencyId,
+      settleOrgId: input.settleOrgId,
+      paymentTermId: input.paymentTermId,
+      untaxedAmount,
+      taxAmount,
+      amount: totalAmount,
+      paidAmount: 0,
+      balance: totalAmount,
+      payableDate,
+      dueDate,
+      period: this.formatPeriod(payableDate),
+      status: this.calculateStatus(totalAmount, 0, dueDate),
+      remark: `资产验收 ${input.assetAcceptanceNo} 审核生成暂估应付`,
+      createdBy: input.createdBy || null,
+      updatedBy: input.createdBy || null,
+    }));
+    payable.entries = await manager.getRepository(PayableEntry).save(input.entries.map((entry, index) =>
+      manager.getRepository(PayableEntry).create({
+        payableId: payable.id,
+        lineNo: index + 1,
+        inventoryInEntryId: null,
+        purchaseReturnEntryId: null,
+        assetAcceptanceEntryId: entry.assetAcceptanceEntryId,
+        sourceReceiveNoticeEntryId: entry.sourceReceiveNoticeEntryId,
+        sourceOrderEntryId: entry.sourceOrderEntryId,
+        sourceRequestEntryId: entry.sourceRequestEntryId || null,
+        materialId: entry.materialId,
+        materialCode: entry.materialCode,
+        materialName: entry.materialName,
+        materialModel: entry.materialModel || null,
+        unitId: entry.unitId,
+        unitCode: entry.unitCode || null,
+        unitName: entry.unitName || null,
+        quantity: Number(entry.quantity),
+        unitPrice: Number(entry.unitPrice),
+        taxRate: Number(entry.taxRate || 0),
+        untaxedAmount: this.round(Number(entry.untaxedAmount), 2),
+        taxAmount: this.round(Number(entry.taxAmount), 2),
+        totalAmount: this.round(Number(entry.totalAmount), 2),
+        createdBy: input.createdBy || null,
+        updatedBy: input.createdBy || null,
+      }),
+    ));
+    return payable;
+  }
+
   async update(id: string, dto: UpdatePayableDto): Promise<Payable> {
     const payable = await this.findById(id);
     if (!payable) throw new NotFoundException('应付账款不存在');
 
-    if (payable.payableType === 'ESTIMATED' && payable.sourceType === 'PURCHASE_INBOUND') {
-      throw new BadRequestException('采购入库生成的暂估应付不允许通过通用应付接口修改');
+    if (
+      (payable.payableType === 'ESTIMATED' && payable.sourceType === 'PURCHASE_INBOUND') ||
+      (payable.payableType === 'ESTIMATED' && payable.sourceType === 'ASSET_ACCEPTANCE') ||
+      (payable.payableType === 'RED' && payable.sourceType === 'PURCHASE_RETURN')
+    ) {
+      throw new BadRequestException('采购来源应付不允许通过通用应付接口修改');
     }
     if (payable.status === 2) {
       throw new BadRequestException('已结算的应付账款不允许修改');
@@ -257,8 +502,12 @@ export class PayableService {
     const payable = await this.findById(id);
     if (!payable) throw new NotFoundException('应付账款不存在');
 
-    if (payable.payableType === 'ESTIMATED' && payable.sourceType === 'PURCHASE_INBOUND') {
-      throw new BadRequestException('采购入库生成的暂估应付不允许通过通用应付接口删除');
+    if (
+      (payable.payableType === 'ESTIMATED' && payable.sourceType === 'PURCHASE_INBOUND') ||
+      (payable.payableType === 'ESTIMATED' && payable.sourceType === 'ASSET_ACCEPTANCE') ||
+      (payable.payableType === 'RED' && payable.sourceType === 'PURCHASE_RETURN')
+    ) {
+      throw new BadRequestException('采购来源应付不允许通过通用应付接口删除');
     }
     if (payable.paidAmount > 0) {
       throw new BadRequestException('已付款的应付账款不允许删除');

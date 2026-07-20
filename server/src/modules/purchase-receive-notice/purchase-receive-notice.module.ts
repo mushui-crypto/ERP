@@ -8,6 +8,8 @@ import { PurchaseReceiveNoticeReversalEntry } from '../../database/entities/purc
 import { PurchaseReceiveNoticeReversal } from '../../database/entities/purchase-receive-notice-reversal.entity';
 import { PurchaseReceiveNotice } from '../../database/entities/purchase-receive-notice.entity';
 import { QualityInspection } from '../../database/entities/quality-inspection.entity';
+import { PurchaseReturnEntry } from '../../database/entities/purchase-return-entry.entity';
+import { PurchaseReturn } from '../../database/entities/purchase-return.entity';
 import { PurchaseReceiveNoticeController } from './purchase-receive-notice.controller';
 import { PurchaseReceiveNoticeService } from './purchase-receive-notice.service';
 
@@ -22,6 +24,8 @@ import { PurchaseReceiveNoticeService } from './purchase-receive-notice.service'
       PurchaseOrderEntry,
       QualityInspection,
       InventoryInEntry,
+      PurchaseReturn,
+      PurchaseReturnEntry,
     ]),
   ],
   providers: [PurchaseReceiveNoticeService],

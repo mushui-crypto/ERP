@@ -1,11 +1,25 @@
-﻿import { Entity, Column, Index } from 'typeorm';
+﻿import { Entity, Column, Index, OneToMany } from 'typeorm';
 import { BaseEntity } from './base.entity';
+import { InventoryOutEntry } from './inventory-out-entry.entity';
 
 @Entity('inventory_out')
 export class InventoryOut extends BaseEntity {
   @Index({ unique: true })
   @Column({ name: 'out_no', length: 50, comment: '出库单号' })
   outNo: string;
+
+  @Index({ unique: true })
+  @Column({ name: 'push_idempotency_key', length: 100, nullable: true })
+  pushIdempotencyKey: string;
+
+  @Column({ name: 'push_payload_hash', length: 64, nullable: true })
+  pushPayloadHash: string;
+
+  @Column({ name: 'source_type', length: 30, nullable: true })
+  sourceType: string;
+
+  @Column({ name: 'business_type', length: 30, nullable: true })
+  businessType: string;
 
   @Column({ name: 'org_id', length: 36, comment: '组织ID' })
   orgId: string;
@@ -88,6 +102,27 @@ export class InventoryOut extends BaseEntity {
   @Column({ type: 'int', default: 0, comment: '状态: 0-草稿 1-待审核 2-已审核 3-已取消' })
   status: number;
 
+  @Column({ name: 'approved_at', type: 'datetime', nullable: true })
+  approvedAt: Date;
+
+  @Column({ name: 'approved_by', length: 50, nullable: true })
+  approvedBy: string;
+
+  @Column({ name: 'asset_card_generation_status', length: 30, default: 'NOT_REQUIRED' })
+  assetCardGenerationStatus: string;
+
+  @Column({ name: 'asset_card_generation_error', length: 1000, nullable: true })
+  assetCardGenerationError: string;
+
+  @Column({ name: 'asset_card_generation_failed_at', type: 'datetime', nullable: true })
+  assetCardGenerationFailedAt: Date;
+
+  @Column({ name: 'asset_card_generated_at', type: 'datetime', nullable: true })
+  assetCardGeneratedAt: Date;
+
   @Column({ length: 500, nullable: true, comment: '备注' })
   remark: string;
+
+  @OneToMany(() => InventoryOutEntry, (entry) => entry.inventoryOut, { cascade: false })
+  entries: InventoryOutEntry[];
 }

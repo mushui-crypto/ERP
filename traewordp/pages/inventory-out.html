@@ -307,7 +307,7 @@ var visibleColumns = JSON.parse(localStorage.getItem('visible_columns_' + docTyp
 var filterFields = [
   { label: '基本信息-单据编号', key: 'docNo', type: 'text' },
   { label: '基本信息-日期', key: 'docDate', type: 'date' },
-  { label: '基本信息-客户', key: 'partnerName', type: 'lookup', lookupType: customer },
+  { label: '基本信息-客户', key: 'partnerName', type: 'lookup', lookupType: 'customer' },
   { label: '基本信息-组织', key: 'orgName', type: 'lookup', lookupType: 'organization' },
   { label: '基本信息-部门', key: 'department', type: 'lookup', lookupType: 'department' },
   { label: '基本信息-人员', key: 'employee', type: 'lookup', lookupType: 'employee' },
@@ -704,10 +704,6 @@ function renderTable(list) {
     tbody.appendChild(row);
   });
 }
-);
-  closeFilterModal();
-  renderTable(filtered);
-}
 function openFilterModal() { document.getElementById('filterModal').classList.add('show'); }
 function closeFilterModal() { document.getElementById('filterModal').classList.remove('show'); }
 function resetFilter() { document.getElementById('filterDocNo').value = ''; document.getElementById('filterPartner').value = ''; document.getElementById('filterOrg').value = ''; document.getElementById('filterStatus').value = ''; document.getElementById('filterStartDate').value = ''; document.getElementById('filterEndDate').value = ''; }
@@ -808,5 +804,6 @@ function nextPage() { loadData(); }
 function exitPage() { showConfirm("确认退出？", function() { window.location.href = "../index.html"; }); }
 document.addEventListener('DOMContentLoaded', init);
 </script>
+<script src="../purchase-p2-asset-api.js"></script>
 </body>
 </html>

@@ -1,6 +1,6 @@
 import { Controller, Get, Post, Put, Delete, Body, Param, Query } from '@nestjs/common';
 import { InventoryOutService } from './inventory-out.service';
-import { CreateInventoryOutDto, UpdateInventoryOutDto } from './dto/inventory-out.dto';
+import { ApproveInventoryOutDto, CreateInventoryOutDto, CreateInventoryOutFromAssetRequestDto, UpdateInventoryOutDto } from './dto/inventory-out.dto';
 
 @Controller('inventory-out')
 export class InventoryOutController {
@@ -27,6 +27,11 @@ export class InventoryOutController {
     return this.inventoryOutService.create(dto);
   }
 
+  @Post('from-asset-out-request/:requestId')
+  async createFromAssetOutRequest(@Param('requestId') requestId: string, @Body() dto: CreateInventoryOutFromAssetRequestDto) {
+    return this.inventoryOutService.createFromAssetOutRequest(requestId, dto);
+  }
+
   @Put(':id')
   async update(@Param('id') id: string, @Body() dto: UpdateInventoryOutDto) {
     return this.inventoryOutService.update(id, dto);
@@ -43,8 +48,13 @@ export class InventoryOutController {
   }
 
   @Post(':id/approve')
-  async approve(@Param('id') id: string) {
-    return this.inventoryOutService.approve(id);
+  async approve(@Param('id') id: string, @Body() dto: ApproveInventoryOutDto = {}) {
+    return this.inventoryOutService.approve(id, dto);
+  }
+
+  @Post(':id/generate-asset-cards')
+  async generateAssetCards(@Param('id') id: string) {
+    return this.inventoryOutService.generateAssetCards(id);
   }
 
   @Post(':id/reject')

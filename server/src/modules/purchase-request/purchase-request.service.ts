@@ -1,4 +1,5 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import { createHash } from 'crypto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DataSource, EntityManager, Repository } from 'typeorm';
 import { PurchaseRequest } from '../../database/entities/purchase-request.entity';
@@ -6,12 +7,15 @@ import { PurchaseRequestEntry } from '../../database/entities/purchase-request-e
 import {
   PURCHASE_REQUEST_STATUS_META,
   PurchaseRequestStatus,
+  PurchaseBillType,
+  PurchaseBusinessType,
   generateDocumentNo,
   withStatusMeta,
 } from '../purchase-common/purchase-status';
 import {
   ApprovePurchaseRequestDto,
   CreatePurchaseRequestDto,
+  ImportPurchaseRequestDto,
   PurchaseRequestEntryDto,
   UpdatePurchaseRequestDto,
 } from './dto/purchase-request.dto';
@@ -106,11 +110,22 @@ export class PurchaseRequestService {
   }
 
   async create(dto: CreatePurchaseRequestDto) {
+    this.validatePurchaseType(dto.billType, dto.businessType);
     const sourceEntries = this.normalizeEntries(dto);
-    return this.dataSource.transaction(async (manager) => {
+    return this.dataSource.transaction((manager) => this.createWithManager(dto, sourceEntries, manager));
+  }
+
+  private async createWithManager(
+    dto: CreatePurchaseRequestDto,
+    sourceEntries: PurchaseRequestEntryDto[],
+    manager: EntityManager,
+    external?: Pick<PurchaseRequest, 'externalSourceType' | 'externalSourceId' | 'externalSourceNo' | 'importPayloadHash'>,
+  ) {
       const first = sourceEntries[0];
       const request = manager.create(PurchaseRequest, {
         requestNo: generateDocumentNo('PR'),
+        billType: dto.billType || PurchaseBillType.STANDARD_PURCHASE,
+        businessType: dto.businessType || PurchaseBusinessType.STANDARD,
         orgId: dto.orgId,
         departmentId: dto.departmentId,
         applicantId: dto.applicantId,
@@ -135,6 +150,7 @@ export class PurchaseRequestService {
         supplierCode: first.supplierCode,
         supplierName: first.supplierName,
         warehouseId: first.warehouseId,
+        ...external,
       });
       const saved = await manager.save(request);
       const entries = sourceEntries.map((item, index) => manager.create(PurchaseRequestEntry, {
@@ -150,7 +166,6 @@ export class PurchaseRequestService {
       }));
       saved.entries = await manager.save(entries);
       return this.present(saved);
-    });
   }
 
   async update(id: string, dto: UpdatePurchaseRequestDto) {
@@ -164,6 +179,7 @@ export class PurchaseRequestService {
       if (![PurchaseRequestStatus.DRAFT, PurchaseRequestStatus.REJECTED].includes(request.status)) {
         throw new BadRequestException('只有草稿或已驳回状态的采购申请允许修改');
       }
+      this.validatePurchaseType(dto.billType || request.billType, dto.businessType || request.businessType);
       const sourceEntries = this.normalizeEntries(dto);
       const duplicateIds = sourceEntries
         .map((item) => item.id)
@@ -184,6 +200,8 @@ export class PurchaseRequestService {
         applicantId: dto.applicantId,
         applicantName: dto.applicantName,
         requestType: dto.requestType || request.requestType,
+        billType: dto.billType || request.billType,
+        businessType: dto.businessType || request.businessType,
         requestDate: dto.requestDate ? new Date(dto.requestDate) : request.requestDate,
         reason: dto.reason,
         remark: dto.remark,
@@ -256,6 +274,106 @@ export class PurchaseRequestService {
       request.entries = nextEntries;
       return this.present(request);
     });
+  }
+
+  async importFromExternal(dto: ImportPurchaseRequestDto) {
+    if (dto.externalSourceType !== 'OA') throw new BadRequestException('P2 资产采购申请只接受 OA 审批来源');
+    if (dto.billType !== PurchaseBillType.ASSET_PURCHASE) throw new BadRequestException('资产采购导入单据类型必须为 ASSET_PURCHASE');
+    if (![PurchaseBusinessType.ASSET_NO_INBOUND, PurchaseBusinessType.ASSET_INBOUND].includes(dto.businessType as PurchaseBusinessType)) {
+      throw new BadRequestException('资产采购导入业务类型必须为 ASSET_NO_INBOUND 或 ASSET_INBOUND');
+    }
+    const payloadHash = this.calculateImportPayloadHash(dto);
+    const existing = await this.requestRepository.findOne({
+      where: { externalSourceType: dto.externalSourceType, externalSourceId: dto.externalSourceId, isDeleted: 0 },
+      relations: { entries: true },
+    });
+    if (existing) {
+      if (existing.importPayloadHash !== payloadHash) throw new BadRequestException('OA 来源已被不同请求载荷使用');
+      return this.present(existing);
+    }
+    try {
+      const sourceEntries = this.normalizeEntries(dto);
+      return await this.dataSource.transaction(async (manager) => {
+        const concurrent = await manager.findOne(PurchaseRequest, {
+          where: { externalSourceType: dto.externalSourceType, externalSourceId: dto.externalSourceId, isDeleted: 0 },
+          relations: { entries: true },
+          lock: { mode: 'pessimistic_write' },
+        });
+        if (concurrent) {
+          if (concurrent.importPayloadHash !== payloadHash) throw new BadRequestException('OA 来源已被不同请求载荷使用');
+          return this.present(concurrent);
+        }
+        return this.createWithManager(dto, sourceEntries, manager, {
+          externalSourceType: dto.externalSourceType,
+          externalSourceId: dto.externalSourceId,
+          externalSourceNo: dto.externalSourceNo || null,
+          importPayloadHash: payloadHash,
+        });
+      });
+    } catch (error) {
+      const concurrent = await this.requestRepository.findOne({
+        where: { externalSourceType: dto.externalSourceType, externalSourceId: dto.externalSourceId, isDeleted: 0 },
+        relations: { entries: true },
+      });
+      if (concurrent) {
+        if (concurrent.importPayloadHash !== payloadHash) throw new BadRequestException('OA 来源已被不同请求载荷使用');
+        return this.present(concurrent);
+      }
+      throw error;
+    }
+  }
+
+  private validatePurchaseType(billType?: string, businessType?: string) {
+    const normalizedBillType = billType || PurchaseBillType.STANDARD_PURCHASE;
+    const normalizedBusinessType = businessType || PurchaseBusinessType.STANDARD;
+    if (normalizedBillType === PurchaseBillType.STANDARD_PURCHASE && normalizedBusinessType !== PurchaseBusinessType.STANDARD) {
+      throw new BadRequestException('标准采购单据只能使用 STANDARD 业务类型');
+    }
+    if (
+      normalizedBillType === PurchaseBillType.ASSET_PURCHASE &&
+      ![PurchaseBusinessType.ASSET_NO_INBOUND, PurchaseBusinessType.ASSET_INBOUND].includes(normalizedBusinessType as PurchaseBusinessType)
+    ) {
+      throw new BadRequestException('资产采购单据业务类型不正确');
+    }
+  }
+
+  private calculateImportPayloadHash(dto: ImportPurchaseRequestDto) {
+    const normalized = {
+      externalSourceType: dto.externalSourceType,
+      externalSourceId: dto.externalSourceId,
+      externalSourceNo: dto.externalSourceNo || null,
+      billType: dto.billType,
+      businessType: dto.businessType,
+      orgId: dto.orgId,
+      departmentId: dto.departmentId || null,
+      applicantId: dto.applicantId || null,
+      applicantName: dto.applicantName || null,
+      requestType: dto.requestType || null,
+      requestDate: dto.requestDate || null,
+      reason: dto.reason || null,
+      remark: dto.remark || null,
+      entries: [...(dto.entries || [])].map((entry) => ({
+        purchaseOrgId: entry.purchaseOrgId,
+        materialId: entry.materialId,
+        materialCode: entry.materialCode,
+        materialName: entry.materialName,
+        materialModel: entry.materialModel || null,
+        unitId: entry.unitId,
+        unitCode: entry.unitCode || null,
+        unitName: entry.unitName || null,
+        requestQty: Number(entry.requestQty),
+        estimatedPrice: Number(entry.estimatedPrice || 0),
+        estimatedAmount: entry.estimatedAmount === undefined ? null : Number(entry.estimatedAmount),
+        requiredDate: entry.requiredDate || null,
+        supplierId: entry.supplierId || null,
+        supplierCode: entry.supplierCode || null,
+        supplierName: entry.supplierName || null,
+        warehouseId: entry.warehouseId || null,
+        contractNo: entry.contractNo || null,
+        remark: entry.remark || null,
+      })).sort((a, b) => `${a.materialId}:${a.purchaseOrgId}`.localeCompare(`${b.materialId}:${b.purchaseOrgId}`)),
+    };
+    return createHash('sha256').update(JSON.stringify(normalized)).digest('hex');
   }
 
   async remove(id: string): Promise<void> {

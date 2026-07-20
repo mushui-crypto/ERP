@@ -2,6 +2,7 @@ import { Body, Controller, Get, Param, Post, Put, Query, UseGuards } from '@nest
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
 import {
+  PushPurchaseReturnToReceiveNoticeDto,
   PushPurchaseOrderToReceiveNoticeDto,
   ReversePurchaseReceiveNoticeDto,
   UpdatePurchaseReceiveNoticeDto,
@@ -44,6 +45,11 @@ export class PurchaseReceiveNoticeController {
   @ApiOperation({ summary: '采购订单下推收料/请检通知' })
   createFromOrder(@Body() dto: PushPurchaseOrderToReceiveNoticeDto) {
     return this.service.createFromOrder(dto);
+  }
+
+  @Post('from-return-replenish')
+  createFromReturnReplenish(@Body() dto: PushPurchaseReturnToReceiveNoticeDto) {
+    return this.service.createFromReturnReplenish(dto.purchaseReturnId);
   }
 
   @Put(':id')

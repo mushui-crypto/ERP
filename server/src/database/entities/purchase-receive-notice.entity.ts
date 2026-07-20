@@ -9,6 +9,12 @@ export class PurchaseReceiveNotice extends BaseEntity {
   @Column({ name: 'notice_no', length: 50, comment: '收料/请检通知单号/FBillNo' })
   noticeNo: string;
 
+  @Column({ name: 'bill_type', length: 30, default: 'STANDARD_PURCHASE', comment: '单据类型' })
+  billType: string;
+
+  @Column({ name: 'business_type', length: 30, default: 'STANDARD', comment: '业务类型' })
+  businessType: string;
+
   @Column({ name: 'receive_batch_no', length: 100, comment: '收料批次号；订单下推幂等键组成部分' })
   receiveBatchNo: string;
 
@@ -17,6 +23,15 @@ export class PurchaseReceiveNotice extends BaseEntity {
 
   @Column({ name: 'purchase_order_no', length: 50, comment: '来源采购订单单号/FOrderBillNo' })
   purchaseOrderNo: string;
+
+  @Column({ name: 'source_type', length: 40, default: 'PURCHASE_ORDER', comment: '来源类型：PURCHASE_ORDER/PURCHASE_RETURN_REPLENISH' })
+  sourceType: string;
+
+  @Column({ name: 'source_purchase_return_id', length: 36, nullable: true, comment: '补料来源采购退料单ID' })
+  sourcePurchaseReturnId: string;
+
+  @Column({ name: 'source_purchase_return_no', length: 50, nullable: true, comment: '补料来源采购退料单号' })
+  sourcePurchaseReturnNo: string;
 
   @Column({ name: 'stock_org_id', length: 36, comment: '收料组织/FStockOrgId' })
   stockOrgId: string;

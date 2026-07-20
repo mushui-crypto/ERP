@@ -6,6 +6,7 @@ import { PurchaseOrderEntry } from '../../database/entities/purchase-order-entry
 import { PurchaseOrder } from '../../database/entities/purchase-order.entity';
 import { PurchaseReceiveNoticeEntry } from '../../database/entities/purchase-receive-notice-entry.entity';
 import { PurchaseReceiveNotice } from '../../database/entities/purchase-receive-notice.entity';
+import { PurchaseReturnEntry } from '../../database/entities/purchase-return-entry.entity';
 import { Supplier } from '../../database/entities/supplier.entity';
 import { Warehouse } from '../../database/entities/warehouse.entity';
 import { InventoryModule } from '../inventory/inventory.module';
@@ -22,6 +23,7 @@ import { InventoryInService } from './inventory-in.service';
       PurchaseReceiveNoticeEntry,
       PurchaseOrder,
       PurchaseOrderEntry,
+      PurchaseReturnEntry,
       Supplier,
       Warehouse,
     ]),

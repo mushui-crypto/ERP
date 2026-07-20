@@ -51,7 +51,7 @@ export class InventoryIn extends BaseEntity {
   @Column({ name: 'in_type', type: 'int', comment: '入库类型: 1-采购入库 2-生产入库 3-销售退货入库 4-其他入库' })
   inType: number;
 
-  @Column({ name: 'source_type', length: 50, nullable: true, comment: '来源类型；采购入库为 PURCHASE_RECEIVE_NOTICE' })
+  @Column({ name: 'source_type', length: 50, nullable: true, comment: '来源类型；普通采购为 PURCHASE_RECEIVE_NOTICE，退料补料为 PURCHASE_RETURN_REPLENISH' })
   sourceType: string;
 
   @Column({ name: 'source_id', length: 36, nullable: true, comment: '兼容字段：单一来源收料通知ID；多来源时为空' })
@@ -132,7 +132,7 @@ export class InventoryIn extends BaseEntity {
   @Column({ name: 'approved_by', length: 50, nullable: true, comment: '审核人/FApproverId' })
   approvedBy: string;
 
-  @Column({ name: 'payable_generation_status', length: 30, default: 'NOT_GENERATED', comment: '暂估应付生成状态' })
+  @Column({ name: 'payable_generation_status', length: 30, default: 'NOT_GENERATED', comment: '暂估应付生成状态；补料入库为 NOT_REQUIRED' })
   payableGenerationStatus: string;
 
   @Column({ name: 'payable_id', length: 36, nullable: true, comment: '暂估应付ID' })

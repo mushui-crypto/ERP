@@ -35,6 +35,9 @@ export class PurchaseReceiveNoticeEntry extends BaseEntity {
   @Column({ name: 'source_request_entry_id', length: 36, nullable: true, comment: '来源采购申请明细ID' })
   sourceRequestEntryId: string;
 
+  @Column({ name: 'source_purchase_return_entry_id', length: 36, nullable: true, comment: '补料来源采购退料明细ID' })
+  sourcePurchaseReturnEntryId: string;
+
   @Column({ name: 'material_id', length: 36, comment: '物料ID/FMaterialId' })
   materialId: string;
 
@@ -73,6 +76,12 @@ export class PurchaseReceiveNoticeEntry extends BaseEntity {
 
   @Column({ name: 'stocked_qty', type: 'decimal', precision: 18, scale: 4, default: 0, comment: '累计审核入库数量/FInStockQty' })
   stockedQty: number;
+
+  @Column({ name: 'asset_accepted_qty', type: 'decimal', precision: 18, scale: 4, default: 0, comment: '累计已通过资产验收数量' })
+  assetAcceptedQty: number;
+
+  @Column({ name: 'returned_qty', type: 'decimal', precision: 18, scale: 4, default: 0, comment: '累计已审核采购退料数量' })
+  returnedQty: number;
 
   @Column({ name: 'check_incoming', default: true, comment: '明细是否来料检验/FCheckInComing' })
   checkIncoming: boolean;

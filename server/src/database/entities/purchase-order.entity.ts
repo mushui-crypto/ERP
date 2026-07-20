@@ -12,6 +12,12 @@ export class PurchaseOrder extends BaseEntity {
   @Column({ name: 'order_no', length: 50, comment: '订单编号' })
   orderNo: string;
 
+  @Column({ name: 'bill_type', length: 30, default: 'STANDARD_PURCHASE', comment: '单据类型' })
+  billType: string;
+
+  @Column({ name: 'business_type', length: 30, default: 'STANDARD', comment: '业务类型' })
+  businessType: string;
+
   @Column({ name: 'supplier_id', length: 36, comment: '供应商ID/FSupplierId' })
   supplierId: string;
 

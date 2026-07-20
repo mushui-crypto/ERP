@@ -1,4 +1,5 @@
 import { Transform, Type } from 'class-transformer';
+import { ApiProperty } from '@nestjs/swagger';
 import {
   ArrayMinSize,
   IsArray,
@@ -12,6 +13,12 @@ import {
   Min,
   ValidateNested,
 } from 'class-validator';
+
+export class PushPurchaseReturnToReceiveNoticeDto {
+  @ApiProperty({ description: '已审核补料方式采购退料单ID' })
+  @IsString()
+  purchaseReturnId: string;
+}
 
 export class PushOrderReceiveLineDto {
   @IsNotEmpty()
