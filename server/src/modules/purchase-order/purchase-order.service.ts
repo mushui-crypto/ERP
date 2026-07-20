@@ -13,6 +13,8 @@ import {
   PurchaseOrderStatus,
   PurchaseReceiveNoticeStatus,
   PurchaseRequestStatus,
+  PurchaseBillType,
+  PurchaseBusinessType,
   generateDocumentNo,
   withStatusMeta,
 } from '../purchase-common/purchase-status';
@@ -129,6 +131,8 @@ export class PurchaseOrderService {
       const first = dto.entries[0];
       const order = manager.create(PurchaseOrder, {
         orderNo: generateDocumentNo('PO'),
+        billType: PurchaseBillType.STANDARD_PURCHASE,
+        businessType: PurchaseBusinessType.STANDARD,
         supplierId: dto.supplierId,
         purchaseOrgId: dto.purchaseOrgId,
         sourceType: PurchaseOrderSourceType.MANUAL,
@@ -379,6 +383,9 @@ export class PurchaseOrderService {
 
         const purchaseOrgIds = new Set(resolved.map(({ requestEntry }) => requestEntry.purchaseOrgId));
         if (purchaseOrgIds.size !== 1) throw new BadRequestException('禁止跨采购组织合并下推采购订单');
+        const billTypes = new Set(resolved.map(({ requestEntry }) => requestEntry.purchaseRequest.billType || PurchaseBillType.STANDARD_PURCHASE));
+        const businessTypes = new Set(resolved.map(({ requestEntry }) => requestEntry.purchaseRequest.businessType || PurchaseBusinessType.STANDARD));
+        if (billTypes.size !== 1 || businessTypes.size !== 1) throw new BadRequestException('禁止混合不同采购业务类型下推采购订单');
         const payloadHash = this.calculateResolvedPushPayloadHash(dto, resolved);
         const existingAfterSourceLock = await this.findByPushIdempotencyKey(dto.idempotencyKey, manager);
         if (existingAfterSourceLock) return this.assertIdempotentPush(existingAfterSourceLock, dto, payloadHash);
@@ -386,6 +393,8 @@ export class PurchaseOrderService {
         const first = resolved[0].requestEntry;
         const order = manager.create(PurchaseOrder, {
           orderNo: generateDocumentNo('PO'),
+          billType: first.purchaseRequest.billType || PurchaseBillType.STANDARD_PURCHASE,
+          businessType: first.purchaseRequest.businessType || PurchaseBusinessType.STANDARD,
           supplierId: dto.supplierId,
           purchaseOrgId: first.purchaseOrgId,
           sourceType: PurchaseOrderSourceType.PURCHASE_REQUEST,

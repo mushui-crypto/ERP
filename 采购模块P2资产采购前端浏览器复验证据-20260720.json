@@ -1,0 +1,250 @@
+{
+  "runTag": "P2FE-1784538619594",
+  "front": "http://127.0.0.1:8099",
+  "api": "http://localhost:3003/api",
+  "startedAt": "2026-07-20T09:10:19.594Z",
+  "checks": [
+    {
+      "id": "P2-FE-ENV-001",
+      "name": "3003 Swagger 可访问",
+      "status": "PASS",
+      "detail": {
+        "status": 200
+      },
+      "at": "2026-07-20T09:10:19.656Z"
+    },
+    {
+      "id": "P2-FE-PUR-purchase-request.html",
+      "name": "采购路径页面显示 P2 资产采购识别提示且指向 3003",
+      "status": "PASS",
+      "detail": {
+        "file": "purchase-request.html",
+        "requests": [
+          "http://localhost:3003/api/purchase-requests?page=1&pageSize=10",
+          "http://localhost:3003/api/purchase-requests?page=1&pageSize=10",
+          "http://localhost:3003/api/purchase-requests?page=1&pageSize=10"
+        ],
+        "errors": []
+      },
+      "at": "2026-07-20T09:10:22.413Z"
+    },
+    {
+      "id": "P2-FE-PUR-purchase-request-create.html",
+      "name": "采购路径页面显示 P2 资产采购识别提示且指向 3003",
+      "status": "PASS",
+      "detail": {
+        "file": "purchase-request-create.html",
+        "requests": [],
+        "errors": []
+      },
+      "at": "2026-07-20T09:10:23.269Z"
+    },
+    {
+      "id": "P2-FE-PUR-purchase-order.html",
+      "name": "采购路径页面显示 P2 资产采购识别提示且指向 3003",
+      "status": "PASS",
+      "detail": {
+        "file": "purchase-order.html",
+        "requests": [
+          "http://localhost:3003/api/purchase-orders?page=1&pageSize=10",
+          "http://localhost:3003/api/purchase-orders?page=1&pageSize=10",
+          "http://localhost:3003/api/purchase-orders?page=1&pageSize=10"
+        ],
+        "errors": []
+      },
+      "at": "2026-07-20T09:10:24.262Z"
+    },
+    {
+      "id": "P2-FE-PUR-purchase-order-create.html",
+      "name": "采购路径页面显示 P2 资产采购识别提示且指向 3003",
+      "status": "PASS",
+      "detail": {
+        "file": "purchase-order-create.html",
+        "requests": [],
+        "errors": []
+      },
+      "at": "2026-07-20T09:10:25.264Z"
+    },
+    {
+      "id": "P2-FE-PUR-purchase-order-detail.html",
+      "name": "采购路径页面显示 P2 资产采购识别提示且指向 3003",
+      "status": "PASS",
+      "detail": {
+        "file": "purchase-order-detail.html",
+        "requests": [],
+        "errors": [
+          "Unexpected token '}'"
+        ]
+      },
+      "at": "2026-07-20T09:10:26.247Z"
+    },
+    {
+      "id": "P2-FE-PUR-purchase-receive.html",
+      "name": "采购路径页面显示 P2 资产采购识别提示且指向 3003",
+      "status": "PASS",
+      "detail": {
+        "file": "purchase-receive.html",
+        "requests": [
+          "http://localhost:3003/api/purchase-receive-notices?page=1&pageSize=10",
+          "http://localhost:3003/api/purchase-receive-notices?page=1&pageSize=10",
+          "http://localhost:3003/api/purchase-receive-notices?page=1&pageSize=10"
+        ],
+        "errors": []
+      },
+      "at": "2026-07-20T09:10:27.259Z"
+    },
+    {
+      "id": "P2-FE-PUR-purchase-receive-create.html",
+      "name": "采购路径页面显示 P2 资产采购识别提示且指向 3003",
+      "status": "PASS",
+      "detail": {
+        "file": "purchase-receive-create.html",
+        "requests": [],
+        "errors": []
+      },
+      "at": "2026-07-20T09:10:28.261Z"
+    },
+    {
+      "id": "P2-FE-PUR-purchase-inbound.html",
+      "name": "采购路径页面显示 P2 资产采购识别提示且指向 3003",
+      "status": "PASS",
+      "detail": {
+        "file": "purchase-inbound.html",
+        "requests": [
+          "http://localhost:3003/api/inventory-in?page=1&pageSize=10&inType=1",
+          "http://localhost:3003/api/inventory-in?page=1&pageSize=10&inType=1",
+          "http://localhost:3003/api/inventory-in?page=1&pageSize=10&inType=1"
+        ],
+        "errors": []
+      },
+      "at": "2026-07-20T09:10:29.263Z"
+    },
+    {
+      "id": "P2-FE-PUR-purchase-inbound-create.html",
+      "name": "采购路径页面显示 P2 资产采购识别提示且指向 3003",
+      "status": "PASS",
+      "detail": {
+        "file": "purchase-inbound-create.html",
+        "requests": [],
+        "errors": []
+      },
+      "at": "2026-07-20T09:10:30.267Z"
+    },
+    {
+      "id": "P2-FE-AA-001",
+      "name": "资产验收页面加载真实 API 面板",
+      "status": "PASS",
+      "detail": {
+        "requests": [
+          "http://localhost:3003/api/asset-acceptances?page=1&pageSize=20",
+          "http://localhost:3003/api/asset-acceptances?page=1&pageSize=20"
+        ]
+      },
+      "at": "2026-07-20T09:10:31.221Z"
+    },
+    {
+      "id": "P2-FE-AA-002",
+      "name": "资产验收页面展示业务类型/状态/下游生成状态",
+      "status": "PASS",
+      "detail": {},
+      "at": "2026-07-20T09:10:31.221Z"
+    },
+    {
+      "id": "P2-FE-CARD-001",
+      "name": "资产卡片页面加载真实 API 面板",
+      "status": "PASS",
+      "detail": {
+        "requests": [
+          "http://localhost:3003/api/fixed-asset?page=1&pageSize=20",
+          "http://localhost:3003/api/fixed-asset?page=1&pageSize=20"
+        ]
+      },
+      "at": "2026-07-20T09:10:32.304Z"
+    },
+    {
+      "id": "P2-FE-CARD-002",
+      "name": "资产卡片页面展示后端 purchasePrice 原值",
+      "status": "PASS",
+      "detail": {
+        "assetNo": "FA20260720165711737769",
+        "purchasePrice": 100
+      },
+      "at": "2026-07-20T09:10:32.315Z"
+    },
+    {
+      "id": "P2-FE-AOR-001",
+      "name": "资产出库申请页面加载真实 API 面板",
+      "status": "PASS",
+      "detail": {
+        "requests": [
+          "http://localhost:3003/api/asset-out-requests?page=1&pageSize=20",
+          "http://localhost:3003/api/asset-out-requests?page=1&pageSize=20"
+        ]
+      },
+      "at": "2026-07-20T09:10:33.280Z"
+    },
+    {
+      "id": "P2-FE-AOR-002",
+      "name": "资产出库申请页面展示来源资产验收单号",
+      "status": "PASS",
+      "detail": {
+        "requestNo": "AOR20260720165712964008",
+        "sourceAssetAcceptanceNo": "AA20260720165712882669"
+      },
+      "at": "2026-07-20T09:10:33.280Z"
+    },
+    {
+      "id": "P2-FE-AOR-LIST-001",
+      "name": "资产出库申请列表页加载真实 API 面板",
+      "status": "PASS",
+      "detail": {
+        "requests": [
+          "http://localhost:3003/api/asset-out-requests?page=1&pageSize=20",
+          "http://localhost:3003/api/asset-out-requests?page=1&pageSize=20"
+        ]
+      },
+      "at": "2026-07-20T09:10:34.271Z"
+    },
+    {
+      "id": "P2-FE-OUT-001",
+      "name": "其他出库页面加载真实 API 面板",
+      "status": "PASS",
+      "detail": {
+        "requests": [
+          "http://localhost:3003/api/inventory-out?page=1&pageSize=20&outType=4",
+          "http://localhost:3003/api/inventory-out?page=1&pageSize=20&outType=4"
+        ]
+      },
+      "at": "2026-07-20T09:10:35.276Z"
+    },
+    {
+      "id": "P2-FE-OUT-002",
+      "name": "其他出库页面展示 P2 资产其他出库记录",
+      "status": "PASS",
+      "detail": {
+        "apiWithoutFilterTotal": 0,
+        "apiP2Total": 8,
+        "expectedOutNo": "OUT20260720165713044249"
+      },
+      "at": "2026-07-20T09:10:35.276Z"
+    },
+    {
+      "id": "P2-FE-OUT-CREATE-001",
+      "name": "其他出库新增页加载真实 API 面板",
+      "status": "PASS",
+      "detail": {
+        "requests": [
+          "http://localhost:3003/api/inventory-out?page=1&pageSize=20&outType=4"
+        ]
+      },
+      "at": "2026-07-20T09:10:36.256Z"
+    }
+  ],
+  "defects": [],
+  "completedAt": "2026-07-20T09:10:36.421Z",
+  "summary": {
+    "total": 20,
+    "passed": 20,
+    "failed": 0
+  }
+}

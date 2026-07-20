@@ -2,6 +2,7 @@ import { Body, Controller, Delete, Get, Param, Post, Put, Query } from '@nestjs/
 import {
   ApprovePurchaseRequestDto,
   CreatePurchaseRequestDto,
+  ImportPurchaseRequestDto,
   UpdatePurchaseRequestDto,
 } from './dto/purchase-request.dto';
 import { PurchaseRequestService } from './purchase-request.service';
@@ -34,6 +35,11 @@ export class PurchaseRequestController {
   @Post()
   create(@Body() dto: CreatePurchaseRequestDto) {
     return this.purchaseRequestService.create(dto);
+  }
+
+  @Post('import')
+  importFromExternal(@Body() dto: ImportPurchaseRequestDto) {
+    return this.purchaseRequestService.importFromExternal(dto);
   }
 
   @Put(':id')

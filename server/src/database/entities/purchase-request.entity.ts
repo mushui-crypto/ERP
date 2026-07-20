@@ -8,6 +8,24 @@ export class PurchaseRequest extends BaseEntity {
   @Column({ name: 'request_no', length: 50, comment: '采购申请单号' })
   requestNo: string;
 
+  @Column({ name: 'bill_type', length: 30, default: 'STANDARD_PURCHASE', comment: '单据类型' })
+  billType: string;
+
+  @Column({ name: 'business_type', length: 30, default: 'STANDARD', comment: '业务类型' })
+  businessType: string;
+
+  @Column({ name: 'external_source_type', length: 30, nullable: true })
+  externalSourceType: string;
+
+  @Column({ name: 'external_source_id', length: 100, nullable: true })
+  externalSourceId: string;
+
+  @Column({ name: 'external_source_no', length: 100, nullable: true })
+  externalSourceNo: string;
+
+  @Column({ name: 'import_payload_hash', length: 64, nullable: true })
+  importPayloadHash: string;
+
   @Column({ name: 'org_id', length: 36, comment: '申请组织ID/FApplicationOrgId' })
   orgId: string;
 

@@ -1,4 +1,4 @@
-﻿import { IsNotEmpty, IsString, IsOptional, IsNumber, IsBoolean, IsDate, MaxLength } from 'class-validator';
+﻿import { IsNotEmpty, IsString, IsOptional, IsNumber, IsBoolean, IsDate, IsDateString, MaxLength } from 'class-validator';
 
 export class CreateInventoryOutDto {
   @IsNotEmpty({ message: '组织ID不能为空' })
@@ -154,4 +154,14 @@ export class UpdateInventoryOutDto {
   @IsOptional()
   @IsString({ message: '备注必须为字符串' })
   remark?: string;
+}
+
+export class CreateInventoryOutFromAssetRequestDto {
+  @IsNotEmpty() @IsString() @MaxLength(100) idempotencyKey: string;
+  @IsOptional() @IsDateString() outDate?: string;
+  @IsOptional() @IsString() @MaxLength(1000) remark?: string;
+}
+
+export class ApproveInventoryOutDto {
+  @IsOptional() @IsString() @MaxLength(50) approvedBy?: string;
 }

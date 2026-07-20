@@ -13,10 +13,10 @@ export class Payable extends BaseEntity {
   @Column({ name: 'supplier_id', length: 36, comment: '供应商ID' })
   supplierId: string;
 
-  @Column({ name: 'payable_type', length: 30, default: 'STANDARD', comment: '立账类型：STANDARD/ESTIMATED' })
+  @Column({ name: 'payable_type', length: 30, default: 'STANDARD', comment: '立账类型：STANDARD/ESTIMATED/RED' })
   payableType: string;
 
-  @Column({ name: 'source_type', length: 50, comment: '来源类型；采购暂估为 PURCHASE_INBOUND' })
+  @Column({ name: 'source_type', length: 50, comment: '来源类型；PURCHASE_INBOUND/PURCHASE_RETURN' })
   sourceType: string;
 
   @Column({ name: 'source_id', length: 36, comment: '来源单据ID；无业务来源时回填本应付ID以满足幂等唯一约束' })

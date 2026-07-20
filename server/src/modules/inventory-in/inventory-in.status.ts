@@ -14,6 +14,7 @@ export enum InventoryInType {
 }
 
 export enum PayableGenerationStatus {
+  NOT_REQUIRED = 'NOT_REQUIRED',
   NOT_GENERATED = 'NOT_GENERATED',
   GENERATED = 'GENERATED',
   FAILED = 'FAILED',

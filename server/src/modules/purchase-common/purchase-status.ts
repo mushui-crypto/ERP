@@ -23,6 +23,17 @@ export enum PurchaseOrderSourceType {
   PURCHASE_REQUEST = 'PURCHASE_REQUEST',
 }
 
+export enum PurchaseBillType {
+  STANDARD_PURCHASE = 'STANDARD_PURCHASE',
+  ASSET_PURCHASE = 'ASSET_PURCHASE',
+}
+
+export enum PurchaseBusinessType {
+  STANDARD = 'STANDARD',
+  ASSET_NO_INBOUND = 'ASSET_NO_INBOUND',
+  ASSET_INBOUND = 'ASSET_INBOUND',
+}
+
 export enum PurchaseReceiveNoticeStatus {
   DRAFT = 0,
   SUBMITTED = 1,
@@ -31,6 +42,32 @@ export enum PurchaseReceiveNoticeStatus {
   CLOSED = 4,
   REJECTED = 5,
   REVERSED = 6,
+}
+
+export enum PurchaseReturnStatus {
+  DRAFT = 0,
+  SUBMITTED = 1,
+  APPROVED = 2,
+  CANCELED = 4,
+  CLOSED = 5,
+  REJECTED = 6,
+}
+
+export enum PurchaseReturnMode {
+  REPLENISH = 'REPLENISH',
+  DEDUCTION = 'DEDUCTION',
+}
+
+export enum PurchaseReturnSourceType {
+  INVENTORY_IN = 'INVENTORY_IN',
+  RETURN_REQUEST = 'RETURN_REQUEST',
+}
+
+export enum RedPayableGenerationStatus {
+  NOT_REQUIRED = 'NOT_REQUIRED',
+  NOT_GENERATED = 'NOT_GENERATED',
+  GENERATED = 'GENERATED',
+  FAILED = 'FAILED',
 }
 
 export const PURCHASE_REQUEST_STATUS_META: Record<number, { code: string; name: string }> = {
@@ -61,6 +98,15 @@ export const PURCHASE_ORDER_STATUS_META: Record<number, { code: string; name: st
   [PurchaseOrderStatus.CLOSED]: { code: 'CLOSED', name: '已关闭' },
   [PurchaseOrderStatus.CANCELED]: { code: 'CANCELED', name: '已取消' },
   [PurchaseOrderStatus.REJECTED]: { code: 'REJECTED', name: '已驳回' },
+};
+
+export const PURCHASE_RETURN_STATUS_META: Record<number, { code: string; name: string }> = {
+  [PurchaseReturnStatus.DRAFT]: { code: 'DRAFT', name: '草稿' },
+  [PurchaseReturnStatus.SUBMITTED]: { code: 'SUBMITTED', name: '待审核' },
+  [PurchaseReturnStatus.APPROVED]: { code: 'APPROVED', name: '已审核' },
+  [PurchaseReturnStatus.CANCELED]: { code: 'CANCELED', name: '已取消' },
+  [PurchaseReturnStatus.CLOSED]: { code: 'CLOSED', name: '已关闭' },
+  [PurchaseReturnStatus.REJECTED]: { code: 'REJECTED', name: '已驳回' },
 };
 
 export function withStatusMeta<T extends { status: number }>(

@@ -96,6 +96,10 @@ export class PurchaseRequestEntryDto {
 }
 
 export class CreatePurchaseRequestDto {
+  @IsOptional() @IsString() billType?: string;
+
+  @IsOptional() @IsString() businessType?: string;
+
   @IsNotEmpty()
   @IsString()
   orgId: string;
@@ -157,6 +161,12 @@ export class CreatePurchaseRequestDto {
 }
 
 export class UpdatePurchaseRequestDto extends CreatePurchaseRequestDto {}
+
+export class ImportPurchaseRequestDto extends CreatePurchaseRequestDto {
+  @IsNotEmpty() @IsString() @MaxLength(30) externalSourceType: string;
+  @IsNotEmpty() @IsString() @MaxLength(100) externalSourceId: string;
+  @IsOptional() @IsString() @MaxLength(100) externalSourceNo?: string;
+}
 
 export class ApprovePurchaseRequestEntryDto {
   @IsNotEmpty()

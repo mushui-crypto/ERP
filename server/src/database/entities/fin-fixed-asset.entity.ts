@@ -2,10 +2,26 @@
 import { BaseEntity } from './base.entity';
 
 @Entity('fin_fixed_asset')
+@Index('UQ_fin_fixed_asset_purchase_source', ['sourceType', 'sourceEntryId', 'sourceSequence'], { unique: true, where: 'source_entry_id IS NOT NULL' })
 export class FinFixedAsset extends BaseEntity {
   @Index({ unique: true })
   @Column({ name: 'asset_no', length: 50, comment: '资产编号' })
   assetNo: string;
+
+  @Column({ name: 'source_type', length: 30, nullable: true }) sourceType: string;
+  @Column({ name: 'source_id', length: 36, nullable: true }) sourceId: string;
+  @Column({ name: 'source_no', length: 50, nullable: true }) sourceNo: string;
+  @Column({ name: 'source_entry_id', length: 36, nullable: true }) sourceEntryId: string;
+  @Column({ name: 'source_sequence', type: 'int', default: 1 }) sourceSequence: number;
+  @Column({ name: 'asset_acceptance_id', length: 36, nullable: true }) assetAcceptanceId: string;
+  @Column({ name: 'asset_acceptance_entry_id', length: 36, nullable: true }) assetAcceptanceEntryId: string;
+  @Column({ name: 'inventory_out_id', length: 36, nullable: true }) inventoryOutId: string;
+  @Column({ name: 'inventory_out_entry_id', length: 36, nullable: true }) inventoryOutEntryId: string;
+  @Column({ name: 'purchase_order_id', length: 36, nullable: true }) purchaseOrderId: string;
+  @Column({ name: 'purchase_order_entry_id', length: 36, nullable: true }) purchaseOrderEntryId: string;
+  @Column({ name: 'purchase_request_id', length: 36, nullable: true }) purchaseRequestId: string;
+  @Column({ name: 'purchase_request_entry_id', length: 36, nullable: true }) purchaseRequestEntryId: string;
+  @Column({ type: 'decimal', precision: 18, scale: 4, default: 1 }) quantity: number;
 
   @Column({ name: 'asset_name', length: 200, comment: '资产名称' })
   assetName: string;

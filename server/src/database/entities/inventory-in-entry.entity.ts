@@ -107,6 +107,15 @@ export class InventoryInEntry extends BaseEntity {
   @Column({ name: 'inventory_posting_id', length: 36, nullable: true, comment: '库存过账记录ID' })
   inventoryPostingId: string;
 
+  @Column({ name: 'returned_qty', type: 'decimal', precision: 18, scale: 4, default: 0, comment: '累计已审核采购退料数量' })
+  returnedQty: number;
+
+  @Column({ name: 'asset_accepted_qty', type: 'decimal', precision: 18, scale: 4, default: 0, comment: '累计已通过资产验收数量' })
+  assetAcceptedQty: number;
+
+  @Column({ name: 'source_purchase_return_entry_id', length: 36, nullable: true, comment: '补料入库来源采购退料明细ID' })
+  sourcePurchaseReturnEntryId: string;
+
   @Column({ length: 500, nullable: true, comment: '行备注' })
   remark: string;
 }

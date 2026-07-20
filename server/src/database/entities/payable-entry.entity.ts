@@ -4,7 +4,9 @@ import { Payable } from './payable.entity';
 
 @Entity('fin_payable_entry')
 @Index('UQ_fin_payable_entry_header_line', ['payableId', 'lineNo'], { unique: true })
-@Index('UQ_fin_payable_entry_inventory_in_entry', ['inventoryInEntryId'], { unique: true })
+@Index('UQ_fin_payable_entry_inventory_in_entry', ['inventoryInEntryId'], { unique: true, where: 'inventory_in_entry_id IS NOT NULL' })
+@Index('UQ_fin_payable_entry_purchase_return_entry', ['purchaseReturnEntryId'], { unique: true, where: 'purchase_return_entry_id IS NOT NULL' })
+@Index('UQ_fin_payable_entry_asset_acceptance', ['assetAcceptanceEntryId'], { unique: true, where: 'asset_acceptance_entry_id IS NOT NULL' })
 @Index('IDX_fin_payable_entry_order_entry', ['sourceOrderEntryId'])
 @Index('IDX_fin_payable_entry_request_entry', ['sourceRequestEntryId'])
 export class PayableEntry extends BaseEntity {
@@ -18,8 +20,14 @@ export class PayableEntry extends BaseEntity {
   @Column({ name: 'line_no', type: 'int', comment: '行号' })
   lineNo: number;
 
-  @Column({ name: 'inventory_in_entry_id', length: 36, comment: '来源采购入库明细ID' })
+  @Column({ name: 'inventory_in_entry_id', length: 36, nullable: true, comment: '来源采购入库明细ID；红字应付为空' })
   inventoryInEntryId: string;
+
+  @Column({ name: 'purchase_return_entry_id', length: 36, nullable: true, comment: '来源采购退料明细ID' })
+  purchaseReturnEntryId: string;
+
+  @Column({ name: 'asset_acceptance_entry_id', length: 36, nullable: true, comment: '来源资产验收明细ID' })
+  assetAcceptanceEntryId: string;
 
   @Column({ name: 'source_receive_notice_entry_id', length: 36, comment: '来源收料通知明细ID' })
   sourceReceiveNoticeEntryId: string;

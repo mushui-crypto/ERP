@@ -8,6 +8,7 @@ import { PurchaseOrderEntry } from '../../database/entities/purchase-order-entry
 import { PurchaseOrder } from '../../database/entities/purchase-order.entity';
 import { PurchaseReceiveNoticeEntry } from '../../database/entities/purchase-receive-notice-entry.entity';
 import { PurchaseReceiveNotice } from '../../database/entities/purchase-receive-notice.entity';
+import { PurchaseReturnEntry } from '../../database/entities/purchase-return-entry.entity';
 import { Supplier } from '../../database/entities/supplier.entity';
 import { Warehouse } from '../../database/entities/warehouse.entity';
 import { InventoryService } from '../inventory/inventory.service';
@@ -69,6 +70,8 @@ export class InventoryInService {
       amount: Number(entry.amount || 0),
       taxAmount: Number(entry.taxAmount || 0),
       totalAmount: Number(entry.totalAmount || 0),
+      returnedQty: Number(entry.returnedQty || 0),
+      availableReturnQty: Math.max(0, Number(entry.quantity || 0) - Number(entry.returnedQty || 0)),
     }));
     return withInventoryInStatus({
       ...inventoryIn,
@@ -189,6 +192,8 @@ export class InventoryInService {
           throw new BadRequestException(`收料通知 ${notice.noticeNo} 不是已审核状态，不能下推采购入库`);
         }
       }
+      this.assertSameValue(notices.map((notice) => notice.sourceType || 'PURCHASE_ORDER'), '禁止混合普通收料与退料补料收料下推采购入库');
+      const isReturnReplenish = notices[0].sourceType === 'PURCHASE_RETURN_REPLENISH';
 
       const purchaseOrderIds = new Set(sourceEntries.map((entry) => entry.sourceOrderId));
       if (purchaseOrderIds.size !== 1) throw new BadRequestException('P0 仅允许合并同一采购订单的多张收料通知');
@@ -198,7 +203,10 @@ export class InventoryInService {
         lock: { mode: 'pessimistic_write' },
       });
       if (!order) throw new BadRequestException('来源采购订单不存在');
-      if (order.status !== PurchaseOrderStatus.APPROVED) {
+      const allowedOrderStatuses = isReturnReplenish
+        ? [PurchaseOrderStatus.APPROVED, PurchaseOrderStatus.FULLY_STOCKED]
+        : [PurchaseOrderStatus.APPROVED];
+      if (!allowedOrderStatuses.includes(order.status)) {
         throw new BadRequestException(`采购订单 ${order.orderNo} 当前状态不允许下推采购入库`);
       }
       if (!order.currencyId) throw new BadRequestException(`采购订单 ${order.orderNo} 缺少币种，不能下推采购入库`);
@@ -207,6 +215,10 @@ export class InventoryInService {
       this.assertSameValue(notices.map((notice) => notice.stockOrgId), '禁止跨收料/库存组织合并下推');
       this.assertSameValue(notices.map((notice) => notice.purchaseOrgId), '禁止跨采购组织合并下推');
       this.assertSameValue(notices.map((notice) => notice.supplierId), '禁止跨供应商合并下推');
+      this.assertSameValue(notices.map((notice) => notice.businessType || 'STANDARD'), '禁止混合不同采购业务类型下推采购入库');
+      const businessType = notices[0].businessType || 'STANDARD';
+      if (businessType === 'ASSET_NO_INBOUND') throw new BadRequestException('资产采购不入库流程禁止生成采购入库单');
+      if (!['STANDARD', 'ASSET_INBOUND'].includes(businessType)) throw new BadRequestException('当前采购业务类型不允许生成采购入库单');
       if (notices.some((notice) => notice.purchaseOrderId !== order.id || notice.supplierId !== order.supplierId)) {
         throw new BadRequestException('收料通知与采购订单的来源或供应商不一致');
       }
@@ -241,9 +253,9 @@ export class InventoryInService {
         settleOrgId: dto.settleOrgId,
         ownerType: dto.ownerType,
         ownerId: dto.ownerId,
-        businessType: 'STANDARD',
+        businessType,
         inType: InventoryInType.PURCHASE,
-        sourceType: 'PURCHASE_RECEIVE_NOTICE',
+        sourceType: isReturnReplenish ? 'PURCHASE_RETURN_REPLENISH' : 'PURCHASE_RECEIVE_NOTICE',
         supplierId: supplier.id,
         supplierCode: supplier.supplierCode,
         supplierName: supplier.supplierName,
@@ -251,7 +263,9 @@ export class InventoryInService {
         paymentTermId: order.paymentTermId,
         inDate: dto.inDate ? new Date(dto.inDate) : new Date(),
         status: InventoryInStatus.DRAFT,
-        payableGenerationStatus: PayableGenerationStatus.NOT_GENERATED,
+        payableGenerationStatus: isReturnReplenish
+          ? PayableGenerationStatus.NOT_REQUIRED
+          : PayableGenerationStatus.NOT_GENERATED,
         amount: 0,
         taxAmount: 0,
         totalAmount: 0,
@@ -300,6 +314,9 @@ export class InventoryInService {
           sourceRequestId: source.sourceRequestId,
           sourceRequestNo: source.sourceRequestNo,
           sourceRequestEntryId: source.sourceRequestEntryId,
+          sourcePurchaseReturnEntryId: source.sourcePurchaseReturnEntryId,
+          returnedQty: 0,
+          assetAcceptedQty: 0,
           remark: input.remark || null,
         });
         createdEntries.push(await manager.save(created));
@@ -479,7 +496,14 @@ export class InventoryInService {
         lock: { mode: 'pessimistic_write' },
       });
       if (!order) throw new BadRequestException('来源采购订单不存在');
-      if (order.status !== PurchaseOrderStatus.APPROVED) {
+      const isReturnReplenish = entries.every((entry) => Boolean(entry.sourcePurchaseReturnEntryId));
+      if (entries.some((entry) => Boolean(entry.sourcePurchaseReturnEntryId)) !== isReturnReplenish) {
+        throw new BadRequestException('禁止混合普通采购入库与退料补料入库明细');
+      }
+      const allowedOrderStatuses = isReturnReplenish
+        ? [PurchaseOrderStatus.APPROVED, PurchaseOrderStatus.FULLY_STOCKED]
+        : [PurchaseOrderStatus.APPROVED];
+      if (!allowedOrderStatuses.includes(order.status)) {
         throw new BadRequestException(`采购订单 ${order.orderNo} 当前状态不允许采购入库审核`);
       }
 
@@ -510,26 +534,45 @@ export class InventoryInService {
         entry.inventoryPostingId = posting.id;
 
         source.stockedQty = this.round(Number(source.stockedQty || 0) + Number(entry.quantity), 4);
-        orderEntry.stockedQty = this.round(Number(orderEntry.stockedQty || 0) + Number(entry.quantity), 4);
-        await manager.save([entry, source, orderEntry]);
+        if (entry.sourcePurchaseReturnEntryId) {
+          const returnEntry = await manager.findOne(PurchaseReturnEntry, {
+            where: { id: entry.sourcePurchaseReturnEntryId, isDeleted: 0 },
+            lock: { mode: 'pessimistic_write' },
+          });
+          if (!returnEntry) throw new BadRequestException('补料入库来源采购退料明细不存在');
+          const remaining = Number(returnEntry.returnQty) - Number(returnEntry.replenishedStockedQty || 0);
+          if (Number(entry.quantity) - remaining > QUANTITY_EPSILON) {
+            throw new BadRequestException(`采购退料第${returnEntry.lineNo}行剩余可补料入库数量为 ${Math.max(0, remaining)}`);
+          }
+          returnEntry.replenishedStockedQty = this.round(Number(returnEntry.replenishedStockedQty || 0) + Number(entry.quantity), 4);
+          await manager.save(returnEntry);
+          await manager.save([entry, source]);
+        } else {
+          orderEntry.stockedQty = this.round(Number(orderEntry.stockedQty || 0) + Number(entry.quantity), 4);
+          await manager.save([entry, source, orderEntry]);
+        }
       }
 
-      const allOrderEntries = await manager.getRepository(PurchaseOrderEntry)
-        .createQueryBuilder('entry')
-        .where('entry.purchaseOrderId = :orderId', { orderId: order.id })
-        .andWhere('entry.isDeleted = 0')
-        .orderBy('entry.id', 'ASC')
-        .setLock('pessimistic_write')
-        .getMany();
-      if (allOrderEntries.length && allOrderEntries.every((entry) => Number(entry.stockedQty || 0) + QUANTITY_EPSILON >= Number(entry.orderQty))) {
-        order.status = PurchaseOrderStatus.FULLY_STOCKED;
-        await manager.save(order);
+      if (!isReturnReplenish) {
+        const allOrderEntries = await manager.getRepository(PurchaseOrderEntry)
+          .createQueryBuilder('entry')
+          .where('entry.purchaseOrderId = :orderId', { orderId: order.id })
+          .andWhere('entry.isDeleted = 0')
+          .orderBy('entry.id', 'ASC')
+          .setLock('pessimistic_write')
+          .getMany();
+        if (allOrderEntries.length && allOrderEntries.every((entry) => Number(entry.stockedQty || 0) + QUANTITY_EPSILON >= Number(entry.orderQty))) {
+          order.status = PurchaseOrderStatus.FULLY_STOCKED;
+          await manager.save(order);
+        }
       }
 
       inventoryIn.status = InventoryInStatus.APPROVED;
       inventoryIn.approvedAt = approvedAt;
       inventoryIn.approvedBy = dto.approvedBy || null;
-      inventoryIn.payableGenerationStatus = PayableGenerationStatus.NOT_GENERATED;
+      inventoryIn.payableGenerationStatus = isReturnReplenish
+        ? PayableGenerationStatus.NOT_REQUIRED
+        : PayableGenerationStatus.NOT_GENERATED;
       inventoryIn.payableId = null;
       inventoryIn.payableNo = null;
       inventoryIn.payableGenerationError = null;
@@ -539,7 +582,10 @@ export class InventoryInService {
       return manager.save(inventoryIn);
     });
 
-    if (approvedInventoryIn.inType !== InventoryInType.PURCHASE) {
+    if (
+      approvedInventoryIn.inType !== InventoryInType.PURCHASE
+      || approvedInventoryIn.sourceType === 'PURCHASE_RETURN_REPLENISH'
+    ) {
       return this.present(approvedInventoryIn);
     }
 
@@ -553,10 +599,13 @@ export class InventoryInService {
         const inventoryIn = await this.findEntityById(id, manager, true);
         if (!inventoryIn) throw new NotFoundException('入库单不存在');
         if (inventoryIn.inType !== InventoryInType.PURCHASE) {
-          throw new BadRequestException('只有标准采购入库允许生成暂估应付');
+          throw new BadRequestException('只有采购入库允许生成暂估应付');
         }
         if (inventoryIn.status !== InventoryInStatus.APPROVED) {
           throw new BadRequestException('只有已审核采购入库允许生成暂估应付');
+        }
+        if (inventoryIn.sourceType === 'PURCHASE_RETURN_REPLENISH') {
+          throw new BadRequestException('退料补料入库不重复生成暂估应付');
         }
         if (inventoryIn.payableGenerationStatus === PayableGenerationStatus.GENERATED && inventoryIn.payableId) {
           return this.present(inventoryIn);
@@ -621,6 +670,7 @@ export class InventoryInService {
         inventoryIn.inType !== InventoryInType.PURCHASE
         || inventoryIn.status !== InventoryInStatus.APPROVED
         || inventoryIn.payableGenerationStatus === PayableGenerationStatus.GENERATED
+        || inventoryIn.payableGenerationStatus === PayableGenerationStatus.NOT_REQUIRED
       ) {
         return null;
       }
@@ -700,7 +750,9 @@ export class InventoryInService {
     if (!inventoryIn.supplierId || !inventoryIn.currencyId || !inventoryIn.paymentTermId) {
       throw new BadRequestException('采购入库缺少供应商、币种或付款条件');
     }
-    if (inventoryIn.businessType !== 'STANDARD') throw new BadRequestException('当前只支持标准采购入库');
+    if (!['STANDARD', 'ASSET_INBOUND'].includes(inventoryIn.businessType)) {
+      throw new BadRequestException('当前业务类型不支持采购入库');
+    }
   }
 
   private async assertSourceAvailable(

@@ -1,6 +1,7 @@
 import { Controller, Get, Post, Put, Delete, Param, Query, Body } from '@nestjs/common';
 import { FixedAssetService } from './fixed-asset.service';
 import { FinFixedAsset } from '../../database/entities/fin-fixed-asset.entity';
+import { CreateAssetCategoryDto } from './dto/fixed-asset.dto';
 
 @Controller('fixed-asset')
 export class FixedAssetController {
@@ -9,6 +10,16 @@ export class FixedAssetController {
   @Get('statistics')
   async getAssetStatistics() {
     return this.fixedAssetService.getAssetStatistics();
+  }
+
+  @Get('categories')
+  async findCategories() {
+    return this.fixedAssetService.findCategories();
+  }
+
+  @Post('categories')
+  async createCategory(@Body() dto: CreateAssetCategoryDto) {
+    return this.fixedAssetService.createCategory(dto);
   }
 
   @Get()

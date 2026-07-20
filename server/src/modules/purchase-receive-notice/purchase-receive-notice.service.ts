@@ -9,11 +9,15 @@ import { PurchaseReceiveNoticeReversalEntry } from '../../database/entities/purc
 import { PurchaseReceiveNoticeReversal } from '../../database/entities/purchase-receive-notice-reversal.entity';
 import { PurchaseReceiveNotice } from '../../database/entities/purchase-receive-notice.entity';
 import { QualityInspection } from '../../database/entities/quality-inspection.entity';
+import { PurchaseReturnEntry } from '../../database/entities/purchase-return-entry.entity';
+import { PurchaseReturn } from '../../database/entities/purchase-return.entity';
 import {
   generateDocumentNo,
   PURCHASE_RECEIVE_NOTICE_STATUS_META,
   PurchaseOrderStatus,
   PurchaseReceiveNoticeStatus,
+  PurchaseReturnMode,
+  PurchaseReturnStatus,
   withStatusMeta,
 } from '../purchase-common/purchase-status';
 import {
@@ -252,6 +256,8 @@ export class PurchaseReceiveNoticeService {
 
       const notice = manager.create(PurchaseReceiveNotice, {
         noticeNo: generateDocumentNo('PRN'),
+        billType: order.billType,
+        businessType: order.businessType,
         receiveBatchNo: dto.receiveBatchNo,
         purchaseOrderId: order.id,
         purchaseOrderNo: order.orderNo,
@@ -294,6 +300,7 @@ export class PurchaseReceiveNoticeService {
             concessionQty: 0,
             unqualifiedQty: 0,
             stockedQty: 0,
+            assetAcceptedQty: 0,
             checkIncoming: line.checkIncoming ?? source.checkIncoming,
             warehouseId: line.warehouseId || source.warehouseId || order.warehouseId,
             unitPrice: money.unitPrice,
@@ -312,6 +319,102 @@ export class PurchaseReceiveNoticeService {
     });
   }
 
+  async createFromReturnReplenish(purchaseReturnId: string, transactionManager?: EntityManager) {
+    const execute = async (manager: EntityManager) => {
+      const purchaseReturn = await manager.findOne(PurchaseReturn, {
+        where: { id: purchaseReturnId, isDeleted: 0 },
+        relations: { entries: true },
+        lock: { mode: 'pessimistic_write' },
+      });
+      if (!purchaseReturn) throw new NotFoundException('采购退料单不存在');
+      if (purchaseReturn.status !== PurchaseReturnStatus.APPROVED) throw new BadRequestException('只有已审核采购退料单允许生成补料收料通知');
+      if (purchaseReturn.returnMode !== PurchaseReturnMode.REPLENISH) throw new BadRequestException('只有补料方式采购退料单允许生成收料通知');
+
+      const existing = await manager.findOne(PurchaseReceiveNotice, {
+        where: { sourcePurchaseReturnId: purchaseReturn.id, isDeleted: 0 },
+        relations: { entries: true },
+        lock: { mode: 'pessimistic_write' },
+      });
+      if (existing) return this.present(existing);
+      const returnEntries = purchaseReturn.entries.filter((entry) => entry.isDeleted === 0);
+      if (!returnEntries.length) throw new BadRequestException('采购退料单没有有效补料明细');
+      const orderIds = [...new Set(returnEntries.map((entry) => entry.sourceOrderId))];
+      if (orderIds.length !== 1) throw new BadRequestException('一张补料收料通知只能对应一张采购订单');
+      const order = await manager.findOne(PurchaseOrder, { where: { id: orderIds[0], isDeleted: 0 } });
+      if (!order) throw new BadRequestException('补料来源采购订单不存在');
+
+      const notice = manager.create(PurchaseReceiveNotice, {
+        noticeNo: generateDocumentNo('PRN'),
+        receiveBatchNo: `REPLENISH:${purchaseReturn.id}`,
+        purchaseOrderId: order.id,
+        purchaseOrderNo: order.orderNo,
+        sourceType: 'PURCHASE_RETURN_REPLENISH',
+        sourcePurchaseReturnId: purchaseReturn.id,
+        sourcePurchaseReturnNo: purchaseReturn.returnNo,
+        stockOrgId: purchaseReturn.stockOrgId,
+        purchaseOrgId: purchaseReturn.purchaseOrgId,
+        supplierId: purchaseReturn.supplierId,
+        receiveDate: new Date(),
+        needCheck: true,
+        status: PurchaseReceiveNoticeStatus.DRAFT,
+        remark: `采购退料 ${purchaseReturn.returnNo} 补料生成`,
+      });
+      await manager.save(notice);
+      const noticeEntries: PurchaseReceiveNoticeEntry[] = [];
+      for (let index = 0; index < returnEntries.length; index += 1) {
+        const source = returnEntries[index];
+        const originalReceiveEntry = await manager.findOne(PurchaseReceiveNoticeEntry, {
+          where: { id: source.sourceReceiveNoticeEntryId, isDeleted: 0 },
+        });
+        const amount = Number((Number(source.returnQty) * Number(source.unitPrice)).toFixed(2));
+        const taxAmount = Number(((amount * Number(source.taxRate || 0)) / 100).toFixed(2));
+        const entry = manager.create(PurchaseReceiveNoticeEntry, {
+          purchaseReceiveNoticeId: notice.id,
+          lineNo: index + 1,
+          sourceOrderId: source.sourceOrderId,
+          sourceOrderNo: order.orderNo,
+          sourceOrderEntryId: source.sourceOrderEntryId,
+          sourceRequestId: source.sourceRequestId,
+          sourceRequestNo: null,
+          sourceRequestEntryId: source.sourceRequestEntryId,
+          sourcePurchaseReturnEntryId: source.id,
+          materialId: source.materialId,
+          materialCode: source.materialCode,
+          materialName: source.materialName,
+          materialModel: source.materialModel,
+          unitId: source.unitId,
+          unitCode: source.unitCode,
+          unitName: source.unitName,
+          receiveQty: Number(source.returnQty),
+          inspectedQty: 0,
+          qualifiedQty: 0,
+          concessionQty: 0,
+          unqualifiedQty: 0,
+          stockedQty: 0,
+          checkIncoming: originalReceiveEntry?.checkIncoming ?? true,
+          warehouseId: source.warehouseId,
+          unitPrice: Number(source.unitPrice),
+          amount,
+          taxRate: Number(source.taxRate || 0),
+          taxAmount,
+          netAmount: Number((amount + taxAmount).toFixed(2)),
+          supplierLot: source.lotNo || null,
+          remark: `采购退料 ${purchaseReturn.returnNo} 补料`,
+        });
+        const savedEntry = await manager.save(entry);
+        source.replenishNoticeEntryId = savedEntry.id;
+        await manager.save(source);
+        noticeEntries.push(savedEntry);
+      }
+      notice.entries = noticeEntries;
+      purchaseReturn.replenishNoticeId = notice.id;
+      purchaseReturn.replenishNoticeNo = notice.noticeNo;
+      await manager.save(purchaseReturn);
+      return this.present(notice);
+    };
+    return transactionManager ? execute(transactionManager) : this.dataSource.transaction(execute);
+  }
+
   async update(id: string, dto: UpdatePurchaseReceiveNoticeDto) {
     return this.dataSource.transaction(async (manager) => {
       const notice = await this.findEntityById(id, manager, true);
@@ -325,7 +428,11 @@ export class PurchaseReceiveNoticeService {
         lock: { mode: 'pessimistic_write' },
       });
       if (!order) throw new BadRequestException('来源采购订单不存在');
-      if (order.status !== PurchaseOrderStatus.APPROVED) {
+      const isReturnReplenish = notice.sourceType === 'PURCHASE_RETURN_REPLENISH';
+      const allowedOrderStatuses = isReturnReplenish
+        ? [PurchaseOrderStatus.APPROVED, PurchaseOrderStatus.FULLY_STOCKED]
+        : [PurchaseOrderStatus.APPROVED];
+      if (!allowedOrderStatuses.includes(order.status)) {
         throw new BadRequestException('来源采购订单当前状态不允许修改收料通知');
       }
       if (!order.purchaseOrgId) throw new BadRequestException('来源采购订单缺少采购组织，不能修改收料通知');
@@ -346,6 +453,9 @@ export class PurchaseReceiveNoticeService {
       });
 
       if (dto.lines) {
+        if (isReturnReplenish && dto.lines.length !== notice.entries.filter((entry) => entry.isDeleted === 0).length) {
+          throw new BadRequestException('退料补料收料通知不允许新增或删除明细');
+        }
         const duplicateIds = dto.lines
           .map((line) => line.id)
           .filter((entryId, index, all) => all.indexOf(entryId) !== index);
@@ -370,6 +480,23 @@ export class PurchaseReceiveNoticeService {
         for (let index = 0; index < dto.lines.length; index += 1) {
           const line = dto.lines[index];
           const entry = existingById.get(line.id)!;
+          if (isReturnReplenish) {
+            if (Math.abs(Number(line.quantity) - Number(entry.receiveQty)) > QUANTITY_EPSILON) {
+              throw new BadRequestException('退料补料收料数量必须等于采购退料数量，不允许修改');
+            }
+            Object.assign(entry, {
+              lineNo: index + 1,
+              checkIncoming: line.checkIncoming ?? entry.checkIncoming,
+              warehouseId: line.warehouseId ?? entry.warehouseId,
+              supplierLot: line.supplierLot ?? entry.supplierLot,
+              produceDate: line.produceDate ? new Date(line.produceDate) : entry.produceDate,
+              expiryDate: line.expiryDate ? new Date(line.expiryDate) : entry.expiryDate,
+              remark: line.remark ?? entry.remark,
+              isDeleted: 0,
+            });
+            nextEntries.push(await manager.save(entry));
+            continue;
+          }
           const orderEntry = await manager.findOne(PurchaseOrderEntry, {
             where: { id: entry.sourceOrderEntryId, purchaseOrderId: notice.purchaseOrderId, isDeleted: 0 },
             lock: { mode: 'pessimistic_write' },
@@ -433,6 +560,20 @@ export class PurchaseReceiveNoticeService {
         throw new BadRequestException('只有待审核收料通知允许审核');
       const entries = notice.entries.filter((entry) => entry.isDeleted === 0);
       for (const entry of entries) {
+        if (notice.sourceType === 'PURCHASE_RETURN_REPLENISH') {
+          const returnEntry = await manager.findOne(PurchaseReturnEntry, {
+            where: { id: entry.sourcePurchaseReturnEntryId, isDeleted: 0 },
+            lock: { mode: 'pessimistic_write' },
+          });
+          if (!returnEntry) throw new BadRequestException('补料来源采购退料明细不存在');
+          const remaining = Number(returnEntry.returnQty) - Number(returnEntry.replenishedReceivedQty || 0);
+          if (Number(entry.receiveQty) - remaining > QUANTITY_EPSILON) {
+            throw new BadRequestException(`采购退料第${returnEntry.lineNo}行剩余可补料收料数量为 ${Math.max(0, remaining)}`);
+          }
+          returnEntry.replenishedReceivedQty = Number(returnEntry.replenishedReceivedQty || 0) + Number(entry.receiveQty);
+          await manager.save(returnEntry);
+          continue;
+        }
         const orderEntry = await manager.findOne(PurchaseOrderEntry, {
           where: { id: entry.sourceOrderEntryId, purchaseOrderId: notice.purchaseOrderId, isDeleted: 0 },
           lock: { mode: 'pessimistic_write' },
@@ -527,6 +668,35 @@ export class PurchaseReceiveNoticeService {
           left.sourceOrderEntryId.localeCompare(right.sourceOrderEntryId),
         );
         for (const noticeEntry of entriesToReverse) {
+          if (notice.sourceType === 'PURCHASE_RETURN_REPLENISH') {
+            const returnEntry = await manager.findOne(PurchaseReturnEntry, {
+              where: { id: noticeEntry.sourcePurchaseReturnEntryId, isDeleted: 0 },
+              lock: { mode: 'pessimistic_write' },
+            });
+            if (!returnEntry) throw new BadRequestException('补料来源采购退料明细不存在');
+            const beforeReceivedQty = Number(returnEntry.replenishedReceivedQty || 0);
+            const reversalQty = Number(noticeEntry.receiveQty || 0);
+            if (beforeReceivedQty + QUANTITY_EPSILON < reversalQty) {
+              throw new BadRequestException(`采购退料第${returnEntry.lineNo}行累计补料收料数量不足，不能冲销`);
+            }
+            const afterReceivedQty = beforeReceivedQty - reversalQty;
+            returnEntry.replenishedReceivedQty = afterReceivedQty;
+            await manager.save(returnEntry);
+            reversalEntries.push(manager.create(PurchaseReceiveNoticeReversalEntry, {
+              reversalId: reversal.id,
+              lineNo: noticeEntry.lineNo,
+              sourceNoticeEntryId: noticeEntry.id,
+              sourceOrderEntryId: noticeEntry.sourceOrderEntryId,
+              materialId: noticeEntry.materialId,
+              unitId: noticeEntry.unitId,
+              reversalQty,
+              beforeReceivedQty,
+              afterReceivedQty,
+              createdBy: dto.operatedBy?.trim() || null,
+              updatedBy: dto.operatedBy?.trim() || null,
+            }));
+            continue;
+          }
           const orderEntry = await manager.findOne(PurchaseOrderEntry, {
             where: {
               id: noticeEntry.sourceOrderEntryId,

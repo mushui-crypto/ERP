@@ -49,6 +49,9 @@ export class PurchaseOrderEntry extends BaseEntity {
   @Column({ name: 'stocked_qty', type: 'decimal', precision: 18, scale: 4, default: 0, comment: '累计审核入库数量/FStockInQty' })
   stockedQty: number;
 
+  @Column({ name: 'returned_qty', type: 'decimal', precision: 18, scale: 4, default: 0, comment: '累计已审核采购退料数量' })
+  returnedQty: number;
+
   @Column({ name: 'unit_price', type: 'decimal', precision: 18, scale: 4, default: 0, comment: '采购单价' })
   unitPrice: number;
 
