@@ -1,0 +1,60 @@
+{
+  "run": "P4-BE-1784547433506",
+  "branch": "codex/purchase-p4-change-reconcile-report",
+  "completedAt": "2026-07-20T11:37:14.990Z",
+  "passed": true,
+  "summary": {
+    "total": 20,
+    "passed": 20,
+    "failed": 0
+  },
+  "checks": [
+    "登录",
+    "变更中文快照",
+    "变更同键同载荷幂等",
+    "变更同键不同载荷返回409",
+    "单订单唯一待生效变更",
+    "变更审核并生效",
+    "订单数量价格金额反写",
+    "取消变更释放唯一约束",
+    "取消后可重建变更",
+    "对账生成及来源追溯",
+    "对账同键同载荷幂等",
+    "对账同键不同载荷返回409",
+    "对账取消释放有效范围",
+    "对账取消后可重生成",
+    "非零差异原因必填",
+    "对账确认及中文原因备注",
+    "订单执行汇总HTTP 200",
+    "订单执行明细HTTP 200",
+    "采购消耗汇总HTTP 200",
+    "基础概览HTTP 200"
+  ],
+  "assertions": {
+    "effectiveChange": {
+      "id": "FF23433E-F36B-1410-8B47-0096A7B40922",
+      "statusCode": "APPROVED",
+      "effectiveStatus": "EFFECTIVE",
+      "orderQty": 14,
+      "unitPrice": 12,
+      "untaxedAmount": 168,
+      "taxAmount": 21.84,
+      "totalAmount": 189.84
+    },
+    "reconciliation": {
+      "canceledId": "0E24433E-F36B-1410-8B47-0096A7B40922",
+      "confirmedId": "1424433E-F36B-1410-8B47-0096A7B40922",
+      "differenceReason": "P4数量差异中文原因"
+    }
+  },
+  "swagger": {
+    "p4PathCount": 17,
+    "requestSchemasNonEmpty": true,
+    "reportQueryParameterCount": 12
+  },
+  "commands": {
+    "build": "npm run build",
+    "migrationDown": "npx typeorm-ts-node-commonjs migration:revert -d src/database/data-source.ts",
+    "migrationUp": "npm run migration:run"
+  }
+}

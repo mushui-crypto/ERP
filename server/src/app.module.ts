@@ -45,6 +45,9 @@ import { PurchaseReturnModule } from './modules/purchase-return/purchase-return.
 import { AssetAcceptanceModule } from './modules/asset-acceptance/asset-acceptance.module';
 import { AssetOutRequestModule } from './modules/asset-out-request/asset-out-request.module';
 import { ExpenseAcceptanceModule } from './modules/expense-acceptance/expense-acceptance.module';
+import { PurchaseOrderChangeModule } from './modules/purchase-order-change/purchase-order-change.module';
+import { PurchaseReconciliationModule } from './modules/purchase-reconciliation/purchase-reconciliation.module';
+import { PurchaseReportModule } from './modules/purchase-report/purchase-report.module';
 import { SalesOrderModule } from './modules/sales-order/sales-order.module';
 import { BomModule } from './modules/bom/bom.module';
 import { BomDetailModule } from './modules/bom-detail/bom-detail.module';
@@ -161,6 +164,9 @@ import { TaskModule } from './modules/task/task.module';
     AssetAcceptanceModule,
     AssetOutRequestModule,
     ExpenseAcceptanceModule,
+    PurchaseOrderChangeModule,
+    PurchaseReconciliationModule,
+    PurchaseReportModule,
     SalesOrderModule,
     BomModule,
     BomDetailModule,

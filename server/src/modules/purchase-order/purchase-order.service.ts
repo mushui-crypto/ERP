@@ -26,6 +26,21 @@ import {
   UpdatePurchaseOrderDto,
 } from './dto/purchase-order.dto';
 
+export interface ApprovedPurchaseOrderChangeLine {
+  sourceOrderEntryId: string;
+  sourceRequestEntryId?: string;
+  oldOrderQty: number;
+  newOrderQty: number;
+  oldUnitPrice: number;
+  newUnitPrice: number;
+  oldDeliveryDate?: Date;
+  newDeliveryDate?: Date;
+  oldWarehouseId?: string;
+  newWarehouseId?: string;
+  oldRemark?: string;
+  newRemark?: string;
+}
+
 @Injectable()
 export class PurchaseOrderService {
   constructor(
@@ -813,6 +828,110 @@ export class PurchaseOrderService {
       if (first) request.purchasedQty = Number(first.purchasedQty || 0);
       await manager.save(request);
     }
+  }
+
+  async applyApprovedChange(
+    orderId: string,
+    lines: ApprovedPurchaseOrderChangeLine[],
+    manager: EntityManager,
+    operatedBy?: string,
+  ) {
+    const order = await this.findEntityById(orderId, manager, true);
+    if (!order) throw new NotFoundException('来源采购订单不存在');
+    if (order.status !== PurchaseOrderStatus.APPROVED) {
+      throw new BadRequestException('只有已审核且未完成、未关闭的采购订单允许变更');
+    }
+    if (!lines.length || new Set(lines.map((line) => line.sourceOrderEntryId)).size !== lines.length) {
+      throw new BadRequestException('采购订单变更明细不能为空或重复');
+    }
+
+    const entries = await manager.getRepository(PurchaseOrderEntry)
+      .createQueryBuilder('entry')
+      .where('entry.purchaseOrderId = :orderId', { orderId })
+      .andWhere('entry.isDeleted = 0')
+      .orderBy('entry.id', 'ASC')
+      .setLock('pessimistic_write')
+      .getMany();
+    const entryById = new Map(entries.map((entry) => [entry.id, entry]));
+    const requestDeltas = new Map<string, number>();
+    const affectedRequestIds = new Set<string>();
+    const sameDate = (left?: Date, right?: Date) => (left ? new Date(left).getTime() : 0) === (right ? new Date(right).getTime() : 0);
+    const sameText = (left?: string, right?: string) => (left || '') === (right || '');
+
+    for (const line of [...lines].sort((left, right) => left.sourceOrderEntryId.localeCompare(right.sourceOrderEntryId))) {
+      const entry = entryById.get(line.sourceOrderEntryId);
+      if (!entry) throw new BadRequestException(`来源采购订单明细不存在: ${line.sourceOrderEntryId}`);
+      if (
+        Math.abs(Number(entry.orderQty) - Number(line.oldOrderQty)) > 0.000001
+        || Math.abs(Number(entry.unitPrice) - Number(line.oldUnitPrice)) > 0.000001
+        || !sameDate(entry.deliveryDate, line.oldDeliveryDate)
+        || !sameText(entry.warehouseId, line.oldWarehouseId)
+        || !sameText(entry.remark, line.oldRemark)
+      ) {
+        throw new BadRequestException(`采购订单第${entry.lineNo}行变更基线已失效，请重新创建变更单`);
+      }
+      if (Number(line.newOrderQty) <= 0) throw new BadRequestException(`采购订单第${entry.lineNo}行新数量必须大于0`);
+      if (Number(line.newUnitPrice) < 0) throw new BadRequestException(`采购订单第${entry.lineNo}行新单价不能小于0`);
+      const executedQty = Math.max(Number(entry.receivedQty || 0), Number(entry.stockedQty || 0));
+      if (Number(line.newOrderQty) + 0.000001 < executedQty) {
+        throw new BadRequestException(`采购订单第${entry.lineNo}行新数量不得小于已收料/已入库数量 ${executedQty}`);
+      }
+      const delta = Number(line.newOrderQty) - Number(entry.orderQty);
+      if (entry.sourceRequestEntryId && Math.abs(delta) > 0.000001) {
+        requestDeltas.set(entry.sourceRequestEntryId, (requestDeltas.get(entry.sourceRequestEntryId) || 0) + delta);
+      }
+      const amount = Number((Number(line.newOrderQty) * Number(line.newUnitPrice)).toFixed(2));
+      const taxAmount = Number(((amount * Number(entry.taxRate || 0)) / 100).toFixed(2));
+      entry.orderQty = Number(line.newOrderQty);
+      entry.unitPrice = Number(line.newUnitPrice);
+      entry.amount = amount;
+      entry.taxAmount = taxAmount;
+      entry.netAmount = Number((amount + taxAmount).toFixed(2));
+      entry.deliveryDate = line.newDeliveryDate ? new Date(line.newDeliveryDate) : null;
+      entry.warehouseId = line.newWarehouseId || null;
+      entry.remark = line.newRemark || null;
+      entry.updatedBy = operatedBy || null;
+    }
+
+    for (const requestEntryId of [...requestDeltas.keys()].sort()) {
+      const requestEntry = await manager.findOne(PurchaseRequestEntry, {
+        where: { id: requestEntryId, isDeleted: 0 },
+        relations: { purchaseRequest: true },
+        lock: { mode: 'pessimistic_write' },
+      });
+      if (!requestEntry || !requestEntry.purchaseRequest) {
+        throw new BadRequestException(`来源采购申请明细不存在: ${requestEntryId}`);
+      }
+      if (![PurchaseRequestStatus.APPROVED, PurchaseRequestStatus.FULLY_ORDERED].includes(requestEntry.purchaseRequest.status)) {
+        throw new BadRequestException(`来源采购申请 ${requestEntry.purchaseRequest.requestNo} 当前状态不允许调整已采购数量`);
+      }
+      const nextPurchasedQty = Number(requestEntry.purchasedQty || 0) + Number(requestDeltas.get(requestEntryId));
+      const approvedQty = Number(requestEntry.approveQty ?? requestEntry.requestQty);
+      if (nextPurchasedQty < -0.000001 || nextPurchasedQty - approvedQty > 0.000001) {
+        throw new BadRequestException(
+          `采购申请 ${requestEntry.purchaseRequest.requestNo} 第${requestEntry.lineNo}行变更后已采购数量超出 0-${approvedQty} 范围`,
+        );
+      }
+      requestEntry.purchasedQty = Number(Math.max(0, nextPurchasedQty).toFixed(4));
+      requestEntry.updatedBy = operatedBy || null;
+      affectedRequestIds.add(requestEntry.purchaseRequestId);
+      await manager.save(requestEntry);
+    }
+
+    await manager.save(entries);
+    await this.refreshRequestStatuses(manager, [...affectedRequestIds]);
+    order.entries = entries;
+    this.recalculateTotals(order);
+    const first = entries.sort((left, right) => left.lineNo - right.lineNo)[0];
+    if (first) {
+      order.materialId = first.materialId;
+      order.materialCode = first.materialCode;
+      order.materialName = first.materialName;
+      order.quantity = Number(first.orderQty);
+      order.unitPrice = Number(first.unitPrice);
+    }
+    order.updatedBy = operatedBy || null;
+    return manager.save(order);
   }
 
   async getStatistics(period?: string) {
