@@ -1,0 +1,764 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>客户管理 — 磐枢工业智能平台</title>
+<link rel="stylesheet" href="../common.css">
+<script src="../common.js"></script>
+<script></script>
+<style>
+.list-filter-row .filter-field label { font-size:12px; color:#666; padding:5px 8px; white-space:nowrap; border-right:1px solid #e8e8e8; }
+.list-filter-row .filter-field input[type="number"] { width:110px; }
+.list-filter-row .filter-field .range-sep { padding:0 4px; color:#666; font-size:12px; }
+
+.modal-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:1000; justify-content:center; align-items:flex-start; padding-top:40px; }
+.modal-overlay.show { display:flex; }
+.modal-dialog { background:#fff; border:1px solid #e8e8e8; border-radius:4px; width:800px; max-height:88vh; overflow-y:auto; box-shadow:0 4px 16px rgba(0,0,0,0.15); }
+.modal-header { display:flex; align-items:center; justify-content:space-between; padding:12px 20px; border-bottom:1px solid #e8e8e8; position:sticky; top:0; background:#fff; z-index:2; }
+.modal-title { font-size:16px; font-weight:600; color:#333; }
+.modal-close { cursor:pointer; font-size:22px; color:#666; background:none; border:none; line-height:1; padding:0 4px; transition:color var(--transition); }
+.modal-close:hover { color:#f5222d; }
+.modal-body { padding:16px 20px; }
+.modal-footer { display:flex; justify-content:flex-end; gap:8px; padding:12px 20px; border-top:1px solid #e8e8e8; position:sticky; bottom:0; background:#fff; z-index:2; }
+
+.modal-toolbar { display:flex; align-items:center; gap:0; padding:6px 20px; background:#f5f5f5; border-bottom:1px solid #e8e8e8; }
+.modal-tool-btn { display:flex; align-items:center; gap:4px; padding:6px 14px; border:none; background:transparent; font-size:13px; color:#333; cursor:pointer; border-radius:4px; transition:all 0.2s; white-space:nowrap; }
+.modal-tool-btn:hover { background:#e8e8e8; }
+.modal-tool-btn.primary { color:#1890ff; font-weight:500; }
+.modal-tool-btn.danger { color:#f5222d; }
+.modal-tool-btn:disabled { opacity:0.4; cursor:not-allowed; }
+.modal-tool-separator { width:1px; height:20px; background:#e8e8e8; margin:0 4px; }
+
+.modal-tab-nav { display:flex; border-bottom:2px solid #e8e8e8; gap:0; margin-bottom:18px; overflow-x:auto; background:#f5f5f5; }
+.modal-tab-nav::-webkit-scrollbar { height:0; }
+.modal-tab { padding:10px 24px; font-size:13px; color:#666; cursor:pointer; border-bottom:2px solid transparent; white-space:nowrap; transition:all var(--transition); }
+.modal-tab:hover { color:#333; }
+.modal-tab.active { color:#1890ff; border-bottom-color:#1890ff; font-weight:500; background:#fff; }
+.modal-tab-pane { display:none; }
+.modal-tab-pane.active { display:block; }
+
+.modal-form-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:14px 16px; }
+.modal-form-grid .form-group { margin-bottom:0; }
+.modal-form-grid .full-row { grid-column:1/-1; }
+
+.bank-action-links a { color:#1890ff; font-size:12px; cursor:pointer; margin-right:8px; }
+.bank-action-links a:hover { text-decoration:underline; }
+</style>
+</head>
+<body>
+
+<aside class="sidebar" id="sidebar">
+<div class="sidebar-logo">
+    <img src="../images/logo.png" alt="磐枢工业智能平台" style="width: 100%; max-width: 200px; margin-bottom: 8px;">
+    <h1 style="font-size: 16px; margin: 0;">磐枢工业智能平台</h1>
+  </div>
+  <nav class="sidebar-menu"></nav>
+<div class="sidebar-user"><div class="avatar">管</div>
+</aside>
+
+<div class="main-content" id="mainContent">
+  <div class="page-header">
+    <div>
+      <div class="flex items-center gap-8">
+        <button class="sidebar-toggle" onclick="toggleSidebar()">&#9776;</button>
+        <div>
+          <h2>客户管理</h2>
+          <div class="breadcrumb"><a href="../index.html">首页</a><span>/</span><a href="#">基础资料</a><span>/</span><span>客户管理</span></div></div>
+        </div>
+      </div>
+    </div>
+    <div class="page-actions">
+      <button class="btn btn-ghost btn-sm" onclick="loadCustomerList()">&#128276; 刷新</button>
+      <button class="btn btn-primary btn-sm" onclick="openCustomerModal('add')">+ 新增客户</button>
+      </div>
+  </div>
+
+  <div class="page-body list-page-body">
+    <div class="list-action-bar">
+      <button class="action-btn" onclick="exportData()">导出数据</button>
+      <button class="action-btn">导入数据</button>
+      <div class="action-separator"></div>
+      <button class="action-btn primary-action" onclick="openCustomerModal('add')">新增客户</button>
+      <button class="action-btn danger-action" onclick="deleteCustomer()">删除</button>
+      <button class="action-btn" onclick="openCustomerModal('edit')">编辑</button>
+      <button class="action-btn success-action" onclick="auditCustomer()">审核</button>
+      <div class="action-separator"></div>
+      <button class="action-btn">上查</button>
+      <button class="action-btn">下查</button>
+      <div class="action-separator"></div>
+      <button class="action-btn">查看历史</button>
+      <button class="action-btn">打印</button>
+      <button class="action-btn">预览</button>
+    </div>
+
+    <div class="list-filter-section">
+      <div class="list-filter-tabs">
+        <span class="filter-tab active" onclick="filterCustomers('all')">全部状态</span>
+        <span class="filter-tab" onclick="filterCustomers('draft')">草稿</span>
+        <span class="filter-tab" onclick="filterCustomers('pending')">待审核</span>
+        <span class="filter-tab" onclick="filterCustomers('approved')">已审核</span>
+        <span class="filter-tab" onclick="filterCustomers('closed')">已禁用</span>
+      </div>
+      <div class="list-filter-row">
+        <div class="filter-field">
+          <label>客户编码</label>
+          <input type="text" id="filterCode" class="form-input" placeholder="请输入客户编码">
+        </div>
+        <div class="filter-field">
+          <label>客户名称</label>
+          <input type="text" id="filterName" class="form-input" placeholder="请输入客户名称">
+        </div>
+        <div class="filter-field">
+          <label>客户类型</label>
+          <select id="filterType" class="form-select">
+            <option value="">全部</option>
+            <option value="company">公司</option>
+            <option value="individual">个人</option>
+            <option value="agent">代理商</option>
+            <option value="retail">零售商</option>
+          </select>
+        </div>
+        <div class="filter-field">
+          <label>信用额度</label>
+          <input type="number" id="filterCreditMin" class="form-input" placeholder="最小值" step="0.01">
+          <span class="range-sep">至</span>
+          <input type="number" id="filterCreditMax" class="form-input" placeholder="最大值" step="0.01">
+        </div>
+      </div>
+      <div class="list-filter-btns">
+        <button class="btn-search" onclick="searchCustomers()">&#128269; 查询</button>
+        <button class="btn-save">&#128190; 保存方案</button>
+        <button class="btn-reset" onclick="resetFilters()">&#8634; 重置</button>
+      </div>
+    </div>
+
+    <div class="list-table-area">
+      <table class="data-table" id="customerTable">
+        <thead>
+          <tr>
+            <th style="width:40px;"><input type="checkbox" class="row-checkbox" onclick="toggleAllCheckboxes(this)"></th>
+            <th>客户编码</th>
+            <th>客户名称</th>
+            <th>客户类型</th>
+            <th>联系人</th>
+            <th>联系电话</th>
+            <th style="text-align:right;">信用额度</th>
+            <th style="text-align:right;">应收余额</th>
+            <th>状态</th>
+            <th>操作</th>
+          </tr>
+        </thead>
+        <tbody id="customerTableBody">
+          <tr><td colspan="10" style="text-align:center;color:#666;padding:20px;">加载中...</td></tr>
+        </tbody>
+      </table>
+      <div class="list-pagination" id="pagination">
+        <span class="page-info">共 0 条记录，第 1/1 页</span>
+        <div class="page-btns"><button disabled>&#9664;</button><button class="active">1</button><button disabled>&#9654;</button></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="customerModal">
+  <div class="modal-dialog">
+    <div class="modal-header">
+      <span class="modal-title" id="customerModalTitle">新增客户</span>
+      <button class="modal-close" onclick="closeModal('customerModal')">&times;</button>
+    </div>
+    <div class="modal-toolbar">
+      <button class="modal-tool-btn" onclick="openCustomerModal('add')"><span>&#10010;</span> 新增</button>
+      <button class="modal-tool-btn primary" onclick="saveCustomer()"><span>&#128184;</span> 保存</button>
+      <button class="modal-tool-btn" onclick="submitCustomer()"><span>&#9989;</span> 提交</button>
+      <button class="modal-tool-btn" onclick="auditCustomer()"><span>&#10004;</span> 审核</button>
+      <button class="modal-tool-btn" onclick="unAuditCustomer()"><span>&#8635;</span> 反审核</button>
+      <div class="modal-tool-separator"></div>
+      <button class="modal-tool-btn" onclick="closeModal('customerModal');loadCustomerList()"><span>&#128203;</span> 返回列表</button>
+    </div>
+    <div class="modal-body">
+      <form id="customerForm">
+        <input type="hidden" id="customerId">
+        <div class="modal-tab-nav">
+          <span class="modal-tab active" onclick="switchModalTab(this,'custTab1')">基本信息</span>
+          <span class="modal-tab" onclick="switchModalTab(this,'custTab2')">联系方式</span>
+          <span class="modal-tab" onclick="switchModalTab(this,'custTab3')">银行信息</span>
+          <span class="modal-tab" onclick="switchModalTab(this,'custTab4')">信用管理</span>
+          <span class="modal-tab" onclick="switchModalTab(this,'custTab5')">财务信息</span>
+          <span class="modal-tab" onclick="switchModalTab(this,'custTab6')">CRM信息</span>
+        </div>
+
+        <div class="modal-tab-pane active" id="custTab1">
+          <div class="modal-form-grid">
+            <div class="form-group"><label class="form-label">客户编码 <span style="color:#f5222d;">*</span></label><input type="text" class="form-input" id="customerCode" placeholder="如 KH-016"></div>
+            <div class="form-group"><label class="form-label">客户名称 <span style="color:#f5222d;">*</span></label><input type="text" class="form-input" id="customerName" placeholder="请输入客户名称"></div>
+            <div class="form-group"><label class="form-label">客户简称</label><input type="text" class="form-input" id="customerShortName" placeholder="请输入客户简称"></div>
+            <div class="form-group"><label class="form-label">客户类型</label><select id="customerType" class="form-select"><option value="company">公司客户</option><option value="individual">个人客户</option><option value="agent">代理商</option><option value="retail">零售商</option></select></div>
+            <div class="form-group"><label class="form-label">联系电话</label><input type="text" class="form-input" id="customerPhone" placeholder="18xxxxxxxx"></div>
+            <div class="form-group"><label class="form-label">所属行业</label><input type="text" class="form-input" id="customerIndustry" placeholder="请输入行业"></div>
+            <div class="form-group"><label class="form-label">注册资金(万元)</label><input type="number" class="form-input" id="customerCapital" placeholder="如 5000.00" step="0.01"></div>
+            <div class="form-group"><label class="form-label">成立日期</label><input type="date" class="form-input" id="customerEstablishDate"></div>
+          </div>
+        </div>
+
+        <div class="modal-tab-pane" id="custTab2">
+          <div class="modal-form-grid">
+            <div class="form-group"><label class="form-label">联系人</label><input type="text" class="form-input" id="contactName" placeholder="请输入联系人"></div>
+            <div class="form-group"><label class="form-label">固定电话</label><input type="text" class="form-input" id="contactTel" placeholder="如 021-5888-1234"></div>
+            <div class="form-group"><label class="form-label">手机</label><input type="text" class="form-input" id="contactMobile" placeholder="如 138****0001"></div>
+            <div class="form-group"><label class="form-label">邮箱</label><input type="text" class="form-input" id="contactEmail" placeholder="如 contact@company.com"></div>
+            <div class="form-group"><label class="form-label">网址</label><input type="text" class="form-input" id="customerWebsite" placeholder="如 www.company.com"></div>
+            <div class="form-group"><label class="form-label">省市区</label><input type="text" class="form-input" id="customerAddressArea" placeholder="请选择省市区"></div>
+            <div class="form-group"><label class="form-label">邮编</label><input type="text" class="form-input" id="customerZipCode" placeholder="如 200000"></div>
+            <div class="form-group full-row"><label class="form-label">详细地址</label><input type="text" class="form-input" id="customerAddress" placeholder="请输入详细地址"></div>
+            <div class="form-group full-row"><label class="form-label">备注</label><textarea class="form-textarea" id="customerRemark" placeholder="请输入备注信息"></textarea></div>
+          </div>
+        </div>
+
+        <div class="modal-tab-pane" id="custTab3">
+          <table class="data-table" style="font-size:12.5px;">
+            <thead>
+              <tr>
+                <th>开户银行</th>
+                <th>银行账号</th>
+                <th>币种</th>
+                <th>操作</th>
+              </tr>
+            </thead>
+            <tbody id="bankAccountsBody">
+              <tr>
+                <td><input type="text" class="form-input" style="width:140px;" placeholder="开户银行"></td>
+                <td><input type="text" class="form-input" style="width:160px;font-family:var(--font-mono);" placeholder="银行账号"></td>
+                <td><select class="form-select" style="width:80px;"><option>CNY</option><option>USD</option><option>EUR</option></select></td>
+                <td class="bank-action-links"><a onclick="addBankRow(this)">添加</a><a style="color:#f5222d;" onclick="removeBankRow(this)">删除</a></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="modal-tab-pane" id="custTab4">
+          <div class="modal-form-grid">
+            <div class="form-group"><label class="form-label">信用额度(元)</label><input type="number" class="form-input" id="creditLimit" placeholder="如 5000000.00" step="0.01"></div>
+            <div class="form-group"><label class="form-label">信用期限(天)</label><input type="number" class="form-input" id="creditDays" placeholder="如 60" min="0"></div>
+            <div class="form-group"><label class="form-label">结算方式</label><select class="form-select" id="settlementMethod"><option value="credit">赊销</option><option value="prepay">预付款</option></select></div>
+            <div class="form-group"><label class="form-label">客户等级</label><select class="form-select" id="customerLevel"><option value="A">A级 (优质客户)</option><option value="B">B级 (良好客户)</option><option value="C">C级 (一般客户)</option><option value="D">D级 (风险客户)</option></select></div>
+            <div class="form-group"><label class="form-label">应收余额(元)</label><input type="number" class="form-input" id="receivableBalance" placeholder="如 3205000.00" step="0.01" readonly></div>
+          </div>
+        </div>
+
+        <div class="modal-tab-pane" id="custTab5">
+          <div class="modal-form-grid">
+            <div class="form-group"><label class="form-label">付款条件</label><select class="form-select" id="paymentTerm"><option value="net30">月结30天</option><option value="net60">月结60天</option><option value="net90">月结90天</option><option value="cod">货到付款</option><option value="pre30">预付30%</option></select></div>
+            <div class="form-group"><label class="form-label">价格策略</label><select class="form-select" id="priceStrategy"><option value="standard">标准价</option><option value="negotiate">协商价</option><option value="contract">合同价</option><option value="promo">促销价</option><option value="wholesale">批发价</option></select></div>
+            <div class="form-group"><label class="form-label">税率类型</label><select class="form-select" id="taxType"><option value="taxable">应税含税</option><option value="taxable-ex">应税不含税</option><option value="non-taxable">免税</option></select></div>
+            <div class="form-group"><label class="form-label">币种</label><select class="form-select" id="currency"><option value="CNY">CNY 人民币</option><option value="USD">USD 美元</option><option value="EUR">EUR 欧元</option></select></div>
+            <div class="form-group"><label class="form-label">税率(%)</label><input type="number" class="form-input" id="taxRate" placeholder="如 13.00" step="0.01"></div>
+          </div>
+        </div>
+
+        <div class="modal-tab-pane" id="custTab6">
+          <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:12px;">
+            <div class="card" style="margin-bottom:0;">
+              <div class="card-header" style="font-size:12px;">客户概览</div>
+              <div class="card-body" style="padding:12px;">
+                <table style="width:100%;font-size:12px;">
+                  <tr><td style="width:70px;color:#666;">客户编码</td><td style="font-family:var(--font-mono);">KH-001</td></tr>
+                  <tr><td style="color:#666;">客户名称</td><td>上海电子科技有限公司</td></tr>
+                  <tr><td style="color:#666;">客户等级</td><td><span class="badge badge-success">A级 优质客户</span></td></tr>
+                  <tr><td style="color:#666;">信用额度</td><td style="font-family:var(--font-mono);">500.00万</td></tr>
+                </table>
+              </div>
+            </div>
+            <div class="card" style="margin-bottom:0;">
+              <div class="card-header" style="font-size:12px;">联系人</div>
+              <div class="card-body" style="padding:12px;">
+                <table style="width:100%;font-size:12px;">
+                  <tr><td style="width:70px;color:#666;">姓名</td><td>李明华</td></tr>
+                  <tr><td style="color:#666;">职位</td><td>采购经理</td></tr>
+                  <tr><td style="color:#666;">手机</td><td style="font-family:var(--font-mono);">138****1234</td></tr>
+                  <tr><td style="color:#666;">邮箱</td><td>lmh@saic.com</td></tr>
+                </table>
+              </div>
+            </div>
+            <div class="card" style="margin-bottom:0;">
+              <div class="card-header" style="font-size:12px;">历史订单</div>
+              <div class="card-body" style="padding:12px;">
+                <table style="width:100%;font-size:11.5px;border-collapse:collapse;">
+                  <tr style="color:#666;"><th style="text-align:left;padding-bottom:6px;border-bottom:1px solid #e8e8e8;">订单编号</th><th style="text-align:right;padding-bottom:6px;border-bottom:1px solid #e8e8e8;">金额</th></tr>
+                  <tr><td style="font-family:var(--font-mono);padding-top:6px;">SO-2024-001</td><td style="text-align:right;font-family:var(--font-mono);padding-top:6px;">120.00万</td></tr>
+                  <tr><td style="font-family:var(--font-mono);">SO-2024-005</td><td style="text-align:right;font-family:var(--font-mono);">85.50万</td></tr>
+                  <tr><td style="font-family:var(--font-mono);">SO-2024-012</td><td style="text-align:right;font-family:var(--font-mono);">200.00万</td></tr>
+                </table>
+              </div>
+            </div>
+            <div class="card" style="margin-bottom:0;">
+              <div class="card-header" style="font-size:12px;">历史出库</div>
+              <div class="card-body" style="padding:12px;">
+                <table style="width:100%;font-size:11.5px;border-collapse:collapse;">
+                  <tr style="color:#666;"><th style="text-align:left;padding-bottom:6px;border-bottom:1px solid #e8e8e8;">出库单</th><th style="text-align:right;padding-bottom:6px;border-bottom:1px solid #e8e8e8;">数量</th></tr>
+                  <tr><td style="font-family:var(--font-mono);padding-top:6px;">WH-2024-003</td><td style="text-align:right;font-family:var(--font-mono);padding-top:6px;">1,200.00</td></tr>
+                  <tr><td style="font-family:var(--font-mono);">WH-2024-008</td><td style="text-align:right;font-family:var(--font-mono);">800.00</td></tr>
+                  <tr><td style="font-family:var(--font-mono);">WH-2024-015</td><td style="text-align:right;font-family:var(--font-mono);">2,000.00</td></tr>
+                </table>
+              </div>
+            </div>
+            <div class="card" style="margin-bottom:0;">
+              <div class="card-header" style="font-size:12px;">应收款</div>
+              <div class="card-body" style="padding:12px;">
+                <table style="width:100%;font-size:11.5px;border-collapse:collapse;">
+                  <tr style="color:#666;"><th style="text-align:left;padding-bottom:6px;border-bottom:1px solid #e8e8e8;">单据</th><th style="text-align:right;padding-bottom:6px;border-bottom:1px solid #e8e8e8;">金额</th><th style="text-align:center;padding-bottom:6px;border-bottom:1px solid #e8e8e8;">状态</th></tr>
+                  <tr><td style="font-family:var(--font-mono);padding-top:6px;">AR-2024-002</td><td style="text-align:right;font-family:var(--font-mono);padding-top:6px;">120.00万</td><td style="text-align:center;"><span class="badge badge-success">已收款</span></td></tr>
+                  <tr><td style="font-family:var(--font-mono);">AR-2024-006</td><td style="text-align:right;font-family:var(--font-mono);">85.50万</td><td style="text-align:center;"><span class="badge badge-warning">待收款</span></td></tr>
+                </table>
+              </div>
+            </div>
+            <div class="card" style="margin-bottom:0;">
+              <div class="card-header" style="font-size:12px;">服务记录</div>
+              <div class="card-body" style="padding:12px;">
+                <table style="width:100%;font-size:11.5px;border-collapse:collapse;">
+                  <tr style="color:#666;"><th style="text-align:left;padding-bottom:6px;border-bottom:1px solid #e8e8e8;">单据</th><th style="text-align:left;padding-bottom:6px;border-bottom:1px solid #e8e8e8;">服务内容</th><th style="text-align:center;padding-bottom:6px;border-bottom:1px solid #e8e8e8;">状态</th></tr>
+                  <tr><td style="font-family:var(--font-mono);padding-top:6px;">SV-2024-001</td><td>产品安装调试</td><td style="text-align:center;"><span class="badge badge-success">已完成</span></td></tr>
+                  <tr><td style="font-family:var(--font-mono);">SV-2024-004</td><td>售后维修服务</td><td style="text-align:center;"><span class="badge badge-success">已完成</span></td></tr>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </form>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost btn-sm" onclick="closeModal('customerModal')">取消</button>
+      <button class="btn btn-primary btn-sm" onclick="saveCustomer()">保存</button>
+    </div>
+  </div>
+</div>
+
+<script>
+function openModal(id){ document.getElementById(id).classList.add('show'); }
+function closeModal(id){ document.getElementById(id).classList.remove('show'); }
+function switchModalTab(el,paneId){ var nav=el.parentElement; nav.querySelectorAll('.modal-tab').forEach(function(t){t.classList.remove('active');}); el.classList.add('active'); var dialog=el.closest(".modal-dialog"); dialog.querySelectorAll('.modal-tab-pane').forEach(function(p){p.classList.remove('active');}); document.getElementById(paneId).classList.add('active'); }
+document.querySelectorAll('.filter-tab').forEach(function(tab){tab.addEventListener('click',function(){this.parentElement.querySelectorAll('.filter-tab').forEach(function(t){t.classList.remove('active');});this.classList.add('active');});});
+
+function addBankRow(el) {
+  var tbody = document.getElementById('bankAccountsBody');
+  var row = document.createElement('tr');
+  row.innerHTML = '<td><input type="text" class="form-input" style="width:140px;" placeholder="开户银行"></td><td><input type="text" class="form-input" style="width:160px;font-family:var(--font-mono);" placeholder="银行账号"></td><td><select class="form-select" style="width:80px;"><option>CNY</option><option>USD</option><option>EUR</option></select></td><td class="bank-action-links"><a onclick="addBankRow(this)">添加</a><a style="color:#f5222d;" onclick="removeBankRow(this)">删除</a></td>';
+  tbody.appendChild(row);
+}
+
+function removeBankRow(el) {
+  var tr = el.closest('tr');
+  var tbody = document.getElementById('bankAccountsBody');
+  if (tbody.children.length > 1) {
+    tr.remove();
+  }
+}
+
+var customerModalMode = 'add';
+var currentEditingCustomerId = null;
+var currentEditingAuditStatus = 'draft';
+var customerList = [];
+
+function updateToolbarButtons() {
+  var btns = document.querySelectorAll('.modal-tool-btn');
+  btns.forEach(function(btn) { btn.disabled = false; btn.style.opacity = '1'; });
+  
+  if (currentEditingAuditStatus === 'draft') {
+    document.querySelector('.modal-tool-btn[onclick*="submitCustomer"]')?.removeAttribute('disabled');
+    document.querySelector('.modal-tool-btn[onclick*="auditCustomer"]')?.setAttribute('disabled', 'true');
+    document.querySelector('.modal-tool-btn[onclick*="unAuditCustomer"]')?.setAttribute('disabled', 'true');
+  } else if (currentEditingAuditStatus === 'pending') {
+    document.querySelector('.modal-tool-btn[onclick*="submitCustomer"]')?.setAttribute('disabled', 'true');
+    document.querySelector('.modal-tool-btn[onclick*="auditCustomer"]')?.removeAttribute('disabled');
+    document.querySelector('.modal-tool-btn[onclick*="unAuditCustomer"]')?.setAttribute('disabled', 'true');
+  } else if (currentEditingAuditStatus === 'approved') {
+    document.querySelector('.modal-tool-btn[onclick*="submitCustomer"]')?.setAttribute('disabled', 'true');
+    document.querySelector('.modal-tool-btn[onclick*="auditCustomer"]')?.setAttribute('disabled', 'true');
+    document.querySelector('.modal-tool-btn[onclick*="unAuditCustomer"]')?.removeAttribute('disabled');
+  }
+}
+
+function toggleAllCheckboxes(el) {
+  document.querySelectorAll('.row-checkbox').forEach(function(cb) { cb.checked = el.checked; });
+}
+
+function openCustomerModal(mode){
+  customerModalMode = mode;
+  currentEditingCustomerId = null;
+  currentEditingAuditStatus = 'draft';
+  
+  document.getElementById('customerModalTitle').textContent = mode === 'add' ? '新增客户' : '编辑客户';
+  if(mode === 'add'){
+    document.getElementById('customerId').value = '';
+    document.getElementById('customerCode').value = '';
+    document.getElementById('customerName').value = '';
+    document.getElementById('customerShortName').value = '';
+    document.getElementById('customerType').value = 'company';
+    document.getElementById('customerPhone').value = '';
+    document.getElementById('customerIndustry').value = '';
+    document.getElementById('customerCapital').value = '';
+    document.getElementById('customerEstablishDate').value = '';
+    document.getElementById('contactName').value = '';
+    document.getElementById('contactTel').value = '';
+    document.getElementById('contactMobile').value = '';
+    document.getElementById('contactEmail').value = '';
+    document.getElementById('customerWebsite').value = '';
+    document.getElementById('customerAddressArea').value = '';
+    document.getElementById('customerZipCode').value = '';
+    document.getElementById('customerAddress').value = '';
+    document.getElementById('customerRemark').value = '';
+    document.getElementById('creditLimit').value = '';
+    document.getElementById('creditDays').value = '';
+    document.getElementById('settlementMethod').value = 'credit';
+    document.getElementById('customerLevel').value = 'A';
+    document.getElementById('receivableBalance').value = '';
+    document.getElementById('paymentTerm').value = 'net30';
+    document.getElementById('priceStrategy').value = 'standard';
+    document.getElementById('taxType').value = 'taxable';
+    document.getElementById('currency').value = 'CNY';
+    document.getElementById('taxRate').value = '13.00';
+  } else {
+    var checked = document.querySelectorAll('.row-checkbox:checked');
+    if (checked.length === 0) {
+      showToast('请先选择要编辑的客户', 'warning');
+      return;
+    }
+    var customer = customerList.find(function(c) { return c.id === checked[0].closest('tr').dataset.id; });
+    if (customer) {
+      document.getElementById('customerId').value = customer.id;
+      document.getElementById('customerCode').value = customer.code || '';
+      document.getElementById('customerName').value = customer.name || '';
+      document.getElementById('customerShortName').value = customer.shortName || '';
+      document.getElementById('customerType').value = customer.type || 'company';
+      document.getElementById('customerPhone').value = customer.phone || '';
+      document.getElementById('customerIndustry').value = customer.industry || '';
+      document.getElementById('customerCapital').value = customer.capital || '';
+      document.getElementById('customerEstablishDate').value = customer.establishDate || '';
+      document.getElementById('contactName').value = customer.contactName || '';
+      document.getElementById('contactTel').value = customer.contactTel || '';
+      document.getElementById('contactMobile').value = customer.contactMobile || '';
+      document.getElementById('contactEmail').value = customer.contactEmail || '';
+      document.getElementById('customerWebsite').value = customer.website || '';
+      document.getElementById('customerAddressArea').value = customer.addressArea || '';
+      document.getElementById('customerZipCode').value = customer.zipCode || '';
+      document.getElementById('customerAddress').value = customer.address || '';
+      document.getElementById('customerRemark').value = customer.remark || '';
+      document.getElementById('creditLimit').value = customer.creditLimit || '';
+      document.getElementById('creditDays').value = customer.creditDays || '';
+      document.getElementById('settlementMethod').value = customer.settlementMethod || 'credit';
+      document.getElementById('customerLevel').value = customer.level || 'A';
+      document.getElementById('receivableBalance').value = customer.receivableBalance || '';
+      document.getElementById('paymentTerm').value = customer.paymentTerm || 'net30';
+      document.getElementById('priceStrategy').value = customer.priceStrategy || 'standard';
+      document.getElementById('taxType').value = customer.taxType || 'taxable';
+      document.getElementById('currency').value = customer.currency || 'CNY';
+      document.getElementById('taxRate').value = customer.taxRate || '13.00';
+      currentEditingCustomerId = customer.id;
+      currentEditingAuditStatus = customer.status || 'draft';
+    }
+  }
+  openModal('customerModal');
+  updateToolbarButtons();
+}
+
+function validateCustomerForm(){
+  var code = document.getElementById('customerCode').value.trim();
+  var name = document.getElementById('customerName').value.trim();
+  if(!code){
+    showToast('请输入客户编码', 'warning');
+    document.getElementById('customerCode').focus();
+    return false;
+  }
+  if(!name){
+    showToast('请输入客户名称', 'warning');
+    document.getElementById('customerName').focus();
+    return false;
+  }
+  return true;
+}
+
+function saveCustomer(){
+  if(!validateCustomerForm()) return;
+  
+  var customerData = {
+    id: document.getElementById('customerId').value || '',
+    code: document.getElementById('customerCode').value.trim(),
+    name: document.getElementById('customerName').value.trim(),
+    shortName: document.getElementById('customerShortName').value.trim(),
+    type: document.getElementById('customerType').value,
+    phone: document.getElementById('customerPhone').value.trim(),
+    industry: document.getElementById('customerIndustry').value.trim(),
+    capital: parseFloat(document.getElementById('customerCapital').value) || 0,
+    establishDate: document.getElementById('customerEstablishDate').value,
+    contactName: document.getElementById('contactName').value.trim(),
+    contactTel: document.getElementById('contactTel').value.trim(),
+    contactMobile: document.getElementById('contactMobile').value.trim(),
+    contactEmail: document.getElementById('contactEmail').value.trim(),
+    website: document.getElementById('customerWebsite').value.trim(),
+    addressArea: document.getElementById('customerAddressArea').value.trim(),
+    zipCode: document.getElementById('customerZipCode').value.trim(),
+    address: document.getElementById('customerAddress').value.trim(),
+    remark: document.getElementById('customerRemark').value.trim(),
+    creditLimit: parseFloat(document.getElementById('creditLimit').value) || 0,
+    creditDays: parseInt(document.getElementById('creditDays').value) || 0,
+    settlementMethod: document.getElementById('settlementMethod').value,
+    level: document.getElementById('customerLevel').value,
+    receivableBalance: parseFloat(document.getElementById('receivableBalance').value) || 0,
+    paymentTerm: document.getElementById('paymentTerm').value,
+    priceStrategy: document.getElementById('priceStrategy').value,
+    taxType: document.getElementById('taxType').value,
+    currency: document.getElementById('currency').value,
+    taxRate: parseFloat(document.getElementById('taxRate').value) || 0,
+    status: currentEditingAuditStatus || 'draft'
+  };
+
+  var list = JSON.parse(localStorage.getItem('erp_master-customer_list') || '[]');
+  
+  if (customerData.id) {
+    var index = list.findIndex(function(c) { return c.id === customerData.id; });
+    if (index !== -1) {
+      list[index] = Object.assign({}, list[index], customerData);
+    }
+  } else {
+    customerData.id = 'cust-' + Date.now();
+    customerData.createdAt = new Date().toISOString();
+    list.push(customerData);
+    currentEditingCustomerId = customerData.id;
+  }
+  
+  localStorage.setItem('erp_master-customer_list', JSON.stringify(list));
+  showToast(customerModalMode === 'add' ? '客户创建成功' : '客户更新成功', 'success');
+  updateToolbarButtons();
+}
+
+function deleteCustomer(){
+  var checked = document.querySelectorAll('.row-checkbox:checked');
+  if(checked.length === 0){
+    showToast('请先选择要删除的客户', 'warning');
+    return;
+  }
+  showConfirm('确定要删除选中的 ' + checked.length + ' 个客户吗？', 'warning', function(result, function() {
+    if (!result) return;
+    
+    var list = JSON.parse(localStorage.getItem('erp_master-customer_list') || '[]');
+    checked.forEach(function(cb) {
+      var id = cb.closest('tr').dataset.id;
+      list = list.filter(function(c) { return c.id !== id; });
+    });
+    localStorage.setItem('erp_master-customer_list', JSON.stringify(list));
+    showToast('删除成功', 'success');
+    loadCustomerList();
+  });
+}
+
+function submitCustomer(){
+  if (currentEditingCustomerId) {
+    if (currentEditingAuditStatus !== 'draft') {
+      showToast('当前状态不允许提交', 'warning');
+      return;
+    }
+    showConfirm('确定要提交此客户吗？', 'warning', function(result, function() {
+      if (!result) return;
+      currentEditingAuditStatus = 'pending';
+      updateToolbarButtons();
+      updateCustomerStatus(currentEditingCustomerId, 'pending');
+      showToast('提交成功，等待审核', 'success');
+    });
+    return;
+  }
+  showToast('请先保存客户', 'warning');
+}
+
+function auditCustomer(){
+  if (currentEditingCustomerId) {
+    if (currentEditingAuditStatus !== 'pending') {
+      showToast('当前状态不允许审核', 'warning');
+      return;
+    }
+    showConfirm('确定要审核此客户吗？', 'warning', function(result, function() {
+      if (!result) return;
+      currentEditingAuditStatus = 'approved';
+      updateToolbarButtons();
+      updateCustomerStatus(currentEditingCustomerId, 'approved');
+      showToast('审核成功', 'success');
+    });
+    return;
+  }
+  var checked = document.querySelectorAll('.row-checkbox:checked');
+  if(checked.length === 0){
+    showToast('请先选择要审核的客户', 'warning');
+    return;
+  }
+  showConfirm('确定要审核选中的 ' + checked.length + ' 个客户吗？', 'warning', function(result, function() {
+    if (!result) return;
+    checked.forEach(function(cb) {
+      var id = cb.closest('tr').dataset.id;
+      updateCustomerStatus(id, 'approved');
+    });
+    showToast('批量审核成功', 'success');
+    loadCustomerList();
+  });
+}
+
+function unAuditCustomer(){
+  if (currentEditingCustomerId) {
+    if (currentEditingAuditStatus !== 'approved') {
+      showToast('当前状态不允许反审核', 'warning');
+      return;
+    }
+    showConfirm('确定要反审核此客户吗？', 'warning', function(result, function() {
+      if (!result) return;
+      currentEditingAuditStatus = 'pending';
+      updateToolbarButtons();
+      updateCustomerStatus(currentEditingCustomerId, 'pending');
+      showToast('反审核成功', 'success');
+    });
+    return;
+  }
+  showToast('请先选择要反审核的客户', 'warning');
+}
+
+function updateCustomerStatus(id, status) {
+  var list = JSON.parse(localStorage.getItem('erp_master-customer_list') || '[]');
+  var index = list.findIndex(function(c) { return c.id === id; });
+  if (index !== -1) {
+    list[index].status = status;
+    localStorage.setItem('erp_master-customer_list', JSON.stringify(list));
+  }
+}
+
+function filterCustomers(type) {
+  loadCustomerList(type);
+}
+
+function searchCustomers() {
+  loadCustomerList();
+}
+
+function resetFilters() {
+  document.getElementById('filterCode').value = '';
+  document.getElementById('filterName').value = '';
+  document.getElementById('filterType').value = '';
+  document.getElementById('filterCreditMin').value = '';
+  document.getElementById('filterCreditMax').value = '';
+  document.querySelectorAll('.filter-tab').forEach(function(t) { t.classList.remove('active'); });
+  document.querySelector('.filter-tab').classList.add('active');
+  loadCustomerList();
+}
+
+function exportData() {
+  showToast('导出功能开发中', 'info');
+}
+
+function loadCustomerList(filterStatus) {
+  customerList = JSON.parse(localStorage.getItem('erp_master-customer_list') || '[]');
+  
+  if (customerList.length === 0) {
+    customerList = [
+      { id: 'cust-001', code: 'KH-001', name: '上海电子科技有限公司', shortName: '上海电子', type: 'company', phone: '021-5888-1234', industry: '电子制造业', capital: 5000, establishDate: '2018-06-15', contactName: '李明华', contactTel: '021-5888-1234', contactMobile: '13800001234', contactEmail: 'lmh@saic.com', website: 'www.shdianzi.com', addressArea: '上海市浦东新区', zipCode: '200120', address: '上海市浦东新区张江高科技园区', remark: '', creditLimit: 5000000, creditDays: 60, settlementMethod: 'credit', level: 'A', receivableBalance: 3205000, paymentTerm: 'net60', priceStrategy: 'standard', taxType: 'taxable', currency: 'CNY', taxRate: 13, status: 'approved', createdAt: new Date().toISOString() },
+      { id: 'cust-002', code: 'KH-002', name: '深圳智造科技有限公司', shortName: '深圳智造', type: 'company', phone: '0755-2888-5678', industry: '智能制造', capital: 8000, establishDate: '2016-03-20', contactName: '王建国', contactTel: '0755-2888-5678', contactMobile: '13900005678', contactEmail: 'wjg@shenzhen.com', website: 'www.szzz.com', addressArea: '广东省深圳市', zipCode: '518000', address: '深圳市南山区科技园', remark: '', creditLimit: 8000000, creditDays: 90, settlementMethod: 'credit', level: 'A', receivableBalance: 1500000, paymentTerm: 'net90', priceStrategy: 'negotiate', taxType: 'taxable', currency: 'CNY', taxRate: 13, status: 'pending', createdAt: new Date().toISOString() },
+      { id: 'cust-003', code: 'KH-003', name: '北京贸易有限公司', shortName: '北京贸易', type: 'company', phone: '010-6888-9012', industry: '贸易', capital: 2000, establishDate: '2020-01-10', contactName: '张丽', contactTel: '010-6888-9012', contactMobile: '13700009012', contactEmail: 'zhangli@bjmy.com', website: 'www.bjmy.com', addressArea: '北京市朝阳区', zipCode: '100020', address: '北京市朝阳区CBD中心', remark: '', creditLimit: 2000000, creditDays: 30, settlementMethod: 'credit', level: 'B', receivableBalance: 500000, paymentTerm: 'net30', priceStrategy: 'standard', taxType: 'taxable', currency: 'CNY', taxRate: 13, status: 'draft', createdAt: new Date().toISOString() }
+    ];
+    localStorage.setItem('erp_master-customer_list', JSON.stringify(customerList));
+  }
+  
+  var codeFilter = document.getElementById('filterCode').value.trim().toLowerCase();
+  var nameFilter = document.getElementById('filterName').value.trim().toLowerCase();
+  var typeFilter = document.getElementById('filterType').value;
+  var creditMin = parseFloat(document.getElementById('filterCreditMin').value) || 0;
+  var creditMax = parseFloat(document.getElementById('filterCreditMax').value) || Infinity;
+  
+  var filtered = customerList.filter(function(c) {
+    var matchStatus = !filterStatus || c.status === filterStatus;
+    var matchCode = !codeFilter || c.code.toLowerCase().includes(codeFilter);
+    var matchName = !nameFilter || c.name.toLowerCase().includes(nameFilter) || (c.shortName && c.shortName.toLowerCase().includes(nameFilter));
+    var matchType = !typeFilter || c.type === typeFilter;
+    var matchCredit = c.creditLimit >= creditMin && c.creditLimit <= creditMax;
+    return matchStatus && matchCode && matchName && matchType && matchCredit;
+  });
+  
+  renderCustomerTable(filtered);
+}
+
+function renderCustomerTable(list) {
+  var tbody = document.getElementById('customerTableBody');
+  
+  if (list.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="10" style="text-align:center;color:#666;padding:20px;">暂无客户数据</td></tr>';
+    document.getElementById('pagination').innerHTML = '<span class="page-info">共 0 条记录，第 1/1 页</span><div class="page-btns"><button disabled>&#9664;</button><button class="active">1</button><button disabled>&#9654;</button></div>';
+    return;
+  }
+  
+  var typeMap = { 'company': '公司客户', 'individual': '个人客户', 'agent': '代理商', 'retail': '零售商' };
+  var statusMap = { 'draft': '草稿', 'pending': '待审核', 'approved': '已审核', 'closed': '已禁用' };
+  var statusBadgeMap = { 'draft': '<span class="badge">草稿</span>', 'pending': '<span class="badge badge-warning">待审核</span>', 'approved': '<span class="badge badge-success">已审核</span>', 'closed': '<span class="badge badge-error">已禁用</span>' };
+  
+  tbody.innerHTML = list.map(function(c) {
+    return '<tr data-id="' + c.id + '">' +
+      '<td><input type="checkbox" class="row-checkbox"></td>' +
+      '<td style="font-family:var(--font-mono);">' + (c.code || '') + '</td>' +
+      '<td>' + (c.name || '') + '</td>' +
+      '<td>' + (typeMap[c.type] || c.type) + '</td>' +
+      '<td>' + (c.contactName || '') + '</td>' +
+      '<td>' + (c.phone || '') + '</td>' +
+      '<td style="text-align:right;font-family:var(--font-mono);">' + parseFloat(c.creditLimit || 0).toFixed(2) + '</td>' +
+      '<td style="text-align:right;font-family:var(--font-mono);">' + parseFloat(c.receivableBalance || 0).toFixed(2) + '</td>' +
+      '<td>' + (statusBadgeMap[c.status] || c.status) + '</td>' +
+      '<td class="row-action-links"><a onclick="viewCustomer(\' + c.id + )">查看</a><a onclick="editCustomer(\' + c.id + )">编辑</a>' + (c.status === 'draft' ? '<a onclick="submitCustomerById(\' + c.id + )">提交</a>' : '') + (c.status === 'pending' ? '<a onclick="auditCustomerById(\' + c.id + )">审核</a>' : '') + (c.status === 'approved' ? '<a onclick="unAuditCustomerById(\' + c.id + )">反审</a>' : '') + '<a style="color:#f5222d;" onclick="deleteCustomerById(\' + c.id + )">删除</a></td>' +
+    '</tr>';
+  }).join('');
+  
+  document.getElementById('pagination').innerHTML = '<span class="page-info">共 ' + list.length + ' 条记录，第 1/1 页</span><div class="page-btns"><button disabled>&#9664;</button><button class="active">1</button><button disabled>&#9654;</button></div>';
+}
+
+function viewCustomer(id) {
+  var customer = customerList.find(function(c) { return c.id === id; });
+  if (customer) {
+    currentEditingCustomerId = customer.id;
+    currentEditingAuditStatus = customer.status;
+    openCustomerModal('edit');
+  }
+}
+
+function editCustomer(id) {
+  var customer = customerList.find(function(c) { return c.id === id; });
+  if (customer) {
+    currentEditingCustomerId = customer.id;
+    currentEditingAuditStatus = customer.status;
+    openCustomerModal('edit');
+  }
+}
+
+function submitCustomerById(id) {
+  currentEditingCustomerId = id;
+  currentEditingAuditStatus = 'draft';
+  submitCustomer();
+}
+
+function auditCustomerById(id) {
+  currentEditingCustomerId = id;
+  currentEditingAuditStatus = 'pending';
+  auditCustomer();
+}
+
+function unAuditCustomerById(id) {
+  currentEditingCustomerId = id;
+  currentEditingAuditStatus = 'approved';
+  unAuditCustomer();
+}
+
+function deleteCustomerById(id) {
+  showConfirm('确定要删除客户吗？', 'warning', function(result, function() {
+    if (!result) return;
+    var list = JSON.parse(localStorage.getItem('erp_master-customer_list') || '[]');
+    list = list.filter(function(c) { return c.id !== id; });
+    localStorage.setItem('erp_master-customer_list', JSON.stringify(list));
+    showToast('删除成功', 'success');
+    loadCustomerList();
+  });
+}
+
+window.addEventListener('DOMContentLoaded', loadCustomerList);
+</script>
+</body>
+</html>

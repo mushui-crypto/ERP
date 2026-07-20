@@ -1,0 +1,2122 @@
+<!DOCTYPE html>
+
+
+
+<html lang="zh-CN">
+
+
+
+<head>
+
+
+
+<meta charset="UTF-8">
+
+
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+
+
+<title>销售报表 — 磐枢工业智能平台</title>
+
+
+
+<link rel="stylesheet" href="../common.css">
+
+
+
+<script src="../common.js"></script>
+<script>
+</script>
+
+
+
+<style>
+
+
+
+
+
+
+
+.toast-container {
+
+
+
+  position: fixed;
+
+
+
+  top: 60px;
+
+
+
+  right: 20px;
+
+
+
+  z-index: 1000;
+
+
+
+  display: flex;
+
+
+
+  flex-direction: column;
+
+
+
+  gap: 8px;
+
+
+
+}
+
+
+
+.toast {
+
+
+
+  padding: 12px 16px;
+
+
+
+  border-radius: var(--radius-md);
+
+
+
+  font-size: 13px;
+
+
+
+  color: var(--text-primary);
+
+
+
+  min-width: 280px;
+
+
+
+  max-width: 400px;
+
+
+
+  display: flex;
+
+
+
+  align-items: center;
+
+
+
+  gap: 8px;
+
+
+
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+
+
+
+  animation: toastIn 0.3s ease;
+
+
+
+}
+
+
+
+@keyframes toastIn {
+
+
+
+  from { opacity: 0; transform: translateX(100%); }
+
+
+
+  to { opacity: 1; transform: translateX(0); }
+
+
+
+}
+
+
+
+.toast-success { background: rgba(34,197,94,0.9); }
+
+
+
+.toast-error { background: rgba(239,68,68,0.9); }
+
+
+
+.toast-warning { background: rgba(234,179,8,0.9); }
+
+
+
+.toast-info { background: rgba(6,182,212,0.9); }
+
+
+
+.toast-icon { font-size: 16px; }
+
+
+
+
+
+
+
+.confirm-modal-overlay {
+
+
+
+  position: fixed;
+
+
+
+  inset: 0;
+
+
+
+  background: rgba(0,0,0,0.6);
+
+
+
+  display: none;
+
+
+
+  align-items: center;
+
+
+
+  justify-content: center;
+
+
+
+  z-index: 2000;
+
+
+
+}
+
+
+
+.confirm-modal-overlay.show { display: flex; }
+
+
+
+.confirm-modal {
+
+
+
+  background: var(--bg-surface);
+
+
+
+  border: 1px solid var(--border-normal);
+
+
+
+  border-radius: var(--radius-lg);
+
+
+
+  padding: 24px;
+
+
+
+  min-width: 360px;
+
+
+
+  max-width: 480px;
+
+
+
+  box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+
+
+
+}
+
+
+
+.confirm-modal-header {
+
+
+
+  font-size: 14px;
+
+
+
+  font-weight: 600;
+
+
+
+  color: var(--text-primary);
+
+
+
+  margin-bottom: 12px;
+
+
+
+}
+
+
+
+.confirm-modal-body {
+
+
+
+  font-size: 13px;
+
+
+
+  color: var(--text-secondary);
+
+
+
+  line-height: 1.6;
+
+
+
+  margin-bottom: 20px;
+
+
+
+}
+
+
+
+.confirm-modal-footer {
+
+
+
+  display: flex;
+
+
+
+  justify-content: flex-end;
+
+
+
+  gap: 8px;
+
+
+
+}
+
+
+
+
+
+
+
+<style>
+
+
+
+.report-body{padding:16px 20px;}
+
+
+
+.report-toolbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:12px;}
+
+
+
+.time-range{display:flex;align-items:center;gap:8px;}
+
+
+
+.time-range .range-label{font-size:13px;color:var(--text-tertiary);}
+
+
+
+.time-range select,.time-range input[type=date]{background:var(--bg-inset);border:1px solid var(--border-normal);color:var(--text-primary);padding:6px 10px;border-radius:var(--radius-sm);font-size:13px;}
+
+
+
+.stat-cards{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:20px;}
+
+
+
+.stat-card{background:var(--bg-surface);border:1px solid var(--border-normal);border-radius:var(--radius-md);padding:18px 20px;position:relative;overflow:hidden;}
+
+
+
+.stat-card .stat-icon{position:absolute;right:16px;top:16px;font-size:28px;opacity:0.25;}
+
+
+
+.stat-card .stat-label{font-size:12px;color:var(--text-tertiary);margin-bottom:8px;}
+
+
+
+.stat-card .stat-value{font-size:26px;font-weight:700;color:var(--text-primary);font-family:var(--font-mono);letter-spacing:0.5px;}
+
+
+
+.stat-card .stat-trend{font-size:12px;margin-top:8px;display:flex;align-items:center;gap:4px;}
+
+
+
+.stat-trend.up{color:var(--color-success);}
+
+
+
+.stat-trend.down{color:var(--color-error);}
+
+
+
+.stat-card.accent-blue{border-left:3px solid var(--text-accent);}
+
+
+
+.stat-card.accent-green{border-left:3px solid var(--color-success);}
+
+
+
+.stat-card.accent-yellow{border-left:3px solid var(--color-warning);}
+
+
+
+.stat-card.accent-cyan{border-left:3px solid var(--color-info);}
+
+
+
+.report-grid{display:grid;grid-template-columns:1fr;gap:16px;}
+
+
+
+.chart-card{background:var(--bg-surface);border:1px solid var(--border-normal);border-radius:var(--radius-md);padding:18px 20px;margin-bottom:16px;}
+
+
+
+.chart-card .card-title{font-size:14px;font-weight:600;color:var(--text-primary);margin-bottom:16px;display:flex;align-items:center;justify-content:space-between;}
+
+
+
+.chart-card .card-title .sub{font-size:12px;color:var(--text-tertiary);font-weight:400;}
+
+
+
+.bar-chart{display:flex;align-items:flex-end;justify-content:space-around;height:220px;padding:0 8px;border-bottom:1px solid var(--border-normal);position:relative;}
+
+
+
+.bar-chart .bar-item{display:flex;flex-direction:column;align-items:center;gap:6px;flex:1;height:100%;justify-content:flex-end;}
+
+
+
+.bar-chart .bar-col{width:42px;background:linear-gradient(180deg,var(--text-accent),rgba(56,189,248,0.3));border-radius:var(--radius-md) 4px 0 0;position:relative;transition:opacity 0.2s;cursor:pointer;}
+
+
+
+.bar-chart .bar-col:hover{opacity:0.8;}
+
+
+
+.bar-chart .bar-col .bar-val{position:absolute;top:-22px;left:50%;transform:translateX(-50%);font-size:11px;color:var(--text-secondary);font-family:var(--font-mono);white-space:nowrap;}
+
+
+
+.bar-chart .bar-label{font-size:12px;color:var(--text-tertiary);}
+
+
+
+.chart-grid-line{position:absolute;left:0;right:0;border-top:1px dashed var(--border-normal);}
+
+
+
+.tables-row{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;}
+
+
+
+.table-card{background:var(--bg-surface);border:1px solid var(--border-normal);border-radius:var(--radius-md);padding:18px 20px;}
+
+
+
+.table-card .card-title{font-size:14px;font-weight:600;color:var(--text-primary);margin-bottom:12px;display:flex;align-items:center;justify-content:space-between;}
+
+
+
+.table-card .card-title .more{font-size:12px;color:var(--text-accent);font-weight:400;cursor:pointer;}
+
+
+
+.table-card .data-table{font-size:13px;}
+
+
+
+.table-card .data-table th,.table-card .data-table td{padding:8px 10px;}
+
+
+
+.rank-num{display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;border-radius:50%;font-size:11px;font-weight:600;}
+
+
+
+.rank-1{background:rgba(234,179,8,0.2);color:var(--color-warning);}
+
+
+
+.rank-2{background:rgba(148,163,184,0.2);color:#cbd5e1;}
+
+
+
+.rank-3{background:rgba(180,83,9,0.2);color:#f59e0b;}
+
+
+
+.rank-other{background:var(--bg-inset);color:var(--text-tertiary);}
+
+
+
+.mini-progress{display:inline-block;width:80px;height:6px;background:var(--bg-inset);border-radius:3px;overflow:hidden;vertical-align:middle;margin-right:6px;}
+
+
+
+.mini-progress .fill{height:100%;background:var(--text-accent);border-radius:3px;}
+
+
+
+.region-bar-cell{display:flex;align-items:center;gap:8px;}
+
+
+
+.region-bar-cell .rbar{flex:1;height:8px;background:var(--bg-inset);border-radius:var(--radius-md);overflow:hidden;}
+
+
+
+.region-bar-cell .rbar .rfill{height:100%;border-radius:var(--radius-md);}
+
+
+
+
+.lookup-modal { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:2000; justify-content:center; align-items:center; }
+.lookup-modal.show { display:flex; }
+.lookup-dialog { background:#fff; border:1px solid #e8e8e8; border-radius:4px; width:720px; max-height:70vh; overflow:hidden; }
+.lookup-header { padding:14px 20px; border-bottom:1px solid #e8e8e8; display:flex; align-items:center; justify-content:space-between; }
+.lookup-title { font-size:15px; font-weight:600; color:#333; }
+.lookup-close { font-size:20px; color:#666; cursor:pointer; background:none; border:none; }
+.lookup-close:hover { color:#333; }
+.lookup-body { padding:16px; }
+.lookup-search { display:flex; gap:8px; margin-bottom:12px; }
+.lookup-search input { flex:1; padding:6px 10px; border:1px solid #e8e8e8; border-radius:4px; font-size:13px; }
+.lookup-search button { padding:6px 16px; background:#1890ff; color:#fff; border:none; border-radius:4px; cursor:pointer; }
+.lookup-table { width:100%; border-collapse:collapse; font-size:13px; }
+.lookup-table th, .lookup-table td { padding:10px 12px; text-align:left; border-bottom:1px solid #e8e8e8; }
+.lookup-table th { background:#fafafa; font-weight:600; color:#333; }
+.lookup-table tr:hover { background:#f5f5f5; }
+.lookup-table .checkbox-cell { width:40px; }
+.lookup-footer { padding:12px 20px; border-top:1px solid #e8e8e8; display:flex; justify-content:flex-end; gap:8px; }
+.lookup-field { display:flex; align-items:center; }
+.lookup-field input { flex:1; padding:6px 10px; border:1px solid #e8e8e8; border-radius:4px 0 0 4px; font-size:13px; }
+.lookup-field button { width:28px; height:28px; border:1px solid #e8e8e8; border-left:none; border-radius:0 4px 4px 0; background:#fff; cursor:pointer; display:flex; align-items:center; justify-content:center; }
+.lookup-field button:hover { background:#f5f5f5; }
+
+</style>
+
+
+
+</head>
+
+
+
+</style>
+
+<body>
+
+
+
+<aside class="sidebar" id="sidebar">
+
+
+
+<div class="sidebar-logo">
+
+
+
+    <img src="../images/logo.png" alt="磐枢工业智能平台" style="width: 100%; max-width: 200px; margin-bottom: 8px;">
+
+
+
+    <h1 style="font-size: 16px; margin: 0;">磐枢工业智能平台</h1>
+
+
+
+  </div>
+
+
+
+  <nav class="sidebar-menu"></nav>
+
+
+
+<div class="sidebar-user"><div class="avatar">管</div>
+
+
+
+</aside>
+
+
+
+
+
+
+
+<div class="main-content" id="mainContent">
+
+
+
+  <div class="page-header" style="position:sticky;top:0;z-index:100;">
+
+
+
+    <div>
+
+
+
+      <div class="flex items-center gap-8">
+
+
+
+        <button class="sidebar-toggle" onclick="toggleSidebar()">&#9776;</button>
+
+
+
+        <div>
+
+
+
+          <h2>销售报表</h2>
+
+
+
+          <div class="breadcrumb"><a href="../index.html">首页</a><span>></span><span>供应链</span><span>></span><span>销售管理</span><span>></span><span>销售报表</span></div></div>
+
+
+
+        </div>
+
+
+
+      </div>
+
+
+
+    </div>
+
+
+
+  </div>
+
+
+
+
+
+
+
+  <div class="report-body">
+
+
+
+    <!-- 顶部工具栏：时间范围选择 -->
+
+
+
+    <div class="report-toolbar">
+
+
+
+      <div class="time-range">
+
+
+
+        <span class="range-label">统计范围：</span>
+
+
+
+        <select id="rangeSelect" onchange="switchRange(this.value)">
+
+
+
+          <option value="month">本月</option>
+
+
+
+          <option value="quarter">本季度</option>
+
+
+
+          <option value="year">本年度</option>
+
+
+
+          <option value="custom">自定义</option>
+
+
+
+        </select>
+
+
+
+        <input type="date" value="2026-07-01" id="dateFrom">
+
+
+
+        <span class="range-label">至</span>
+
+
+
+        <input type="date" value="2026-07-31" id="dateTo">
+
+
+
+        <button class="action-btn primary-action" onclick="refreshReport()">查询</button>
+
+
+
+      </div>
+
+
+
+      <div>
+
+
+
+        <button class="action-btn">导出</button>
+
+
+
+        <button class="action-btn">打印</button>
+
+
+
+        <button class="action-btn">刷新</button>
+
+
+
+      </div>
+
+
+
+    </div>
+
+
+
+
+
+
+
+    <!-- 4个统计卡片 -->
+
+
+
+    <div class="stat-cards">
+
+
+
+      <div class="stat-card accent-blue">
+
+
+
+        <div class="stat-icon">&#128176;</div>
+
+
+
+        <div class="stat-label">本月销售额（元）</div>
+
+
+
+        <div class="stat-value">3,285,000.00</div>
+
+
+
+        <div class="stat-trend up">&#9650; 12.50% 较上月</div>
+
+
+
+      </div>
+
+
+
+      <div class="stat-card accent-green">
+
+
+
+        <div class="stat-icon">&#128221;</div>
+
+
+
+        <div class="stat-label">销售订单数（单）</div>
+
+
+
+        <div class="stat-value">128</div>
+
+
+
+        <div class="stat-trend up">&#9650; 8.30% 较上月</div>
+
+
+
+      </div>
+
+
+
+      <div class="stat-card accent-yellow">
+
+
+
+        <div class="stat-icon">&#129309;</div>
+
+
+
+        <div class="stat-label">成交客户数（家）</div>
+
+
+
+        <div class="stat-value">46</div>
+
+
+
+        <div class="stat-trend up">&#9650; 4.50% 较上月</div>
+
+
+
+      </div>
+
+
+
+      <div class="stat-card accent-cyan">
+
+
+
+        <div class="stat-icon">&#128202;</div>
+
+
+
+        <div class="stat-label">平均客单价（元）</div>
+
+
+
+        <div class="stat-value">25,664.06</div>
+
+
+
+        <div class="stat-trend down">&#9660; 2.10% 较上月</div>
+
+
+
+      </div>
+
+
+
+    </div>
+
+
+
+
+
+
+
+    <!-- 近6个月销售趋势柱状图 -->
+
+
+
+    <div class="chart-card">
+
+
+
+      <div class="card-title">
+
+
+
+        <span>近6个月销售趋势</span>
+
+
+
+        <span class="sub">单位：万元</span>
+
+
+
+      </div>
+
+
+
+      <div class="bar-chart">
+
+
+
+        <div class="bar-item">
+
+
+
+          <div class="bar-col" style="height:55%"><span class="bar-val">186.50</span></div>
+
+
+
+          <div class="bar-label">2月</div>
+
+
+
+        </div>
+
+
+
+        <div class="bar-item">
+
+
+
+          <div class="bar-col" style="height:68%"><span class="bar-val">231.20</span></div>
+
+
+
+          <div class="bar-label">3月</div>
+
+
+
+        </div>
+
+
+
+        <div class="bar-item">
+
+
+
+          <div class="bar-col" style="height:60%"><span class="bar-val">203.80</span></div>
+
+
+
+          <div class="bar-label">4月</div>
+
+
+
+        </div>
+
+
+
+        <div class="bar-item">
+
+
+
+          <div class="bar-col" style="height:78%"><span class="bar-val">265.40</span></div>
+
+
+
+          <div class="bar-label">5月</div>
+
+
+
+        </div>
+
+
+
+        <div class="bar-item">
+
+
+
+          <div class="bar-col" style="height:85%"><span class="bar-val">289.60</span></div>
+
+
+
+          <div class="bar-label">6月</div>
+
+
+
+        </div>
+
+
+
+        <div class="bar-item">
+
+
+
+          <div class="bar-col" style="height:100%"><span class="bar-val">328.50</span></div>
+
+
+
+          <div class="bar-label">7月</div>
+
+
+
+        </div>
+
+
+
+      </div>
+
+
+
+    </div>
+
+
+
+
+
+
+
+    <!-- 客户销售排名表 -->
+
+
+
+    <div class="table-card" style="margin-bottom:16px;">
+
+
+
+      <div class="card-title">
+
+
+
+        <span>客户销售排名 TOP 8</span>
+
+
+
+        <span class="more">查看全部 &gt;</span>
+
+
+
+      </div>
+
+
+
+      <table class="data-table">
+
+
+
+        <thead><tr>
+
+
+
+          <th>排名</th>
+
+
+
+          <th>客户名称</th>
+
+
+
+          <th>销售单数</th>
+
+
+
+          <th style="text-align:right">销售总额(元)</th>
+
+
+
+          <th style="text-align:right">占比</th>
+
+
+
+          <th>占比图示</th>
+
+
+
+        </tr></thead>
+
+
+
+        <tbody>
+
+
+
+          <tr>
+
+
+
+            <td><span class="rank-num rank-1">1</span></td>
+
+
+
+            <td>中国航天科技集团有限公司</td>
+
+
+
+            <td>4</td>
+
+
+
+            <td style="text-align:right;font-family:var(--font-mono)">8,562,000.00</td>
+
+
+
+            <td style="text-align:right;font-family:var(--font-mono)">20.15%</td>
+
+
+
+            <td><span class="mini-progress"><span class="fill" style="width:100%"></span></span></td>
+
+
+
+          </tr>
+
+
+
+          <tr>
+
+
+
+            <td><span class="rank-num rank-2">2</span></td>
+
+
+
+            <td>重庆长安汽车股份有限公司</td>
+
+
+
+            <td>9</td>
+
+
+
+            <td style="text-align:right;font-family:var(--font-mono)">6,358,000.00</td>
+
+
+
+            <td style="text-align:right;font-family:var(--font-mono)">14.96%</td>
+
+
+
+            <td><span class="mini-progress"><span class="fill" style="width:74%"></span></span></td>
+
+
+
+          </tr>
+
+
+
+          <tr>
+
+
+
+            <td><span class="rank-num rank-3">3</span></td>
+
+
+
+            <td>北京字节跳动科技有限公司</td>
+
+
+
+            <td>15</td>
+
+
+
+            <td style="text-align:right;font-family:var(--font-mono)">5,120,000.00</td>
+
+
+
+            <td style="text-align:right;font-family:var(--font-mono)">12.05%</td>
+
+
+
+            <td><span class="mini-progress"><span class="fill" style="width:60%"></span></span></td>
+
+
+
+          </tr>
+
+
+
+          <tr>
+
+
+
+            <td><span class="rank-num rank-other">4</span></td>
+
+
+
+            <td>浙江阿里巴巴网络有限公司</td>
+
+
+
+            <td>10</td>
+
+
+
+            <td style="text-align:right;font-family:var(--font-mono)">4,783,000.00</td>
+
+
+
+            <td style="text-align:right;font-family:var(--font-mono)">11.26%</td>
+
+
+
+            <td><span class="mini-progress"><span class="fill" style="width:56%"></span></span></td>
+
+
+
+          </tr>
+
+
+
+          <tr>
+
+
+
+            <td><span class="rank-num rank-other">5</span></td>
+
+
+
+            <td>深圳测试公司</td>
+
+
+
+            <td>12</td>
+
+
+
+            <td style="text-align:right;font-family:var(--font-mono)">3,285,000.00</td>
+
+
+
+            <td style="text-align:right;font-family:var(--font-mono)">7.73%</td>
+
+
+
+            <td><span class="mini-progress"><span class="fill" style="width:38%"></span></span></td>
+
+
+
+          </tr>
+
+
+
+          <tr>
+
+
+
+            <td><span class="rank-num rank-other">6</span></td>
+
+
+
+            <td>测试公司</td>
+
+
+
+            <td>7</td>
+
+
+
+            <td style="text-align:right;font-family:var(--font-mono)">1,987,500.00</td>
+
+
+
+            <td style="text-align:right;font-family:var(--font-mono)">4.68%</td>
+
+
+
+            <td><span class="mini-progress"><span class="fill" style="width:23%"></span></span></td>
+
+
+
+          </tr>
+
+
+
+          <tr>
+
+
+
+            <td><span class="rank-num rank-other">7</span></td>
+
+
+
+            <td>上海汽车集团股份有限公司</td>
+
+
+
+            <td>8</td>
+
+
+
+            <td style="text-align:right;font-family:var(--font-mono)">1,568,000.00</td>
+
+
+
+            <td style="text-align:right;font-family:var(--font-mono)">3.69%</td>
+
+
+
+            <td><span class="mini-progress"><span class="fill" style="width:18%"></span></span></td>
+
+
+
+          </tr>
+
+
+
+          <tr>
+
+
+
+            <td><span class="rank-num rank-other">8</span></td>
+
+
+
+            <td>广州美的集团有限公司</td>
+
+
+
+            <td>6</td>
+
+
+
+            <td style="text-align:right;font-family:var(--font-mono)">896,000.00</td>
+
+
+
+            <td style="text-align:right;font-family:var(--font-mono)">2.11%</td>
+
+
+
+            <td><span class="mini-progress"><span class="fill" style="width:10%"></span></span></td>
+
+
+
+          </tr>
+
+
+
+        </tbody>
+
+
+
+      </table>
+
+
+
+    </div>
+
+
+
+
+
+
+
+    <!-- 产品销售汇总 + 区域销售分布 -->
+
+
+
+    <div class="tables-row">
+
+
+
+      <div class="table-card">
+
+
+
+        <div class="card-title">
+
+
+
+          <span>产品销售汇总</span>
+
+
+
+          <span class="more">查看明细 &gt;</span>
+
+
+
+        </div>
+
+
+
+        <table class="data-table">
+
+
+
+          <thead><tr>
+
+
+
+            <th>物料名称</th>
+
+
+
+            <th>分类</th>
+
+
+
+            <th style="text-align:right">销售数量</th>
+
+
+
+            <th style="text-align:right">销售金额(元)</th>
+
+
+
+          </tr></thead>
+
+
+
+          <tbody>
+
+
+
+            <tr>
+
+
+
+              <td>高频传感器模块</td>
+
+
+
+              <td>电子元器件</td>
+
+
+
+              <td style="text-align:right;font-family:var(--font-mono)">12,500.00</td>
+
+
+
+              <td style="text-align:right;font-family:var(--font-mono)">1,875,000.00</td>
+
+
+
+            </tr>
+
+
+
+            <tr>
+
+
+
+              <td>控制电路板</td>
+
+
+
+              <td>电子元器件</td>
+
+
+
+              <td style="text-align:right;font-family:var(--font-mono)">18,300.00</td>
+
+
+
+              <td style="text-align:right;font-family:var(--font-mono)">1,555,500.00</td>
+
+
+
+            </tr>
+
+
+
+            <tr>
+
+
+
+              <td>锂电池模组</td>
+
+
+
+              <td>汽车零部件</td>
+
+
+
+              <td style="text-align:right;font-family:var(--font-mono)">3,200.00</td>
+
+
+
+              <td style="text-align:right;font-family:var(--font-mono)">9,920,000.00</td>
+
+
+
+            </tr>
+
+
+
+            <tr>
+
+
+
+              <td>铝合金外壳</td>
+
+
+
+              <td>精密仪器</td>
+
+
+
+              <td style="text-align:right;font-family:var(--font-mono)">6,800.00</td>
+
+
+
+              <td style="text-align:right;font-family:var(--font-mono)">816,000.00</td>
+
+
+
+            </tr>
+
+
+
+            <tr>
+
+
+
+              <td>传感器组件</td>
+
+
+
+              <td>精密仪器</td>
+
+
+
+              <td style="text-align:right;font-family:var(--font-mono)">2,100.00</td>
+
+
+
+              <td style="text-align:right;font-family:var(--font-mono)">9,450,000.00</td>
+
+
+
+            </tr>
+
+
+
+            <tr>
+
+
+
+              <td>通信模块</td>
+
+
+
+              <td>电子元器件</td>
+
+
+
+              <td style="text-align:right;font-family:var(--font-mono)">4,500.00</td>
+
+
+
+              <td style="text-align:right;font-family:var(--font-mono)">2,970,000.00</td>
+
+
+
+            </tr>
+
+
+
+          </tbody>
+
+
+
+        </table>
+
+
+
+      </div>
+
+
+
+
+
+
+
+      <div class="table-card">
+
+
+
+        <div class="card-title">
+
+
+
+          <span>区域销售分布</span>
+
+
+
+          <span class="more">查看明细 &gt;</span>
+
+
+
+        </div>
+
+
+
+        <table class="data-table">
+
+
+
+          <thead><tr>
+
+
+
+            <th>区域</th>
+
+
+
+            <th>客户数</th>
+
+
+
+            <th style="text-align:right">销售金额(元)</th>
+
+
+
+            <th>占比图示</th>
+
+
+
+          </tr></thead>
+
+
+
+          <tbody>
+
+
+
+            <tr>
+
+
+
+              <td>华南地区</td>
+
+
+
+              <td>15</td>
+
+
+
+              <td style="text-align:right;font-family:var(--font-mono)">12,450,000.00</td>
+
+
+
+              <td><div class="region-bar-cell"><div class="rbar"><div class="rfill" style="width:100%;background:var(--text-accent);"></div></div><span style="font-size:11px;color:var(--text-tertiary);font-family:var(--font-mono);">29.30%</span></div></td>
+
+
+
+            </tr>
+
+
+
+            <tr>
+
+
+
+              <td>华东地区</td>
+
+
+
+              <td>12</td>
+
+
+
+              <td style="text-align:right;font-family:var(--font-mono)">10,860,000.00</td>
+
+
+
+              <td><div class="region-bar-cell"><div class="rbar"><div class="rfill" style="width:87%;background:var(--color-info);"></div></div><span style="font-size:11px;color:var(--text-tertiary);font-family:var(--font-mono);">25.56%</span></div></td>
+
+
+
+            </tr>
+
+
+
+            <tr>
+
+
+
+              <td>华北地区</td>
+
+
+
+              <td>10</td>
+
+
+
+              <td style="text-align:right;font-family:var(--font-mono)">8,920,000.00</td>
+
+
+
+              <td><div class="region-bar-cell"><div class="rbar"><div class="rfill" style="width:72%;background:var(--color-success);"></div></div><span style="font-size:11px;color:var(--text-tertiary);font-family:var(--font-mono);">21.00%</span></div></td>
+
+
+
+            </tr>
+
+
+
+            <tr>
+
+
+
+              <td>西南地区</td>
+
+
+
+              <td>6</td>
+
+
+
+              <td style="text-align:right;font-family:var(--font-mono)">6,358,000.00</td>
+
+
+
+              <td><div class="region-bar-cell"><div class="rbar"><div class="rfill" style="width:51%;background:var(--color-warning);"></div></div><span style="font-size:11px;color:var(--text-tertiary);font-family:var(--font-mono);">14.97%</span></div></td>
+
+
+
+            </tr>
+
+
+
+            <tr>
+
+
+
+              <td>华中地区</td>
+
+
+
+              <td>2</td>
+
+
+
+              <td style="text-align:right;font-family:var(--font-mono)">2,180,000.00</td>
+
+
+
+              <td><div class="region-bar-cell"><div class="rbar"><div class="rfill" style="width:18%;background:#a78bfa;"></div></div><span style="font-size:11px;color:var(--text-tertiary);font-family:var(--font-mono);">5.13%</span></div></td>
+
+
+
+            </tr>
+
+
+
+            <tr>
+
+
+
+              <td>东北地区</td>
+
+
+
+              <td>1</td>
+
+
+
+              <td style="text-align:right;font-family:var(--font-mono)">1,682,000.00</td>
+
+
+
+              <td><div class="region-bar-cell"><div class="rbar"><div class="rfill" style="width:14%;background:#f472b6;"></div></div><span style="font-size:11px;color:var(--text-tertiary);font-family:var(--font-mono);">3.96%</span></div></td>
+
+
+
+            </tr>
+
+
+
+          </tbody>
+
+
+
+        </table>
+
+
+
+      </div>
+
+
+
+    </div>
+
+
+
+  </div>
+
+
+
+</div>
+
+
+
+
+
+
+
+<script>
+
+
+
+
+
+
+
+
+
+
+;
+
+
+
+  toast.className = 'toast toast-' + (type || 'info');
+
+
+
+  toast.innerHTML = '<span class="toast-icon">' + (icons[type] || icons.info) + '</span><span>' + message + '</span>';
+
+
+
+container.appendChild(toast);
+
+
+
+}
+
+
+
+  setTimeout(function() { toast.remove(); }, 3000);
+function closeConfirmModal() {
+
+
+
+  document.getElementById('confirmModal').classList.remove('show');
+
+
+
+  confirmCallback = null;
+
+
+
+
+
+
+
+}
+
+
+
+function confirmOk() {
+
+
+
+  if (confirmCallback) {
+
+
+
+    confirmCallback();
+
+
+
+  }
+
+
+
+  closeConfirmModal();
+
+
+
+}
+
+
+
+
+
+
+
+function switchRange(v){
+
+
+
+  var dFrom=document.getElementById('dateFrom');
+
+
+
+  var dTo=document.getElementById('dateTo');
+
+
+
+  if(v==='month'){dFrom.value='2026-07-01';dTo.value='2026-07-31';}
+
+
+
+  else if(v==='quarter'){dFrom.value='2026-07-01';dTo.value='2026-09-30';}
+
+
+
+  else if(v==='year'){dFrom.value='2026-01-01';dTo.value='2026-12-31';}
+
+
+
+}
+
+
+
+function refreshReport(){showToast('正在查询销售报表数据...', 'info');}
+
+
+
+
+var currentLookupField = null;
+var currentLookupType = null;
+var lookupData = [];
+var lookupColumns = [];
+
+function openLookup(fieldId, type) {
+  currentLookupField = fieldId;
+  currentLookupType = type;
+  
+  if (type === 'org') {
+    lookupColumns = ['编码', '名称', '形态', '上级组织'];
+    lookupData = JSON.parse(localStorage.getItem('erp_orgs') || '[]');
+    document.getElementById('lookupTitle').textContent = '选择组织';
+  } else if (type === 'department') {
+    lookupColumns = ['编码', '名称'];
+    lookupData = JSON.parse(localStorage.getItem('erp_departments_cache') || '[]');
+    document.getElementById('lookupTitle').textContent = '选择部门';
+  } else if (type === 'employee') {
+    lookupColumns = ['编号', '姓名', '所属部门'];
+    lookupData = JSON.parse(localStorage.getItem('erp_employees_cache') || '[]');
+    document.getElementById('lookupTitle').textContent = '选择员工';
+  } else if (type === 'supplier') {
+    lookupColumns = ['编码', '名称'];
+    lookupData = JSON.parse(localStorage.getItem('erp_suppliers_cache') || '[]');
+    document.getElementById('lookupTitle').textContent = '选择供应商';
+  } else if (type === 'customer') {
+    lookupColumns = ['编码', '名称'];
+    lookupData = JSON.parse(localStorage.getItem('erp_customers_cache') || '[]');
+    document.getElementById('lookupTitle').textContent = '选择客户';
+  } else if (type === 'material') {
+    lookupColumns = ['物料编码', '物料名称', '规格型号', '基本单位'];
+    lookupData = JSON.parse(localStorage.getItem('erp_materials_cache') || '[]');
+    document.getElementById('lookupTitle').textContent = '选择物料';
+  } else if (type === 'warehouse') {
+    lookupColumns = ['编码', '名称'];
+    lookupData = JSON.parse(localStorage.getItem('erp_warehouses_cache') || '[]');
+    document.getElementById('lookupTitle').textContent = '选择仓库';
+  }
+  
+  renderLookupTable(lookupData);
+  document.getElementById('lookupModal').classList.add('show');
+}
+
+function closeLookup() {
+  document.getElementById('lookupModal').classList.remove('show');
+}
+
+function filterLookup() {
+  var keyword = document.getElementById('lookupKeyword').value.trim().toLowerCase();
+  var filtered = lookupData.filter(function(item) {
+    var code = item.code || '';
+    var name = item.name || '';
+    return code.toLowerCase().includes(keyword) || name.toLowerCase().includes(keyword);
+  });
+  renderLookupTable(filtered);
+}
+
+function renderLookupTable(data) {
+  var head = document.getElementById('lookupTableHead');
+  var body = document.getElementById('lookupTableBody');
+  
+  head.innerHTML = '<tr><th class="checkbox-cell"><input type="checkbox" onclick="selectAllLookup()"></th>' + lookupColumns.map(function(col) { return '<th>' + col + '</th>'; }).join('') + '</tr>';
+  
+  body.innerHTML = '';
+  data.forEach(function(item) {
+    var row = document.createElement('tr');
+    row.onclick = function() { selectLookupRow(this); };
+    var cells = ['<td class="checkbox-cell"><input type="checkbox" class="lookup-checkbox" value="' + item.id + '"></td>'];
+    if (currentLookupType === 'org') {
+      cells.push('<td>' + item.code + '</td><td>' + item.name + '</td><td>' + (item.form || '') + '</td><td>' + (item.parentName || '') + '</td>');
+    } else if (currentLookupType === 'department') {
+      cells.push('<td>' + item.code + '</td><td>' + item.name + '</td>');
+    } else if (currentLookupType === 'employee') {
+      cells.push('<td>' + item.code + '</td><td>' + item.name + '</td><td>' + (item.department || '') + '</td>');
+    } else if (currentLookupType === 'supplier' || currentLookupType === 'customer') {
+      cells.push('<td>' + item.code + '</td><td>' + item.name + '</td>');
+    } else if (currentLookupType === 'material') {
+      cells.push('<td>' + item.code + '</td><td>' + item.name + '</td><td>' + (item.specification || '') + '</td><td>' + (item.unit || '') + '</td>');
+    } else if (currentLookupType === 'warehouse') {
+      cells.push('<td>' + item.code + '</td><td>' + item.name + '</td>');
+    }
+    row.innerHTML = cells.join('');
+    body.appendChild(row);
+  });
+  
+  if (data.length === 0) {
+    body.innerHTML = '<tr><td colspan="' + (lookupColumns.length + 1) + '" style="text-align:center;padding:40px;color:#999;">暂无数据</td></tr>';
+  }
+}
+
+function selectAllLookup() {
+  var master = document.querySelector('.lookup-table th input');
+  var checkboxes = document.querySelectorAll('.lookup-checkbox');
+  checkboxes.forEach(function(cb) { cb.checked = master.checked; });
+}
+
+function selectLookupRow(row) {
+  var checkbox = row.querySelector('.lookup-checkbox');
+  checkbox.checked = !checkbox.checked;
+}
+
+function confirmLookup() {
+  var checkboxes = document.querySelectorAll('.lookup-checkbox:checked');
+  if (checkboxes.length === 0) {
+    showToast('请选择一条记录', 'warning');
+    return;
+  }
+  
+  var item = lookupData.find(function(d) { return d.id === checkboxes[0].value; });
+  if (item) {
+    var field = document.getElementById(currentLookupField);
+    if (field) {
+      field.value = item.name;
+      field.setAttribute('data-id', item.id);
+      field.setAttribute('data-code', item.code);
+      
+      if (currentLookupType === 'material') {
+        var row = field.closest('tr');
+        if (row) {
+          row.querySelector('.material-name').value = item.name;
+          row.querySelector('.material-spec').value = item.specification || '';
+          row.querySelector('.material-unit').value = item.unit || '';
+        }
+      }
+    }
+  }
+  
+  closeLookup();
+}
+
+function openMaterialLookup(btn) {
+  var field = btn.previousElementSibling;
+  field.id = 'lookupField_' + Date.now();
+  currentLookupField = field.id;
+  openLookup(field.id, 'material');
+}
+
+function openOrgLookup(btn) {
+  var field = btn.previousElementSibling;
+  field.id = 'lookupField_' + Date.now();
+  currentLookupField = field.id;
+  openLookup(field.id, 'org');
+}
+
+function openSupplierLookup(btn) {
+  var field = btn.previousElementSibling;
+  field.id = 'lookupField_' + Date.now();
+  currentLookupField = field.id;
+  openLookup(field.id, 'supplier');
+}
+
+function openWarehouseLookup(btn) {
+  var field = btn.previousElementSibling;
+  field.id = 'lookupField_' + Date.now();
+  currentLookupField = field.id;
+  openLookup(field.id, 'warehouse');
+}
+
+function initLookupData() {
+  if (!localStorage.getItem('erp_orgs')) {
+    localStorage.setItem('erp_orgs', JSON.stringify([
+      { id: 'org-001', code: 'ORG-HQ', name: '磐枢工业集团', form: '集团', parentName: '' },
+      { id: 'org-002', code: 'ORG-SM', name: '磐枢智能制造有限公司', form: '公司', parentName: '磐枢工业集团' },
+      { id: 'org-003', code: 'ORG-SM-PD', name: '生产制造部', form: '部门', parentName: '磐枢智能制造有限公司' },
+      { id: 'org-004', code: 'ORG-SM-FA', name: '财务部', form: '部门', parentName: '磐枢智能制造有限公司' },
+      { id: 'org-005', code: 'ORG-SM-SD', name: '销售部', form: '部门', parentName: '磐枢智能制造有限公司' }
+    ]));
+  }
+  if (!localStorage.getItem('erp_departments_cache')) {
+    localStorage.setItem('erp_departments_cache', JSON.stringify([
+      { id: 'dept-001', code: 'DEPT-PD', name: '生产制造部', status: 1 },
+      { id: 'dept-002', code: 'DEPT-FA', name: '财务部', status: 1 },
+      { id: 'dept-003', code: 'DEPT-SD', name: '销售部', status: 1 },
+      { id: 'dept-004', code: 'DEPT-AS', name: '装配车间', status: 1 },
+      { id: 'dept-005', code: 'DEPT-QC', name: '质检车间', status: 1 }
+    ]));
+  }
+  if (!localStorage.getItem('erp_employees_cache')) {
+    localStorage.setItem('erp_employees_cache', JSON.stringify([
+      { id: 'emp-001', code: 'EMP-001', name: '张三', department: '生产制造部', status: 1 },
+      { id: 'emp-002', code: 'EMP-002', name: '李四', department: '生产制造部', status: 1 },
+      { id: 'emp-003', code: 'EMP-003', name: '王五', department: '财务部', status: 1 },
+      { id: 'emp-004', code: 'EMP-004', name: '赵六', department: '销售部', status: 1 },
+      { id: 'emp-005', code: 'EMP-005', name: '钱七', department: '质检车间', status: 1 }
+    ]));
+  }
+  if (!localStorage.getItem('erp_suppliers_cache')) {
+    localStorage.setItem('erp_suppliers_cache', JSON.stringify([
+      { id: 'sup-001', code: 'S-001', name: '深圳电子元器件有限公司', status: 1 },
+      { id: 'sup-002', code: 'S-002', name: '杭州精密机械加工厂', status: 1 },
+      { id: 'sup-003', code: 'S-003', name: '上海材料科技有限公司', status: 1 },
+      { id: 'sup-004', code: 'S-004', name: '东莞五金制品厂', status: 1 }
+    ]));
+  }
+  if (!localStorage.getItem('erp_materials_cache')) {
+    localStorage.setItem('erp_materials_cache', JSON.stringify([
+      { id: 'mat-001', code: 'P-001', name: '高频传感器模块', specification: 'HT-2026', unit: '个', status: 1 },
+      { id: 'mat-002', code: 'P-002', name: '控制电路板', specification: 'CB-2026', unit: '块', status: 1 },
+      { id: 'mat-003', code: 'P-003', name: '智能控制器', specification: 'IC-V3', unit: '台', status: 1 },
+      { id: 'mat-004', code: 'P-004', name: '电源模块', specification: 'PM-500W', unit: '个', status: 1 },
+      { id: 'mat-005', code: 'M-001', name: 'PCB电路板', specification: 'FR-4双层', unit: '块', status: 1 },
+      { id: 'mat-006', code: 'M-002', name: '贴片电阻', specification: '10KΩ 0603', unit: '个', status: 1 },
+      { id: 'mat-007', code: 'M-003', name: '贴片电容', specification: '100μF 0805', unit: '个', status: 1 },
+      { id: 'mat-008', code: 'M-004', name: '螺丝', specification: 'M4x10', unit: '包', status: 1 }
+    ]));
+  }
+  if (!localStorage.getItem('erp_warehouses_cache')) {
+    localStorage.setItem('erp_warehouses_cache', JSON.stringify([
+      { id: 'wh-001', code: 'WH-001', name: '成品仓', status: 1 },
+      { id: 'wh-002', code: 'WH-002', name: '原料仓', status: 1 },
+      { id: 'wh-003', code: 'WH-003', name: '半成品仓', status: 1 },
+      { id: 'wh-004', code: 'WH-004', name: '辅料仓', status: 1 }
+    ]));
+  }
+}
+
+</script>
+
+
+
+
+<div class="lookup-modal" id="lookupModal">
+  <div class="lookup-dialog">
+    <div class="lookup-header">
+      <div class="lookup-title" id="lookupTitle">选择</div>
+      <button class="lookup-close" onclick="closeLookup()">×</button>
+    </div>
+    <div class="lookup-body">
+      <div class="lookup-search">
+        <input type="text" id="lookupKeyword" placeholder="请输入编码或名称搜索" onkeydown="if(event.key==='Enter')filterLookup()">
+        <button onclick="filterLookup()">搜索</button>
+      </div>
+      <table class="lookup-table">
+        <thead id="lookupTableHead"></thead>
+        <tbody id="lookupTableBody"></tbody>
+      </table>
+    </div>
+    <div class="lookup-footer">
+      <button class="btn btn-cancel" onclick="closeLookup()">取消</button>
+      <button class="btn btn-primary" onclick="confirmLookup()">确定</button>
+    </div>
+  </div>
+</div>
+
+
+<div class="confirm-modal-overlay" id="confirmModal">
+  <div class="confirm-modal-dialog">
+    <div class="confirm-modal-header">
+      <span class="confirm-modal-icon" id="confirmIcon">&#9888;</span>
+      <span class="confirm-modal-title" id="confirmTitle">系统提示</span>
+    </div>
+    <div class="confirm-modal-body">
+      <div class="confirm-modal-message" id="confirmMessage"></div>
+    </div>
+    <div class="confirm-modal-footer">
+      <button class="btn-cancel" onclick="closeConfirmModal(false)">取消</button>
+      <button class="btn-confirm" onclick="closeConfirmModal(true)">确定</button>
+    </div>
+  </div>
+</div>
+
+</body>
+
+
+
+</html>

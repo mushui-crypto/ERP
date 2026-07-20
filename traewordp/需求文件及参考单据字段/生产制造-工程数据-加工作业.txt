@@ -1,0 +1,56 @@
+生产制造-工程数据-加工作业
+
+字段说明：
+单据头：FBillHead 
+	 实体主键：FID 
+	 数据状态：FDocumentStatus 
+	 禁用状态：FForbidStatus 
+	 名称：FName  (必填项)
+	 编码：FNumber 
+	 描述：FDescription 
+	 创建组织：FCreateOrgId  (必填项)
+	 使用组织：FUseOrgId  (必填项)
+	 创建人：FCreatorId 
+	 修改人：FModifierId 
+	 创建日期：FCreateDate 
+	 修改日期：FModifyDate 
+	 禁用人：FForbidderId 
+	 审核人：FApproverId 
+	 禁用日期：FForbidDate 
+	 审核日期：FApproveDate 
+	 时间单位：FTIMEUNIT 
+	 工作中心：FWorkCenterID 
+	 失效日期：FExpireDate  (必填项)
+	 生效日期：FEffectDate  (必填项)
+	 数据来源：FProcessSrc 
+	 PLM内码：FPLMProcessId 
+	 数据采集顺序：FDataAcOrder  (必填项)
+	 特征标识：FFeatureFlag  (必填项)
+	 自动生成条码拆装箱单：FAutoGenPackaging 
+	 强制换箱打印箱号标签：FIsForceChangeBoxPrint 
+	 产品：FIsMaterial 
+	 批号：FIsLot 
+	 计划跟踪号：FIsPlanTrcNo 
+	 仓库仓位：FIsWarePosition 
+	 BOM版本：FIsBom 
+	 生产订单分录：FIsMoEntry 
+	 客户：FIsCustomer 
+	 辅助属性：FIsAuxprop 
+资源：FEntity 
+	 实体主键：FEntryID 
+	 资源编码：FResourceID 
+	 资源名称：FResName 
+	 资源分类：FResTypeID 
+	 数量：FResQty 
+缺陷类型：FDefectEntity 
+	 实体主键：FEntryID 
+	 缺陷类型编码：FDefectTypeId  (必填项)
+	 缺陷类型名称：FDefectTypeName 
+	 缺陷类型分组：FDefectTypeGroup 
+成本资源：FCostResourceEntity 
+	 实体主键：FEntryID 
+	 资源：FCostResource  (必填项)
+	 使用比例%：FUseRate 
+	 资源需求数量：FResourceReqNum 
+	 数量单位：FQtyUnit 
+	 最近一次使用比例：FUseRateRecent 

@@ -1,0 +1,1493 @@
+<!DOCTYPE html>
+
+
+
+<html lang="zh-CN">
+
+
+
+<head>
+
+
+
+<meta charset="UTF-8">
+
+
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+
+
+<title>设备点检 — 磐枢工业智能平台</title>
+
+
+
+<link rel="stylesheet" href="../common.css">
+
+
+
+<script src="../common.js"></script>
+<script>
+</script>
+
+<style>
+.column-modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:2000;justify-content:center;align-items:center;}
+.column-modal.show{display:flex;}
+.column-dialog{background:#fff;border:1px solid #d9d9d9;border-radius:8px;width:560px;min-width:400px;max-width:720px;height:420px;min-height:300px;max-height:70vh;overflow:hidden;box-shadow:0 10px 30px rgba(0,0,0,0.15);position:relative;resize:both;}
+.column-header{padding:16px 20px;border-bottom:1px solid #f0f0f0;background:#fafafa;display:flex;align-items:center;justify-content:space-between;cursor:move;}
+.column-title{font-size:16px;font-weight:600;color:#333;}
+.column-close{font-size:20px;color:#999;cursor:pointer;border:none;background:none;width:28px;height:28px;display:flex;align-items:center;justify-content:center;border-radius:4px;transition:all 0.3s;cursor:pointer;}
+.column-close:hover{background:#f5f5f5;color:#666;}
+.column-body{padding:20px;overflow-y:auto;height:calc(100% - 88px);background:#fff;}
+.column-footer{padding:14px 20px;border-top:1px solid #f0f0f0;display:flex;justify-content:flex-end;gap:12px;background:#fafafa;position:absolute;bottom:0;left:0;right:0;}
+.column-item{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:4px;transition:all 0.2s;}
+.column-item:hover{background:#f5f7fa;}
+.column-item input[type="checkbox"]{width:16px;height:16px;cursor:pointer;accent-color:#1890ff;}
+.column-item label{font-size:14px;color:#333;cursor:pointer;flex:1;}
+</style>
+
+
+</head>
+
+
+
+<body>
+
+
+
+
+
+
+
+<!-- ===== SIDEBAR ===== -->
+
+
+
+<aside class="sidebar" id="sidebar">
+
+
+
+<div class="sidebar-logo">
+
+
+
+    <img src="../images/logo.png" alt="磐枢工业智能平台" style="width: 100%; max-width: 200px; margin-bottom: 8px;">
+
+
+
+    <h1 style="font-size: 16px; margin: 0;">磐枢工业智能平台</h1>
+
+
+
+  </div>
+
+
+
+  <nav class="sidebar-menu"></nav>
+
+
+
+<div class="sidebar-user">
+
+
+
+    <div class="avatar">管</div>
+
+
+
+</aside>
+
+
+
+
+
+
+
+<!-- ===== MAIN CONTENT ===== -->
+
+
+
+<div class="main-content" id="mainContent">
+
+
+
+  <div class="page-header" style="position:sticky;top:0;z-index:100;">
+
+
+
+    <div>
+
+
+
+      <div class="flex items-center gap-8">
+
+
+
+        <button class="sidebar-toggle" id="sidebarToggle" onclick="toggleSidebar()">&#9776;</button>
+
+
+
+        <div>
+
+
+
+          <h2 id="pageTitle">设备点检</h2>
+
+
+
+          <div class="breadcrumb" id="pageBreadcrumb">
+
+
+
+            <a href="../index.html">首页</a><span>/</span><a href="../index.html">设备管理</a><span>/</span><span>设备点检</span>
+
+
+
+          </div></div>
+
+
+
+        </div>
+
+
+
+      </div>
+
+
+
+    </div>
+
+
+
+    <div class="page-actions">
+
+
+
+      <button class="btn btn-ghost btn-sm">&#128276; 消息</button>
+
+
+
+      <button class="btn btn-ghost btn-sm" onclick="window.location.href='../login.html'">&#9211; 退出</button>
+
+      </div>
+
+
+
+  </div>
+
+  <div class="doc-header" style="background:#fff;border-bottom:1px solid #e8e8e8;padding:12px 20px;display:flex;justify-content:space-between;align-items:center;">
+    <div style="font-size:14px;color:#666;">快捷操作</div>
+    <div class="doc-toolbar" style="display:flex;gap:8px;flex-wrap:wrap;">
+      <button class="toolbar-btn" style="padding:6px 12px;border-radius:4px;font-size:13px;cursor:pointer;border:1px solid #d9d9d9;background:#fff;color:#666;display:flex;align-items:center;gap:6px;transition:all 0.3s;" onclick="showToast('刷新功能开发中...', 'info')"><span>🔄</span> 刷新</button>
+      <button class="toolbar-btn" style="padding:6px 12px;border-radius:4px;font-size:13px;cursor:pointer;border:1px solid #d9d9d9;background:#fff;color:#666;display:flex;align-items:center;gap:6px;transition:all 0.3s;" onclick="openColumnSettings()"><span>⚙️</span> 显示/隐藏列</button>
+      <button class="toolbar-btn" style="padding:6px 12px;border-radius:4px;font-size:13px;cursor:pointer;border:1px solid #d9d9d9;background:#fff;color:#666;display:flex;align-items:center;gap:6px;transition:all 0.3s;" onclick="showToast('导出功能开发中...', 'info')"><span>📤</span> 导出</button>
+      <button class="toolbar-btn danger" style="padding:6px 12px;border-radius:4px;font-size:13px;cursor:pointer;border:1px solid #f5222d;background:#f5222d;color:#fff;display:flex;align-items:center;gap:6px;transition:all 0.3s;" onclick="showConfirm('确认退出？', function() {location.href='../index.html';});"><span>✖️</span> 退出</button>
+    </div>
+  </div>
+
+  <div class="page-body">
+
+
+
+    <!-- ===== TABS ===== -->
+
+
+
+    <div class="tabs">
+
+
+
+      <div class="tab-item active" onclick="switchTab('standard')">点检标准</div>
+
+
+
+      <div class="tab-item" onclick="switchTab('plan')">点检计划</div>
+
+
+
+      <div class="tab-item" onclick="switchTab('record')">点检记录</div>
+
+
+
+    </div>
+
+
+
+
+
+
+
+    <!-- ===== TAB: 点检标准 ===== -->
+
+
+
+    <div class="tab-pane active" id="tab-standard">
+
+
+
+      <div class="card">
+
+
+
+        <div class="card-header">点检标准列表</div>
+
+
+
+        <div class="card-body">
+
+
+
+          <div class="toolbar" style="margin-bottom:16px;">
+
+
+
+            <div class="toolbar-left">
+
+
+
+              <button class="btn btn-primary btn-sm">&#10133; 新增</button>
+
+
+
+              <button class="btn btn-ghost btn-sm">&#128221; 编辑</button>
+
+
+
+              <button class="btn btn-ghost btn-sm">&#128465; 删除</button>
+
+
+
+            </div>
+
+
+
+            <div class="toolbar-right">
+
+
+
+              <div class="form-search" style="width:200px;">
+
+
+
+                <input type="text" class="form-input" placeholder="搜索标准编号/设备名称">
+
+
+
+              </div>
+
+
+
+            </div>
+
+
+
+          </div>
+
+
+
+          <div class="table-wrapper">
+
+
+
+            <table class="data-table">
+
+
+
+              <thead>
+
+
+
+                <tr>
+                  <th data-column="standardNo">标准编号</th>
+                  <th data-column="equipCode">设备编号</th>
+                  <th data-column="equipName">设备名称</th>
+                  <th data-column="checkItem">点检项目</th>
+                  <th data-column="checkFrequency">点检频率</th>
+                  <th data-column="checkMethod">点检方法</th>
+                  <th data-column="qualifiedStandard">合格标准</th>
+                  <th data-column="action">操作</th>
+                </tr>
+
+
+
+              </thead>
+
+
+
+              <tbody>
+
+
+
+                <tr>
+                  <td data-column="standardNo">CK-STD-001</td>
+                  <td data-column="equipCode">CNC-001</td>
+                  <td data-column="equipName">CNC加工中心A</td>
+                  <td data-column="checkItem">主轴振动检测</td>
+                  <td data-column="checkFrequency">每日</td>
+                  <td data-column="checkMethod">振动分析仪</td>
+                  <td data-column="qualifiedStandard">振动值 ≤ 2.0mm/s</td>
+                  <td data-column="action" class="row-action-links"><a href="#" onclick="openModal('detailModal')">详情</a><a href="#">编辑</a></td>
+                </tr>
+
+                <tr>
+                  <td data-column="standardNo">CK-STD-002</td>
+                  <td data-column="equipCode">CNC-001</td>
+                  <td data-column="equipName">CNC加工中心A</td>
+                  <td data-column="checkItem">主轴温度检测</td>
+                  <td data-column="checkFrequency">每日</td>
+                  <td data-column="checkMethod">红外测温仪</td>
+                  <td data-column="qualifiedStandard">温度 ≤ 60°C</td>
+                  <td data-column="action" class="row-action-links"><a href="#" onclick="openModal('detailModal')">详情</a><a href="#">编辑</a></td>
+                </tr>
+
+                <tr>
+                  <td data-column="standardNo">CK-STD-003</td>
+                  <td data-column="equipCode">CNC-002</td>
+                  <td data-column="equipName">CNC加工中心B</td>
+                  <td data-column="checkItem">刀具磨损检测</td>
+                  <td data-column="checkFrequency">每班</td>
+                  <td data-column="checkMethod">目视检查</td>
+                  <td data-column="qualifiedStandard">磨损量 ≤ 0.5mm</td>
+                  <td data-column="action" class="row-action-links"><a href="#" onclick="openModal('detailModal')">详情</a><a href="#">编辑</a></td>
+                </tr>
+
+                <tr>
+                  <td data-column="standardNo">CK-STD-004</td>
+                  <td data-column="equipCode">LATHE-001</td>
+                  <td data-column="equipName">车床A</td>
+                  <td data-column="checkItem">导轨润滑检测</td>
+                  <td data-column="checkFrequency">每日</td>
+                  <td data-column="checkMethod">目视检查</td>
+                  <td data-column="qualifiedStandard">润滑油充足，无泄漏</td>
+                  <td data-column="action" class="row-action-links"><a href="#" onclick="openModal('detailModal')">详情</a><a href="#">编辑</a></td>
+                </tr>
+
+                <tr>
+                  <td data-column="standardNo">CK-STD-005</td>
+                  <td data-column="equipCode">MILL-001</td>
+                  <td data-column="equipName">铣床A</td>
+                  <td data-column="checkItem">液压系统压力</td>
+                  <td data-column="checkFrequency">每周</td>
+                  <td data-column="checkMethod">压力表</td>
+                  <td data-column="qualifiedStandard">压力 4.5-5.0 MPa</td>
+                  <td data-column="action" class="row-action-links"><a href="#" onclick="openModal('detailModal')">详情</a><a href="#">编辑</a></td>
+                </tr>
+
+
+
+              </tbody>
+
+
+
+            </table>
+
+
+
+          </div>
+
+
+
+          <div class="pagination" style="margin-top:16px;">
+
+
+
+            <div class="page-btn">上一页</div>
+
+
+
+            <div class="page-btn active">1</div>
+
+
+
+            <div class="page-btn">2</div>
+
+
+
+            <div class="page-btn">3</div>
+
+
+
+            <div class="page-btn">下一页</div>
+
+
+
+            <div class="page-info">共 22 条，显示 1-5 条</div>
+
+
+
+          </div>
+
+
+
+        </div>
+
+
+
+      </div>
+
+
+
+    </div>
+
+
+
+
+
+
+
+    <!-- ===== TAB: 点检计划 ===== -->
+
+
+
+    <div class="tab-pane" id="tab-plan">
+
+
+
+      <div class="card">
+
+
+
+        <div class="card-header">点检计划列表</div>
+
+
+
+        <div class="card-body">
+
+
+
+          <div class="toolbar" style="margin-bottom:16px;">
+
+
+
+            <div class="toolbar-left">
+
+
+
+              <button class="btn btn-primary btn-sm">&#10133; 新增</button>
+
+
+
+              <button class="btn btn-ghost btn-sm">&#128221; 编辑</button>
+
+
+
+              <button class="btn btn-ghost btn-sm">&#128465; 删除</button>
+
+
+
+            </div>
+
+
+
+            <div class="toolbar-right">
+
+
+
+              <div class="form-search" style="width:200px;">
+
+
+
+                <input type="text" class="form-input" placeholder="搜索计划编号/设备名称">
+
+
+
+              </div>
+
+
+
+            </div>
+
+
+
+          </div>
+
+
+
+          <div class="table-wrapper">
+
+
+
+            <table class="data-table">
+
+
+
+              <thead>
+
+
+
+                <tr>
+                  <th data-column="planNo">计划编号</th>
+                  <th data-column="equipCode">设备编号</th>
+                  <th data-column="equipName">设备名称</th>
+                  <th data-column="checkDate">点检日期</th>
+                  <th data-column="checker">点检人员</th>
+                  <th data-column="status">状态</th>
+                  <th data-column="action">操作</th>
+                </tr>
+
+
+
+              </thead>
+
+
+
+              <tbody>
+
+
+
+                <tr>
+                  <td data-column="planNo">CK-PLAN-001</td>
+                  <td data-column="equipCode">CNC-001</td>
+                  <td data-column="equipName">CNC加工中心A</td>
+                  <td data-column="checkDate">2026-07-10</td>
+                  <td data-column="checker">测试人员</td>
+                  <td data-column="status"><span class="badge badge-success">已完成</span></td>
+                  <td data-column="action" class="row-action-links"><a href="#" onclick="openModal('detailModal')">详情</a></td>
+                </tr>
+
+                <tr>
+                  <td data-column="planNo">CK-PLAN-002</td>
+                  <td data-column="equipCode">CNC-002</td>
+                  <td data-column="equipName">CNC加工中心B</td>
+                  <td data-column="checkDate">2026-07-10</td>
+                  <td data-column="checker">测试人员</td>
+                  <td data-column="status"><span class="badge badge-warning">进行中</span></td>
+                  <td data-column="action" class="row-action-links"><a href="#" onclick="openModal('detailModal')">详情</a><a href="#">执行</a></td>
+                </tr>
+
+                <tr>
+                  <td data-column="planNo">CK-PLAN-003</td>
+                  <td data-column="equipCode">LATHE-001</td>
+                  <td data-column="equipName">车床A</td>
+                  <td data-column="checkDate">2026-07-10</td>
+                  <td data-column="checker">测试人员</td>
+                  <td data-column="status"><span class="badge badge-info">待执行</span></td>
+                  <td data-column="action" class="row-action-links"><a href="#" onclick="openModal('detailModal')">详情</a><a href="#">执行</a></td>
+                </tr>
+
+                <tr>
+                  <td data-column="planNo">CK-PLAN-004</td>
+                  <td data-column="equipCode">MILL-001</td>
+                  <td data-column="equipName">铣床A</td>
+                  <td data-column="checkDate">2026-07-10</td>
+                  <td data-column="checker">测试人员</td>
+                  <td data-column="status"><span class="badge badge-info">待执行</span></td>
+                  <td data-column="action" class="row-action-links"><a href="#" onclick="openModal('detailModal')">详情</a><a href="#">执行</a></td>
+                </tr>
+
+                <tr>
+                  <td data-column="planNo">CK-PLAN-005</td>
+                  <td data-column="equipCode">GRIND-001</td>
+                  <td data-column="equipName">磨床A</td>
+                  <td data-column="checkDate">2026-07-10</td>
+                  <td data-column="checker">测试人员</td>
+                  <td data-column="status"><span class="badge badge-success">已完成</span></td>
+                  <td data-column="action" class="row-action-links"><a href="#" onclick="openModal('detailModal')">详情</a></td>
+                </tr>
+
+
+
+              </tbody>
+
+
+
+            </table>
+
+
+
+          </div>
+
+
+
+          <div class="pagination" style="margin-top:16px;">
+
+
+
+            <div class="page-btn">上一页</div>
+
+
+
+            <div class="page-btn active">1</div>
+
+
+
+            <div class="page-btn">2</div>
+
+
+
+            <div class="page-btn">3</div>
+
+
+
+            <div class="page-btn">下一页</div>
+
+
+
+            <div class="page-info">共 30 条，显示 1-5 条</div>
+
+
+
+          </div>
+
+
+
+        </div>
+
+
+
+      </div>
+
+
+
+    </div>
+
+
+
+
+
+
+
+    <!-- ===== TAB: 点检记录 ===== -->
+
+
+
+    <div class="tab-pane" id="tab-record">
+
+
+
+      <div class="card">
+
+
+
+        <div class="card-header">点检记录列表</div>
+
+
+
+        <div class="card-body">
+
+
+
+          <div class="toolbar" style="margin-bottom:16px;">
+
+
+
+            <div class="toolbar-left">
+
+
+
+              <button class="btn btn-primary btn-sm">&#10133; 新增</button>
+
+
+
+              <button class="btn btn-ghost btn-sm">&#128221; 编辑</button>
+
+
+
+              <button class="btn btn-ghost btn-sm">&#128465; 删除</button>
+
+
+
+            </div>
+
+
+
+            <div class="toolbar-right">
+
+
+
+              <div class="form-search" style="width:200px;">
+
+
+
+                <input type="text" class="form-input" placeholder="搜索记录编号/设备名称">
+
+
+
+              </div>
+
+
+
+            </div>
+
+
+
+          </div>
+
+
+
+          <div class="table-wrapper">
+
+
+
+            <table class="data-table">
+
+
+
+              <thead>
+
+
+
+                <tr>
+                  <th data-column="recordNo">记录编号</th>
+                  <th data-column="equipCode">设备编号</th>
+                  <th data-column="equipName">设备名称</th>
+                  <th data-column="checkDate">点检日期</th>
+                  <th data-column="checker">点检人员</th>
+                  <th data-column="checkResult">点检结果</th>
+                  <th data-column="abnormalDesc">异常描述</th>
+                  <th data-column="processStatus">处理状态</th>
+                  <th data-column="action">操作</th>
+                </tr>
+
+
+
+              </thead>
+
+
+
+              <tbody>
+
+
+
+                <tr>
+                  <td data-column="recordNo">CK-REC-001</td>
+                  <td data-column="equipCode">CNC-001</td>
+                  <td data-column="equipName">CNC加工中心A</td>
+                  <td data-column="checkDate">2026-07-10</td>
+                  <td data-column="checker">测试人员</td>
+                  <td data-column="checkResult"><span class="badge badge-success">合格</span></td>
+                  <td data-column="abnormalDesc">-</td>
+                  <td data-column="processStatus"><span class="badge badge-success">已完成</span></td>
+                  <td data-column="action" class="row-action-links"><a href="#" onclick="openModal('detailModal')">详情</a></td>
+                </tr>
+
+                <tr>
+                  <td data-column="recordNo">CK-REC-002</td>
+                  <td data-column="equipCode">CNC-002</td>
+                  <td data-column="equipName">CNC加工中心B</td>
+                  <td data-column="checkDate">2026-07-10</td>
+                  <td data-column="checker">测试人员</td>
+                  <td data-column="checkResult"><span class="badge badge-error">不合格</span></td>
+                  <td data-column="abnormalDesc">主轴振动值 2.8mm/s，超过标准值</td>
+                  <td data-column="processStatus"><span class="badge badge-warning">处理中</span></td>
+                  <td data-column="action" class="row-action-links"><a href="#" onclick="openModal('detailModal')">详情</a><a href="#">处理</a></td>
+                </tr>
+
+                <tr>
+                  <td data-column="recordNo">CK-REC-003</td>
+                  <td data-column="equipCode">LATHE-001</td>
+                  <td data-column="equipName">车床A</td>
+                  <td data-column="checkDate">2026-07-10</td>
+                  <td data-column="checker">测试人员</td>
+                  <td data-column="checkResult"><span class="badge badge-warning">待确认</span></td>
+                  <td data-column="abnormalDesc">导轨润滑油不足</td>
+                  <td data-column="processStatus"><span class="badge badge-info">待处理</span></td>
+                  <td data-column="action" class="row-action-links"><a href="#" onclick="openModal('detailModal')">详情</a><a href="#">确认</a></td>
+                </tr>
+
+                <tr>
+                  <td data-column="recordNo">CK-REC-004</td>
+                  <td data-column="equipCode">MILL-001</td>
+                  <td data-column="equipName">铣床A</td>
+                  <td data-column="checkDate">2026-07-10</td>
+                  <td data-column="checker">测试人员</td>
+                  <td data-column="checkResult"><span class="badge badge-success">合格</span></td>
+                  <td data-column="abnormalDesc">-</td>
+                  <td data-column="processStatus"><span class="badge badge-success">已完成</span></td>
+                  <td data-column="action" class="row-action-links"><a href="#" onclick="openModal('detailModal')">详情</a></td>
+                </tr>
+
+                <tr>
+                  <td data-column="recordNo">CK-REC-005</td>
+                  <td data-column="equipCode">GRIND-001</td>
+                  <td data-column="equipName">磨床A</td>
+                  <td data-column="checkDate">2026-07-10</td>
+                  <td data-column="checker">测试人员</td>
+                  <td data-column="checkResult"><span class="badge badge-success">合格</span></td>
+                  <td data-column="abnormalDesc">-</td>
+                  <td data-column="processStatus"><span class="badge badge-success">已完成</span></td>
+                  <td data-column="action" class="row-action-links"><a href="#" onclick="openModal('detailModal')">详情</a></td>
+                </tr>
+
+
+
+              </tbody>
+
+
+
+            </table>
+
+
+
+          </div>
+
+
+
+          <div class="pagination" style="margin-top:16px;">
+
+
+
+            <div class="page-btn">上一页</div>
+
+
+
+            <div class="page-btn active">1</div>
+
+
+
+            <div class="page-btn">2</div>
+
+
+
+            <div class="page-btn">3</div>
+
+
+
+            <div class="page-btn">下一页</div>
+
+
+
+            <div class="page-info">共 45 条，显示 1-5 条</div>
+
+
+
+          </div>
+
+
+
+        </div>
+
+
+
+      </div>
+
+
+
+    </div>
+
+
+
+  </div>
+
+
+
+</div>
+
+
+
+
+
+
+
+<!-- ===== MODAL ===== -->
+
+
+
+<div class="modal-overlay" id="detailModal">
+
+
+
+  <div class="modal-dialog">
+
+
+
+    <div class="modal-header">
+
+
+
+      <h3>点检详情</h3>
+
+
+
+      <button class="modal-close" onclick="closeModal('detailModal')">&times;</button>
+
+
+
+    </div>
+
+
+
+    <div class="modal-body">
+
+
+
+      <div class="grid-2" style="gap:16px;">
+
+
+
+        <div class="form-group">
+
+
+
+          <label class="form-label">记录编号</label>
+
+
+
+          <input type="text" class="form-input" value="CK-REC-002" readonly>
+
+
+
+        </div>
+
+
+
+        <div class="form-group">
+
+
+
+          <label class="form-label">设备编号</label>
+
+
+
+          <input type="text" class="form-input" value="CNC-002" readonly>
+
+
+
+        </div>
+
+
+
+        <div class="form-group">
+
+
+
+          <label class="form-label">设备名称</label>
+
+
+
+          <input type="text" class="form-input" value="CNC加工中心B" readonly>
+
+
+
+        </div>
+
+
+
+        <div class="form-group">
+
+
+
+          <label class="form-label">点检日期</label>
+
+
+
+          <input type="text" class="form-input" value="2026-07-10" readonly>
+
+
+
+        </div>
+
+
+
+        <div class="form-group">
+
+
+
+          <label class="form-label">点检人员</label>
+
+
+
+          <input type="text" class="form-input" value="测试人员" readonly>
+
+
+
+        </div>
+
+
+
+        <div class="form-group">
+
+
+
+          <label class="form-label">点检结果</label>
+
+
+
+          <span class="badge badge-error">不合格</span>
+
+
+
+        </div>
+
+
+
+      </div>
+
+
+
+      <div class="form-group">
+
+
+
+        <label class="form-label">异常描述</label>
+
+
+
+        <textarea class="form-textarea" readonly>主轴振动值检测为 2.8mm/s，超过合格标准值 2.0mm/s。建议安排检修，检查主轴轴承磨损情况，必要时更换。</textarea>
+
+
+
+      </div>
+
+
+
+      <div class="form-group">
+
+
+
+        <label class="form-label">处理状态</label>
+
+
+
+        <span class="badge badge-warning">处理中</span>
+
+
+
+      </div>
+
+
+
+    </div>
+
+
+
+    <div class="modal-footer">
+
+
+
+      <button class="btn btn-ghost btn-sm" onclick="closeModal('detailModal')">关闭</button>
+
+
+
+    </div>
+
+
+
+  </div>
+
+
+
+</div>
+
+
+
+
+
+
+
+<script>
+
+
+
+function switchTab(tabName) {
+
+
+
+  document.querySelectorAll('.tab-item').forEach(item => item.classList.remove('active'));
+
+
+
+  document.querySelectorAll('.tab-pane').forEach(pane => pane.classList.remove('active'));
+
+
+
+  event.target.classList.add('active');
+
+
+
+  document.getElementById('tab-' + tabName).classList.add('active');
+
+
+
+
+
+
+
+function openModal(modalId) {
+
+
+
+  document.getElementById(modalId).classList.add('show');
+
+
+
+
+
+
+
+function closeModal(modalId) {
+
+
+
+  document.getElementById(modalId).classList.remove('show');
+
+
+
+}
+
+
+
+
+
+
+
+document.querySelectorAll('.modal-overlay').forEach(overlay => {
+
+
+
+  overlay.addEventListener('click', function(e) {
+
+
+
+    if (e.target === this) this.classList.remove('show');
+
+
+
+  });
+
+
+
+});
+
+
+
+
+
+
+
+}
+
+
+
+}
+var currentLookupField = null;
+var currentLookupType = null;
+var lookupData = [];
+var lookupColumns = [];
+
+function openLookup(fieldId, type) {
+  currentLookupField = fieldId;
+  currentLookupType = type;
+  
+  if (type === 'org') {
+    lookupColumns = ['编码', '名称', '形态', '上级组织'];
+    lookupData = JSON.parse(localStorage.getItem('erp_orgs') || '[]');
+    document.getElementById('lookupTitle').textContent = '选择组织';
+  } else if (type === 'department') {
+    lookupColumns = ['编码', '名称'];
+    lookupData = JSON.parse(localStorage.getItem('erp_departments_cache') || '[]');
+    document.getElementById('lookupTitle').textContent = '选择部门';
+  } else if (type === 'employee') {
+    lookupColumns = ['编号', '姓名', '所属部门'];
+    lookupData = JSON.parse(localStorage.getItem('erp_employees_cache') || '[]');
+    document.getElementById('lookupTitle').textContent = '选择员工';
+  } else if (type === 'supplier') {
+    lookupColumns = ['编码', '名称'];
+    lookupData = JSON.parse(localStorage.getItem('erp_suppliers_cache') || '[]');
+    document.getElementById('lookupTitle').textContent = '选择供应商';
+  } else if (type === 'customer') {
+    lookupColumns = ['编码', '名称'];
+    lookupData = JSON.parse(localStorage.getItem('erp_customers_cache') || '[]');
+    document.getElementById('lookupTitle').textContent = '选择客户';
+  } else if (type === 'material') {
+    lookupColumns = ['物料编码', '物料名称', '规格型号', '基本单位'];
+    lookupData = JSON.parse(localStorage.getItem('erp_materials_cache') || '[]');
+    document.getElementById('lookupTitle').textContent = '选择物料';
+  } else if (type === 'warehouse') {
+    lookupColumns = ['编码', '名称'];
+    lookupData = JSON.parse(localStorage.getItem('erp_warehouses_cache') || '[]');
+    document.getElementById('lookupTitle').textContent = '选择仓库';
+  }
+  
+  renderLookupTable(lookupData);
+  document.getElementById('lookupModal').classList.add('show');
+}
+
+function closeLookup() {
+  document.getElementById('lookupModal').classList.remove('show');
+}
+
+function filterLookup() {
+  var keyword = document.getElementById('lookupKeyword').value.trim().toLowerCase();
+  var filtered = lookupData.filter(function(item) {
+    var code = item.code || '';
+    var name = item.name || '';
+    return code.toLowerCase().includes(keyword) || name.toLowerCase().includes(keyword);
+  });
+  renderLookupTable(filtered);
+}
+
+function renderLookupTable(data) {
+  var head = document.getElementById('lookupTableHead');
+  var body = document.getElementById('lookupTableBody');
+  
+  head.innerHTML = '<tr><th class="checkbox-cell"><input type="checkbox" onclick="selectAllLookup()"></th>' + lookupColumns.map(function(col) { return '<th>' + col + '</th>'; }).join('') + '</tr>';
+  
+  body.innerHTML = '';
+  data.forEach(function(item) {
+    var row = document.createElement('tr');
+    row.onclick = function() { selectLookupRow(this); };
+    var cells = ['<td class="checkbox-cell"><input type="checkbox" class="lookup-checkbox" value="' + item.id + '"></td>'];
+    if (currentLookupType === 'org') {
+      cells.push('<td>' + item.code + '</td><td>' + item.name + '</td><td>' + (item.form || '') + '</td><td>' + (item.parentName || '') + '</td>');
+    } else if (currentLookupType === 'department') {
+      cells.push('<td>' + item.code + '</td><td>' + item.name + '</td>');
+    } else if (currentLookupType === 'employee') {
+      cells.push('<td>' + item.code + '</td><td>' + item.name + '</td><td>' + (item.department || '') + '</td>');
+    } else if (currentLookupType === 'supplier' || currentLookupType === 'customer') {
+      cells.push('<td>' + item.code + '</td><td>' + item.name + '</td>');
+    } else if (currentLookupType === 'material') {
+      cells.push('<td>' + item.code + '</td><td>' + item.name + '</td><td>' + (item.specification || '') + '</td><td>' + (item.unit || '') + '</td>');
+    } else if (currentLookupType === 'warehouse') {
+      cells.push('<td>' + item.code + '</td><td>' + item.name + '</td>');
+    }
+    row.innerHTML = cells.join('');
+    body.appendChild(row);
+  });
+  
+  if (data.length === 0) {
+    body.innerHTML = '<tr><td colspan="' + (lookupColumns.length + 1) + '" style="text-align:center;padding:40px;color:#999;">暂无数据</td></tr>';
+  }
+}
+
+function selectAllLookup() {
+  var master = document.querySelector('.lookup-table th input');
+  var checkboxes = document.querySelectorAll('.lookup-checkbox');
+  checkboxes.forEach(function(cb) { cb.checked = master.checked; });
+}
+
+function selectLookupRow(row) {
+  var checkbox = row.querySelector('.lookup-checkbox');
+  checkbox.checked = !checkbox.checked;
+}
+
+function confirmLookup() {
+  var checkboxes = document.querySelectorAll('.lookup-checkbox:checked');
+  if (checkboxes.length === 0) {
+    showToast('请选择一条记录', 'warning');
+    return;
+  }
+  
+  var item = lookupData.find(function(d) { return d.id === checkboxes[0].value; });
+  if (item) {
+    var field = document.getElementById(currentLookupField);
+    if (field) {
+      field.value = item.name;
+      field.setAttribute('data-id', item.id);
+      field.setAttribute('data-code', item.code);
+      
+      if (currentLookupType === 'material') {
+        var row = field.closest('tr');
+        if (row) {
+          row.querySelector('.material-name').value = item.name;
+          row.querySelector('.material-spec').value = item.specification || '';
+          row.querySelector('.material-unit').value = item.unit || '';
+        }
+      }
+    }
+  }
+  
+  closeLookup();
+}
+
+function openMaterialLookup(btn) {
+  var field = btn.previousElementSibling;
+  field.id = 'lookupField_' + Date.now();
+  currentLookupField = field.id;
+  openLookup(field.id, 'material');
+}
+
+function openOrgLookup(btn) {
+  var field = btn.previousElementSibling;
+  field.id = 'lookupField_' + Date.now();
+  currentLookupField = field.id;
+  openLookup(field.id, 'org');
+}
+
+function openSupplierLookup(btn) {
+  var field = btn.previousElementSibling;
+  field.id = 'lookupField_' + Date.now();
+  currentLookupField = field.id;
+  openLookup(field.id, 'supplier');
+}
+
+function openWarehouseLookup(btn) {
+  var field = btn.previousElementSibling;
+  field.id = 'lookupField_' + Date.now();
+  currentLookupField = field.id;
+  openLookup(field.id, 'warehouse');
+}
+
+function initLookupData() {
+  if (!localStorage.getItem('erp_orgs')) {
+    localStorage.setItem('erp_orgs', JSON.stringify([
+      { id: 'org-001', code: 'ORG-HQ', name: '磐枢工业集团', form: '集团', parentName: '' },
+      { id: 'org-002', code: 'ORG-SM', name: '磐枢智能制造有限公司', form: '公司', parentName: '磐枢工业集团' },
+      { id: 'org-003', code: 'ORG-SM-PD', name: '生产制造部', form: '部门', parentName: '磐枢智能制造有限公司' },
+      { id: 'org-004', code: 'ORG-SM-FA', name: '财务部', form: '部门', parentName: '磐枢智能制造有限公司' },
+      { id: 'org-005', code: 'ORG-SM-SD', name: '销售部', form: '部门', parentName: '磐枢智能制造有限公司' }
+    ]));
+  }
+  if (!localStorage.getItem('erp_departments_cache')) {
+    localStorage.setItem('erp_departments_cache', JSON.stringify([
+      { id: 'dept-001', code: 'DEPT-PD', name: '生产制造部', status: 1 },
+      { id: 'dept-002', code: 'DEPT-FA', name: '财务部', status: 1 },
+      { id: 'dept-003', code: 'DEPT-SD', name: '销售部', status: 1 },
+      { id: 'dept-004', code: 'DEPT-AS', name: '装配车间', status: 1 },
+      { id: 'dept-005', code: 'DEPT-QC', name: '质检车间', status: 1 }
+    ]));
+  }
+  if (!localStorage.getItem('erp_employees_cache')) {
+    localStorage.setItem('erp_employees_cache', JSON.stringify([
+      { id: 'emp-001', code: 'EMP-001', name: '张三', department: '生产制造部', status: 1 },
+      { id: 'emp-002', code: 'EMP-002', name: '李四', department: '生产制造部', status: 1 },
+      { id: 'emp-003', code: 'EMP-003', name: '王五', department: '财务部', status: 1 },
+      { id: 'emp-004', code: 'EMP-004', name: '赵六', department: '销售部', status: 1 },
+      { id: 'emp-005', code: 'EMP-005', name: '钱七', department: '质检车间', status: 1 }
+    ]));
+  }
+  if (!localStorage.getItem('erp_suppliers_cache')) {
+    localStorage.setItem('erp_suppliers_cache', JSON.stringify([
+      { id: 'sup-001', code: 'S-001', name: '深圳电子元器件有限公司', status: 1 },
+      { id: 'sup-002', code: 'S-002', name: '杭州精密机械加工厂', status: 1 },
+      { id: 'sup-003', code: 'S-003', name: '上海材料科技有限公司', status: 1 },
+      { id: 'sup-004', code: 'S-004', name: '东莞五金制品厂', status: 1 }
+    ]));
+  }
+  if (!localStorage.getItem('erp_materials_cache')) {
+    localStorage.setItem('erp_materials_cache', JSON.stringify([
+      { id: 'mat-001', code: 'P-001', name: '高频传感器模块', specification: 'HT-2026', unit: '个', status: 1 },
+      { id: 'mat-002', code: 'P-002', name: '控制电路板', specification: 'CB-2026', unit: '块', status: 1 },
+      { id: 'mat-003', code: 'P-003', name: '智能控制器', specification: 'IC-V3', unit: '台', status: 1 },
+      { id: 'mat-004', code: 'P-004', name: '电源模块', specification: 'PM-500W', unit: '个', status: 1 },
+      { id: 'mat-005', code: 'M-001', name: 'PCB电路板', specification: 'FR-4双层', unit: '块', status: 1 },
+      { id: 'mat-006', code: 'M-002', name: '贴片电阻', specification: '10KΩ 0603', unit: '个', status: 1 },
+      { id: 'mat-007', code: 'M-003', name: '贴片电容', specification: '100μF 0805', unit: '个', status: 1 },
+      { id: 'mat-008', code: 'M-004', name: '螺丝', specification: 'M4x10', unit: '包', status: 1 }
+    ]));
+  }
+  if (!localStorage.getItem('erp_warehouses_cache')) {
+    localStorage.setItem('erp_warehouses_cache', JSON.stringify([
+      { id: 'wh-001', code: 'WH-001', name: '成品仓', status: 1 },
+      { id: 'wh-002', code: 'WH-002', name: '原料仓', status: 1 },
+      { id: 'wh-003', code: 'WH-003', name: '半成品仓', status: 1 },
+      { id: 'wh-004', code: 'WH-004', name: '辅料仓', status: 1 }
+    ]));
+  }
+}
+
+var allColumns = ['standardNo', 'planNo', 'recordNo', 'equipCode', 'equipName', 'checkItem', 'checkFrequency', 'checkMethod', 'qualifiedStandard', 'checkDate', 'checker', 'checkResult', 'abnormalDesc', 'processStatus', 'status', 'action'];
+var visibleColumns = JSON.parse(localStorage.getItem('equipment_check_columns') || JSON.stringify(allColumns));
+
+function updateColumnVisibility() {
+  document.querySelectorAll('th[data-column], td[data-column]').forEach(function(el) {
+    var col = el.getAttribute('data-column');
+    el.style.display = visibleColumns.includes(col) ? '' : 'none';
+  });
+}
+
+function openColumnSettings() {
+  var container = document.getElementById('columnCheckboxes');
+  container.innerHTML = '';
+  var colNames = {
+    'standardNo': '标准编号',
+    'planNo': '计划编号',
+    'recordNo': '记录编号',
+    'equipCode': '设备编号',
+    'equipName': '设备名称',
+    'checkItem': '点检项目',
+    'checkFrequency': '点检频率',
+    'checkMethod': '点检方法',
+    'qualifiedStandard': '合格标准',
+    'checkDate': '点检日期',
+    'checker': '点检人员',
+    'checkResult': '点检结果',
+    'abnormalDesc': '异常描述',
+    'processStatus': '处理状态',
+    'status': '状态',
+    'action': '操作'
+  };
+  allColumns.forEach(function(col) {
+    var item = document.createElement('div');
+    item.className = 'column-item';
+    item.innerHTML = '<input type="checkbox" id="col_' + col + '" ' + (visibleColumns.includes(col) ? 'checked' : '') + ' onchange="toggleColumn(this)">' +
+                     '<label for="col_' + col + '">' + colNames[col] + '</label>';
+    container.appendChild(item);
+  });
+  document.getElementById('columnModal').classList.add('show');
+}
+
+function closeColumnSettings() {
+  document.getElementById('columnModal').classList.remove('show');
+}
+
+function toggleColumn(cb) {
+  var col = cb.id.replace('col_', '');
+  if (cb.checked) {
+    if (!visibleColumns.includes(col)) {
+      visibleColumns.push(col);
+    }
+  } else {
+    var idx = visibleColumns.indexOf(col);
+    if (idx > -1) {
+      visibleColumns.splice(idx, 1);
+    }
+  }
+}
+
+function saveColumnSettings() {
+  localStorage.setItem('equipment_check_columns', JSON.stringify(visibleColumns));
+  updateColumnVisibility();
+  closeColumnSettings();
+}
+
+window.addEventListener('load', function() {
+  updateColumnVisibility();
+});
+
+</script>
+
+<div class="lookup-modal" id="lookupModal">
+  <div class="lookup-dialog">
+    <div class="lookup-header">
+      <div class="lookup-title" id="lookupTitle">选择</div>
+      <button class="lookup-close" onclick="closeLookup()">×</button>
+    </div>
+    <div class="lookup-body">
+      <div class="lookup-search">
+        <input type="text" id="lookupKeyword" placeholder="请输入编码或名称搜索" onkeydown="if(event.key==='Enter')filterLookup()">
+        <button onclick="filterLookup()">搜索</button>
+      </div>
+      <table class="lookup-table">
+        <thead id="lookupTableHead"></thead>
+        <tbody id="lookupTableBody"></tbody>
+      </table>
+    </div>
+    <div class="lookup-footer">
+      <button class="btn btn-cancel" onclick="closeLookup()">取消</button>
+      <button class="btn btn-primary" onclick="confirmLookup()">确定</button>
+    </div>
+  </div>
+</div>
+
+<div class="column-modal" id="columnModal">
+  <div class="column-dialog">
+    <div class="column-header">
+      <div class="column-title">列设置</div>
+      <button class="column-close" onclick="closeColumnSettings()">×</button>
+    </div>
+    <div class="column-body">
+      <div id="columnCheckboxes"></div>
+    </div>
+    <div class="column-footer">
+      <button class="btn btn-cancel" onclick="closeColumnSettings()">取消</button>
+      <button class="btn btn-primary" onclick="saveColumnSettings()">确定</button>
+    </div>
+  </div>
+</div>
+
+</body>
+
+
+
+</html>

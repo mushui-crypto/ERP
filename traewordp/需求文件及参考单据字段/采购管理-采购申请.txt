@@ -1,0 +1,155 @@
+采购申请、字段说明：
+基本信息：FBillHead 
+	 实体主键：FID 
+	 单据编号：FBillNo 
+	 数据状态：FDocumentStatus 
+	 单据类型：FBillTypeID  (必填项)
+	 申请组织：FApplicationOrgId  (必填项)
+	 申请部门：FApplicationDeptId 
+	 申请人：FApplicantId 
+	 币别：FCurrencyId 
+	 含税金额合计：FTotalAmount 
+	 作废人：FCancellerId 
+	 关闭状态：FCloseStatus 
+	 关闭人：FCloserId 
+	 创建人：FCreatorId 
+	 关闭日期：FCloseDate 
+	 作废日期：FCancelDate 
+	 审核人：FApproverId 
+	 最后修改人：FModifierId 
+	 创建日期：FCreateDate 
+	 作废状态：FCancelStatus 
+	 最后修改日期：FModifyDate 
+	 审核日期：FApproveDate 
+	 汇率类型：FExchangeTypeId 
+	 备注：FNote 
+	 是否是单据转换：FIsConvert 
+	 申请类型：FRequestType  (必填项)
+	 申请日期：FApplicationDate  (必填项)
+	 合并作废：FIsMergeCancel 
+	 来源类型：FSrcType 
+	 价外税：FISPRICEEXCLUDETAX 
+	 验收方式：FACCTYPE 
+	 手工关闭：FMANUALCLOSE 
+	 关闭原因：FCloseReason 
+	 生成直运出入库：FIsCreateStraightOutIN 
+明细信息：FEntity 
+	 实体主键：FEntryID 
+	物料编码：FMaterialId  (必填项) 
+        物料名称：FMaterialName 
+	 规格型号：FMaterialModel 
+	 物料类别：FMaterialType 
+	 申请数量：FReqQty 
+	 批准数量：FApproveQty 
+	 建议供应商：FSuggestSupplierId 
+	 提前期：FLeadTime 
+	 含税金额：FReqAmount 
+	 采购组织：FPurchaseOrgId  (必填项)
+	 采购组：FPurchaseGroupId 
+	 收料组织：FReceiveOrgId 
+	 仓库：FStockId 
+	 订单数量：FOrderQty 
+	 剩余数量：FRemainQty 
+	 合同号：FContractNo 
+	 需求跟踪号：FReqTraceNo 
+	 业务终止：FMRPTerminateStatus 
+	 终止人：FTerminaterId 
+	 终止日期：FTerminateDate 
+	 业务关闭：FMRPCloseStatus 
+	 计划确认：FPlanConfirm 
+ 	 计价数量：FPriceUnitQty 
+	 采购部门：FPurchaseDeptId 
+	 交货地址：FReceiveAddress 
+	 备注：FEntryNote 
+	 订单关联数量（基本单位）：FOrderJNBaseQty 
+	 订单数量（基本单位）：FOrderBaseQty 
+	 基本单位：FBaseUnitId 
+	 计价单位：FPriceUnitId  (必填项)
+	 申请单位：FUnitId  (必填项)
+	 订单关联数量：FOrderJoinQty 
+	 批准数量(基本单位)：FBaseUnitQty 
+	 辅助属性：FAuxpropId 
+	 BOM版本：FBOMNoId 
+	 源单类型：FSrcBillTypeId 
+	 源单编号：FSrcBillNo 
+	 物料说明：FMaterialDesc 
+	 建议采购日期：FSuggestPurDate 
+	 到货日期：FArrivalDate 
+	 入库数量(基本单位)：FBaseStockQty 
+	 收料数量(基本单位)：FBaseReceiveQty 
+	 入库数量：FStockQty 
+	 收料数量：FReceiveQty 
+	 业务流程：FBFLowId 
+	 供货地点：FProviderId 
+	 拆分作废：FIsSplitCancel 
+	 计划跟踪号：FMtoNo 
+	 需求组织：FRequireOrgId  (必填项)
+	 采购员：FPurchaserId 
+	 申请数量(基本单位)：FBaseReqQty 
+	 收料部门：FReceiveDeptId 
+	 需求部门：FRequireDeptId 
+	 费用项目：FChargeProjectID 
+	 单价：FEvaluatePrice 
+ 	 库存单位：FREQSTOCKUNITID  (必填项)
+	 库存单位数量：FREQSTOCKQTY 
+	 库存基本数量：FREQSTOCKBASEQTY 
+	 订单库存关联数量(基本单位)：FORDERSTOCKJNBASEQTY 
+	 计价基本数量：FPRICEBASEQTY 
+	 携带的主业务单位：FSRCBIZUNITID 
+	 采购基本分子：FPURBASENUM 
+	 库存基本分母：FSTOCKBASEDEN 
+	 VMI业务：FIsVmiBusiness 
+	 税率%：FTAXRATE 
+	 金额：FAmount 
+	 价目表：FPriceListEntry 
+	 关联询价数量：FInquiryJoinQty 
+	 关联询价数量（基本单位）：FInquiryJoinBaseQty 
+	 价格下限：FDownPrice 
+	 价格上限：FUpPrice 
+	 需求来源：FDEMANDTYPE 
+	 需求单据编号：FDEMANDBILLNO 
+	 需求单据行号：FDEMANDBILLENTRYSEQ 
+	 需求单据分录内码：FDEMANDBILLENTRYID 
+	 产品类型：FRowType 
+	 父项产品：FParentMaterialId 
+	 父项BOM版本：FParentBomId 
+	 父产品行主键：FParentRowId 
+	 申请单拆单前分录内码：FSrcReqSplitEntryId 
+	 申请单合并前分录内码：FSrcReqMergeEntryIds 
+	 价目表分录id：FPRILSTENTRYID 
+	 配套单据编号：FAssortBillNo 
+	 配套单据行号：FASSORTBILLSEQ 
+	 供应商物料编码：FSupMatId 
+	 供应商物料名称：FSupMatName 
+	 已执行价税合计：FReqExecAllamount 
+	 已执行金额：FReqExecAmount 
+	 关联下推价税合计：FOrderJoinAllamout 
+	 关联下推金额：FOrderJoinAmount 
+	 
+移动单据：FMobBillHead 
+	 实体主键：FEntryId 
+	 扩展字段：FExtendField 
+	 订单名称：FOrderName 
+	 移动单据：FIsMobBill 
+	 是否挂单：FMobIsPending 
+关联关系表：FEntity_Link 
+	 实体主键：FLinkId 
+	 业务流程图：FEntity_Link_FFlowId 
+	 推进路线：FEntity_Link_FFlowLineId 
+	 转换规则：FEntity_Link_FRuleId 
+	 源单表内码：FEntity_Link_FSTableId 
+	 源单表：FEntity_Link_FSTableName 
+	 源单内码：FEntity_Link_FSBillId 
+	 源单分录内码：FEntity_Link_FSId 
+	 原始携带量：FEntity_Link_FBaseUnitQtyOld 
+	 修改携带量：FEntity_Link_FBaseUnitQty 
+	 原始携带量：FEntity_Link_FSalBaseQtyOld 
+	 修改携带量：FEntity_Link_FSalBaseQty 
+	 原始携带量：FEntity_Link_FREQSTOCKBASEQTYOld 
+	 修改携带量：FEntity_Link_FREQSTOCKBASEQTY 
+	 迁移图：FEntity_Link_FLnkTrackerId 
+	 上游状态：FEntity_Link_FLnkSState 
+	 数量FLnk：FEntity_Link_FLnkAmount 
+	 迁移图：FEntity_Link_FLINKTrackerId 
+	 上游状态：FEntity_Link_FLINKSState 
+	 数量FLINK：FEntity_Link_FLINKAmount 

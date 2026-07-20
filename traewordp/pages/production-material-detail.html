@@ -1,0 +1,2507 @@
+<!DOCTYPE html>
+
+
+
+
+<html lang="zh-CN">
+
+
+
+
+<head>
+
+
+
+
+<meta charset="UTF-8">
+
+
+
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+
+
+
+<title>编辑 删除 编辑</title>
+
+
+
+
+<link rel="stylesheet" href="../common.css">
+
+
+
+
+<script src="../common.js"></script>
+<script>
+</script>
+
+
+
+
+<script src="../doc-data-store.js">
+var currentLookupField = null;
+var currentLookupType = null;
+var lookupData = [];
+var lookupColumns = [];
+
+function openLookup(fieldId, type) {
+  currentLookupField = fieldId;
+  currentLookupType = type;
+  
+  if (type === 'org') {
+    lookupColumns = ['编码', '名称', '形态', '上级组织'];
+    lookupData = JSON.parse(localStorage.getItem('erp_orgs') || '[]');
+    document.getElementById('lookupTitle').textContent = '选择组织';
+  } else if (type === 'department') {
+    lookupColumns = ['编码', '名称'];
+    lookupData = JSON.parse(localStorage.getItem('erp_departments_cache') || '[]');
+    document.getElementById('lookupTitle').textContent = '选择部门';
+  } else if (type === 'employee') {
+    lookupColumns = ['编号', '姓名', '所属部门'];
+    lookupData = JSON.parse(localStorage.getItem('erp_employees_cache') || '[]');
+    document.getElementById('lookupTitle').textContent = '选择员工';
+  } else if (type === 'supplier') {
+    lookupColumns = ['编码', '名称'];
+    lookupData = JSON.parse(localStorage.getItem('erp_suppliers_cache') || '[]');
+    document.getElementById('lookupTitle').textContent = '选择供应商';
+  } else if (type === 'customer') {
+    lookupColumns = ['编码', '名称'];
+    lookupData = JSON.parse(localStorage.getItem('erp_customers_cache') || '[]');
+    document.getElementById('lookupTitle').textContent = '选择客户';
+  } else if (type === 'material') {
+    lookupColumns = ['物料编码', '物料名称', '规格型号', '基本单位'];
+    lookupData = JSON.parse(localStorage.getItem('erp_materials_cache') || '[]');
+    document.getElementById('lookupTitle').textContent = '选择物料';
+  } else if (type === 'warehouse') {
+    lookupColumns = ['编码', '名称'];
+    lookupData = JSON.parse(localStorage.getItem('erp_warehouses_cache') || '[]');
+    document.getElementById('lookupTitle').textContent = '选择仓库';
+  }
+  
+  renderLookupTable(lookupData);
+  document.getElementById('lookupModal').classList.add('show');
+}
+
+function closeLookup() {
+  document.getElementById('lookupModal').classList.remove('show');
+}
+
+function filterLookup() {
+  var keyword = document.getElementById('lookupKeyword').value.trim().toLowerCase();
+  var filtered = lookupData.filter(function(item) {
+    var code = item.code || '';
+    var name = item.name || '';
+    return code.toLowerCase().includes(keyword) || name.toLowerCase().includes(keyword);
+  });
+  renderLookupTable(filtered);
+}
+
+function renderLookupTable(data) {
+  var head = document.getElementById('lookupTableHead');
+  var body = document.getElementById('lookupTableBody');
+  
+  head.innerHTML = '<tr><th class="checkbox-cell"><input type="checkbox" onclick="selectAllLookup()"></th>' + lookupColumns.map(function(col) { return '<th>' + col + '</th>'; }).join('') + '</tr>';
+  
+  body.innerHTML = '';
+  data.forEach(function(item) {
+    var row = document.createElement('tr');
+    row.onclick = function() { selectLookupRow(this); };
+    var cells = ['<td class="checkbox-cell"><input type="checkbox" class="lookup-checkbox" value="' + item.id + '"></td>'];
+    if (currentLookupType === 'org') {
+      cells.push('<td>' + item.code + '</td><td>' + item.name + '</td><td>' + (item.form || '') + '</td><td>' + (item.parentName || '') + '</td>');
+    } else if (currentLookupType === 'department') {
+      cells.push('<td>' + item.code + '</td><td>' + item.name + '</td>');
+    } else if (currentLookupType === 'employee') {
+      cells.push('<td>' + item.code + '</td><td>' + item.name + '</td><td>' + (item.department || '') + '</td>');
+    } else if (currentLookupType === 'supplier' || currentLookupType === 'customer') {
+      cells.push('<td>' + item.code + '</td><td>' + item.name + '</td>');
+    } else if (currentLookupType === 'material') {
+      cells.push('<td>' + item.code + '</td><td>' + item.name + '</td><td>' + (item.specification || '') + '</td><td>' + (item.unit || '') + '</td>');
+    } else if (currentLookupType === 'warehouse') {
+      cells.push('<td>' + item.code + '</td><td>' + item.name + '</td>');
+    }
+    row.innerHTML = cells.join('');
+    body.appendChild(row);
+  });
+  
+  if (data.length === 0) {
+    body.innerHTML = '<tr><td colspan="' + (lookupColumns.length + 1) + '" style="text-align:center;padding:40px;color:#999;">暂无数据</td></tr>';
+  }
+}
+
+function selectAllLookup() {
+  var master = document.querySelector('.lookup-table th input');
+  var checkboxes = document.querySelectorAll('.lookup-checkbox');
+  checkboxes.forEach(function(cb) { cb.checked = master.checked; });
+}
+
+function selectLookupRow(row) {
+  var checkbox = row.querySelector('.lookup-checkbox');
+  checkbox.checked = !checkbox.checked;
+}
+
+function confirmLookup() {
+  var checkboxes = document.querySelectorAll('.lookup-checkbox:checked');
+  if (checkboxes.length === 0) {
+    showToast('请选择一条记录', 'warning');
+    return;
+  }
+  
+  var item = lookupData.find(function(d) { return d.id === checkboxes[0].value; });
+  if (item) {
+    var field = document.getElementById(currentLookupField);
+    if (field) {
+      field.value = item.name;
+      field.setAttribute('data-id', item.id);
+      field.setAttribute('data-code', item.code);
+      
+      if (currentLookupType === 'material') {
+        var row = field.closest('tr');
+        if (row) {
+          row.querySelector('.material-name').value = item.name;
+          row.querySelector('.material-spec').value = item.specification || '';
+          row.querySelector('.material-unit').value = item.unit || '';
+        }
+      }
+    }
+  }
+  
+  closeLookup();
+}
+
+function openMaterialLookup(btn) {
+  var field = btn.previousElementSibling;
+  field.id = 'lookupField_' + Date.now();
+  currentLookupField = field.id;
+  openLookup(field.id, 'material');
+}
+
+function openOrgLookup(btn) {
+  var field = btn.previousElementSibling;
+  field.id = 'lookupField_' + Date.now();
+  currentLookupField = field.id;
+  openLookup(field.id, 'org');
+}
+
+function openSupplierLookup(btn) {
+  var field = btn.previousElementSibling;
+  field.id = 'lookupField_' + Date.now();
+  currentLookupField = field.id;
+  openLookup(field.id, 'supplier');
+}
+
+function openWarehouseLookup(btn) {
+  var field = btn.previousElementSibling;
+  field.id = 'lookupField_' + Date.now();
+  currentLookupField = field.id;
+  openLookup(field.id, 'warehouse');
+}
+
+function initLookupData() {
+  if (!localStorage.getItem('erp_orgs')) {
+    localStorage.setItem('erp_orgs', JSON.stringify([
+      { id: 'org-001', code: 'ORG-HQ', name: '磐枢工业集团', form: '集团', parentName: '' },
+      { id: 'org-002', code: 'ORG-SM', name: '磐枢智能制造有限公司', form: '公司', parentName: '磐枢工业集团' },
+      { id: 'org-003', code: 'ORG-SM-PD', name: '生产制造部', form: '部门', parentName: '磐枢智能制造有限公司' },
+      { id: 'org-004', code: 'ORG-SM-FA', name: '财务部', form: '部门', parentName: '磐枢智能制造有限公司' },
+      { id: 'org-005', code: 'ORG-SM-SD', name: '销售部', form: '部门', parentName: '磐枢智能制造有限公司' }
+    ]));
+  }
+  if (!localStorage.getItem('erp_departments_cache')) {
+    localStorage.setItem('erp_departments_cache', JSON.stringify([
+      { id: 'dept-001', code: 'DEPT-PD', name: '生产制造部', status: 1 },
+      { id: 'dept-002', code: 'DEPT-FA', name: '财务部', status: 1 },
+      { id: 'dept-003', code: 'DEPT-SD', name: '销售部', status: 1 },
+      { id: 'dept-004', code: 'DEPT-AS', name: '装配车间', status: 1 },
+      { id: 'dept-005', code: 'DEPT-QC', name: '质检车间', status: 1 }
+    ]));
+  }
+  if (!localStorage.getItem('erp_employees_cache')) {
+    localStorage.setItem('erp_employees_cache', JSON.stringify([
+      { id: 'emp-001', code: 'EMP-001', name: '张三', department: '生产制造部', status: 1 },
+      { id: 'emp-002', code: 'EMP-002', name: '李四', department: '生产制造部', status: 1 },
+      { id: 'emp-003', code: 'EMP-003', name: '王五', department: '财务部', status: 1 },
+      { id: 'emp-004', code: 'EMP-004', name: '赵六', department: '销售部', status: 1 },
+      { id: 'emp-005', code: 'EMP-005', name: '钱七', department: '质检车间', status: 1 }
+    ]));
+  }
+  if (!localStorage.getItem('erp_suppliers_cache')) {
+    localStorage.setItem('erp_suppliers_cache', JSON.stringify([
+      { id: 'sup-001', code: 'S-001', name: '深圳电子元器件有限公司', status: 1 },
+      { id: 'sup-002', code: 'S-002', name: '杭州精密机械加工厂', status: 1 },
+      { id: 'sup-003', code: 'S-003', name: '上海材料科技有限公司', status: 1 },
+      { id: 'sup-004', code: 'S-004', name: '东莞五金制品厂', status: 1 }
+    ]));
+  }
+  if (!localStorage.getItem('erp_materials_cache')) {
+    localStorage.setItem('erp_materials_cache', JSON.stringify([
+      { id: 'mat-001', code: 'P-001', name: '高频传感器模块', specification: 'HT-2026', unit: '个', status: 1 },
+      { id: 'mat-002', code: 'P-002', name: '控制电路板', specification: 'CB-2026', unit: '块', status: 1 },
+      { id: 'mat-003', code: 'P-003', name: '智能控制器', specification: 'IC-V3', unit: '台', status: 1 },
+      { id: 'mat-004', code: 'P-004', name: '电源模块', specification: 'PM-500W', unit: '个', status: 1 },
+      { id: 'mat-005', code: 'M-001', name: 'PCB电路板', specification: 'FR-4双层', unit: '块', status: 1 },
+      { id: 'mat-006', code: 'M-002', name: '贴片电阻', specification: '10KΩ 0603', unit: '个', status: 1 },
+      { id: 'mat-007', code: 'M-003', name: '贴片电容', specification: '100μF 0805', unit: '个', status: 1 },
+      { id: 'mat-008', code: 'M-004', name: '螺丝', specification: 'M4x10', unit: '包', status: 1 }
+    ]));
+  }
+  if (!localStorage.getItem('erp_warehouses_cache')) {
+    localStorage.setItem('erp_warehouses_cache', JSON.stringify([
+      { id: 'wh-001', code: 'WH-001', name: '成品仓', status: 1 },
+      { id: 'wh-002', code: 'WH-002', name: '原料仓', status: 1 },
+      { id: 'wh-003', code: 'WH-003', name: '半成品仓', status: 1 },
+      { id: 'wh-004', code: 'WH-004', name: '辅料仓', status: 1 }
+    ]));
+  }
+}
+
+</script>
+
+
+
+
+<style>
+
+
+
+
+  /* 批量操作 */
+
+
+
+
+  .detail-page-body { padding: 0; display: flex; flex-direction: column; height: calc(100vh - 56px); overflow: hidden; }
+
+
+
+
+
+
+
+
+
+  /* 导入数据 */
+
+
+
+
+  .detail-action-bar {
+
+
+
+
+    display: flex; align-items: center; gap: 2px;
+
+
+
+
+    padding: 8px 16px;
+
+
+
+
+    border-bottom: 1px solid #e8e8e8;
+
+
+
+
+    background: var(--bg-surface);
+
+
+
+
+    flex-shrink: 0;
+
+
+
+
+  }
+
+
+
+
+  .detail-action-bar .action-btn {
+
+
+
+
+    display: inline-flex; align-items: center; gap: 4px;
+
+
+
+
+    padding: 4px 12px; font-size: 12px;
+
+
+
+
+    color: var(--text-secondary);
+
+
+
+
+    background: transparent; border: 1px solid transparent;
+
+
+
+
+    border-radius: var(--radius-sm); cursor: pointer;
+
+
+
+
+    transition: all var(--transition); white-space: nowrap;
+
+
+
+
+  }
+
+
+
+
+  .detail-action-bar .action-btn:hover { background: rgba(56,189,248,0.08); color: var(--text-primary); border-color: #e8e8e8; }
+
+
+
+
+  .detail-action-bar .action-btn.primary-action { color: var(--text-accent); font-weight: 500; }
+
+
+
+
+  .detail-action-bar .action-btn.primary-action:hover { background: rgba(56,189,248,0.15); }
+
+
+
+
+  .detail-action-bar .action-btn.success-action { color: var(--color-success); }
+
+
+
+
+  .detail-action-bar .action-btn.success-action:hover { background: rgba(34,197,94,0.1); }
+
+
+
+
+  .detail-action-bar .action-btn.danger-action { color: var(--color-error); }
+
+
+
+
+  .detail-action-bar .action-separator { width: 1px; height: 18px; background: #e8e8e8; margin: 0 6px; flex-shrink: 0; }
+
+
+
+
+
+
+
+
+
+  /* 导入数据删除 */
+
+
+
+
+  .detail-card {
+
+
+
+
+    background: var(--bg-surface);
+
+
+
+
+    border-bottom: 1px solid #e8e8e8;
+
+
+
+
+    padding: 16px 20px;
+
+
+
+
+    flex-shrink: 0;
+
+
+
+
+  }
+
+
+
+
+  .detail-form-row {
+
+
+
+
+    display: grid;
+
+
+
+
+    grid-template-columns: repeat(4, 1fr);
+
+
+
+
+    gap: 14px;
+
+
+
+
+    margin-bottom: 12px;
+
+
+
+
+  }
+
+
+
+
+  .detail-form-row:last-child { margin-bottom: 0; }
+
+
+
+
+  .detail-form-item { display: flex; flex-direction: column; }
+
+
+
+
+  .detail-form-item label {
+
+
+
+
+    font-size: 12px; color: var(--text-tertiary);
+
+
+
+
+    margin-bottom: 4px; font-weight: 500;
+
+
+
+
+  }
+
+
+
+
+  .detail-form-item .field-value {
+
+
+
+
+    padding: 6px 10px;
+
+
+
+
+    background: var(--bg-inset);
+
+
+
+
+    border: 1px solid #e8e8e8;
+
+
+
+
+    border-radius: var(--radius-sm);
+
+
+
+
+    color: var(--text-primary);
+
+
+
+
+    font-size: 13px;
+
+
+
+
+    min-height: 30px;
+
+
+
+
+    display: flex; align-items: center;
+
+
+
+
+  }
+
+
+
+
+  .detail-form-item .field-value.readonly {
+
+
+
+
+    color: var(--text-secondary);
+
+
+
+
+    background: var(--bg-inset);
+
+
+
+
+  }
+
+
+
+
+  .detail-form-item input,
+
+
+
+
+  .detail-form-item select,
+
+
+
+
+  .detail-form-item textarea {
+
+
+
+
+    width: 100%; padding: 6px 10px;
+
+
+
+
+    background: var(--bg-inset);
+
+
+
+
+    border: 1px solid #e8e8e8;
+
+
+
+
+    border-radius: var(--radius-sm);
+
+
+
+
+    color: var(--text-primary);
+
+
+
+
+    font-size: 13px;
+
+
+
+
+    font-family: var(--font-body);
+
+
+
+
+    outline: none;
+
+
+
+
+    transition: border-color var(--transition);
+
+
+
+
+  }
+
+
+
+
+  .detail-form-item input:focus,
+
+
+
+
+  .detail-form-item select:focus,
+
+
+
+
+  .detail-form-item textarea:focus {
+
+
+
+
+    border-color: var(--text-accent);
+
+
+
+
+  }
+
+
+
+
+  .detail-form-item input[readonly],
+
+
+
+
+  .detail-form-item textarea[readonly] {
+
+
+
+
+    color: var(--text-secondary);
+
+
+
+
+    background: var(--bg-inset);
+
+
+
+
+    cursor: default;
+
+
+
+
+  }
+
+
+
+
+  .detail-form-item textarea { resize: vertical; min-height: 32px; }
+
+
+
+
+  .detail-form-item .span-2 { grid-column: span 2; }
+
+
+
+
+  .detail-form-item .span-4 { grid-column: span 4; }
+
+
+
+
+
+
+
+
+
+  /*  */
+
+
+
+
+  .detail-table-area {
+
+
+
+
+    flex: 1; overflow: auto;
+
+
+
+
+    background: var(--bg-surface);
+
+
+
+
+    padding: 0;
+
+
+
+
+  }
+
+
+
+
+  .detail-table-area .data-table th {
+
+
+
+
+    position: sticky; top: 0; z-index: 5;
+
+
+
+
+    background: var(--bg-inset);
+
+
+
+
+    color: var(--text-secondary);
+
+
+
+
+    font-size: 12px;
+
+
+
+
+  }
+
+
+
+
+  .detail-table-area .data-table td {
+
+
+
+
+    color: var(--text-secondary);
+
+
+
+
+    font-size: 12.5px;
+
+
+
+
+  }
+
+
+
+
+  .detail-table-area .data-table td input {
+
+
+
+
+    background: var(--bg-inset);
+
+
+
+
+    border: 1px solid #e8e8e8;
+
+
+
+
+    border-radius: var(--radius-sm);
+
+
+
+
+    color: var(--text-primary);
+
+
+
+
+    padding: 4px 8px;
+
+
+
+
+    font-size: 12.5px;
+
+
+
+
+    width: 100%;
+
+
+
+
+    max-width: 110px;
+
+
+
+
+    outline: none;
+
+
+
+
+  }
+
+
+
+
+  .detail-table-area .data-table td input:focus { border-color: var(--text-accent); }
+
+
+
+
+  .detail-table-area .data-table td input[readonly] {
+
+
+
+
+    color: var(--text-secondary);
+
+
+
+
+    background: transparent;
+
+
+
+
+    border-color: transparent;
+
+
+
+
+  }
+
+
+
+
+  .detail-table-area .data-table td .num-cell {
+
+
+
+
+    font-family: var(--font-mono);
+
+
+
+
+    text-align: right;
+
+
+
+
+  }
+
+
+
+
+
+
+
+
+
+  .badge-secondary { background: rgba(148,163,184,0.15); color: var(--text-tertiary); }
+
+
+
+
+  .badge-danger { background: rgba(239,68,68,0.15); color: var(--color-error); }
+
+
+
+
+
+
+
+
+
+  /* 导入数据删除 */
+
+
+
+
+  .toast-container { position: fixed; top: 60px; right: 20px; z-index: 10000; display: flex; flex-direction: column; gap: 10px; }
+
+
+
+
+  .toast { display: flex; align-items: center; gap: 10px; padding: 12px 16px; border-radius: var(--radius-md); min-width: 280px; max-width: 420px; animation: toastSlide 0.3s ease; border: 1px solid #e8e8e8; box-shadow: 0 4px 16px rgba(0,0,0,0.4); }
+
+
+
+
+  @keyframes toastSlide { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+
+
+
+
+  .toast .toast-icon { font-size: 16px; flex-shrink: 0; }
+
+
+
+
+  .toast .toast-content { flex: 1; font-size: 13px; color: var(--text-primary); }
+
+
+
+
+  .toast .toast-title { font-weight: 600; margin-bottom: 2px; }
+
+
+
+
+  .toast .toast-message { font-size: 12px; color: var(--text-secondary); }
+
+
+
+
+  .toast-success { background: rgba(34,197,94,0.18); border-color: rgba(34,197,94,0.4); }
+
+
+
+
+  .toast-success .toast-title { color: var(--color-success); }
+
+
+
+
+  .toast-warning { background: rgba(234,179,8,0.18); border-color: rgba(234,179,8,0.4); }
+
+
+
+
+  .toast-warning .toast-title { color: var(--color-warning); }
+
+
+
+
+  .toast-error { background: rgba(239,68,68,0.18); border-color: rgba(239,68,68,0.4); }
+
+
+
+
+  .toast-error .toast-title { color: var(--color-error); }
+
+
+
+
+  .toast-info { background: rgba(6,182,212,0.18); border-color: rgba(6,182,212,0.4); }
+
+
+
+
+  .toast-info .toast-title { color: var(--color-info); }
+
+
+
+
+
+
+
+
+
+  .confirm-modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 2000; justify-content: center; align-items: center; }
+
+
+
+
+  .confirm-modal-overlay.show { display: flex; }
+
+
+
+
+  .confirm-modal-dialog { background: var(--bg-surface); border: 1px solid #e8e8e8; border-radius: var(--radius-md); width: 420px; overflow: hidden; box-shadow: 0 8px 24px rgba(0,0,0,0.5); }
+
+
+
+
+  .confirm-modal-header { padding: 14px 20px; border-bottom: 1px solid #e8e8e8; display: flex; align-items: center; gap: 10px; }
+
+
+
+
+  .confirm-modal-icon { font-size: 18px; }
+
+
+
+
+  .confirm-modal-title { font-size: 14px; font-weight: 600; color: var(--text-primary); }
+
+
+
+
+  .confirm-modal-body { padding: 20px; text-align: center; }
+
+
+
+
+  .confirm-modal-message { font-size: 13px; color: var(--text-secondary); line-height: 1.6; }
+
+
+
+
+  .confirm-modal-footer { display: flex; gap: 12px; justify-content: flex-end; padding: 12px 20px; border-top: 1px solid #e8e8e8; }
+
+
+
+
+  .confirm-modal-footer button { padding: 6px 16px; border-radius: var(--radius-sm); font-size: 13px; cursor: pointer; transition: all var(--transition); }
+
+
+
+
+  .confirm-modal-footer .btn-cancel { border: 1px solid #e8e8e8; background: var(--bg-inset); color: var(--text-secondary); }
+
+
+
+
+  .confirm-modal-footer .btn-cancel:hover { background: var(--bg-raised); color: var(--text-primary); }
+
+
+
+
+  .confirm-modal-footer .btn-confirm { border: none; background: var(--text-accent); color: #0a0e1a; font-weight: 500; }
+
+
+
+
+  .confirm-modal-footer .btn-confirm:hover { background: #7dd3fc; }
+
+
+
+
+
+.lookup-modal { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:2000; justify-content:center; align-items:center; }
+.lookup-modal.show { display:flex; }
+.lookup-dialog { background:#fff; border:1px solid #e8e8e8; border-radius:4px; width:720px; max-height:70vh; overflow:hidden; }
+.lookup-header { padding:14px 20px; border-bottom:1px solid #e8e8e8; display:flex; align-items:center; justify-content:space-between; }
+.lookup-title { font-size:15px; font-weight:600; color:#333; }
+.lookup-close { font-size:20px; color:#666; cursor:pointer; background:none; border:none; }
+.lookup-close:hover { color:#333; }
+.lookup-body { padding:16px; }
+.lookup-search { display:flex; gap:8px; margin-bottom:12px; }
+.lookup-search input { flex:1; padding:6px 10px; border:1px solid #e8e8e8; border-radius:4px; font-size:13px; }
+.lookup-search button { padding:6px 16px; background:#1890ff; color:#fff; border:none; border-radius:4px; cursor:pointer; }
+.lookup-table { width:100%; border-collapse:collapse; font-size:13px; }
+.lookup-table th, .lookup-table td { padding:10px 12px; text-align:left; border-bottom:1px solid #e8e8e8; }
+.lookup-table th { background:#fafafa; font-weight:600; color:#333; }
+.lookup-table tr:hover { background:#f5f5f5; }
+.lookup-table .checkbox-cell { width:40px; }
+.lookup-footer { padding:12px 20px; border-top:1px solid #e8e8e8; display:flex; justify-content:flex-end; gap:8px; }
+.lookup-field { display:flex; align-items:center; }
+.lookup-field input { flex:1; padding:6px 10px; border:1px solid #e8e8e8; border-radius:4px 0 0 4px; font-size:13px; }
+.lookup-field button { width:28px; height:28px; border:1px solid #e8e8e8; border-left:none; border-radius:0 4px 4px 0; background:#fff; cursor:pointer; display:flex; align-items:center; justify-content:center; }
+.lookup-field button:hover { background:#f5f5f5; }
+
+</style>
+
+
+
+
+</head>
+
+
+
+
+<body>
+
+
+
+
+<aside class="sidebar" id="sidebar">
+
+
+
+
+  <div class="sidebar-logo">
+
+
+
+
+    <img src="../images/LOGO.png" alt="编辑" style="width: 100%; max-width: 200px; margin-bottom: 8px;">
+
+
+
+
+    <h1 style="font-size: 16px; margin: 0;">编辑</h1>
+
+
+
+
+  </div>
+
+
+
+
+  <nav class="sidebar-menu"></nav>
+
+
+
+
+  <div class="sidebar-user"><div class="avatar">删除</div></div>
+
+
+
+
+</aside>
+
+
+
+
+
+
+
+
+
+<div class="main-content" id="mainContent">
+
+
+
+
+  <div class="page-header">
+
+
+
+
+    <div>
+
+
+
+
+      <div class="flex items-center gap-8">
+
+
+
+
+        <button class="sidebar-toggle" onclick="toggleSidebar()">&#9776;</button>
+
+
+
+
+        <div>
+
+
+
+
+          <h2>编辑</h2>
+
+
+
+
+          <div class="breadcrumb"><a href="../index.html">编辑</a><span>&gt;</span><a href="production-material.html">批量操作</a><span>&gt;</span><span>导入数据</span></div></div>
+
+
+
+
+        </div>
+
+
+
+
+      </div>
+
+
+
+
+    </div>
+
+
+
+
+  </div>
+
+
+
+
+
+
+
+
+
+  <div class="detail-page-body">
+
+
+
+
+    <!-- 导入数据 -->
+
+
+
+
+    <div class="detail-action-bar">
+
+
+
+
+      <button class="action-btn primary-action" onclick="saveDoc()">&#128184; 导入数据</button>
+
+
+
+
+      <button class="action-btn success-action" onclick="submitDoc()">&#9989; 删除</button>
+
+
+
+
+      <button class="action-btn success-action" onclick="approveDoc()">&#10004; 编辑</button>
+
+
+
+
+      <button class="action-btn" onclick="rejectDoc()">&#8634; 导入数据</button>
+
+
+
+
+      <span class="action-separator"></span>
+
+
+
+
+      <button class="action-btn" onclick="goBack()">&#128203; 导入数据</button>
+
+
+
+
+    </div>
+
+
+
+
+
+
+
+
+
+    <!-- 导入数据删除 -->
+
+
+
+
+    <div class="detail-card">
+
+
+
+
+      <div class="detail-form-row">
+
+
+
+
+        <div class="detail-form-item">
+
+
+
+
+          <label>导入数据删除</label>
+
+
+
+
+          <input type="text" id="fld-docNo" readonly placeholder="?">
+
+
+
+
+        </div>
+
+
+
+
+        <div class="detail-form-item">
+
+
+
+
+          <label>编辑</label>
+
+
+
+
+          <input type="text" id="fld-sourceNo" readonly>
+
+
+
+
+        </div>
+
+
+
+
+        <div class="detail-form-item">
+
+
+
+
+          <label>批量操作</label>
+
+
+
+
+          <input type="text" id="fld-product" readonly>
+
+
+
+
+        </div>
+
+
+
+
+        <div class="detail-form-item">
+
+
+
+
+          <label>删除</label>
+
+
+
+
+          <input type="text" id="fld-status" readonly>
+
+
+
+
+        </div>
+
+
+
+
+      </div>
+
+
+
+
+      <div class="detail-form-row">
+
+
+
+
+        <div class="detail-form-item">
+
+
+
+
+          <label></label>
+
+
+
+
+          <input type="text" id="fld-createDate" readonly>
+
+
+
+
+        </div>
+
+
+
+
+        <div class="detail-form-item">
+
+
+
+
+          <label>导入数据删除</label>
+
+
+
+
+          <input type="text" id="fld-createBy" readonly>
+
+
+
+
+        </div>
+
+
+
+
+        <div class="detail-form-item span-2">
+
+
+
+
+          <label>编辑</label>
+
+
+
+
+          <input type="text" id="fld-remark" placeholder="批量操作">
+
+
+
+
+        </div>
+
+
+
+
+      </div>
+
+
+
+
+    </div>
+
+
+
+
+
+
+
+
+
+    <!-- 导入数据删除 -->
+
+
+
+
+    <div class="detail-table-area">
+
+
+
+
+      <table class="data-table">
+
+
+
+
+        <thead>
+
+
+
+
+          <tr>
+
+
+
+
+            <th style="text-align:center;">编辑</th>
+
+
+
+
+            <th>批量操作</th>
+
+
+
+
+            <th>批量操作</th>
+
+
+
+
+            <th>批量操作</th>
+
+
+
+
+            <th></th>
+
+
+
+
+            <th>编辑</th>
+
+
+
+
+            <th>导入数据</th>
+
+
+
+
+            <th style="text-align:right;">BOM</th>
+
+
+
+
+            <th style="text-align:right;"></th>
+
+
+
+
+            <th style="text-align:right;"></th>
+
+
+
+
+            <th style="text-align:right;">删除</th>
+
+
+
+
+            <th style="text-align:right;">删除</th>
+
+
+
+
+            <th style="text-align:center;">导入数据删除</th>
+
+
+
+
+          </tr>
+
+
+
+
+        </thead>
+
+
+
+
+        <tbody id="detailTableBody">
+
+
+
+
+          <tr><td colspan="13" style="text-align:center;color:var(--text-tertiary);padding:20px;">编辑</td></tr>
+
+
+
+
+        </tbody>
+
+
+
+
+      </table>
+
+
+
+
+    </div>
+
+
+
+
+  </div>
+
+
+
+
+</div>
+
+
+
+
+
+
+
+
+
+<script>
+
+
+
+
+var DOC_TYPE = 'material_list';
+
+
+
+
+var currentDocId = null;
+
+
+
+
+var currentDoc = null;
+
+
+
+
+
+
+
+
+
+function fmt(num) {
+
+
+
+
+  return (parseFloat(num) || 0).toFixed(2);
+
+
+
+
+}
+
+
+
+
+
+
+
+
+
+function getStatusText(status) {
+
+
+
+
+  return DocDataStore.STATUS_LABELS[status] || '编辑';
+
+
+
+
+}
+
+
+
+
+
+
+
+
+
+function isReadonly() {
+
+
+
+
+  // 编辑
+
+
+
+
+  return currentDoc && currentDoc.status >= DocDataStore.STATUS.APPROVED;
+
+
+
+
+}
+
+
+
+
+
+
+
+
+
+function renderDetail() {
+
+
+
+
+  if (!currentDoc) return;
+
+
+
+
+  var h = currentDoc.header || {};
+
+
+
+
+  document.getElementById('fld-docNo').value = currentDoc.docNo || '';
+
+
+
+
+  document.getElementById('fld-sourceNo').value = h.sourceDocNo || '';
+
+
+
+
+  document.getElementById('fld-product').value = h.productNames || '';
+
+
+
+
+  document.getElementById('fld-status').value = getStatusText(currentDoc.status);
+
+
+
+
+  document.getElementById('fld-createDate').value = (h.createDate || '').slice(0, 10);
+
+
+
+
+  document.getElementById('fld-createBy').value = h.createBy || '';
+
+
+
+
+  document.getElementById('fld-remark').value = h.remark || '';
+
+
+
+
+
+
+
+
+
+  var readonly = isReadonly();
+
+
+
+
+  document.getElementById('fld-remark').readOnly = readonly;
+
+
+
+
+
+
+
+
+
+  var tbody = document.getElementById('detailTableBody');
+
+
+
+
+  tbody.innerHTML = '';
+
+
+
+
+  if (!currentDoc.details || currentDoc.details.length === 0) {
+
+
+
+
+    tbody.innerHTML = '<tr><td colspan="13" style="text-align:center;color:var(--text-tertiary);padding:20px;">编辑</td></tr>';
+
+
+
+
+    return;
+
+
+
+
+  }
+
+
+
+
+  currentDoc.details.forEach(function(d, idx) {
+
+
+
+
+    var requiredQty = parseFloat(d.requiredQty) || 0;
+
+
+
+
+    var requisitionedQty = parseFloat(d.requisitionedQty) || 0;
+
+
+
+
+    var unReqQty = parseFloat(d.unRequisitionedQty);
+
+
+
+
+    if (isNaN(unReqQty)) unReqQty = requiredQty - requisitionedQty;
+
+
+
+
+    var inspectText = (d.inspectType === '1') ? '删除' : '删除';
+
+
+
+
+    var tr = document.createElement('tr');
+
+
+
+
+    tr.innerHTML = '<td style="text-align:center;">' + (idx + 1) + '</td>' +
+
+
+
+
+      '<td>' + (d.productCode || '') + '</td>' +
+
+
+
+
+      '<td>' + (d.productName || '') + '</td>' +
+
+
+
+
+      '<td>' + (d.materialCode || '') + '</td>' +
+
+
+
+
+      '<td>' + (d.materialName || '') + '</td>' +
+
+
+
+
+      '<td>' + (d.specification || '') + '</td>' +
+
+
+
+
+      '<td>' + (d.unit || '') + '</td>' +
+
+
+
+
+      '<td class="num-cell">' + fmt(d.baseQty) + '</td>' +
+
+
+
+
+      '<td class="num-cell">' + fmt(d.orderQty) + '</td>' +
+
+
+
+
+      '<td><input type="number" class="d-requiredQty" data-idx="' + idx + '" value="' + requiredQty.toFixed(2) + '" step="0.01" min="0" oninput="onRequiredQtyChange(this, ' + idx + ')" ' + (readonly ? 'readonly' : '') + '></td>' +
+
+
+
+
+      '<td class="num-cell" style="color:var(--color-success);">' + fmt(requisitionedQty) + '</td>' +
+
+
+
+
+      '<td class="num-cell d-unReqQty" style="color:var(--color-warning);">' + fmt(unReqQty) + '</td>' +
+
+
+
+
+      '<td style="text-align:center;">' + inspectText + '</td>';
+
+
+
+
+    tbody.appendChild(tr);
+
+
+
+
+  });
+
+
+
+
+}
+
+
+
+
+
+
+
+
+
+function onRequiredQtyChange(el, idx) {
+
+
+
+
+  var val = parseFloat(el.value) || 0;
+
+
+
+
+  if (val < 0) { el.value = '0.00'; val = 0; }
+
+
+
+
+  var reqQty = parseFloat(currentDoc.details[idx].requisitionedQty) || 0;
+
+
+
+
+  // ?
+
+
+
+
+  var unReq = Math.max(0, val - reqQty);
+
+
+
+
+  var row = el.closest('tr');
+
+
+
+
+  var unReqCell = row.querySelector('.d-unReqQty');
+
+
+
+
+  if (unReqCell) unReqCell.textContent = fmt(unReq);
+
+
+
+
+}
+
+
+
+
+
+
+
+
+
+function collectDetails() {
+
+
+
+
+  var rows = document.querySelectorAll('#detailTableBody tr');
+
+
+
+
+  var details = [];
+
+
+
+
+  rows.forEach(function(tr, idx) {
+
+
+
+
+    var orig = currentDoc.details[idx];
+
+
+
+
+    var requiredQty = parseFloat(tr.querySelector('.d-requiredQty').value) || 0;
+
+
+
+
+    var requisitionedQty = parseFloat(orig.requisitionedQty) || 0;
+
+
+
+
+    var detail = Object.assign({}, orig, {
+
+
+
+
+      requiredQty: Math.round(requiredQty * 10000) / 10000,
+
+
+
+
+      unRequisitionedQty: Math.round(Math.max(0, requiredQty - requisitionedQty) * 10000) / 10000
+
+
+
+
+    });
+
+
+
+
+    details.push(detail);
+
+
+
+
+  });
+
+
+
+
+  return details;
+
+
+
+
+}
+
+
+
+
+
+
+
+
+
+function saveDoc() {
+
+
+
+
+  if (!currentDocId) { showToast('删除', 'warning'); return; }
+
+
+
+
+  if (isReadonly()) { showToast('批量操作', 'warning'); return; }
+
+
+
+
+  var details = collectDetails();
+
+
+
+
+  var remark = document.getElementById('fld-remark').value;
+
+
+
+
+  try {
+
+
+
+
+    DocDataStore.updateDoc(DOC_TYPE, currentDocId, { remark: remark }, null);
+
+
+
+
+    DocDataStore.updateMaterialList(currentDocId, details);
+
+
+
+
+    // 批量操作
+
+
+
+
+    currentDoc = DocDataStore.getDoc(DOC_TYPE, currentDocId);
+
+
+
+
+    showToast('导入数据?', 'success');
+
+
+
+
+    renderDetail();
+
+
+
+
+  } catch (e) {
+
+
+
+
+    showToast('' + e.message, 'error');
+
+
+
+
+  }
+
+
+
+
+}
+
+
+
+
+
+
+
+
+
+function submitDoc() {
+
+
+
+
+  if (!currentDocId) { showToast('删除', 'warning'); return; }
+
+
+
+
+  showConfirm('', 'warning', function(r, function() {
+
+
+
+
+    if (r) {
+
+
+
+
+      try {
+
+
+
+
+        DocDataStore.submitDoc(DOC_TYPE, currentDocId);
+
+
+
+
+        currentDoc = DocDataStore.getDoc(DOC_TYPE, currentDocId);
+
+
+
+
+        showToast('编辑', 'success');
+
+
+
+
+        renderDetail();
+
+
+
+
+      }); catch (e) { showToast('导入数据删除' + e.message, 'error'); }
+
+
+
+
+    }
+
+
+
+
+  });
+
+
+
+
+}
+
+
+
+
+
+
+
+
+
+function approveDoc() {
+
+
+
+
+  if (!currentDocId) { showToast('删除', 'warning'); return; }
+
+
+
+
+  showConfirm('', 'warning', function(r, function() {
+
+
+
+
+    if (r) {
+
+
+
+
+      try {
+
+
+
+
+        DocDataStore.approveDoc(DOC_TYPE, currentDocId);
+
+
+
+
+        currentDoc = DocDataStore.getDoc(DOC_TYPE, currentDocId);
+
+
+
+
+        showToast('删除', 'success');
+
+
+
+
+        renderDetail();
+
+
+
+
+      }); catch (e) { showToast('批量操作' + e.message, 'error'); }
+
+
+
+
+    }
+
+
+
+
+  });
+
+
+
+
+}
+
+
+
+
+
+
+
+
+
+function rejectDoc() {
+
+
+
+
+  if (!currentDocId) { showToast('删除', 'warning'); return; }
+
+
+
+
+  showConfirm('', 'warning', function(r, function() {
+
+
+
+
+    if (r) {
+
+
+
+
+      try {
+
+
+
+
+        DocDataStore.rejectDoc(DOC_TYPE, currentDocId);
+
+
+
+
+        currentDoc = DocDataStore.getDoc(DOC_TYPE, currentDocId);
+
+
+
+
+        showToast('?', 'success');
+
+
+
+
+        renderDetail();
+
+
+
+
+      }); catch (e) { showToast('' + e.message, 'error'); }
+
+
+
+
+    }
+
+
+
+
+  });
+
+
+
+
+}
+
+
+
+
+
+
+
+
+
+function goBack() {
+
+
+
+
+  window.location.href = 'production-material.html';
+
+
+
+
+}
+
+
+
+
+
+
+
+
+
+function loadDoc(docId) {
+
+
+
+
+  var doc = DocDataStore.getDoc(DOC_TYPE, docId);
+
+
+
+
+  if (!doc) {
+
+
+
+
+    showToast('导入数据?', 'error');
+
+
+
+
+    setTimeout(function() { goBack(); }, 1200);
+
+
+
+
+    return;
+
+
+
+
+  }
+
+
+
+
+  currentDocId = doc.id;
+
+
+
+
+  currentDoc = doc;
+
+
+
+
+  renderDetail();
+
+
+
+
+}
+
+
+
+
+
+
+
+
+
+document.addEventListener('DOMContentLoaded', function() {
+
+
+
+
+  if (typeof DocDataStore !== 'undefined') DocDataStore.initTestData();
+
+
+
+
+  var params = new URLSearchParams(window.location.search);
+
+
+
+
+  var id = params.get('id');
+
+
+
+
+  if (id) {
+
+
+
+
+    loadDoc(id);
+
+
+
+
+  } else {
+
+
+
+
+    showToast('导入数据删除ID导入数据', 'warning');
+
+
+
+
+    setTimeout(function() { goBack(); }, 1200);
+
+
+
+
+  }
+
+
+
+
+});
+
+
+
+
+
+</script>
+
+
+
+
+
+<div class="lookup-modal" id="lookupModal">
+  <div class="lookup-dialog">
+    <div class="lookup-header">
+      <div class="lookup-title" id="lookupTitle">选择</div>
+      <button class="lookup-close" onclick="closeLookup()">×</button>
+    </div>
+    <div class="lookup-body">
+      <div class="lookup-search">
+        <input type="text" id="lookupKeyword" placeholder="请输入编码或名称搜索" onkeydown="if(event.key==='Enter')filterLookup()">
+        <button onclick="filterLookup()">搜索</button>
+      </div>
+      <table class="lookup-table">
+        <thead id="lookupTableHead"></thead>
+        <tbody id="lookupTableBody"></tbody>
+      </table>
+    </div>
+    <div class="lookup-footer">
+      <button class="btn btn-cancel" onclick="closeLookup()">取消</button>
+      <button class="btn btn-primary" onclick="confirmLookup()">确定</button>
+    </div>
+  </div>
+</div>
+
+</body>
+
+
+
+
+</html>
+
+
+
+

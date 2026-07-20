@@ -1,0 +1,1575 @@
+<!DOCTYPE html>
+
+
+
+<html lang="zh-CN">
+
+
+
+<head>
+
+
+
+<meta charset="UTF-8">
+
+
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+
+
+<title>BOM详情 — 磐枢工业智能平台</title>
+
+
+
+<link rel="stylesheet" href="../common.css">
+
+
+
+<script src="../common.js"></script>
+<script>
+</script>
+
+
+
+<style>
+
+
+
+.text-mono { font-family: var(--font-mono); }
+
+
+
+.bom-detail-container { display: flex; gap: 16px; height: calc(100vh - 112px); padding: 16px 24px; }
+
+
+
+.bom-tree-panel { width: 40%; background: var(--bg-surface); border: 1px solid var(--border-normal); border-radius: var(--radius-md); overflow: hidden; display: flex; flex-direction: column; }
+
+
+
+.bom-tree-header { padding: 12px 16px; border-bottom: 1px solid var(--border-normal); display: flex; align-items: center; justify-content: space-between; }
+
+
+
+.bom-tree-header h4 { margin: 0; font-size: 13px; color: var(--text-primary); }
+
+
+
+.bom-tree-body { flex: 1; overflow-y: auto; padding: 8px; }
+
+
+
+.tree-row { display: flex; align-items: center; padding: 6px 8px; cursor: pointer; border-radius:var(--radius-sm); transition: background var(--transition); font-size: 12.5px; }
+
+
+
+.tree-row:hover { background: rgba(56,189,248,0.06); }
+
+
+
+.tree-row.active { background: rgba(56,189,248,0.12); }
+
+
+
+.tree-row .expand-icon { width: 16px; text-align: center; font-size: 12px; color: var(--text-tertiary); flex-shrink: 0; }
+
+
+
+.tree-row .tree-node { width: 8px; height: 8px; border-radius: 50%; margin-right: 6px; flex-shrink: 0; }
+
+
+
+.tree-row .tree-node.root { background: var(--text-accent); }
+
+
+
+.tree-row .tree-node.branch { background: var(--color-info); }
+
+
+
+.tree-row .tree-node.leaf { background: var(--text-tertiary); width: 6px; height: 6px; }
+
+
+
+.tree-row .tree-info { flex: 1; overflow: hidden; }
+
+
+
+.tree-row .tree-info .tree-code { font-family: var(--font-mono); font-size: 12px; color: var(--text-accent); }
+
+
+
+.tree-row .tree-info .tree-name { font-size: 12px; color: var(--text-secondary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+
+
+.tree-row .tree-qty { font-family: var(--font-mono); font-size: 12px; color: var(--text-tertiary); margin-left: 8px; }
+
+
+
+.tree-row.level-1 { padding-left: 24px; }
+
+
+
+.tree-row.level-2 { padding-left: 48px; }
+
+
+
+.tree-row.level-3 { padding-left: 72px; }
+
+
+
+.bom-detail-panel { flex: 1; background: var(--bg-surface); border: 1px solid var(--border-normal); border-radius: var(--radius-md); overflow: hidden; display: flex; flex-direction: column; }
+
+
+
+.bom-detail-header { padding: 12px 16px; border-bottom: 1px solid var(--border-normal); }
+
+
+
+.bom-detail-header h4 { margin: 0; font-size: 13px; color: var(--text-primary); }
+
+
+
+.bom-detail-body { flex: 1; overflow-y: auto; padding: 16px; }
+
+
+
+.stat-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 16px; }
+
+
+
+.stat-card { background: var(--bg-inset); border: 1px solid var(--border-normal); border-radius: var(--radius-sm); padding: 12px; text-align: center; }
+
+
+
+.stat-card .stat-value { font-family: var(--font-mono); font-size: 20px; font-weight: 700; color: var(--text-accent); }
+
+
+
+.stat-card .stat-label { font-size: 11px; color: var(--text-tertiary); margin-top: 4px; }
+
+
+
+.info-section { background: var(--bg-inset); border: 1px solid var(--border-normal); border-radius: var(--radius-sm); padding: 12px; margin-bottom: 12px; }
+
+
+
+.info-section-title { font-size: 12px; font-weight: 600; color: var(--text-tertiary); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 10px; }
+
+
+
+.info-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+
+
+
+.info-item { display: flex; flex-direction: column; gap: 2px; }
+
+
+
+.info-label { font-size: 11px; color: var(--text-tertiary); }
+
+
+
+.info-value { font-size: 13px; color: var(--text-primary); }
+
+
+
+.info-value.mono { font-family: var(--font-mono); }
+
+
+
+.info-value.accent { color: var(--text-accent); }
+
+
+
+.source-tag { font-size: 11px; padding: 1px 6px; border-radius: 8px; }
+
+
+
+.source-purchase { background: rgba(6,182,212,0.15); color: #22d3ee; }
+
+
+
+.source-make { background: rgba(34,197,94,0.15); color: #4ade80; }
+
+
+
+.source-outsource { background: rgba(234,179,8,0.15); color: #facc15; }
+
+
+
+
+.lookup-modal { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:2000; justify-content:center; align-items:center; }
+.lookup-modal.show { display:flex; }
+.lookup-dialog { background:#fff; border:1px solid #e8e8e8; border-radius:4px; width:720px; max-height:70vh; overflow:hidden; }
+.lookup-header { padding:14px 20px; border-bottom:1px solid #e8e8e8; display:flex; align-items:center; justify-content:space-between; }
+.lookup-title { font-size:15px; font-weight:600; color:#333; }
+.lookup-close { font-size:20px; color:#666; cursor:pointer; background:none; border:none; }
+.lookup-close:hover { color:#333; }
+.lookup-body { padding:16px; }
+.lookup-search { display:flex; gap:8px; margin-bottom:12px; }
+.lookup-search input { flex:1; padding:6px 10px; border:1px solid #e8e8e8; border-radius:4px; font-size:13px; }
+.lookup-search button { padding:6px 16px; background:#1890ff; color:#fff; border:none; border-radius:4px; cursor:pointer; }
+.lookup-table { width:100%; border-collapse:collapse; font-size:13px; }
+.lookup-table th, .lookup-table td { padding:10px 12px; text-align:left; border-bottom:1px solid #e8e8e8; }
+.lookup-table th { background:#fafafa; font-weight:600; color:#333; }
+.lookup-table tr:hover { background:#f5f5f5; }
+.lookup-table .checkbox-cell { width:40px; }
+.lookup-footer { padding:12px 20px; border-top:1px solid #e8e8e8; display:flex; justify-content:flex-end; gap:8px; }
+.lookup-field { display:flex; align-items:center; }
+.lookup-field input { flex:1; padding:6px 10px; border:1px solid #e8e8e8; border-radius:4px 0 0 4px; font-size:13px; }
+.lookup-field button { width:28px; height:28px; border:1px solid #e8e8e8; border-left:none; border-radius:0 4px 4px 0; background:#fff; cursor:pointer; display:flex; align-items:center; justify-content:center; }
+.lookup-field button:hover { background:#f5f5f5; }
+
+</style>
+
+
+
+</head>
+
+
+
+<body>
+
+
+
+
+
+
+
+<aside class="sidebar" id="sidebar">
+
+
+
+<div class="sidebar-logo">
+
+
+
+    <img src="../images/logo.png" alt="磐枢工业智能平台" style="width: 100%; max-width: 200px; margin-bottom: 8px;">
+
+
+
+    <h1 style="font-size: 16px; margin: 0;">磐枢工业智能平台</h1>
+
+
+
+  </div>
+
+
+
+  <nav class="sidebar-menu"></nav>
+
+
+
+<div class="sidebar-user"><div class="avatar">管</div>
+
+
+
+</aside>
+
+
+
+
+
+
+
+<div class="main-content" id="mainContent">
+
+
+
+  <div class="page-header" style="position:sticky;top:0;z-index:100;">
+
+
+
+    <div>
+
+
+
+      <div class="flex items-center gap-8">
+
+
+
+        <button class="sidebar-toggle" onclick="toggleSidebar()">&#9776;</button>
+
+
+
+        <div>
+
+
+
+          <h2>BOM详情</h2>
+
+
+
+          <div class="breadcrumb"><a href="../index.html">首页</a><span>></span><span>生产制造</span><span>></span><a href="bom.html">工程数据</a><span>></span><a href="bom.html">BOM管理</a><span>></span><span class="text-accent">BOM-YB-001</span></div></div>
+
+
+
+        </div>
+
+
+
+      </div>
+
+
+
+    </div>
+
+
+
+    <div class="page-actions">
+
+
+
+      <button class="btn btn-ghost btn-sm">📤 导出BOM</button>
+
+
+
+      <button class="btn btn-ghost btn-sm">📋 复制BOM</button>
+
+
+
+      <a href="bom.html" class="btn btn-ghost btn-sm">← 返回列表</a>
+
+
+
+    </div>
+
+
+
+  </div>
+
+
+
+
+
+
+
+  <div class="bom-detail-container">
+
+
+
+    <div class="bom-tree-panel">
+
+
+
+      <div class="bom-tree-header">
+
+
+
+        <h4>BOM结构树</h4>
+
+
+
+        <div class="flex gap-4">
+
+
+
+          <button class="action-btn btn-sm" onclick="expandAll()">展开全部</button>
+
+
+
+          <button class="action-btn btn-sm" onclick="collapseAll()">折叠全部</button>
+
+
+
+        </div>
+
+
+
+      </div>
+
+
+
+      <div class="bom-tree-body" id="bomTreeBody">
+
+
+
+        <div class="tree-row active" onclick="selectNode(this, 'root')">
+
+
+
+          <span class="expand-icon" onclick="toggleBranch(event, 'level1')">-</span>
+
+
+
+          <span class="tree-node root"></span>
+
+
+
+          <div class="tree-info">
+
+
+
+            <div class="tree-code">FG-YB-001</div>
+
+
+
+            <div class="tree-name">汽车仪表盘外壳总成</div>
+
+
+
+          </div>
+
+
+
+          <span class="tree-qty">1.00</span>
+
+
+
+        </div>
+
+
+
+
+
+
+
+        <div id="level1">
+
+
+
+          <div class="tree-row level-1" onclick="selectNode(this, 'l1-1')">
+
+
+
+            <span class="expand-icon" onclick="toggleBranch(event, 'level2-1')">-</span>
+
+
+
+            <span class="tree-node branch"></span>
+
+
+
+            <div class="tree-info">
+
+
+
+              <div class="tree-code">SFG-MB-002</div>
+
+
+
+              <div class="tree-name">仪表盘面板组件</div>
+
+
+
+            </div>
+
+
+
+            <span class="tree-qty">1.00</span>
+
+
+
+          </div>
+
+
+
+
+
+
+
+          <div id="level2-1">
+
+
+
+            <div class="tree-row level-2" onclick="selectNode(this, 'l2-1')">
+
+
+
+              <span class="expand-icon"></span>
+
+
+
+              <span class="tree-node leaf"></span>
+
+
+
+              <div class="tree-info">
+
+
+
+                <div class="tree-code">RM-PMMA-003</div>
+
+
+
+                <div class="tree-name">透明PMMA板</div>
+
+
+
+              </div>
+
+
+
+              <span class="tree-qty">0.80</span>
+
+
+
+            </div>
+
+
+
+            <div class="tree-row level-2" onclick="selectNode(this, 'l2-2')">
+
+
+
+              <span class="expand-icon"></span>
+
+
+
+              <span class="tree-node leaf"></span>
+
+
+
+              <div class="tree-info">
+
+
+
+                <div class="tree-code">RM-LED-010</div>
+
+
+
+                <div class="tree-name">LED背光模组</div>
+
+
+
+              </div>
+
+
+
+              <span class="tree-qty">1.00</span>
+
+
+
+            </div>
+
+
+
+          </div>
+
+
+
+
+
+
+
+          <div class="tree-row level-1" onclick="selectNode(this, 'l1-2')">
+
+
+
+            <span class="expand-icon"></span>
+
+
+
+            <span class="tree-node leaf"></span>
+
+
+
+            <div class="tree-info">
+
+
+
+              <div class="tree-code">RM-ABS-001</div>
+
+
+
+              <div class="tree-name">ABS树脂 PC-770</div>
+
+
+
+            </div>
+
+
+
+            <span class="tree-qty">2.50</span>
+
+
+
+          </div>
+
+
+
+
+
+
+
+          <div class="tree-row level-1" onclick="selectNode(this, 'l1-3')">
+
+
+
+            <span class="expand-icon"></span>
+
+
+
+            <span class="tree-node leaf"></span>
+
+
+
+            <div class="tree-info">
+
+
+
+              <div class="tree-code">RM-MET-005</div>
+
+
+
+              <div class="tree-name">金属卡扣组件</div>
+
+
+
+            </div>
+
+
+
+            <span class="tree-qty">4.00</span>
+
+
+
+          </div>
+
+
+
+
+
+
+
+          <div class="tree-row level-1" onclick="selectNode(this, 'l1-4')">
+
+
+
+            <span class="expand-icon" onclick="toggleBranch(event, 'level2-2')">-</span>
+
+
+
+            <span class="tree-node branch"></span>
+
+
+
+            <div class="tree-info">
+
+
+
+              <div class="tree-code">SFG-SEAL-001</div>
+
+
+
+              <div class="tree-name">密封组件</div>
+
+
+
+            </div>
+
+
+
+            <span class="tree-qty">1.00</span>
+
+
+
+          </div>
+
+
+
+
+
+
+
+          <div id="level2-2">
+
+
+
+            <div class="tree-row level-2" onclick="selectNode(this, 'l2-3')">
+
+
+
+              <span class="expand-icon"></span>
+
+
+
+              <span class="tree-node leaf"></span>
+
+
+
+              <div class="tree-info">
+
+
+
+                <div class="tree-code">RM-SEAL-007</div>
+
+
+
+                <div class="tree-name">防尘密封条</div>
+
+
+
+              </div>
+
+
+
+              <span class="tree-qty">1.20</span>
+
+
+
+            </div>
+
+
+
+            <div class="tree-row level-2" onclick="selectNode(this, 'l2-4')">
+
+
+
+              <span class="expand-icon"></span>
+
+
+
+              <span class="tree-node leaf"></span>
+
+
+
+              <div class="tree-info">
+
+
+
+                <div class="tree-code">RM-GASKET-002</div>
+
+
+
+                <div class="tree-name">橡胶垫片</div>
+
+
+
+              </div>
+
+
+
+              <span class="tree-qty">2.00</span>
+
+
+
+            </div>
+
+
+
+          </div>
+
+
+
+
+
+
+
+          <div class="tree-row level-1" onclick="selectNode(this, 'l1-5')">
+
+
+
+            <span class="expand-icon"></span>
+
+
+
+            <span class="tree-node leaf"></span>
+
+
+
+            <div class="tree-info">
+
+
+
+              <div class="tree-code">RM-SCREW-003</div>
+
+
+
+              <div class="tree-name">M4十字螺丝</div>
+
+
+
+            </div>
+
+
+
+            <span class="tree-qty">8.00</span>
+
+
+
+          </div>
+
+
+
+        </div>
+
+
+
+      </div>
+
+
+
+    </div>
+
+
+
+
+
+
+
+    <div class="bom-detail-panel">
+
+
+
+      <div class="bom-detail-header">
+
+
+
+        <h4>物料详情</h4>
+
+
+
+      </div>
+
+
+
+      <div class="bom-detail-body">
+
+
+
+        <div class="stat-cards">
+
+
+
+          <div class="stat-card">
+
+
+
+            <div class="stat-value">3</div>
+
+
+
+            <div class="stat-label">层级数</div>
+
+
+
+          </div>
+
+
+
+          <div class="stat-card">
+
+
+
+            <div class="stat-value">9</div>
+
+
+
+            <div class="stat-label">物料总数</div>
+
+
+
+          </div>
+
+
+
+          <div class="stat-card">
+
+
+
+            <div class="stat-value">¥286.50</div>
+
+
+
+            <div class="stat-label">标准成本</div>
+
+
+
+          </div>
+
+
+
+        </div>
+
+
+
+
+
+
+
+        <div class="info-section">
+
+
+
+          <div class="info-section-title">基本信息</div>
+
+
+
+          <div class="info-grid">
+
+
+
+            <div class="info-item">
+
+
+
+              <span class="info-label">物料编码</span>
+
+
+
+              <span class="info-value mono accent">FG-YB-001</span>
+
+
+
+            </div>
+
+
+
+            <div class="info-item">
+
+
+
+              <span class="info-label">物料名称</span>
+
+
+
+              <span class="info-value">汽车仪表盘外壳总成</span>
+
+
+
+            </div>
+
+
+
+            <div class="info-item">
+
+
+
+              <span class="info-label">规格型号</span>
+
+
+
+              <span class="info-value mono">480x220x65mm</span>
+
+
+
+            </div>
+
+
+
+            <div class="info-item">
+
+
+
+              <span class="info-label">单位</span>
+
+
+
+              <span class="info-value">PCS</span>
+
+
+
+            </div>
+
+
+
+            <div class="info-item">
+
+
+
+              <span class="info-label">用量</span>
+
+
+
+              <span class="info-value mono">1.00</span>
+
+
+
+            </div>
+
+
+
+            <div class="info-item">
+
+
+
+              <span class="info-label">损耗率</span>
+
+
+
+              <span class="info-value mono">0.00%</span>
+
+
+
+            </div>
+
+
+
+            <div class="info-item">
+
+
+
+              <span class="info-label">物料来源</span>
+
+
+
+              <span class="info-value"><span class="source-tag source-make">自制</span></span>
+
+
+
+            </div>
+
+
+
+            <div class="info-item">
+
+
+
+              <span class="info-label">标准成本</span>
+
+
+
+              <span class="info-value mono">¥286.50</span>
+
+
+
+            </div>
+
+
+
+          </div>
+
+
+
+        </div>
+
+
+
+
+
+
+
+        <div class="info-section">
+
+
+
+          <div class="info-section-title">替代料信息</div>
+
+
+
+          <div class="info-grid">
+
+
+
+            <div class="info-item">
+
+
+
+              <span class="info-label">替代料编码</span>
+
+
+
+              <span class="info-value mono">-</span>
+
+
+
+            </div>
+
+
+
+            <div class="info-item">
+
+
+
+              <span class="info-label">替代料名称</span>
+
+
+
+              <span class="info-value">-</span>
+
+
+
+            </div>
+
+
+
+            <div class="info-item">
+
+
+
+              <span class="info-label">替代比例</span>
+
+
+
+              <span class="info-value mono">-</span>
+
+
+
+            </div>
+
+
+
+            <div class="info-item">
+
+
+
+              <span class="info-label">优先级</span>
+
+
+
+              <span class="info-value">-</span>
+
+
+
+            </div>
+
+
+
+          </div>
+
+
+
+        </div>
+
+
+
+
+
+
+
+        <div class="info-section">
+
+
+
+          <div class="info-section-title">工序信息</div>
+
+
+
+          <div class="table-wrapper">
+
+
+
+            <table class="data-table" style="font-size:12px;">
+
+
+
+              <thead><tr>
+
+
+
+                <th>工序编码</th>
+
+
+
+                <th>工序名称</th>
+
+
+
+                <th>工作中心</th>
+
+
+
+                <th>标准工时</th>
+
+
+
+                <th>优先级</th>
+
+
+
+              </tr></thead>
+
+
+
+              <tbody>
+
+
+
+                <tr><td>OP-001</td><td>注塑成型</td><td>注塑车间-A区</td><td class="text-mono">0.80h</td><td>1</td></tr>
+
+
+
+                <tr><td>OP-002</td><td>表面处理</td><td>涂装车间-B区</td><td class="text-mono">0.50h</td><td>2</td></tr>
+
+
+
+                <tr><td>OP-003</td><td>装配组装</td><td>装配车间-C区</td><td class="text-mono">1.20h</td><td>3</td></tr>
+
+
+
+                <tr><td>OP-004</td><td>成品检验</td><td>质检中心</td><td class="text-mono">0.30h</td><td>4</td></tr>
+
+
+
+              </tbody>
+
+
+
+            </table>
+
+
+
+          </div>
+
+
+
+        </div>
+
+
+
+      </div>
+
+
+
+    </div>
+
+
+
+  </div>
+
+
+
+</div>
+
+
+
+
+
+
+
+<script>
+
+
+
+function toggleBranch(e, id) {
+
+
+
+  e.stopPropagation();
+
+
+
+  var el = document.getElementById(id);
+
+
+
+  var icon = e.target;
+
+
+
+  if (el) {
+
+
+
+    var isHidden = el.style.display === 'none';
+
+
+
+    el.style.display = isHidden ? 'block' : 'none';
+
+
+
+    icon.textContent = isHidden ? '-' : '+';
+
+
+
+  }
+
+
+
+}
+
+
+
+function expandAll() {
+
+
+
+  document.querySelectorAll('[id^="level"]').forEach(function(el){ el.style.display = 'block'; });
+
+
+
+  document.querySelectorAll('.expand-icon').forEach(function(el){ if(el.textContent) el.textContent = '-'; });
+
+
+
+}
+
+
+
+function collapseAll() {
+
+
+
+  document.querySelectorAll('[id^="level"]').forEach(function(el){ el.style.display = 'none'; });
+
+
+
+  document.querySelectorAll('.expand-icon').forEach(function(el){ if(el.textContent) el.textContent = '+'; });
+
+
+
+}
+
+
+
+function selectNode(el, id) {
+
+
+
+  document.querySelectorAll('.tree-row').forEach(function(row){ row.classList.remove('active'); });
+
+
+
+  el.classList.add('active');
+
+
+
+}
+
+
+
+
+var currentLookupField = null;
+var currentLookupType = null;
+var lookupData = [];
+var lookupColumns = [];
+
+function openLookup(fieldId, type) {
+  currentLookupField = fieldId;
+  currentLookupType = type;
+  
+  if (type === 'org') {
+    lookupColumns = ['编码', '名称', '形态', '上级组织'];
+    lookupData = JSON.parse(localStorage.getItem('erp_orgs') || '[]');
+    document.getElementById('lookupTitle').textContent = '选择组织';
+  } else if (type === 'department') {
+    lookupColumns = ['编码', '名称'];
+    lookupData = JSON.parse(localStorage.getItem('erp_departments_cache') || '[]');
+    document.getElementById('lookupTitle').textContent = '选择部门';
+  } else if (type === 'employee') {
+    lookupColumns = ['编号', '姓名', '所属部门'];
+    lookupData = JSON.parse(localStorage.getItem('erp_employees_cache') || '[]');
+    document.getElementById('lookupTitle').textContent = '选择员工';
+  } else if (type === 'supplier') {
+    lookupColumns = ['编码', '名称'];
+    lookupData = JSON.parse(localStorage.getItem('erp_suppliers_cache') || '[]');
+    document.getElementById('lookupTitle').textContent = '选择供应商';
+  } else if (type === 'customer') {
+    lookupColumns = ['编码', '名称'];
+    lookupData = JSON.parse(localStorage.getItem('erp_customers_cache') || '[]');
+    document.getElementById('lookupTitle').textContent = '选择客户';
+  } else if (type === 'material') {
+    lookupColumns = ['物料编码', '物料名称', '规格型号', '基本单位'];
+    lookupData = JSON.parse(localStorage.getItem('erp_materials_cache') || '[]');
+    document.getElementById('lookupTitle').textContent = '选择物料';
+  } else if (type === 'warehouse') {
+    lookupColumns = ['编码', '名称'];
+    lookupData = JSON.parse(localStorage.getItem('erp_warehouses_cache') || '[]');
+    document.getElementById('lookupTitle').textContent = '选择仓库';
+  }
+  
+  renderLookupTable(lookupData);
+  document.getElementById('lookupModal').classList.add('show');
+}
+
+function closeLookup() {
+  document.getElementById('lookupModal').classList.remove('show');
+}
+
+function filterLookup() {
+  var keyword = document.getElementById('lookupKeyword').value.trim().toLowerCase();
+  var filtered = lookupData.filter(function(item) {
+    var code = item.code || '';
+    var name = item.name || '';
+    return code.toLowerCase().includes(keyword) || name.toLowerCase().includes(keyword);
+  });
+  renderLookupTable(filtered);
+}
+
+function renderLookupTable(data) {
+  var head = document.getElementById('lookupTableHead');
+  var body = document.getElementById('lookupTableBody');
+  
+  head.innerHTML = '<tr><th class="checkbox-cell"><input type="checkbox" onclick="selectAllLookup()"></th>' + lookupColumns.map(function(col) { return '<th>' + col + '</th>'; }).join('') + '</tr>';
+  
+  body.innerHTML = '';
+  data.forEach(function(item) {
+    var row = document.createElement('tr');
+    row.onclick = function() { selectLookupRow(this); };
+    var cells = ['<td class="checkbox-cell"><input type="checkbox" class="lookup-checkbox" value="' + item.id + '"></td>'];
+    if (currentLookupType === 'org') {
+      cells.push('<td>' + item.code + '</td><td>' + item.name + '</td><td>' + (item.form || '') + '</td><td>' + (item.parentName || '') + '</td>');
+    } else if (currentLookupType === 'department') {
+      cells.push('<td>' + item.code + '</td><td>' + item.name + '</td>');
+    } else if (currentLookupType === 'employee') {
+      cells.push('<td>' + item.code + '</td><td>' + item.name + '</td><td>' + (item.department || '') + '</td>');
+    } else if (currentLookupType === 'supplier' || currentLookupType === 'customer') {
+      cells.push('<td>' + item.code + '</td><td>' + item.name + '</td>');
+    } else if (currentLookupType === 'material') {
+      cells.push('<td>' + item.code + '</td><td>' + item.name + '</td><td>' + (item.specification || '') + '</td><td>' + (item.unit || '') + '</td>');
+    } else if (currentLookupType === 'warehouse') {
+      cells.push('<td>' + item.code + '</td><td>' + item.name + '</td>');
+    }
+    row.innerHTML = cells.join('');
+    body.appendChild(row);
+  });
+  
+  if (data.length === 0) {
+    body.innerHTML = '<tr><td colspan="' + (lookupColumns.length + 1) + '" style="text-align:center;padding:40px;color:#999;">暂无数据</td></tr>';
+  }
+}
+
+function selectAllLookup() {
+  var master = document.querySelector('.lookup-table th input');
+  var checkboxes = document.querySelectorAll('.lookup-checkbox');
+  checkboxes.forEach(function(cb) { cb.checked = master.checked; });
+}
+
+function selectLookupRow(row) {
+  var checkbox = row.querySelector('.lookup-checkbox');
+  checkbox.checked = !checkbox.checked;
+}
+
+function confirmLookup() {
+  var checkboxes = document.querySelectorAll('.lookup-checkbox:checked');
+  if (checkboxes.length === 0) {
+    showToast('请选择一条记录', 'warning');
+    return;
+  }
+  
+  var item = lookupData.find(function(d) { return d.id === checkboxes[0].value; });
+  if (item) {
+    var field = document.getElementById(currentLookupField);
+    if (field) {
+      field.value = item.name;
+      field.setAttribute('data-id', item.id);
+      field.setAttribute('data-code', item.code);
+      
+      if (currentLookupType === 'material') {
+        var row = field.closest('tr');
+        if (row) {
+          row.querySelector('.material-name').value = item.name;
+          row.querySelector('.material-spec').value = item.specification || '';
+          row.querySelector('.material-unit').value = item.unit || '';
+        }
+      }
+    }
+  }
+  
+  closeLookup();
+}
+
+function openMaterialLookup(btn) {
+  var field = btn.previousElementSibling;
+  field.id = 'lookupField_' + Date.now();
+  currentLookupField = field.id;
+  openLookup(field.id, 'material');
+}
+
+function openOrgLookup(btn) {
+  var field = btn.previousElementSibling;
+  field.id = 'lookupField_' + Date.now();
+  currentLookupField = field.id;
+  openLookup(field.id, 'org');
+}
+
+function openSupplierLookup(btn) {
+  var field = btn.previousElementSibling;
+  field.id = 'lookupField_' + Date.now();
+  currentLookupField = field.id;
+  openLookup(field.id, 'supplier');
+}
+
+function openWarehouseLookup(btn) {
+  var field = btn.previousElementSibling;
+  field.id = 'lookupField_' + Date.now();
+  currentLookupField = field.id;
+  openLookup(field.id, 'warehouse');
+}
+
+function initLookupData() {
+  if (!localStorage.getItem('erp_orgs')) {
+    localStorage.setItem('erp_orgs', JSON.stringify([
+      { id: 'org-001', code: 'ORG-HQ', name: '磐枢工业集团', form: '集团', parentName: '' },
+      { id: 'org-002', code: 'ORG-SM', name: '磐枢智能制造有限公司', form: '公司', parentName: '磐枢工业集团' },
+      { id: 'org-003', code: 'ORG-SM-PD', name: '生产制造部', form: '部门', parentName: '磐枢智能制造有限公司' },
+      { id: 'org-004', code: 'ORG-SM-FA', name: '财务部', form: '部门', parentName: '磐枢智能制造有限公司' },
+      { id: 'org-005', code: 'ORG-SM-SD', name: '销售部', form: '部门', parentName: '磐枢智能制造有限公司' }
+    ]));
+  }
+  if (!localStorage.getItem('erp_departments_cache')) {
+    localStorage.setItem('erp_departments_cache', JSON.stringify([
+      { id: 'dept-001', code: 'DEPT-PD', name: '生产制造部', status: 1 },
+      { id: 'dept-002', code: 'DEPT-FA', name: '财务部', status: 1 },
+      { id: 'dept-003', code: 'DEPT-SD', name: '销售部', status: 1 },
+      { id: 'dept-004', code: 'DEPT-AS', name: '装配车间', status: 1 },
+      { id: 'dept-005', code: 'DEPT-QC', name: '质检车间', status: 1 }
+    ]));
+  }
+  if (!localStorage.getItem('erp_employees_cache')) {
+    localStorage.setItem('erp_employees_cache', JSON.stringify([
+      { id: 'emp-001', code: 'EMP-001', name: '张三', department: '生产制造部', status: 1 },
+      { id: 'emp-002', code: 'EMP-002', name: '李四', department: '生产制造部', status: 1 },
+      { id: 'emp-003', code: 'EMP-003', name: '王五', department: '财务部', status: 1 },
+      { id: 'emp-004', code: 'EMP-004', name: '赵六', department: '销售部', status: 1 },
+      { id: 'emp-005', code: 'EMP-005', name: '钱七', department: '质检车间', status: 1 }
+    ]));
+  }
+  if (!localStorage.getItem('erp_suppliers_cache')) {
+    localStorage.setItem('erp_suppliers_cache', JSON.stringify([
+      { id: 'sup-001', code: 'S-001', name: '深圳电子元器件有限公司', status: 1 },
+      { id: 'sup-002', code: 'S-002', name: '杭州精密机械加工厂', status: 1 },
+      { id: 'sup-003', code: 'S-003', name: '上海材料科技有限公司', status: 1 },
+      { id: 'sup-004', code: 'S-004', name: '东莞五金制品厂', status: 1 }
+    ]));
+  }
+  if (!localStorage.getItem('erp_materials_cache')) {
+    localStorage.setItem('erp_materials_cache', JSON.stringify([
+      { id: 'mat-001', code: 'P-001', name: '高频传感器模块', specification: 'HT-2026', unit: '个', status: 1 },
+      { id: 'mat-002', code: 'P-002', name: '控制电路板', specification: 'CB-2026', unit: '块', status: 1 },
+      { id: 'mat-003', code: 'P-003', name: '智能控制器', specification: 'IC-V3', unit: '台', status: 1 },
+      { id: 'mat-004', code: 'P-004', name: '电源模块', specification: 'PM-500W', unit: '个', status: 1 },
+      { id: 'mat-005', code: 'M-001', name: 'PCB电路板', specification: 'FR-4双层', unit: '块', status: 1 },
+      { id: 'mat-006', code: 'M-002', name: '贴片电阻', specification: '10KΩ 0603', unit: '个', status: 1 },
+      { id: 'mat-007', code: 'M-003', name: '贴片电容', specification: '100μF 0805', unit: '个', status: 1 },
+      { id: 'mat-008', code: 'M-004', name: '螺丝', specification: 'M4x10', unit: '包', status: 1 }
+    ]));
+  }
+  if (!localStorage.getItem('erp_warehouses_cache')) {
+    localStorage.setItem('erp_warehouses_cache', JSON.stringify([
+      { id: 'wh-001', code: 'WH-001', name: '成品仓', status: 1 },
+      { id: 'wh-002', code: 'WH-002', name: '原料仓', status: 1 },
+      { id: 'wh-003', code: 'WH-003', name: '半成品仓', status: 1 },
+      { id: 'wh-004', code: 'WH-004', name: '辅料仓', status: 1 }
+    ]));
+  }
+}
+
+</script>
+
+
+
+
+<div class="lookup-modal" id="lookupModal">
+  <div class="lookup-dialog">
+    <div class="lookup-header">
+      <div class="lookup-title" id="lookupTitle">选择</div>
+      <button class="lookup-close" onclick="closeLookup()">×</button>
+    </div>
+    <div class="lookup-body">
+      <div class="lookup-search">
+        <input type="text" id="lookupKeyword" placeholder="请输入编码或名称搜索" onkeydown="if(event.key==='Enter')filterLookup()">
+        <button onclick="filterLookup()">搜索</button>
+      </div>
+      <table class="lookup-table">
+        <thead id="lookupTableHead"></thead>
+        <tbody id="lookupTableBody"></tbody>
+      </table>
+    </div>
+    <div class="lookup-footer">
+      <button class="btn btn-cancel" onclick="closeLookup()">取消</button>
+      <button class="btn btn-primary" onclick="confirmLookup()">确定</button>
+    </div>
+  </div>
+</div>
+
+</body>
+
+
+
+</html>

@@ -1,0 +1,508 @@
+import { MigrationInterface, QueryRunner } from 'typeorm';
+
+export class Phase5SqlServer1783770000001 implements MigrationInterface {
+  name = 'Phase5SqlServer1783770000001';
+
+  public async up(queryRunner: QueryRunner): Promise<void> {
+    await queryRunner.query(`CREATE TABLE [sys_workflow_definition] (
+      [id] varchar(36) NOT NULL,
+      [created_at] datetime NOT NULL DEFAULT GETDATE(),
+      [updated_at] datetime NOT NULL DEFAULT GETDATE(),
+      [created_by] varchar(36) NULL,
+      [updated_by] varchar(36) NULL,
+      [data_center_id] varchar(36) NULL,
+      [org_id] varchar(36) NULL,
+      [is_deleted] bit NOT NULL DEFAULT 0,
+      [workflow_code] varchar(50) NOT NULL,
+      [workflow_name] varchar(200) NOT NULL,
+      [description] text NULL,
+      [business_type] varchar(100) NOT NULL,
+      [start_form_id] varchar(36) NULL,
+      [is_enabled] int NOT NULL DEFAULT 1,
+      [is_default] int NOT NULL DEFAULT 0,
+      [version] int NOT NULL DEFAULT 1,
+      CONSTRAINT [PK_sys_workflow_definition] PRIMARY KEY ([id]),
+      CONSTRAINT [UQ_sys_workflow_definition_workflow_code] UNIQUE ([workflow_code])
+    )`);
+
+    await queryRunner.query(`CREATE TABLE [sys_workflow_node] (
+      [id] varchar(36) NOT NULL,
+      [created_at] datetime NOT NULL DEFAULT GETDATE(),
+      [updated_at] datetime NOT NULL DEFAULT GETDATE(),
+      [created_by] varchar(36) NULL,
+      [updated_by] varchar(36) NULL,
+      [data_center_id] varchar(36) NULL,
+      [org_id] varchar(36) NULL,
+      [is_deleted] bit NOT NULL DEFAULT 0,
+      [workflow_id] varchar(36) NOT NULL,
+      [workflow_code] varchar(50) NOT NULL,
+      [node_code] varchar(50) NOT NULL,
+      [node_name] varchar(100) NOT NULL,
+      [node_type] varchar(50) NOT NULL,
+      [sort_order] int NOT NULL,
+      [parent_node_id] varchar(36) NULL,
+      [assignee_type] varchar(50) NOT NULL,
+      [assignee_ids] varchar(500) NULL,
+      [assignee_names] varchar(500) NULL,
+      [approval_type] varchar(50) NOT NULL DEFAULT 'single',
+      [timeout_hours] int NULL,
+      [can_reject] int NOT NULL DEFAULT 1,
+      [can_delegate] int NOT NULL DEFAULT 1,
+      CONSTRAINT [PK_sys_workflow_node] PRIMARY KEY ([id]),
+      CONSTRAINT [UQ_sys_workflow_node_node_code] UNIQUE ([node_code])
+    )`);
+
+    await queryRunner.query(`CREATE TABLE [sys_workflow_line] (
+      [id] varchar(36) NOT NULL,
+      [created_at] datetime NOT NULL DEFAULT GETDATE(),
+      [updated_at] datetime NOT NULL DEFAULT GETDATE(),
+      [created_by] varchar(36) NULL,
+      [updated_by] varchar(36) NULL,
+      [data_center_id] varchar(36) NULL,
+      [org_id] varchar(36) NULL,
+      [is_deleted] bit NOT NULL DEFAULT 0,
+      [workflow_id] varchar(36) NOT NULL,
+      [source_node_id] varchar(36) NOT NULL,
+      [target_node_id] varchar(36) NOT NULL,
+      [condition_type] varchar(50) NULL,
+      [condition_expression] text NULL,
+      [line_name] varchar(100) NULL,
+      [is_default] int NOT NULL DEFAULT 0,
+      CONSTRAINT [PK_sys_workflow_line] PRIMARY KEY ([id])
+    )`);
+
+    await queryRunner.query(`CREATE TABLE [sys_workflow_instance] (
+      [id] varchar(36) NOT NULL,
+      [created_at] datetime NOT NULL DEFAULT GETDATE(),
+      [updated_at] datetime NOT NULL DEFAULT GETDATE(),
+      [created_by] varchar(36) NULL,
+      [updated_by] varchar(36) NULL,
+      [data_center_id] varchar(36) NULL,
+      [org_id] varchar(36) NULL,
+      [is_deleted] bit NOT NULL DEFAULT 0,
+      [instance_no] varchar(50) NOT NULL,
+      [workflow_id] varchar(36) NOT NULL,
+      [workflow_code] varchar(50) NOT NULL,
+      [workflow_name] varchar(200) NOT NULL,
+      [business_type] varchar(100) NOT NULL,
+      [business_id] varchar(36) NOT NULL,
+      [business_no] varchar(50) NULL,
+      [business_title] varchar(500) NULL,
+      [creator_id] varchar(36) NOT NULL,
+      [creator_name] varchar(50) NOT NULL,
+      [current_node_id] varchar(36) NOT NULL,
+      [current_node_name] varchar(100) NOT NULL,
+      [status] int NOT NULL DEFAULT 1,
+      [start_time] datetime NOT NULL,
+      [end_time] datetime NULL,
+      [remark] varchar(500) NULL,
+      CONSTRAINT [PK_sys_workflow_instance] PRIMARY KEY ([id]),
+      CONSTRAINT [UQ_sys_workflow_instance_instance_no] UNIQUE ([instance_no])
+    )`);
+
+    await queryRunner.query(`CREATE TABLE [sys_workflow_task] (
+      [id] varchar(36) NOT NULL,
+      [created_at] datetime NOT NULL DEFAULT GETDATE(),
+      [updated_at] datetime NOT NULL DEFAULT GETDATE(),
+      [created_by] varchar(36) NULL,
+      [updated_by] varchar(36) NULL,
+      [data_center_id] varchar(36) NULL,
+      [org_id] varchar(36) NULL,
+      [is_deleted] bit NOT NULL DEFAULT 0,
+      [task_no] varchar(50) NOT NULL,
+      [instance_id] varchar(36) NOT NULL,
+      [instance_no] varchar(50) NOT NULL,
+      [workflow_id] varchar(36) NOT NULL,
+      [workflow_code] varchar(50) NOT NULL,
+      [node_id] varchar(36) NOT NULL,
+      [node_code] varchar(50) NOT NULL,
+      [node_name] varchar(100) NOT NULL,
+      [business_type] varchar(100) NOT NULL,
+      [business_id] varchar(36) NOT NULL,
+      [business_no] varchar(50) NULL,
+      [business_title] varchar(500) NULL,
+      [assignee_id] varchar(36) NOT NULL,
+      [assignee_name] varchar(50) NOT NULL,
+      [status] int NOT NULL DEFAULT 1,
+      [priority] int NOT NULL DEFAULT 2,
+      [create_time] datetime NOT NULL,
+      [claim_time] datetime NULL,
+      [complete_time] datetime NULL,
+      [action] varchar(50) NULL,
+      [comment] text NULL,
+      [timeout_time] datetime NULL,
+      CONSTRAINT [PK_sys_workflow_task] PRIMARY KEY ([id]),
+      CONSTRAINT [UQ_sys_workflow_task_task_no] UNIQUE ([task_no])
+    )`);
+
+    await queryRunner.query(`CREATE TABLE [sys_workflow_history] (
+      [id] varchar(36) NOT NULL,
+      [created_at] datetime NOT NULL DEFAULT GETDATE(),
+      [updated_at] datetime NOT NULL DEFAULT GETDATE(),
+      [created_by] varchar(36) NULL,
+      [updated_by] varchar(36) NULL,
+      [data_center_id] varchar(36) NULL,
+      [org_id] varchar(36) NULL,
+      [is_deleted] bit NOT NULL DEFAULT 0,
+      [instance_id] varchar(36) NOT NULL,
+      [instance_no] varchar(50) NOT NULL,
+      [node_id] varchar(36) NOT NULL,
+      [node_code] varchar(50) NOT NULL,
+      [node_name] varchar(100) NOT NULL,
+      [action] varchar(50) NOT NULL,
+      [operator_id] varchar(36) NOT NULL,
+      [operator_name] varchar(50) NOT NULL,
+      [operate_time] datetime NOT NULL,
+      [comment] text NULL,
+      [business_type] varchar(100) NOT NULL,
+      [business_id] varchar(36) NOT NULL,
+      CONSTRAINT [PK_sys_workflow_history] PRIMARY KEY ([id])
+    )`);
+
+    await queryRunner.query(`CREATE TABLE [sys_message] (
+      [id] varchar(36) NOT NULL,
+      [created_at] datetime NOT NULL DEFAULT GETDATE(),
+      [updated_at] datetime NOT NULL DEFAULT GETDATE(),
+      [created_by] varchar(36) NULL,
+      [updated_by] varchar(36) NULL,
+      [data_center_id] varchar(36) NULL,
+      [org_id] varchar(36) NULL,
+      [is_deleted] bit NOT NULL DEFAULT 0,
+      [message_no] varchar(50) NOT NULL,
+      [sender_id] varchar(36) NOT NULL,
+      [sender_name] varchar(50) NOT NULL,
+      [receiver_id] varchar(36) NOT NULL,
+      [receiver_name] varchar(50) NOT NULL,
+      [message_type] varchar(50) NOT NULL,
+      [title] varchar(200) NOT NULL,
+      [content] text NOT NULL,
+      [business_type] varchar(100) NULL,
+      [business_id] varchar(36) NULL,
+      [business_no] varchar(50) NULL,
+      [link_url] varchar(500) NULL,
+      [is_read] bit NOT NULL DEFAULT 0,
+      [read_time] datetime NULL,
+      [is_pinned] bit NOT NULL DEFAULT 0,
+      [priority] int NOT NULL DEFAULT 2,
+      CONSTRAINT [PK_sys_message] PRIMARY KEY ([id]),
+      CONSTRAINT [UQ_sys_message_message_no] UNIQUE ([message_no])
+    )`);
+
+    await queryRunner.query(`CREATE TABLE [sys_task] (
+      [id] varchar(36) NOT NULL,
+      [created_at] datetime NOT NULL DEFAULT GETDATE(),
+      [updated_at] datetime NOT NULL DEFAULT GETDATE(),
+      [created_by] varchar(36) NULL,
+      [updated_by] varchar(36) NULL,
+      [data_center_id] varchar(36) NULL,
+      [org_id] varchar(36) NULL,
+      [is_deleted] bit NOT NULL DEFAULT 0,
+      [task_no] varchar(50) NOT NULL,
+      [title] varchar(200) NOT NULL,
+      [description] text NULL,
+      [task_type] varchar(50) NOT NULL,
+      [priority] int NOT NULL DEFAULT 2,
+      [status] int NOT NULL DEFAULT 0,
+      [assignee_id] varchar(36) NULL,
+      [assignee_name] varchar(50) NULL,
+      [start_date] datetime NULL,
+      [end_date] datetime NULL,
+      [complete_date] datetime NULL,
+      [progress] int NOT NULL DEFAULT 0,
+      [parent_id] varchar(36) NULL,
+      [business_type] varchar(100) NULL,
+      [business_id] varchar(36) NULL,
+      [business_no] varchar(50) NULL,
+      [remark] varchar(500) NULL,
+      CONSTRAINT [PK_sys_task] PRIMARY KEY ([id]),
+      CONSTRAINT [UQ_sys_task_task_no] UNIQUE ([task_no])
+    )`);
+
+    await queryRunner.query(`CREATE TABLE [hr_recruitment_requirement] (
+      [id] varchar(36) NOT NULL,
+      [created_at] datetime NOT NULL DEFAULT GETDATE(),
+      [updated_at] datetime NOT NULL DEFAULT GETDATE(),
+      [created_by] varchar(36) NULL,
+      [updated_by] varchar(36) NULL,
+      [data_center_id] varchar(36) NULL,
+      [org_id] varchar(36) NULL,
+      [is_deleted] bit NOT NULL DEFAULT 0,
+      [requirement_no] varchar(50) NOT NULL,
+      [department_id] varchar(36) NOT NULL,
+      [department_name] varchar(200) NOT NULL,
+      [position_id] varchar(36) NOT NULL,
+      [position_name] varchar(200) NOT NULL,
+      [headcount] int NOT NULL,
+      [hired_count] int NOT NULL DEFAULT 0,
+      [requirement_type] int NOT NULL,
+      [education] varchar(50) NOT NULL,
+      [work_experience] varchar(50) NOT NULL,
+      [salary_min] decimal(12,2) NOT NULL,
+      [salary_max] decimal(12,2) NOT NULL,
+      [job_description] text NOT NULL,
+      [requirements] text NOT NULL,
+      [recruitment_channel] varchar(500) NULL,
+      [expected_start_date] datetime NOT NULL,
+      [requester_id] varchar(36) NOT NULL,
+      [requester_name] varchar(50) NOT NULL,
+      [status] int NOT NULL DEFAULT 0,
+      [remark] varchar(500) NULL,
+      CONSTRAINT [PK_hr_recruitment_requirement] PRIMARY KEY ([id]),
+      CONSTRAINT [UQ_hr_recruitment_requirement_requirement_no] UNIQUE ([requirement_no])
+    )`);
+
+    await queryRunner.query(`CREATE TABLE [hr_recruitment_candidate] (
+      [id] varchar(36) NOT NULL,
+      [created_at] datetime NOT NULL DEFAULT GETDATE(),
+      [updated_at] datetime NOT NULL DEFAULT GETDATE(),
+      [created_by] varchar(36) NULL,
+      [updated_by] varchar(36) NULL,
+      [data_center_id] varchar(36) NULL,
+      [org_id] varchar(36) NULL,
+      [is_deleted] bit NOT NULL DEFAULT 0,
+      [candidate_no] varchar(50) NOT NULL,
+      [requirement_id] varchar(36) NOT NULL,
+      [requirement_no] varchar(50) NOT NULL,
+      [position_name] varchar(200) NOT NULL,
+      [name] varchar(50) NOT NULL,
+      [gender] int NOT NULL,
+      [age] int NOT NULL,
+      [education] varchar(50) NOT NULL,
+      [work_experience] varchar(50) NOT NULL,
+      [phone] varchar(20) NOT NULL,
+      [email] varchar(100) NULL,
+      [resume_url] varchar(500) NULL,
+      [source_channel] varchar(100) NOT NULL,
+      [current_salary] decimal(12,2) NULL,
+      [expected_salary] decimal(12,2) NULL,
+      [status] int NOT NULL DEFAULT 0,
+      [remark] varchar(500) NULL,
+      CONSTRAINT [PK_hr_recruitment_candidate] PRIMARY KEY ([id]),
+      CONSTRAINT [UQ_hr_recruitment_candidate_candidate_no] UNIQUE ([candidate_no])
+    )`);
+
+    await queryRunner.query(`CREATE TABLE [hr_training_plan] (
+      [id] varchar(36) NOT NULL,
+      [created_at] datetime NOT NULL DEFAULT GETDATE(),
+      [updated_at] datetime NOT NULL DEFAULT GETDATE(),
+      [created_by] varchar(36) NULL,
+      [updated_by] varchar(36) NULL,
+      [data_center_id] varchar(36) NULL,
+      [org_id] varchar(36) NULL,
+      [is_deleted] bit NOT NULL DEFAULT 0,
+      [plan_no] varchar(50) NOT NULL,
+      [department_id] varchar(36) NOT NULL,
+      [department_name] varchar(200) NOT NULL,
+      [title] varchar(200) NOT NULL,
+      [training_type] varchar(50) NOT NULL,
+      [start_date] datetime NOT NULL,
+      [end_date] datetime NOT NULL,
+      [location] varchar(200) NOT NULL,
+      [trainer_id] varchar(36) NOT NULL,
+      [trainer_name] varchar(50) NOT NULL,
+      [content] text NOT NULL,
+      [expected_count] int NOT NULL,
+      [actual_count] int NOT NULL DEFAULT 0,
+      [budget] decimal(12,2) NOT NULL,
+      [actual_cost] decimal(12,2) NOT NULL DEFAULT 0,
+      [status] int NOT NULL DEFAULT 0,
+      [remark] varchar(500) NULL,
+      CONSTRAINT [PK_hr_training_plan] PRIMARY KEY ([id]),
+      CONSTRAINT [UQ_hr_training_plan_plan_no] UNIQUE ([plan_no])
+    )`);
+
+    await queryRunner.query(`CREATE TABLE [hr_performance_plan] (
+      [id] varchar(36) NOT NULL,
+      [created_at] datetime NOT NULL DEFAULT GETDATE(),
+      [updated_at] datetime NOT NULL DEFAULT GETDATE(),
+      [created_by] varchar(36) NULL,
+      [updated_by] varchar(36) NULL,
+      [data_center_id] varchar(36) NULL,
+      [org_id] varchar(36) NULL,
+      [is_deleted] bit NOT NULL DEFAULT 0,
+      [plan_no] varchar(50) NOT NULL,
+      [department_id] varchar(36) NOT NULL,
+      [department_name] varchar(200) NOT NULL,
+      [title] varchar(200) NOT NULL,
+      [plan_type] varchar(50) NOT NULL,
+      [period] varchar(20) NOT NULL,
+      [start_date] datetime NOT NULL,
+      [end_date] datetime NOT NULL,
+      [self_assessment_deadline] datetime NOT NULL,
+      [supervisor_assessment_deadline] datetime NOT NULL,
+      [review_deadline] datetime NOT NULL,
+      [description] text NULL,
+      [status] int NOT NULL DEFAULT 0,
+      [remark] varchar(500) NULL,
+      CONSTRAINT [PK_hr_performance_plan] PRIMARY KEY ([id]),
+      CONSTRAINT [UQ_hr_performance_plan_plan_no] UNIQUE ([plan_no])
+    )`);
+
+    await queryRunner.query(`CREATE TABLE [hr_performance_result] (
+      [id] varchar(36) NOT NULL,
+      [created_at] datetime NOT NULL DEFAULT GETDATE(),
+      [updated_at] datetime NOT NULL DEFAULT GETDATE(),
+      [created_by] varchar(36) NULL,
+      [updated_by] varchar(36) NULL,
+      [data_center_id] varchar(36) NULL,
+      [org_id] varchar(36) NULL,
+      [is_deleted] bit NOT NULL DEFAULT 0,
+      [result_no] varchar(50) NOT NULL,
+      [plan_id] varchar(36) NOT NULL,
+      [plan_no] varchar(50) NOT NULL,
+      [plan_title] varchar(200) NOT NULL,
+      [emp_id] varchar(36) NOT NULL,
+      [emp_name] varchar(50) NOT NULL,
+      [department_id] varchar(36) NOT NULL,
+      [department_name] varchar(200) NOT NULL,
+      [position_id] varchar(36) NOT NULL,
+      [position_name] varchar(200) NOT NULL,
+      [self_score] decimal(5,2) NULL,
+      [self_comment] text NULL,
+      [supervisor_score] decimal(5,2) NULL,
+      [supervisor_comment] text NULL,
+      [final_score] decimal(5,2) NULL,
+      [performance_level] varchar(20) NULL,
+      [bonus_ratio] decimal(5,2) NULL,
+      [improvement_suggestion] text NULL,
+      [status] int NOT NULL DEFAULT 0,
+      CONSTRAINT [PK_hr_performance_result] PRIMARY KEY ([id]),
+      CONSTRAINT [UQ_hr_performance_result_result_no] UNIQUE ([result_no])
+    )`);
+
+    await queryRunner.query(`CREATE TABLE [crm_customer_category] (
+      [id] varchar(36) NOT NULL,
+      [created_at] datetime NOT NULL DEFAULT GETDATE(),
+      [updated_at] datetime NOT NULL DEFAULT GETDATE(),
+      [created_by] varchar(36) NULL,
+      [updated_by] varchar(36) NULL,
+      [data_center_id] varchar(36) NULL,
+      [org_id] varchar(36) NULL,
+      [is_deleted] bit NOT NULL DEFAULT 0,
+      [category_code] varchar(50) NOT NULL,
+      [category_name] varchar(100) NOT NULL,
+      [parent_id] varchar(36) NULL,
+      [sort_order] int NOT NULL DEFAULT 0,
+      [enabled] int NOT NULL DEFAULT 1,
+      [remark] varchar(500) NULL,
+      CONSTRAINT [PK_crm_customer_category] PRIMARY KEY ([id]),
+      CONSTRAINT [UQ_crm_customer_category_category_code] UNIQUE ([category_code])
+    )`);
+
+    await queryRunner.query(`CREATE TABLE [crm_customer_contact] (
+      [id] varchar(36) NOT NULL,
+      [created_at] datetime NOT NULL DEFAULT GETDATE(),
+      [updated_at] datetime NOT NULL DEFAULT GETDATE(),
+      [created_by] varchar(36) NULL,
+      [updated_by] varchar(36) NULL,
+      [data_center_id] varchar(36) NULL,
+      [org_id] varchar(36) NULL,
+      [is_deleted] bit NOT NULL DEFAULT 0,
+      [contact_no] varchar(50) NOT NULL,
+      [customer_id] varchar(36) NOT NULL,
+      [customer_no] varchar(50) NOT NULL,
+      [customer_name] varchar(200) NOT NULL,
+      [name] varchar(50) NOT NULL,
+      [position] varchar(100) NULL,
+      [phone] varchar(20) NOT NULL,
+      [email] varchar(100) NULL,
+      [qq] varchar(20) NULL,
+      [wechat] varchar(100) NULL,
+      [is_primary] bit NOT NULL DEFAULT 0,
+      [enabled] int NOT NULL DEFAULT 1,
+      [remark] varchar(500) NULL,
+      CONSTRAINT [PK_crm_customer_contact] PRIMARY KEY ([id]),
+      CONSTRAINT [UQ_crm_customer_contact_contact_no] UNIQUE ([contact_no])
+    )`);
+
+    await queryRunner.query(`CREATE TABLE [crm_customer_followup] (
+      [id] varchar(36) NOT NULL,
+      [created_at] datetime NOT NULL DEFAULT GETDATE(),
+      [updated_at] datetime NOT NULL DEFAULT GETDATE(),
+      [created_by] varchar(36) NULL,
+      [updated_by] varchar(36) NULL,
+      [data_center_id] varchar(36) NULL,
+      [org_id] varchar(36) NULL,
+      [is_deleted] bit NOT NULL DEFAULT 0,
+      [followup_no] varchar(50) NOT NULL,
+      [customer_id] varchar(36) NOT NULL,
+      [customer_no] varchar(50) NOT NULL,
+      [customer_name] varchar(200) NOT NULL,
+      [contact_id] varchar(36) NULL,
+      [contact_name] varchar(50) NULL,
+      [followup_type] varchar(50) NOT NULL,
+      [followup_result] varchar(50) NOT NULL,
+      [content] text NOT NULL,
+      [next_followup_date] datetime NULL,
+      [followup_user_id] varchar(36) NOT NULL,
+      [followup_user_name] varchar(50) NOT NULL,
+      [is_returned] bit NOT NULL DEFAULT 0,
+      CONSTRAINT [PK_crm_customer_followup] PRIMARY KEY ([id]),
+      CONSTRAINT [UQ_crm_customer_followup_followup_no] UNIQUE ([followup_no])
+    )`);
+
+    await queryRunner.query(`CREATE TABLE [crm_sales_stage] (
+      [id] varchar(36) NOT NULL,
+      [created_at] datetime NOT NULL DEFAULT GETDATE(),
+      [updated_at] datetime NOT NULL DEFAULT GETDATE(),
+      [created_by] varchar(36) NULL,
+      [updated_by] varchar(36) NULL,
+      [data_center_id] varchar(36) NULL,
+      [org_id] varchar(36) NULL,
+      [is_deleted] bit NOT NULL DEFAULT 0,
+      [stage_code] varchar(50) NOT NULL,
+      [stage_name] varchar(100) NOT NULL,
+      [sort_order] int NOT NULL,
+      [probability] decimal(5,2) NOT NULL,
+      [enabled] int NOT NULL DEFAULT 1,
+      [remark] varchar(500) NULL,
+      CONSTRAINT [PK_crm_sales_stage] PRIMARY KEY ([id]),
+      CONSTRAINT [UQ_crm_sales_stage_stage_code] UNIQUE ([stage_code])
+    )`);
+
+    await queryRunner.query(`CREATE TABLE [crm_opportunity_activity] (
+      [id] varchar(36) NOT NULL,
+      [created_at] datetime NOT NULL DEFAULT GETDATE(),
+      [updated_at] datetime NOT NULL DEFAULT GETDATE(),
+      [created_by] varchar(36) NULL,
+      [updated_by] varchar(36) NULL,
+      [data_center_id] varchar(36) NULL,
+      [org_id] varchar(36) NULL,
+      [is_deleted] bit NOT NULL DEFAULT 0,
+      [activity_no] varchar(50) NOT NULL,
+      [opportunity_id] varchar(36) NOT NULL,
+      [opportunity_no] varchar(50) NOT NULL,
+      [activity_type] varchar(50) NOT NULL,
+      [title] varchar(200) NOT NULL,
+      [activity_time] datetime NOT NULL,
+      [content] text NOT NULL,
+      [next_action] text NULL,
+      [next_action_time] datetime NULL,
+      [activity_user_id] varchar(36) NOT NULL,
+      [activity_user_name] varchar(50) NOT NULL,
+      CONSTRAINT [PK_crm_opportunity_activity] PRIMARY KEY ([id]),
+      CONSTRAINT [UQ_crm_opportunity_activity_activity_no] UNIQUE ([activity_no])
+    )`);
+  }
+
+  public async down(queryRunner: QueryRunner): Promise<void> {
+    await queryRunner.query(`DROP TABLE [crm_opportunity_activity]`);
+    await queryRunner.query(`DROP TABLE [crm_sales_stage]`);
+    await queryRunner.query(`DROP TABLE [crm_customer_followup]`);
+    await queryRunner.query(`DROP TABLE [crm_customer_contact]`);
+    await queryRunner.query(`DROP TABLE [crm_customer_category]`);
+    await queryRunner.query(`DROP TABLE [hr_performance_result]`);
+    await queryRunner.query(`DROP TABLE [hr_performance_plan]`);
+    await queryRunner.query(`DROP TABLE [hr_training_plan]`);
+    await queryRunner.query(`DROP TABLE [hr_recruitment_candidate]`);
+    await queryRunner.query(`DROP TABLE [hr_recruitment_requirement]`);
+    await queryRunner.query(`DROP TABLE [sys_task]`);
+    await queryRunner.query(`DROP TABLE [sys_message]`);
+    await queryRunner.query(`DROP TABLE [sys_workflow_history]`);
+    await queryRunner.query(`DROP TABLE [sys_workflow_task]`);
+    await queryRunner.query(`DROP TABLE [sys_workflow_instance]`);
+    await queryRunner.query(`DROP TABLE [sys_workflow_line]`);
+    await queryRunner.query(`DROP TABLE [sys_workflow_node]`);
+    await queryRunner.query(`DROP TABLE [sys_workflow_definition]`);
+  }
+}

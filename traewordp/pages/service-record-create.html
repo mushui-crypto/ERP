@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>服务记录 - 新增/编辑</title>
+<link rel="stylesheet" href="../common.css">
+<script src="../common.js"></script>
+<script></script>
+<style>
+.doc-page{display:flex;height:100vh;background:#f0f2f5;}
+.doc-sidebar{width:200px;background:#001529;color:#fff;display:flex;flex-direction:column;}
+.doc-sidebar-title{padding:16px 20px;font-size:15px;font-weight:600;border-bottom:1px solid #002140;background:#001529;}
+.doc-sidebar-menu{list-style:none;padding:0;margin:0;flex:1;}
+.doc-sidebar-menu li a{display:flex;align-items:center;padding:12px 20px;color:#bfbfbf;text-decoration:none;font-size:13px;transition:all 0.3s;}
+.doc-sidebar-menu li a:hover{background:#002140;color:#fff;}
+.doc-sidebar-menu li a.active{background:#1890ff;color:#fff;}
+.doc-content{flex:1;display:flex;flex-direction:column;overflow:hidden;}
+.doc-header{position:sticky;top:0;z-index:100;background:#fff;border-bottom:1px solid #e8e8e8;padding:16px 20px;display:flex;justify-content:space-between;align-items:center;}
+.doc-header-title{font-size:20px;font-weight:600;color:#333;margin-bottom:4px;}
+.doc-header-subtitle{font-size:13px;color:#999;}
+.doc-toolbar{display:flex;gap:8px;flex-wrap:wrap;}
+.toolbar-btn{padding:6px 12px;border-radius:4px;font-size:13px;cursor:pointer;border:1px solid #d9d9d9;background:#fff;color:#666;display:flex;align-items:center;gap:6px;transition:all 0.3s;}
+.toolbar-btn:hover{border-color:#1890ff;color:#1890ff;}
+.toolbar-btn.primary{background:#1890ff;color:#fff;border-color:#1890ff;}
+.toolbar-btn.danger{background:#f5222d;color:#fff;border-color:#f5222d;}
+.doc-body{flex:1;padding:16px;overflow-y:auto;}
+.doc-card{background:#fff;border-radius:4px;box-shadow:0 1px 2px rgba(0,0,0,0.05);overflow:hidden;margin-bottom:16px;}
+.doc-card-title{padding:14px 20px;border-bottom:1px solid #e8e8e8;font-weight:600;font-size:14px;color:#333;background:#fafafa;}
+.form-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px 16px;padding:20px;}
+.form-grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px 16px;padding:20px;}
+.form-grid-2{display:grid;grid-template-columns:repeat(2,1fr);gap:12px 16px;padding:20px;}
+.form-item{display:flex;flex-direction:column;}
+.form-item label{font-size:13px;color:#666;margin-bottom:4px;font-weight:500;}
+.form-item label .required{color:#f5222d;margin-right:4px;}
+.form-item input,.form-item select,.form-item textarea{padding:6px 10px;border:1px solid #e8e8e8;border-radius:4px;font-size:13px;color:#333;background:#fff;box-sizing:border-box;}
+.form-item input:focus,.form-item select:focus,.form-item textarea:focus{outline:none;border-color:#1890ff;}
+.form-item textarea{resize:vertical;min-height:120px;}
+.form-item .readonly{background:#fafafa;color:#999;}
+.lookup-field{display:flex;align-items:center;}
+.lookup-field input{flex:1;border-radius:4px 0 0 4px;}
+.lookup-field button{width:28px;height:28px;border:1px solid #e8e8e8;border-left:none;border-radius:0 4px 4px 0;background:#fff;cursor:pointer;}
+.lookup-field button:hover{background:#f5f5f5;}
+.toast{position:fixed;top:60px;right:20px;padding:12px 20px;border-radius:4px;color:#fff;font-size:13px;z-index:9999;animation:toastIn 0.3s ease;}
+@keyframes toastIn{from{opacity:0;transform:translateX(100%);}to{opacity:1;transform:translateX(0);}}
+.toast-success{background:rgba(34,197,94,0.9);}
+.toast-warning{background:rgba(245,158,11,0.9);}
+.toast-error{background:rgba(239,68,68,0.9);}
+.status-badge{display:inline-block;padding:4px 10px;border-radius:4px;font-size:12px;font-weight:500;}
+.status-success{background:#f6ffed;color:#52c41a;border:1px solid #b7eb8f;}
+.status-warning{background:#fff7e6;color:#fa8c16;border:1px solid #ffd591;}
+.lookup-modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:2000;justify-content:center;align-items:center;}
+.lookup-modal.show{display:flex;}
+.lookup-dialog{background:#fff;border:1px solid #d9d9d9;border-radius:8px;width:800px;height:500px;overflow:hidden;box-shadow:0 10px 30px rgba(0,0,0,0.15);position:relative;resize:both;}
+.lookup-header{padding:16px 20px;border-bottom:1px solid #f0f0f0;background:#fafafa;display:flex;align-items:center;justify-content:space-between;cursor:move;}
+.lookup-title{font-size:16px;font-weight:600;color:#333;}
+.lookup-close{font-size:20px;color:#999;cursor:pointer;border:none;background:none;width:28px;height:28px;display:flex;align-items:center;justify-content:center;border-radius:4px;}
+.lookup-close:hover{background:#f5f5f5;color:#666;}
+.lookup-search{display:flex;gap:8px;margin-bottom:12px;}
+.lookup-search input{flex:1;padding:8px 12px;border:1px solid #e8e8e8;border-radius:4px;font-size:13px;}
+.lookup-search button{padding:8px 16px;border:none;background:#1890ff;color:#fff;border-radius:4px;cursor:pointer;font-size:13px;}
+.lookup-table{width:100%;border-collapse:collapse;}
+.lookup-table th,.lookup-table td{padding:10px 12px;text-align:left;border-bottom:1px solid #e8e8e8;}
+.lookup-table th{background:#fafafa;font-weight:600;color:#333;}
+.lookup-table tr:hover{background:#f5f5f5;}
+.lookup-table .checkbox-cell{width:40px;}
+</style>
+</head>
+<body>
+<div class="doc-page">
+  <aside class="doc-sidebar">
+    <div class="doc-sidebar-title">业务导航</div>
+    <ul class="doc-sidebar-menu">
+      <li><a href="service-request.html"><span class="menu-icon">&#128203;</span> 服务请求列表</a></li>
+      <li><a href="service-dispatch.html"><span class="menu-icon">&#128246;</span> 服务派工</a></li>
+      <li><a href="service-record.html"><span class="menu-icon">&#128190;</span> 服务记录列表</a></li>
+      <li><a href="#" class="active"><span class="menu-icon">&#10010;</span> 服务记录新增</a></li>
+    </ul>
+  </aside>
+  <div class="doc-content">
+    <header class="doc-header">
+      <div>
+        <div class="doc-header-title">服务记录 - 新增</div>
+        <div class="doc-header-subtitle">记录服务执行结果</div>
+      </div>
+      <div class="doc-toolbar">
+        <button class="toolbar-btn" onclick="goToList()"><span class="icon">📋</span> 列表</button>
+        <button class="toolbar-btn" onclick="selectDispatch()"><span class="icon">🔍</span> 选单</button>
+        <button class="toolbar-btn primary" onclick="saveDoc()"><span class="icon">✓</span> 保存</button>
+        <button class="toolbar-btn" onclick="completeDoc()"><span class="icon">✓</span> 完成</button>
+        <div style="width:1px;height:24px;background:#e8e8e8;margin:0 8px;"></div>
+        <button class="toolbar-btn" onclick="prevDoc()"><span class="icon">⬅️</span> 上查</button>
+        <button class="toolbar-btn" onclick="nextDoc()"><span class="icon">➡️</span> 下查</button>
+        <div style="width:1px;height:24px;background:#e8e8e8;margin:0 8px;"></div>
+        <button class="toolbar-btn danger" onclick="exitDoc()"><span class="icon">✖️</span> 退出</button>
+      </div>
+    </header>
+    <div class="doc-body">
+      <div class="doc-card">
+        <div class="doc-card-title">基本信息</div>
+        <div class="form-grid">
+          <div class="form-item"><label>单据编号</label><input type="text" id="field_单据编号" readonly class="readonly"></div>
+          <div class="form-item"><label><span class="required">*</span>日期</label><input type="date" id="field_日期"></div>
+          <div class="form-item"><label>派工单</label><input type="text" id="field_派工单" readonly class="readonly"></div>
+          <div class="form-item"><label>状态</label><input type="text" id="field_状态" readonly class="readonly" value="执行中"></div>
+        </div>
+      </div>
+      <div class="doc-card">
+        <div class="doc-card-title">客户信息</div>
+        <div class="form-grid">
+          <div class="form-item"><label>客户</label><input type="text" id="field_客户" readonly class="readonly"></div>
+          <div class="form-item"><label>服务类型</label><input type="text" id="field_服务类型" readonly class="readonly"></div>
+          <div class="form-item"><label>问题描述</label><input type="text" id="field_问题描述" readonly class="readonly"></div>
+          <div class="form-item"><label>服务地址</label><input type="text" id="field_服务地址" readonly class="readonly"></div>
+        </div>
+      </div>
+      <div class="doc-card">
+        <div class="doc-card-title">服务执行信息</div>
+        <div class="form-grid">
+          <div class="form-item"><label>服务人员</label><input type="text" id="field_服务人员" readonly class="readonly"></div>
+          <div class="form-item"><label><span class="required">*</span>服务结果</label><select id="field_服务结果"><option value="">请选择</option><option value="success">服务成功</option><option value="partial">部分完成</option><option value="failed">服务失败</option></select></div>
+          <div class="form-item"><label><span class="required">*</span>实际开始时间</label><input type="datetime-local" id="field_实际开始时间"></div>
+          <div class="form-item"><label><span class="required">*</span>实际结束时间</label><input type="datetime-local" id="field_实际结束时间"></div>
+        </div>
+      </div>
+      <div class="doc-card">
+        <div class="doc-card-title">服务详情</div>
+        <div class="form-grid-2">
+          <div class="form-item"><label><span class="required">*</span>服务过程描述</label><textarea id="field_服务过程" placeholder="请详细描述服务执行过程..."></textarea></div>
+          <div class="form-item"><label>服务结果描述</label><textarea id="field_结果描述" placeholder="请描述服务结果和客户反馈..."></textarea></div>
+        </div>
+      </div>
+      <div class="doc-card">
+        <div class="doc-card-title">耗材使用</div>
+        <div class="form-grid-3">
+          <div class="form-item"><label>物料名称</label><input type="text" id="field_耗材名称" placeholder="请输入耗材名称"></div>
+          <div class="form-item"><label>数量</label><input type="number" id="field_耗材数量" placeholder="请输入数量"></div>
+          <div class="form-item"><label>单位</label><input type="text" id="field_耗材单位" placeholder="请输入单位"></div>
+        </div>
+      </div>
+      <div class="doc-card">
+        <div class="doc-card-title">费用信息</div>
+        <div class="form-grid">
+          <div class="form-item"><label>工时(小时)</label><input type="number" id="field_工时" placeholder="请输入工时"></div>
+          <div class="form-item"><label>工时费用</label><input type="number" id="field_工时费用" placeholder="请输入工时费用"></div>
+          <div class="form-item"><label>材料费用</label><input type="number" id="field_材料费用" placeholder="请输入材料费用"></div>
+          <div class="form-item"><label>总费用</label><input type="number" id="field_总费用" readonly class="readonly"></div>
+        </div>
+      </div>
+      <div class="doc-card">
+        <div class="doc-card-title">客户确认</div>
+        <div class="form-grid-3">
+          <div class="form-item"><label>客户签字</label><input type="text" id="field_客户签字" placeholder="请输入客户签字"></div>
+          <div class="form-item"><label>联系方式</label><input type="text" id="field_联系方式" placeholder="请输入联系方式"></div>
+          <div class="form-item"><label>满意度</label><select id="field_满意度"><option value="">请选择</option><option value="5">非常满意</option><option value="4">满意</option><option value="3">一般</option><option value="2">不满意</option><option value="1">非常不满意</option></select></div>
+        </div>
+      </div>
+      <div class="doc-card">
+        <div class="doc-card-title">备注</div>
+        <div class="form-grid-3">
+          <div class="form-item"><label>备注信息</label><input type="text" id="field_备注" placeholder="请输入备注信息"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+var currentDocId = null;
+
+function init() {
+  document.getElementById('field_日期').value = new Date().toISOString().split('T')[0];
+  document.getElementById('field_单据编号').value = 'SRD' + new Date().toISOString().replace(/[-T:]/g, '').substring(2, 14);
+  
+  var dispatchId = localStorage.getItem('service_dispatch_selected');
+  if (dispatchId) {
+    var dispatch = JSON.parse(localStorage.getItem('service_dispatch_' + dispatchId));
+    if (dispatch) {
+      document.getElementById('field_派工单').value = dispatch.docNo;
+      document.getElementById('field_客户').value = dispatch.customer;
+      document.getElementById('field_服务类型').value = dispatch.serviceType;
+      document.getElementById('field_问题描述').value = dispatch.problemDesc;
+      document.getElementById('field_服务地址').value = dispatch.address;
+      document.getElementById('field_服务人员').value = dispatch.dispatchPerson;
+      document.getElementById('field_实际开始时间').value = dispatch.planStartTime;
+    }
+  }
+}
+
+function goToList() { location.href = 'service-record.html'; }
+
+function selectDispatch() {
+  var modal = document.createElement('div');
+  modal.className = 'lookup-modal show';
+  modal.innerHTML = '<div class="lookup-dialog"><div class="lookup-header"><span class="lookup-title">选择派工单</span><button class="lookup-close" onclick="this.closest(\'.lookup-modal\').remove()">×</button></div><div class="lookup-body"><div class="lookup-search"><input type="text" id="dispatchKeyword" placeholder="搜索..." onkeyup="filterDispatchLookup()"><button onclick="filterDispatchLookup()">搜索</button></div><table class="lookup-table" id="dispatchLookupTable"><thead><tr><th class="checkbox-cell"><input type="checkbox"></th><th>单据编号</th><th>日期</th><th>客户</th><th>派工人员</th><th>状态</th></tr></thead><tbody id="dispatchLookupBody"></tbody></table></div><div class="lookup-footer" style="padding:12px 20px;border-top:1px solid #e8e8e8;display:flex;justify-content:flex-end;gap:8px;"><button class="toolbar-btn" onclick="this.closest(\'.lookup-modal\').remove()">取消</button><button class="toolbar-btn primary" onclick="confirmDispatchSelection()">确定</button></div></div>';
+  document.body.appendChild(modal);
+  renderDispatchLookup();
+}
+
+function renderDispatchLookup() {
+  var body = document.getElementById('dispatchLookupBody');
+  body.innerHTML = '';
+  var data = [];
+  for (var i = 0; i < localStorage.length; i++) {
+    var key = localStorage.key(i);
+    if (key.startsWith('service_dispatch_')) {
+      try {
+        var item = JSON.parse(localStorage.getItem(key));
+        if (item.status !== 'completed') {
+          data.push(item);
+        }
+      } catch(e) {}
+    }
+  }
+  data.sort(function(a, b) { return new Date(b.date) - new Date(a.date); });
+  if (data.length === 0) {
+    body.innerHTML = '<tr><td colspan="6" style="text-align:center;color:#999;">暂无待执行的派工单</td></tr>';
+    return;
+  }
+  data.forEach(function(item) {
+    var statusText = item.status === 'pending' ? '待执行' : item.status === 'in_progress' ? '执行中' : item.status;
+    var statusColor = item.status === 'pending' ? '#fa8c16' : item.status === 'in_progress' ? '#1890ff' : '#666';
+    var row = document.createElement('tr');
+    row.onclick = function() { this.querySelector('input').checked = !this.querySelector('input').checked; };
+    row.innerHTML = '<td class="checkbox-cell"><input type="checkbox" class="dispatch-checkbox" value="' + item.id + '"></td>' +
+      '<td>' + item.docNo + '</td>' +
+      '<td>' + item.date + '</td>' +
+      '<td>' + item.customer + '</td>' +
+      '<td>' + item.dispatchPerson + '</td>' +
+      '<td><span style="color:' + statusColor + ';">' + statusText + '</span></td>';
+    body.appendChild(row);
+  });
+}
+
+function filterDispatchLookup() {
+  var keyword = document.getElementById('dispatchKeyword').value.trim().toLowerCase();
+  var body = document.getElementById('dispatchLookupBody');
+  var rows = body.querySelectorAll('tr');
+  rows.forEach(function(row) {
+    var text = row.textContent.toLowerCase();
+    row.style.display = text.includes(keyword) ? '' : 'none';
+  });
+}
+
+function confirmDispatchSelection() {
+  var checkboxes = document.querySelectorAll('.dispatch-checkbox:checked');
+  if (checkboxes.length === 0) { showToast('请选择一条派工单', 'warning'); return; }
+  var dispatchId = checkboxes[0].value;
+  var dispatch = JSON.parse(localStorage.getItem('service_dispatch_' + dispatchId));
+  if (dispatch) {
+    document.getElementById('field_派工单').value = dispatch.docNo;
+    document.getElementById('field_客户').value = dispatch.customer;
+    document.getElementById('field_服务类型').value = dispatch.serviceType;
+    document.getElementById('field_问题描述').value = dispatch.problemDesc;
+    document.getElementById('field_服务地址').value = dispatch.address;
+    document.getElementById('field_服务人员').value = dispatch.dispatchPerson;
+    document.getElementById('field_实际开始时间').value = dispatch.planStartTime;
+    localStorage.setItem('service_dispatch_selected', dispatchId);
+  }
+  document.querySelector('.lookup-modal').remove();
+}
+
+function saveDoc() {
+  var hours = parseFloat(document.getElementById('field_工时').value) || 0;
+  var laborCost = parseFloat(document.getElementById('field_工时费用').value) || 0;
+  var materialCost = parseFloat(document.getElementById('field_材料费用').value) || 0;
+  document.getElementById('field_总费用').value = (laborCost + materialCost).toFixed(2);
+  
+  var doc = {
+    id: currentDocId || 'SRD' + Date.now(),
+    docNo: document.getElementById('field_单据编号').value,
+    date: document.getElementById('field_日期').value,
+    dispatchDoc: document.getElementById('field_派工单').value,
+    customer: document.getElementById('field_客户').value,
+    serviceType: document.getElementById('field_服务类型').value,
+    problemDesc: document.getElementById('field_问题描述').value,
+    address: document.getElementById('field_服务地址').value,
+    servicePerson: document.getElementById('field_服务人员').value,
+    result: document.getElementById('field_服务结果').value,
+    actualStartTime: document.getElementById('field_实际开始时间').value,
+    actualEndTime: document.getElementById('field_实际结束时间').value,
+    processDesc: document.getElementById('field_服务过程').value,
+    resultDesc: document.getElementById('field_结果描述').value,
+    consumableName: document.getElementById('field_耗材名称').value,
+    consumableQty: document.getElementById('field_耗材数量').value,
+    consumableUnit: document.getElementById('field_耗材单位').value,
+    hours: hours,
+    laborCost: laborCost,
+    materialCost: materialCost,
+    totalCost: laborCost + materialCost,
+    customerSign: document.getElementById('field_客户签字').value,
+    contact: document.getElementById('field_联系方式').value,
+    satisfaction: document.getElementById('field_满意度').value,
+    status: 'in_progress',
+    remark: document.getElementById('field_备注').value,
+    createdAt: new Date().toISOString()
+  };
+  localStorage.setItem('service_record_' + doc.id, JSON.stringify(doc));
+  showToast('保存成功！', 'success');
+  currentDocId = doc.id;
+}
+
+function completeDoc() {
+  if (!currentDocId) { saveDoc(); }
+  var result = document.getElementById('field_服务结果').value;
+  if (!result) { showToast('请选择服务结果！', 'warning'); return; }
+  
+  var doc = JSON.parse(localStorage.getItem('service_record_' + currentDocId));
+  doc.status = 'completed';
+  localStorage.setItem('service_record_' + currentDocId, JSON.stringify(doc));
+  
+  var dispatchId = localStorage.getItem('service_dispatch_selected');
+  if (dispatchId) {
+    var dispatch = JSON.parse(localStorage.getItem('service_dispatch_' + dispatchId));
+    dispatch.status = 'completed';
+    localStorage.setItem('service_dispatch_' + dispatchId, JSON.stringify(dispatch));
+  }
+  
+  document.getElementById('field_状态').value = '已完成';
+  showToast('服务完成！', 'success');
+}
+
+function prevDoc() { showToast('没有上一张单据', 'info'); }
+
+function nextDoc() { showToast('没有下一张单据', 'info'); }
+
+function exitDoc() {
+  showConfirm("确认退出？未保存的数据将丢失。", function(result) {
+    if (result) {
+      location.href = 'service-record.html';
+    }
+  });
+}
+
+, 3000);
+}
+
+init();
+</script>
+</body>
+</html>

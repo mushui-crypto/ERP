@@ -1,0 +1,76 @@
+批号调整单
+库存管理
+
+字段说明：
+基本信息：FBillHead 
+	 实体主键：FID 
+	 单据编号：FBillNo 
+	 单据状态：FDocumentStatus 
+	 库存组织：FStockOrgId  (必填项)
+	 日期：FDate  (必填项)
+	 单据类型：FBillTypeID  (必填项)
+	 货主类型：FOwnerTypeIdHead  (必填项)
+	 货主：FOwnerIdHead  (必填项)
+	 部门：FDepId 
+	 库存组：FStockGroupId 
+	 仓管员：FStockerId 
+	 本位币：FBaseCurrId 
+	 备注：FNote 
+	 创建人：FCreatorId 
+	 创建日期：FCreateDate 
+	 最后修改人：FModifierId 
+	 最后修改日期：FModifyDate 
+	 审核人：FApproverId 
+	 审核日期：FApproveDate 
+	 作废人：FCancelerId 
+	 作废日期：FCANCELDATE 
+	 作废状态：FCancelStatus 
+	 序列号上传：FScanBox 
+明细信息：FSTK_LOTADJUSTENTRY 
+	 实体主键：FEntryID 
+	 分组：FGroup 
+	 物料编码：FMATERIALID  (必填项)
+	 物料名称：FMaterialName 
+	 规格型号：FMaterialModel 
+	 单位：FUnitID  (必填项)
+	 转换数量：FQty 
+	 基本单位：FBASEUNITID 
+	 基本单位数量：FBaseQty 
+	 成本价：FPrice 
+	 总成本：FAmount 
+	 仓库：FSTOCKID  (必填项)
+	 仓位：FStockLocId 
+	 货位：FF100001
+	 库存状态：FStockStatusId  (必填项)
+	 库存辅单位：FSecUnitID 
+	 转换数量(库存辅单位)：FSecQty 
+	 物料类别：FMaterialTypeId 
+	 BOM版本：FBOMID 
+	 生产日期：FProduceDate 
+	 保质期单位：FKFPeriodUnit 
+	 保质期：FKFPeriod 
+	 有效期至：FExpiryDate 
+	 保管者类型：FKeeperTypeId  (必填项)
+	 保管者：FKeeperId  (必填项)
+	 货主类型：FOwnerTypeId  (必填项)
+	 货主：FOwnerId  (必填项)
+	 备注：FENote 
+	 辅助属性：FAUXPROPID 
+	 转换类型：FConvertType  (必填项)
+	 计划跟踪号：FMtono 
+	 项目编号：FProjectNo 
+	 库存更新标志：FStockFlag 
+	 批号：FLot 
+	 即时库存：FInvQty 
+	 对应转换前分录ID：FConvertEntryID 
+	 入库日期：FBusinessDate 
+	 序列号单位：FSNUnitID 
+	 序列号单位数量：FSNQty 
+	 辅单位：FExtAuxUnitId 
+	 转换数量（辅单位）：FExtAuxUnitQty 
+	 供应商批号：FSupplierLot 
+序列号子单据体：FSerialSubEntity 
+	 实体主键：FDetailID 
+	 序列号：FSerialNo 
+	 序列号：FSerialId 
+	 备注：FSerialNote 

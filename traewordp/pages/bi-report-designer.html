@@ -1,0 +1,2603 @@
+<!DOCTYPE html>
+
+
+
+<html lang="zh-CN">
+
+
+
+<head>
+
+
+
+<meta charset="UTF-8">
+
+
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+
+
+<title>报表设计器 — 磐枢工业智能平台</title>
+
+
+
+<link rel="stylesheet" href="../common.css">
+
+
+
+<script src="../common.js"></script>
+<script>
+</script>
+
+
+
+<style>
+
+
+
+
+
+
+
+.toast-container {
+
+
+
+  position: fixed;
+
+
+
+  top: 60px;
+
+
+
+  right: 20px;
+
+
+
+  z-index: 1000;
+
+
+
+  display: flex;
+
+
+
+  flex-direction: column;
+
+
+
+  gap: 8px;
+
+
+
+}
+
+
+
+.toast {
+
+
+
+  padding: 12px 16px;
+
+
+
+  border-radius: var(--radius-md);
+
+
+
+  font-size: 13px;
+
+
+
+  color: var(--text-primary);
+
+
+
+  min-width: 280px;
+
+
+
+  max-width: 400px;
+
+
+
+  display: flex;
+
+
+
+  align-items: center;
+
+
+
+  gap: 8px;
+
+
+
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+
+
+
+  animation: toastIn 0.3s ease;
+
+
+
+}
+
+
+
+@keyframes toastIn {
+
+
+
+  from { opacity: 0; transform: translateX(100%); }
+
+
+
+  to { opacity: 1; transform: translateX(0); }
+
+
+
+}
+
+
+
+.toast-success { background: rgba(34,197,94,0.9); }
+
+
+
+.toast-error { background: rgba(239,68,68,0.9); }
+
+
+
+.toast-warning { background: rgba(234,179,8,0.9); }
+
+
+
+.toast-info { background: rgba(6,182,212,0.9); }
+
+
+
+.toast-icon { font-size: 16px; }
+
+
+
+
+
+
+
+.confirm-modal-overlay {
+
+
+
+  position: fixed;
+
+
+
+  inset: 0;
+
+
+
+  background: rgba(0,0,0,0.6);
+
+
+
+  display: none;
+
+
+
+  align-items: center;
+
+
+
+  justify-content: center;
+
+
+
+  z-index: 2000;
+
+
+
+}
+
+
+
+.confirm-modal-overlay.show { display: flex; }
+
+
+
+.confirm-modal {
+
+
+
+  background: var(--bg-surface);
+
+
+
+  border: 1px solid var(--border-normal);
+
+
+
+  border-radius: var(--radius-lg);
+
+
+
+  padding: 24px;
+
+
+
+  min-width: 360px;
+
+
+
+  max-width: 480px;
+
+
+
+  box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+
+
+
+}
+
+
+
+.confirm-modal-header {
+
+
+
+  font-size: 14px;
+
+
+
+  font-weight: 600;
+
+
+
+  color: var(--text-primary);
+
+
+
+  margin-bottom: 12px;
+
+
+
+}
+
+
+
+.confirm-modal-body {
+
+
+
+  font-size: 13px;
+
+
+
+  color: var(--text-secondary);
+
+
+
+  line-height: 1.6;
+
+
+
+  margin-bottom: 20px;
+
+
+
+}
+
+
+
+.confirm-modal-footer {
+
+
+
+  display: flex;
+
+
+
+  justify-content: flex-end;
+
+
+
+  gap: 8px;
+
+
+
+}
+
+
+
+
+
+
+
+<style>
+
+
+
+.designer-layout { display: flex; height: calc(100vh - 56px); }
+
+
+
+.panel-left { width: 280px; background: var(--bg-surface); border-right: 1px solid var(--border-normal); display: flex; flex-direction: column; flex-shrink: 0; }
+
+
+
+.panel-center { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+
+
+
+.panel-right { width: 320px; background: var(--bg-surface); border-left: 1px solid var(--border-normal); display: flex; flex-direction: column; flex-shrink: 0; overflow-y: auto; }
+
+
+
+.panel-header { padding: 12px 14px; border-bottom: 1px solid var(--border-normal); font-size: 13px; font-weight: 600; color: var(--text-primary); display: flex; align-items: center; justify-content: space-between; }
+
+
+
+.panel-body { flex: 1; overflow-y: auto; padding: 8px; }
+
+
+
+.data-source-tree { font-size: 12px; }
+
+
+
+.tree-node { padding: 6px 10px; cursor: pointer; border-radius: var(--radius-sm); display: flex; align-items: center; gap: 6px; color: var(--text-secondary); }
+
+
+
+.tree-node:hover { background: rgba(56,189,248,0.06); }
+
+
+
+.tree-node.active { background: rgba(56,189,248,0.12); color: var(--text-accent); }
+
+
+
+.tree-node .expand-icon { font-size: 10px; color: var(--text-tertiary); }
+
+
+
+.tree-node .field-icon { font-size: 11px; color: var(--text-tertiary); }
+
+
+
+.tree-node .field-type { font-size: 10px; color: var(--text-tertiary); margin-left: auto; }
+
+
+
+.canvas-toolbar { padding: 8px 12px; background: var(--bg-inset); border-bottom: 1px solid var(--border-normal); display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
+
+
+
+.canvas-toolbar .tool-btn { padding: 6px 12px; font-size: 12px; border: 1px solid var(--border-normal); border-radius: var(--radius-sm); background: transparent; color: var(--text-secondary); cursor: pointer; display: flex; align-items: center; gap: 4px; transition: all var(--transition); }
+
+
+
+.canvas-toolbar .tool-btn:hover { background: var(--bg-raised); border-color: var(--border-strong); }
+
+
+
+.canvas-toolbar .tool-btn.active { background: var(--text-accent); color: #0a0e1a; border-color: var(--text-accent); }
+
+
+
+.canvas-area { flex: 1; background: var(--bg-base); overflow: auto; padding: 20px; }
+
+
+
+.report-canvas { width: 800px; min-height: 600px; background: var(--bg-surface); border: 1px dashed var(--border-normal); border-radius: var(--radius-md); margin: 0 auto; padding: 24px; position: relative; }
+
+
+
+.report-canvas .canvas-header { text-align: center; margin-bottom: 20px; }
+
+
+
+.report-canvas .canvas-header h3 { font-size: 18px; color: var(--text-primary); }
+
+
+
+.report-canvas .canvas-header p { font-size: 12px; color: var(--text-tertiary); margin-top: 4px; }
+
+
+
+.canvas-element { background: var(--bg-inset); border: 1px solid var(--border-normal); border-radius: var(--radius-sm); padding: 12px; margin-bottom: 16px; }
+
+
+
+.canvas-element .element-title { font-size: 12px; color: var(--text-tertiary); margin-bottom: 8px; }
+
+
+
+.prop-section { margin-bottom: 16px; }
+
+
+
+.prop-section-title { font-size: 12px; font-weight: 600; color: var(--text-tertiary); margin-bottom: 8px; padding-bottom: 4px; border-bottom: 1px solid var(--border-normal); }
+
+
+
+.prop-item { margin-bottom: 10px; }
+
+
+
+.prop-item label { font-size: 11px; color: var(--text-tertiary); display: block; margin-bottom: 4px; }
+
+
+
+.prop-item input, .prop-item select, .prop-item textarea { width: 100%; padding: 6px 8px; font-size: 12px; background: var(--bg-inset); border: 1px solid var(--border-normal); border-radius: var(--radius-sm); color: var(--text-primary); outline: none; }
+
+
+
+.prop-item input:focus, .prop-item select:focus, .prop-item textarea:focus { border-color: var(--text-accent); }
+
+
+
+.prop-item textarea { min-height: 60px; resize: vertical; }
+
+
+
+.prop-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+
+
+
+.prop-checkbox { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--text-secondary); }
+
+
+
+.prop-checkbox input { width: auto; }
+
+
+
+.list-section { background: var(--bg-surface); border: 1px solid var(--border-normal); border-radius: var(--radius-md); overflow: hidden; }
+
+
+
+.list-section-header { padding: 12px 16px; border-bottom: 1px solid var(--border-normal); font-size: 14px; font-weight: 600; color: var(--text-primary); display: flex; align-items: center; justify-content: space-between; }
+
+
+
+
+.lookup-modal { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:2000; justify-content:center; align-items:center; }
+.lookup-modal.show { display:flex; }
+.lookup-dialog { background:#fff; border:1px solid #e8e8e8; border-radius:4px; width:720px; max-height:70vh; overflow:hidden; }
+.lookup-header { padding:14px 20px; border-bottom:1px solid #e8e8e8; display:flex; align-items:center; justify-content:space-between; }
+.lookup-title { font-size:15px; font-weight:600; color:#333; }
+.lookup-close { font-size:20px; color:#666; cursor:pointer; background:none; border:none; }
+.lookup-close:hover { color:#333; }
+.lookup-body { padding:16px; }
+.lookup-search { display:flex; gap:8px; margin-bottom:12px; }
+.lookup-search input { flex:1; padding:6px 10px; border:1px solid #e8e8e8; border-radius:4px; font-size:13px; }
+.lookup-search button { padding:6px 16px; background:#1890ff; color:#fff; border:none; border-radius:4px; cursor:pointer; }
+.lookup-table { width:100%; border-collapse:collapse; font-size:13px; }
+.lookup-table th, .lookup-table td { padding:10px 12px; text-align:left; border-bottom:1px solid #e8e8e8; }
+.lookup-table th { background:#fafafa; font-weight:600; color:#333; }
+.lookup-table tr:hover { background:#f5f5f5; }
+.lookup-table .checkbox-cell { width:40px; }
+.lookup-footer { padding:12px 20px; border-top:1px solid #e8e8e8; display:flex; justify-content:flex-end; gap:8px; }
+.lookup-field { display:flex; align-items:center; }
+.lookup-field input { flex:1; padding:6px 10px; border:1px solid #e8e8e8; border-radius:4px 0 0 4px; font-size:13px; }
+.lookup-field button { width:28px; height:28px; border:1px solid #e8e8e8; border-left:none; border-radius:0 4px 4px 0; background:#fff; cursor:pointer; display:flex; align-items:center; justify-content:center; }
+.lookup-field button:hover { background:#f5f5f5; }
+
+</style>
+
+
+
+</head>
+
+
+
+</style>
+
+<body>
+
+
+
+
+
+
+
+<aside class="sidebar" id="sidebar">
+
+
+
+<div class="sidebar-logo">
+
+
+
+    <img src="../images/logo.png" alt="磐枢工业智能平台" style="width: 100%; max-width: 200px; margin-bottom: 8px;">
+
+
+
+    <h1 style="font-size: 16px; margin: 0;">磐枢工业智能平台</h1>
+
+
+
+  </div>
+
+
+
+  <nav class="sidebar-menu"></nav>
+
+
+
+<div class="sidebar-user"><div class="avatar">管</div>
+
+
+
+</aside>
+
+
+
+
+
+
+
+<div class="main-content" id="mainContent">
+
+
+
+  <div class="page-header" style="position:sticky;top:0;z-index:100;">
+
+
+
+    <div>
+
+
+
+      <div class="flex items-center gap-8">
+
+
+
+        <button class="sidebar-toggle" onclick="toggleSidebar()">&#9776;</button>
+
+
+
+        <div>
+
+
+
+          <h2>报表设计器</h2>
+
+
+
+          <div class="breadcrumb"><a href="../index.html">首页</a><span>></span><span>BI智能分析</span><span>></span><span>自定义报表</span><span>></span><span>报表设计器</span></div></div>
+
+
+
+        </div>
+
+
+
+      </div>
+
+
+
+    </div>
+
+
+
+    <div class="page-actions">
+
+
+
+      <button class="btn btn-primary" onclick="openModal('newReportModal')">+ 新建报表</button>
+      </div>
+
+
+
+  </div>
+
+
+
+
+
+
+
+  <div class="designer-layout">
+
+
+
+    <div class="panel-left">
+
+
+
+      <div class="panel-header">数据源</div>
+
+
+
+      <div class="panel-body">
+
+
+
+        <div class="data-source-tree" id="dataSourceTree">
+
+
+
+          <div class="tree-node" onclick="toggleDataSource(this)">
+
+
+
+            <span class="expand-icon">▸</span><span>销售订单</span>
+
+
+
+          </div>
+
+
+
+          <div class="sub-tree" style="display:none;padding-left:16px;">
+
+
+
+            <div class="tree-node"><span class="field-icon">A</span><span>订单号</span><span class="field-type">字符串</span></div>
+
+
+
+            <div class="tree-node"><span class="field-icon">A</span><span>客户名称</span><span class="field-type">字符串</span></div>
+
+
+
+            <div class="tree-node"><span class="field-icon">N</span><span>订单金额</span><span class="field-type">数值</span></div>
+
+
+
+            <div class="tree-node"><span class="field-icon">D</span><span>订单日期</span><span class="field-type">日期</span></div>
+
+
+
+            <div class="tree-node"><span class="field-icon">N</span><span>数量</span><span class="field-type">数值</span></div>
+
+
+
+            <div class="tree-node"><span class="field-icon">A</span><span>业务员</span><span class="field-type">字符串</span></div>
+
+
+
+            <div class="tree-node"><span class="field-icon">A</span><span>状态</span><span class="field-type">字符串</span></div>
+
+
+
+          </div>
+
+
+
+          <div class="tree-node" onclick="toggleDataSource(this)">
+
+
+
+            <span class="expand-icon">▸</span><span>采购订单</span>
+
+
+
+          </div>
+
+
+
+          <div class="sub-tree" style="display:none;padding-left:16px;">
+
+
+
+            <div class="tree-node"><span class="field-icon">A</span><span>订单号</span><span class="field-type">字符串</span></div>
+
+
+
+            <div class="tree-node"><span class="field-icon">A</span><span>供应商名称</span><span class="field-type">字符串</span></div>
+
+
+
+            <div class="tree-node"><span class="field-icon">N</span><span>订单金额</span><span class="field-type">数值</span></div>
+
+
+
+            <div class="tree-node"><span class="field-icon">D</span><span>订单日期</span><span class="field-type">日期</span></div>
+
+
+
+            <div class="tree-node"><span class="field-icon">N</span><span>数量</span><span class="field-type">数值</span></div>
+
+
+
+          </div>
+
+
+
+          <div class="tree-node" onclick="toggleDataSource(this)">
+
+
+
+            <span class="expand-icon">▸</span><span>库存</span>
+
+
+
+          </div>
+
+
+
+          <div class="sub-tree" style="display:none;padding-left:16px;">
+
+
+
+            <div class="tree-node"><span class="field-icon">A</span><span>物料编码</span><span class="field-type">字符串</span></div>
+
+
+
+            <div class="tree-node"><span class="field-icon">A</span><span>物料名称</span><span class="field-type">字符串</span></div>
+
+
+
+            <div class="tree-node"><span class="field-icon">N</span><span>库存数量</span><span class="field-type">数值</span></div>
+
+
+
+            <div class="tree-node"><span class="field-icon">N</span><span>库存金额</span><span class="field-type">数值</span></div>
+
+
+
+            <div class="tree-node"><span class="field-icon">A</span><span>仓库</span><span class="field-type">字符串</span></div>
+
+
+
+          </div>
+
+
+
+          <div class="tree-node" onclick="toggleDataSource(this)">
+
+
+
+            <span class="expand-icon">▸</span><span>生产工单</span>
+
+
+
+          </div>
+
+
+
+          <div class="sub-tree" style="display:none;padding-left:16px;">
+
+
+
+            <div class="tree-node"><span class="field-icon">A</span><span>工单号</span><span class="field-type">字符串</span></div>
+
+
+
+            <div class="tree-node"><span class="field-icon">A</span><span>产品名称</span><span class="field-type">字符串</span></div>
+
+
+
+            <div class="tree-node"><span class="field-icon">N</span><span>计划数量</span><span class="field-type">数值</span></div>
+
+
+
+            <div class="tree-node"><span class="field-icon">N</span><span>完成数量</span><span class="field-type">数值</span></div>
+
+
+
+            <div class="tree-node"><span class="field-icon">D</span><span>开工日期</span><span class="field-type">日期</span></div>
+
+
+
+            <div class="tree-node"><span class="field-icon">D</span><span>完工日期</span><span class="field-type">日期</span></div>
+
+
+
+          </div>
+
+
+
+          <div class="tree-node" onclick="toggleDataSource(this)">
+
+
+
+            <span class="expand-icon">▸</span><span>财务凭证</span>
+
+
+
+          </div>
+
+
+
+          <div class="sub-tree" style="display:none;padding-left:16px;">
+
+
+
+            <div class="tree-node"><span class="field-icon">A</span><span>凭证号</span><span class="field-type">字符串</span></div>
+
+
+
+            <div class="tree-node"><span class="field-icon">D</span><span>凭证日期</span><span class="field-type">日期</span></div>
+
+
+
+            <div class="tree-node"><span class="field-icon">N</span><span>借方金额</span><span class="field-type">数值</span></div>
+
+
+
+            <div class="tree-node"><span class="field-icon">N</span><span>贷方金额</span><span class="field-type">数值</span></div>
+
+
+
+            <div class="tree-node"><span class="field-icon">A</span><span>科目名称</span><span class="field-type">字符串</span></div>
+
+
+
+          </div>
+
+
+
+          <div class="tree-node" onclick="toggleDataSource(this)">
+
+
+
+            <span class="expand-icon">▸</span><span>客户</span>
+
+
+
+          </div>
+
+
+
+          <div class="sub-tree" style="display:none;padding-left:16px;">
+
+
+
+            <div class="tree-node"><span class="field-icon">A</span><span>客户编码</span><span class="field-type">字符串</span></div>
+
+
+
+            <div class="tree-node"><span class="field-icon">A</span><span>客户名称</span><span class="field-type">字符串</span></div>
+
+
+
+            <div class="tree-node"><span class="field-icon">A</span><span>所属地区</span><span class="field-type">字符串</span></div>
+
+
+
+            <div class="tree-node"><span class="field-icon">N</span><span>累计交易额</span><span class="field-type">数值</span></div>
+
+
+
+            <div class="tree-node"><span class="field-icon">A</span><span>客户等级</span><span class="field-type">字符串</span></div>
+
+
+
+          </div>
+
+
+
+          <div class="tree-node" onclick="toggleDataSource(this)">
+
+
+
+            <span class="expand-icon">▸</span><span>供应商</span>
+
+
+
+          </div>
+
+
+
+          <div class="sub-tree" style="display:none;padding-left:16px;">
+
+
+
+            <div class="tree-node"><span class="field-icon">A</span><span>供应商编码</span><span class="field-type">字符串</span></div>
+
+
+
+            <div class="tree-node"><span class="field-icon">A</span><span>供应商名称</span><span class="field-type">字符串</span></div>
+
+
+
+            <div class="tree-node"><span class="field-icon">A</span><span>所属地区</span><span class="field-type">字符串</span></div>
+
+
+
+            <div class="tree-node"><span class="field-icon">N</span><span>累计采购额</span><span class="field-type">数值</span></div>
+
+
+
+          </div>
+
+
+
+        </div>
+
+
+
+      </div>
+
+
+
+    </div>
+
+
+
+
+
+
+
+    <div class="panel-center">
+
+
+
+      <div class="canvas-toolbar">
+
+
+
+        <button class="tool-btn active" onclick="selectTool('table')"><span>▦</span>表格</button>
+
+
+
+        <button class="tool-btn" onclick="selectTool('chart')"><span>📊</span>图表</button>
+
+
+
+        <button class="tool-btn" onclick="selectTool('text')"><span>T</span>文本</button>
+
+
+
+        <button class="tool-btn" onclick="selectTool('image')"><span>🖼️</span>图片</button>
+
+
+
+        <span style="width:1px;height:20px;background:var(--border-normal);margin:0 4px;"></span>
+
+
+
+        <button class="tool-btn" onclick="previewReport()"><span>👁️</span>预览</button>
+
+
+
+        <button class="tool-btn" onclick="saveReport()"><span>💾</span>保存</button>
+
+
+
+        <button class="tool-btn" onclick="exportReport()"><span>📥</span>导出</button>
+
+
+
+      </div>
+
+
+
+      <div class="canvas-area">
+
+
+
+        <div class="report-canvas">
+
+
+
+          <div class="canvas-header">
+
+
+
+            <h3>销售订单统计表</h3>
+
+
+
+            <p>统计周期：2026年7月</p>
+
+
+
+          </div>
+
+
+
+          <div class="canvas-element">
+
+
+
+            <div class="element-title">订单明细表</div>
+
+
+
+            <table class="data-table" style="font-size:12px;">
+
+
+
+              <thead><tr>
+
+
+
+                <th>订单号</th><th>客户名称</th><th style="text-align:right">订单金额</th><th>订单日期</th><th>状态</th>
+
+
+
+              </tr></thead>
+
+
+
+              <tbody>
+
+
+
+                <tr><td>SO-2026-0001</td><td>深圳测试公司</td><td style="text-align:right;font-family:var(--font-mono)">328,500.00</td><td>2026-07-02</td><td><span class="badge badge-success">已审</span></td></tr>
+
+
+
+                <tr><td>SO-2026-0002</td><td>上海汽车集团股份有限公司</td><td style="text-align:right;font-family:var(--font-mono)">156,800.00</td><td>2026-07-03</td><td><span class="badge badge-warning">待审</span></td></tr>
+
+
+
+                <tr><td>SO-2026-0003</td><td>北京字节跳动科技有限公司</td><td style="text-align:right;font-family:var(--font-mono)">512,000.00</td><td>2026-07-04</td><td><span class="badge badge-success">已审</span></td></tr>
+
+
+
+                <tr><td>SO-2026-0004</td><td>广州美的集团有限公司</td><td style="text-align:right;font-family:var(--font-mono)">89,600.00</td><td>2026-07-05</td><td><span class="badge badge-info">已出库</span></td></tr>
+
+
+
+                <tr><td>SO-2026-0005</td><td>成都腾讯科技有限公司</td><td style="text-align:right;font-family:var(--font-mono)">245,000.00</td><td>2026-07-06</td><td><span class="badge badge-warning">待审</span></td></tr>
+
+
+
+              </tbody>
+
+
+
+            </table>
+
+
+
+          </div>
+
+
+
+          <div class="canvas-element">
+
+
+
+            <div class="element-title">订单金额汇总</div>
+
+
+
+            <div style="height:200px;background:var(--bg-base);border-radius:var(--radius-sm);display:flex;align-items:center;justify-content:center;color:var(--text-tertiary);font-size:13px;">
+
+
+
+              [柱状图预览区域]
+
+
+
+            </div>
+
+
+
+          </div>
+
+
+
+        </div>
+
+
+
+      </div>
+
+
+
+    </div>
+
+
+
+
+
+
+
+    <div class="panel-right">
+
+
+
+      <div class="panel-header">
+
+
+
+        <span>属性面板</span>
+
+
+
+        <span style="font-size:11px;color:var(--text-tertiary)">订单明细表</span>
+
+
+
+      </div>
+
+
+
+      <div class="panel-body">
+
+
+
+        <div class="tabs">
+
+
+
+          <span class="tab-item active" onclick="switchTab(this)">报表属性</span>
+
+
+
+          <span class="tab-item" onclick="switchTab(this)">表格属性</span>
+
+
+
+          <span class="tab-item" onclick="switchTab(this)">图表属性</span>
+
+
+
+        </div>
+
+
+
+        <div class="tab-content">
+
+
+
+          <div class="tab-pane active" id="tab-report">
+
+
+
+            <div class="prop-section">
+
+
+
+              <div class="prop-section-title">基本信息</div>
+
+
+
+              <div class="prop-item">
+
+
+
+                <label>报表名称</label>
+
+
+
+                <input type="text" value="销售订单统计表">
+
+
+
+              </div>
+
+
+
+              <div class="prop-item">
+
+
+
+                <label>报表描述</label>
+
+
+
+                <textarea>统计销售订单的金额、数量等关键指标</textarea>
+
+
+
+              </div>
+
+
+
+            </div>
+
+
+
+            <div class="prop-section">
+
+
+
+              <div class="prop-section-title">数据源</div>
+
+
+
+              <div class="prop-item">
+
+
+
+                <label>主数据源</label>
+
+
+
+                <select>
+
+
+
+                  <option>销售订单</option>
+
+
+
+                  <option>采购订单</option>
+
+
+
+                  <option>库存</option>
+
+
+
+                  <option>生产工单</option>
+
+
+
+                </select>
+
+
+
+              </div>
+
+
+
+            </div>
+
+
+
+            <div class="prop-section">
+
+
+
+              <div class="prop-section-title">查询条件</div>
+
+
+
+              <div class="prop-item">
+
+
+
+                <label>订单日期范围</label>
+
+
+
+                <div class="prop-row">
+
+
+
+                  <input type="date" value="2026-07-01">
+
+
+
+                  <input type="date" value="2026-07-31">
+
+
+
+                </div>
+
+
+
+              </div>
+
+
+
+              <div class="prop-item">
+
+
+
+                <label>订单状态</label>
+
+
+
+                <select>
+
+
+
+                  <option>全部</option>
+
+
+
+                  <option>已审</option>
+
+
+
+                  <option>待审</option>
+
+
+
+                  <option>已出库</option>
+
+
+
+                </select>
+
+
+
+              </div>
+
+
+
+            </div>
+
+
+
+          </div>
+
+
+
+          <div class="tab-pane" id="tab-table">
+
+
+
+            <div class="prop-section">
+
+
+
+              <div class="prop-section-title">列配置</div>
+
+
+
+              <div class="prop-item">
+
+
+
+                <label>显示列</label>
+
+
+
+                <select multiple style="height:100px;">
+
+
+
+                  <option selected>订单号</option>
+
+
+
+                  <option selected>客户名称</option>
+
+
+
+                  <option selected>订单金额</option>
+
+
+
+                  <option selected>订单日期</option>
+
+
+
+                  <option selected>状态</option>
+
+
+
+                  <option>业务员</option>
+
+
+
+                  <option>数量</option>
+
+
+
+                </select>
+
+
+
+              </div>
+
+
+
+            </div>
+
+
+
+            <div class="prop-section">
+
+
+
+              <div class="prop-section-title">排序</div>
+
+
+
+              <div class="prop-item">
+
+
+
+                <label>排序字段</label>
+
+
+
+                <select>
+
+
+
+                  <option>订单日期</option>
+
+
+
+                  <option>订单金额</option>
+
+
+
+                  <option>客户名称</option>
+
+
+
+                </select>
+
+
+
+              </div>
+
+
+
+              <div class="prop-item">
+
+
+
+                <label>排序方式</label>
+
+
+
+                <select>
+
+
+
+                  <option>升序</option>
+
+
+
+                  <option>降序</option>
+
+
+
+                </select>
+
+
+
+              </div>
+
+
+
+            </div>
+
+
+
+            <div class="prop-section">
+
+
+
+              <div class="prop-section-title">分组汇总</div>
+
+
+
+              <div class="prop-checkbox"><input type="checkbox" checked><span>启用分组</span></div>
+
+
+
+              <div class="prop-item">
+
+
+
+                <label>分组字段</label>
+
+
+
+                <select>
+
+
+
+                  <option>客户名称</option>
+
+
+
+                  <option>业务员</option>
+
+
+
+                  <option>订单日期</option>
+
+
+
+                </select>
+
+
+
+              </div>
+
+
+
+              <div class="prop-checkbox"><input type="checkbox" checked><span>显示汇总行</span></div>
+
+
+
+              <div class="prop-item">
+
+
+
+                <label>汇总方式</label>
+
+
+
+                <select>
+
+
+
+                  <option>求和</option>
+
+
+
+                  <option>平均值</option>
+
+
+
+                  <option>最大值</option>
+
+
+
+                  <option>最小值</option>
+
+
+
+                </select>
+
+
+
+              </div>
+
+
+
+            </div>
+
+
+
+          </div>
+
+
+
+          <div class="tab-pane" id="tab-chart">
+
+
+
+            <div class="prop-section">
+
+
+
+              <div class="prop-section-title">图表类型</div>
+
+
+
+              <div class="prop-item">
+
+
+
+                <select>
+
+
+
+                  <option>柱状图</option>
+
+
+
+                  <option>折线图</option>
+
+
+
+                  <option>饼图</option>
+
+
+
+                  <option>面积图</option>
+
+
+
+                  <option>散点图</option>
+
+
+
+                </select>
+
+
+
+              </div>
+
+
+
+            </div>
+
+
+
+            <div class="prop-section">
+
+
+
+              <div class="prop-section-title">数据系列</div>
+
+
+
+              <div class="prop-item">
+
+
+
+                <label>类别字段</label>
+
+
+
+                <select>
+
+
+
+                  <option>客户名称</option>
+
+
+
+                  <option>订单日期</option>
+
+
+
+                  <option>产品类别</option>
+
+
+
+                </select>
+
+
+
+              </div>
+
+
+
+              <div class="prop-item">
+
+
+
+                <label>数值字段</label>
+
+
+
+                <select>
+
+
+
+                  <option>订单金额</option>
+
+
+
+                  <option>数量</option>
+
+
+
+                  <option>利润</option>
+
+
+
+                </select>
+
+
+
+              </div>
+
+
+
+            </div>
+
+
+
+            <div class="prop-section">
+
+
+
+              <div class="prop-section-title">坐标轴</div>
+
+
+
+              <div class="prop-item">
+
+
+
+                <label>X轴标题</label>
+
+
+
+                <input type="text" value="客户名称">
+
+
+
+              </div>
+
+
+
+              <div class="prop-item">
+
+
+
+                <label>Y轴标题</label>
+
+
+
+                <input type="text" value="订单金额(元)">
+
+
+
+              </div>
+
+
+
+              <div class="prop-checkbox"><input type="checkbox" checked><span>显示网格线</span></div>
+
+
+
+            </div>
+
+
+
+            <div class="prop-section">
+
+
+
+              <div class="prop-section-title">样式</div>
+
+
+
+              <div class="prop-item">
+
+
+
+                <label>图表标题</label>
+
+
+
+                <input type="text" value="订单金额汇总">
+
+
+
+              </div>
+
+
+
+              <div class="prop-checkbox"><input type="checkbox" checked><span>显示图例</span></div>
+
+
+
+              <div class="prop-checkbox"><input type="checkbox"><span>显示数据标签</span></div>
+
+
+
+            </div>
+
+
+
+          </div>
+
+
+
+        </div>
+
+
+
+      </div>
+
+
+
+    </div>
+
+
+
+  </div>
+
+
+
+
+
+
+
+  <div style="padding:20px 24px;">
+
+
+
+    <div class="list-section">
+
+
+
+      <div class="list-section-header">
+
+
+
+        <span>报表列表</span>
+
+
+
+        <button class="btn btn-primary btn-sm" onclick="openModal('newReportModal')">+ 新建报表</button>
+
+
+
+      </div>
+
+
+
+      <div class="list-table-area" style="height:300px;">
+
+
+
+        <table class="data-table">
+
+
+
+          <thead><tr>
+
+
+
+            <th>报表名称</th>
+
+
+
+            <th>数据源</th>
+
+
+
+            <th>创建时间</th>
+
+
+
+            <th>状态</th>
+
+
+
+            <th>操作</th>
+
+
+
+          </tr></thead>
+
+
+
+          <tbody>
+
+
+
+            <tr><td><a href="#">销售订单统计表</a></td><td>销售订单</td><td>2026-07-01 10:30</td><td><span class="badge badge-success">已发布</span></td><td class="row-action-links"><a href="#">编辑</a><a href="#">预览</a><a href="#">复制</a><a href="#">删除</a></td></tr>
+
+
+
+            <tr><td><a href="#">采购订单汇总表</a></td><td>采购订单</td><td>2026-07-02 14:15</td><td><span class="badge badge-success">已发布</span></td><td class="row-action-links"><a href="#">编辑</a><a href="#">预览</a><a href="#">复制</a><a href="#">删除</a></td></tr>
+
+
+
+            <tr><td><a href="#">库存盘点报表</a></td><td>库存</td><td>2026-07-03 09:20</td><td><span class="badge badge-warning">草稿</span></td><td class="row-action-links"><a href="#">编辑</a><a href="#">预览</a><a href="#">复制</a><a href="#">删除</a></td></tr>
+
+
+
+            <tr><td><a href="#">生产工单执行报表</a></td><td>生产工单</td><td>2026-07-04 16:45</td><td><span class="badge badge-success">已发布</span></td><td class="row-action-links"><a href="#">编辑</a><a href="#">预览</a><a href="#">复制</a><a href="#">删除</a></td></tr>
+
+
+
+            <tr><td><a href="#">财务凭证汇总表</a></td><td>财务凭证</td><td>2026-07-05 11:00</td><td><span class="badge badge-success">已发布</span></td><td class="row-action-links"><a href="#">编辑</a><a href="#">预览</a><a href="#">复制</a><a href="#">删除</a></td></tr>
+
+
+
+            <tr><td><a href="#">客户销售分析报表</a></td><td>客户、销售订单</td><td>2026-07-06 13:30</td><td><span class="badge badge-warning">草稿</span></td><td class="row-action-links"><a href="#">编辑</a><a href="#">预览</a><a href="#">复制</a><a href="#">删除</a></td></tr>
+
+
+
+            <tr><td><a href="#">供应商采购报表</a></td><td>供应商、采购订单</td><td>2026-07-07 15:20</td><td><span class="badge badge-info">已提交</span></td><td class="row-action-links"><a href="#">编辑</a><a href="#">预览</a><a href="#">复制</a><a href="#">删除</a></td></tr>
+
+
+
+            <tr><td><a href="#">月度销售趋势报表</a></td><td>销售订单</td><td>2026-07-08 10:10</td><td><span class="badge badge-success">已发布</span></td><td class="row-action-links"><a href="#">编辑</a><a href="#">预览</a><a href="#">复制</a><a href="#">删除</a></td></tr>
+
+
+
+            <tr><td><a href="#">成本分析报表</a></td><td>财务凭证、生产工单</td><td>2026-07-09 14:00</td><td><span class="badge badge-warning">草稿</span></td><td class="row-action-links"><a href="#">编辑</a><a href="#">预览</a><a href="#">复制</a><a href="#">删除</a></td></tr>
+
+
+
+            <tr><td><a href="#">库存周转率报表</a></td><td>库存、销售订单</td><td>2026-07-10 09:30</td><td><span class="badge badge-success">已发布</span></td><td class="row-action-links"><a href="#">编辑</a><a href="#">预览</a><a href="#">复制</a><a href="#">删除</a></td></tr>
+
+
+
+          </tbody>
+
+
+
+        </table>
+
+
+
+      </div>
+
+
+
+      <div class="list-pagination">
+
+
+
+        <span class="page-info">共 25 条记录，第 1/3 页</span>
+
+
+
+        <div class="page-btns">
+
+
+
+          <button>&lt; 上一页</button>
+
+
+
+          <button class="active">1</button>
+
+
+
+          <button>2</button>
+
+
+
+          <button>3</button>
+
+
+
+          <button>下一页 &gt;</button>
+
+
+
+        </div>
+
+
+
+      </div>
+
+
+
+    </div>
+
+
+
+  </div>
+
+
+
+
+
+
+
+  <div class="modal-overlay" id="newReportModal">
+
+
+
+    <div class="modal-dialog">
+
+
+
+      <div class="modal-header">
+
+
+
+        <h3>新建报表</h3>
+
+
+
+        <button class="modal-close" onclick="closeModal('newReportModal')">&times;</button>
+
+
+
+      </div>
+
+
+
+      <div class="modal-body">
+
+
+
+        <div class="prop-section">
+
+
+
+          <div class="prop-section-title">基本信息</div>
+
+
+
+          <div class="prop-item">
+
+
+
+            <label>报表名称</label>
+
+
+
+            <input type="text" placeholder="请输入报表名称">
+
+
+
+          </div>
+
+
+
+          <div class="prop-item">
+
+
+
+            <label>报表描述</label>
+
+
+
+            <textarea placeholder="请输入报表描述"></textarea>
+
+
+
+          </div>
+
+
+
+        </div>
+
+
+
+        <div class="prop-section">
+
+
+
+          <div class="prop-section-title">数据源设置</div>
+
+
+
+          <div class="prop-item">
+
+
+
+            <label>选择数据源</label>
+
+
+
+            <select multiple style="height:150px;">
+
+
+
+              <option>销售订单</option>
+
+
+
+              <option>采购订单</option>
+
+
+
+              <option>库存</option>
+
+
+
+              <option>生产工单</option>
+
+
+
+              <option>财务凭证</option>
+
+
+
+              <option>客户</option>
+
+
+
+              <option>供应商</option>
+
+
+
+            </select>
+
+
+
+          </div>
+
+
+
+        </div>
+
+
+
+      </div>
+
+
+
+      <div class="modal-footer">
+
+
+
+        <button class="btn btn-ghost" onclick="closeModal('newReportModal')">取消</button>
+
+
+
+        <button class="btn btn-primary" onclick="closeModal('newReportModal')">确定</button>
+
+
+
+      </div>
+
+
+
+    </div>
+
+
+
+  </div>
+
+
+
+</div>
+
+
+
+
+
+
+
+<script>
+
+
+
+
+
+
+
+
+
+
+;
+
+
+
+  toast.className = 'toast toast-' + (type || 'info');
+
+
+
+  toast.innerHTML = '<span class="toast-icon">' + (icons[type] || icons.info) + '</span><span>' + message + '</span>';
+
+
+
+container.appendChild(toast);
+
+
+
+}
+
+
+
+  setTimeout(function() { toast.remove(); }, 3000);
+function closeConfirmModal() {
+
+
+
+  document.getElementById('confirmModal').classList.remove('show');
+
+
+
+  confirmCallback = null;
+
+
+
+
+
+
+
+}
+
+
+
+function confirmOk() {
+
+
+
+  if (confirmCallback) {
+
+
+
+    confirmCallback();
+
+
+
+  }
+
+
+
+  closeConfirmModal();
+
+
+
+}
+
+
+
+
+
+
+
+function openModal(id){document.getElementById(id).classList.add('show');}
+
+
+
+function closeModal(id){document.getElementById(id).classList.remove('show');}
+
+
+
+document.querySelectorAll('.modal-overlay').forEach(function(ov){ov.addEventListener('click',function(e){if(e.target===ov)ov.classList.remove('show');});});
+
+
+
+
+
+
+
+function toggleDataSource(el) {
+
+
+
+  var sub = el.nextElementSibling;
+
+
+
+  var icon = el.querySelector('.expand-icon');
+
+
+
+  if (sub && sub.classList.contains('sub-tree')) {
+
+
+
+    var isHidden = sub.style.display === 'none';
+
+
+
+    sub.style.display = isHidden ? 'block' : 'none';
+
+
+
+    if (icon) icon.textContent = isHidden ? '▾' : '▸';
+
+
+
+  }
+
+
+
+
+
+
+
+}
+
+
+
+function selectTool(tool) {
+
+
+
+  document.querySelectorAll('.tool-btn').forEach(function(b) { b.classList.remove('active'); });
+
+
+
+  if (event && event.target) {
+
+
+
+    event.target.closest('.tool-btn').classList.add('active');
+
+
+
+  }
+
+
+
+}
+
+
+
+
+
+
+
+function switchTab(el) {
+
+
+
+  var tabs = el.parentElement.querySelectorAll('.tab-item');
+
+
+
+  var panes = el.parentElement.nextElementSibling.querySelectorAll('.tab-pane');
+
+
+
+  tabs.forEach(function(t) { t.classList.remove('active'); });
+
+
+
+  panes.forEach(function(p) { p.classList.remove('active'); });
+
+
+
+  el.classList.add('active');
+
+
+
+  var idx = Array.from(tabs).indexOf(el);
+
+
+
+  panes[idx].classList.add('active');
+
+
+
+}
+
+
+
+
+
+
+
+function previewReport() { showToast('预览功能开发中', 'info'); }
+
+
+
+function saveReport() { showToast('报表已保存', 'info'); }
+
+
+
+function exportReport() { showToast('导出功能开发中', 'info'); }
+
+
+
+
+var currentLookupField = null;
+var currentLookupType = null;
+var lookupData = [];
+var lookupColumns = [];
+
+function openLookup(fieldId, type) {
+  currentLookupField = fieldId;
+  currentLookupType = type;
+  
+  if (type === 'org') {
+    lookupColumns = ['编码', '名称', '形态', '上级组织'];
+    lookupData = JSON.parse(localStorage.getItem('erp_orgs') || '[]');
+    document.getElementById('lookupTitle').textContent = '选择组织';
+  } else if (type === 'department') {
+    lookupColumns = ['编码', '名称'];
+    lookupData = JSON.parse(localStorage.getItem('erp_departments_cache') || '[]');
+    document.getElementById('lookupTitle').textContent = '选择部门';
+  } else if (type === 'employee') {
+    lookupColumns = ['编号', '姓名', '所属部门'];
+    lookupData = JSON.parse(localStorage.getItem('erp_employees_cache') || '[]');
+    document.getElementById('lookupTitle').textContent = '选择员工';
+  } else if (type === 'supplier') {
+    lookupColumns = ['编码', '名称'];
+    lookupData = JSON.parse(localStorage.getItem('erp_suppliers_cache') || '[]');
+    document.getElementById('lookupTitle').textContent = '选择供应商';
+  } else if (type === 'customer') {
+    lookupColumns = ['编码', '名称'];
+    lookupData = JSON.parse(localStorage.getItem('erp_customers_cache') || '[]');
+    document.getElementById('lookupTitle').textContent = '选择客户';
+  } else if (type === 'material') {
+    lookupColumns = ['物料编码', '物料名称', '规格型号', '基本单位'];
+    lookupData = JSON.parse(localStorage.getItem('erp_materials_cache') || '[]');
+    document.getElementById('lookupTitle').textContent = '选择物料';
+  } else if (type === 'warehouse') {
+    lookupColumns = ['编码', '名称'];
+    lookupData = JSON.parse(localStorage.getItem('erp_warehouses_cache') || '[]');
+    document.getElementById('lookupTitle').textContent = '选择仓库';
+  }
+  
+  renderLookupTable(lookupData);
+  document.getElementById('lookupModal').classList.add('show');
+}
+
+function closeLookup() {
+  document.getElementById('lookupModal').classList.remove('show');
+}
+
+function filterLookup() {
+  var keyword = document.getElementById('lookupKeyword').value.trim().toLowerCase();
+  var filtered = lookupData.filter(function(item) {
+    var code = item.code || '';
+    var name = item.name || '';
+    return code.toLowerCase().includes(keyword) || name.toLowerCase().includes(keyword);
+  });
+  renderLookupTable(filtered);
+}
+
+function renderLookupTable(data) {
+  var head = document.getElementById('lookupTableHead');
+  var body = document.getElementById('lookupTableBody');
+  
+  head.innerHTML = '<tr><th class="checkbox-cell"><input type="checkbox" onclick="selectAllLookup()"></th>' + lookupColumns.map(function(col) { return '<th>' + col + '</th>'; }).join('') + '</tr>';
+  
+  body.innerHTML = '';
+  data.forEach(function(item) {
+    var row = document.createElement('tr');
+    row.onclick = function() { selectLookupRow(this); };
+    var cells = ['<td class="checkbox-cell"><input type="checkbox" class="lookup-checkbox" value="' + item.id + '"></td>'];
+    if (currentLookupType === 'org') {
+      cells.push('<td>' + item.code + '</td><td>' + item.name + '</td><td>' + (item.form || '') + '</td><td>' + (item.parentName || '') + '</td>');
+    } else if (currentLookupType === 'department') {
+      cells.push('<td>' + item.code + '</td><td>' + item.name + '</td>');
+    } else if (currentLookupType === 'employee') {
+      cells.push('<td>' + item.code + '</td><td>' + item.name + '</td><td>' + (item.department || '') + '</td>');
+    } else if (currentLookupType === 'supplier' || currentLookupType === 'customer') {
+      cells.push('<td>' + item.code + '</td><td>' + item.name + '</td>');
+    } else if (currentLookupType === 'material') {
+      cells.push('<td>' + item.code + '</td><td>' + item.name + '</td><td>' + (item.specification || '') + '</td><td>' + (item.unit || '') + '</td>');
+    } else if (currentLookupType === 'warehouse') {
+      cells.push('<td>' + item.code + '</td><td>' + item.name + '</td>');
+    }
+    row.innerHTML = cells.join('');
+    body.appendChild(row);
+  });
+  
+  if (data.length === 0) {
+    body.innerHTML = '<tr><td colspan="' + (lookupColumns.length + 1) + '" style="text-align:center;padding:40px;color:#999;">暂无数据</td></tr>';
+  }
+}
+
+function selectAllLookup() {
+  var master = document.querySelector('.lookup-table th input');
+  var checkboxes = document.querySelectorAll('.lookup-checkbox');
+  checkboxes.forEach(function(cb) { cb.checked = master.checked; });
+}
+
+function selectLookupRow(row) {
+  var checkbox = row.querySelector('.lookup-checkbox');
+  checkbox.checked = !checkbox.checked;
+}
+
+function confirmLookup() {
+  var checkboxes = document.querySelectorAll('.lookup-checkbox:checked');
+  if (checkboxes.length === 0) {
+    showToast('请选择一条记录', 'warning');
+    return;
+  }
+  
+  var item = lookupData.find(function(d) { return d.id === checkboxes[0].value; });
+  if (item) {
+    var field = document.getElementById(currentLookupField);
+    if (field) {
+      field.value = item.name;
+      field.setAttribute('data-id', item.id);
+      field.setAttribute('data-code', item.code);
+      
+      if (currentLookupType === 'material') {
+        var row = field.closest('tr');
+        if (row) {
+          row.querySelector('.material-name').value = item.name;
+          row.querySelector('.material-spec').value = item.specification || '';
+          row.querySelector('.material-unit').value = item.unit || '';
+        }
+      }
+    }
+  }
+  
+  closeLookup();
+}
+
+function openMaterialLookup(btn) {
+  var field = btn.previousElementSibling;
+  field.id = 'lookupField_' + Date.now();
+  currentLookupField = field.id;
+  openLookup(field.id, 'material');
+}
+
+function openOrgLookup(btn) {
+  var field = btn.previousElementSibling;
+  field.id = 'lookupField_' + Date.now();
+  currentLookupField = field.id;
+  openLookup(field.id, 'org');
+}
+
+function openSupplierLookup(btn) {
+  var field = btn.previousElementSibling;
+  field.id = 'lookupField_' + Date.now();
+  currentLookupField = field.id;
+  openLookup(field.id, 'supplier');
+}
+
+function openWarehouseLookup(btn) {
+  var field = btn.previousElementSibling;
+  field.id = 'lookupField_' + Date.now();
+  currentLookupField = field.id;
+  openLookup(field.id, 'warehouse');
+}
+
+function initLookupData() {
+  if (!localStorage.getItem('erp_orgs')) {
+    localStorage.setItem('erp_orgs', JSON.stringify([
+      { id: 'org-001', code: 'ORG-HQ', name: '磐枢工业集团', form: '集团', parentName: '' },
+      { id: 'org-002', code: 'ORG-SM', name: '磐枢智能制造有限公司', form: '公司', parentName: '磐枢工业集团' },
+      { id: 'org-003', code: 'ORG-SM-PD', name: '生产制造部', form: '部门', parentName: '磐枢智能制造有限公司' },
+      { id: 'org-004', code: 'ORG-SM-FA', name: '财务部', form: '部门', parentName: '磐枢智能制造有限公司' },
+      { id: 'org-005', code: 'ORG-SM-SD', name: '销售部', form: '部门', parentName: '磐枢智能制造有限公司' }
+    ]));
+  }
+  if (!localStorage.getItem('erp_departments_cache')) {
+    localStorage.setItem('erp_departments_cache', JSON.stringify([
+      { id: 'dept-001', code: 'DEPT-PD', name: '生产制造部', status: 1 },
+      { id: 'dept-002', code: 'DEPT-FA', name: '财务部', status: 1 },
+      { id: 'dept-003', code: 'DEPT-SD', name: '销售部', status: 1 },
+      { id: 'dept-004', code: 'DEPT-AS', name: '装配车间', status: 1 },
+      { id: 'dept-005', code: 'DEPT-QC', name: '质检车间', status: 1 }
+    ]));
+  }
+  if (!localStorage.getItem('erp_employees_cache')) {
+    localStorage.setItem('erp_employees_cache', JSON.stringify([
+      { id: 'emp-001', code: 'EMP-001', name: '张三', department: '生产制造部', status: 1 },
+      { id: 'emp-002', code: 'EMP-002', name: '李四', department: '生产制造部', status: 1 },
+      { id: 'emp-003', code: 'EMP-003', name: '王五', department: '财务部', status: 1 },
+      { id: 'emp-004', code: 'EMP-004', name: '赵六', department: '销售部', status: 1 },
+      { id: 'emp-005', code: 'EMP-005', name: '钱七', department: '质检车间', status: 1 }
+    ]));
+  }
+  if (!localStorage.getItem('erp_suppliers_cache')) {
+    localStorage.setItem('erp_suppliers_cache', JSON.stringify([
+      { id: 'sup-001', code: 'S-001', name: '深圳电子元器件有限公司', status: 1 },
+      { id: 'sup-002', code: 'S-002', name: '杭州精密机械加工厂', status: 1 },
+      { id: 'sup-003', code: 'S-003', name: '上海材料科技有限公司', status: 1 },
+      { id: 'sup-004', code: 'S-004', name: '东莞五金制品厂', status: 1 }
+    ]));
+  }
+  if (!localStorage.getItem('erp_materials_cache')) {
+    localStorage.setItem('erp_materials_cache', JSON.stringify([
+      { id: 'mat-001', code: 'P-001', name: '高频传感器模块', specification: 'HT-2026', unit: '个', status: 1 },
+      { id: 'mat-002', code: 'P-002', name: '控制电路板', specification: 'CB-2026', unit: '块', status: 1 },
+      { id: 'mat-003', code: 'P-003', name: '智能控制器', specification: 'IC-V3', unit: '台', status: 1 },
+      { id: 'mat-004', code: 'P-004', name: '电源模块', specification: 'PM-500W', unit: '个', status: 1 },
+      { id: 'mat-005', code: 'M-001', name: 'PCB电路板', specification: 'FR-4双层', unit: '块', status: 1 },
+      { id: 'mat-006', code: 'M-002', name: '贴片电阻', specification: '10KΩ 0603', unit: '个', status: 1 },
+      { id: 'mat-007', code: 'M-003', name: '贴片电容', specification: '100μF 0805', unit: '个', status: 1 },
+      { id: 'mat-008', code: 'M-004', name: '螺丝', specification: 'M4x10', unit: '包', status: 1 }
+    ]));
+  }
+  if (!localStorage.getItem('erp_warehouses_cache')) {
+    localStorage.setItem('erp_warehouses_cache', JSON.stringify([
+      { id: 'wh-001', code: 'WH-001', name: '成品仓', status: 1 },
+      { id: 'wh-002', code: 'WH-002', name: '原料仓', status: 1 },
+      { id: 'wh-003', code: 'WH-003', name: '半成品仓', status: 1 },
+      { id: 'wh-004', code: 'WH-004', name: '辅料仓', status: 1 }
+    ]));
+  }
+}
+
+</script>
+
+
+
+
+<div class="lookup-modal" id="lookupModal">
+  <div class="lookup-dialog">
+    <div class="lookup-header">
+      <div class="lookup-title" id="lookupTitle">选择</div>
+      <button class="lookup-close" onclick="closeLookup()">×</button>
+    </div>
+    <div class="lookup-body">
+      <div class="lookup-search">
+        <input type="text" id="lookupKeyword" placeholder="请输入编码或名称搜索" onkeydown="if(event.key==='Enter')filterLookup()">
+        <button onclick="filterLookup()">搜索</button>
+      </div>
+      <table class="lookup-table">
+        <thead id="lookupTableHead"></thead>
+        <tbody id="lookupTableBody"></tbody>
+      </table>
+    </div>
+    <div class="lookup-footer">
+      <button class="btn btn-cancel" onclick="closeLookup()">取消</button>
+      <button class="btn btn-primary" onclick="confirmLookup()">确定</button>
+    </div>
+  </div>
+</div>
+
+
+<div class="confirm-modal-overlay" id="confirmModal">
+  <div class="confirm-modal-dialog">
+    <div class="confirm-modal-header">
+      <span class="confirm-modal-icon" id="confirmIcon">&#9888;</span>
+      <span class="confirm-modal-title" id="confirmTitle">系统提示</span>
+    </div>
+    <div class="confirm-modal-body">
+      <div class="confirm-modal-message" id="confirmMessage"></div>
+    </div>
+    <div class="confirm-modal-footer">
+      <button class="btn-cancel" onclick="closeConfirmModal(false)">取消</button>
+      <button class="btn-confirm" onclick="closeConfirmModal(true)">确定</button>
+    </div>
+  </div>
+</div>
+
+</body>
+
+
+
+</html>

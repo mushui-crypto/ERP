@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>选择组织 — 磐枢工业智能平台</title>
+<style>
+:root {
+  --bg-base: #0a0e1a;
+  --bg-surface: #111827;
+  --bg-raised: #1e293b;
+  --bg-inset: #0d1321;
+  --border-normal: rgba(56,189,248,0.12);
+  --border-strong: rgba(56,189,248,0.25);
+  --text-primary: #f1f5f9;
+  --text-secondary: #e2e8f0;
+  --text-tertiary: #cbd5e1;
+  --text-accent: #38bdf8;
+  --color-success: #22c55e;
+  --color-warning: #eab308;
+  --color-error: #ef4444;
+  --color-info: #06b6d4;
+  --radius-sm: 2px;
+  --radius-md: 6px;
+  --radius-lg: 10px;
+  --transition: 150ms ease;
+  --font-body: 'Inter', 'Noto Sans SC', 'Microsoft YaHei', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', 'Menlo', 'Consolas', monospace;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { font-size: 14px; -webkit-font-smoothing: antialiased; }
+body {
+  font-family: var(--font-body);
+  background: var(--bg-base);
+  color: var(--text-primary);
+  min-height: 100vh;
+  display: flex; align-items: center; justify-content: center;
+  overflow: hidden;
+}
+body::before {
+  content: ''; position: fixed; inset: 0;
+  background:
+    radial-gradient(ellipse 80% 60% at 20% 80%, rgba(56,189,248,0.06) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 50% at 80% 20%, rgba(6,182,212,0.04) 0%, transparent 60%);
+  pointer-events: none; z-index: 0;
+}
+
+.wrapper { position: relative; z-index: 1; width: 100%; max-width: 640px; padding: 20px; }
+
+.card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-normal);
+  border-radius: var(--radius-lg);
+  padding: 32px;
+}
+
+.card-header { text-align: center; margin-bottom: 28px; }
+.card-header .logo-icon {
+  width: 48px; height: 48px; margin: 0 auto 16px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, rgba(56,189,248,0.15), rgba(6,182,212,0.08));
+  border: 1px solid var(--border-normal);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 22px;
+}
+.card-header h1 {
+  font-size: 18px; font-weight: 600;
+  color: var(--text-primary);
+}
+.card-header p {
+  font-size: 12px; color: var(--text-tertiary);
+  margin-top: 6px;
+}
+
+.org-list {
+  display: grid;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.org-item {
+  background: var(--bg-inset);
+  border: 1px solid var(--border-normal);
+  border-radius: var(--radius-md);
+  padding: 16px;
+  cursor: pointer;
+  transition: all var(--transition);
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.org-item:hover {
+  border-color: var(--text-accent);
+  background: rgba(56,189,248,0.05);
+}
+.org-item.selected {
+  border-color: var(--text-accent);
+  background: rgba(56,189,248,0.08);
+}
+.org-item .org-radio {
+  width: 18px; height: 18px;
+  border: 2px solid var(--border-strong);
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.org-item.selected .org-radio {
+  border-color: var(--text-accent);
+}
+.org-item.selected .org-radio::after {
+  content: '';
+  width: 10px; height: 10px;
+  background: var(--text-accent);
+  border-radius: 50%;
+}
+.org-item .org-info { flex: 1; }
+.org-item .org-info .org-name {
+  font-size: 14px; font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 2px;
+}
+.org-item .org-info .org-detail {
+  font-size: 12px;
+  color: var(--text-tertiary);
+}
+.org-item .org-status {
+  font-size: 11px;
+  padding: 3px 8px;
+  border-radius: var(--radius-sm);
+}
+.org-item .org-status.active {
+  background: rgba(34,197,94,0.1);
+  color: var(--color-success);
+}
+.org-item .org-status.inactive {
+  background: rgba(239,68,68,0.1);
+  color: var(--color-error);
+}
+
+.btn-enter {
+  width: 100%; padding: 12px;
+  background: var(--text-accent);
+  color: #0a0e1a;
+  border: none; border-radius: var(--radius-sm);
+  font-size: 15px; font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition);
+  letter-spacing: 2px;
+}
+.btn-enter:hover { background: #7dd3fc; }
+.btn-enter:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 40px 20px;
+  color: var(--text-tertiary);
+}
+.empty-state .empty-icon {
+  font-size: 48px;
+  margin-bottom: 16px;
+}
+.empty-state p {
+  font-size: 13px;
+  margin-bottom: 8px;
+}
+.empty-state a {
+  color: var(--text-accent);
+  font-size: 12px;
+}
+
+.loading {
+  text-align: center;
+  padding: 40px;
+  color: var(--text-tertiary);
+}
+
+.error-message {
+  display: none;
+  text-align: center;
+  color: var(--color-error);
+  font-size: 12px;
+  margin-bottom: 16px;
+  padding: 8px;
+  background: rgba(239,68,68,0.08);
+  border: 1px solid rgba(239,68,68,0.2);
+  border-radius: var(--radius-sm);
+}
+.error-message.show { display: block; }
+
+.btn-back {
+  display: block;
+  text-align: center;
+  padding: 10px;
+  color: var(--text-tertiary);
+  font-size: 12px;
+  text-decoration: none;
+  margin-top: 12px;
+  transition: color var(--transition);
+}
+.btn-back:hover { color: var(--text-accent); }
+
+.dc-badge {
+  display: inline-block;
+  padding: 4px 10px;
+  background: rgba(56,189,248,0.1);
+  border: 1px solid rgba(56,189,248,0.2);
+  border-radius: var(--radius-sm);
+  font-size: 11px;
+  color: var(--text-accent);
+  margin-bottom: 16px;
+}
+</style>
+</head>
+<body>
+<div class="wrapper">
+  <div class="card">
+    <div class="card-header">
+      <div class="logo-icon">&#127970;</div>
+      <h1>选择组织</h1>
+      <p>请选择您要访问的组织</p>
+    </div>
+
+    <div id="dcBadge"></div>
+
+    <div class="error-message" id="errorMessage"></div>
+
+    <div id="orgList">
+      <div class="loading">加载组织列表中...</div>
+    </div>
+
+    <button class="btn-enter" id="btnEnter" disabled>进入系统</button>
+    <a href="select-data-center.html" class="btn-back">返回数据中心选择</a>
+  </div>
+</div>
+
+<script>
+var API_BASE = 'http://localhost:3001/api';
+
+function getAccessToken() {
+  return localStorage.getItem('accessToken');
+
+function checkLogin() {
+  if (!getAccessToken()) {
+    window.location.href = 'login.html';
+    return false;
+  }
+  var dcId = localStorage.getItem('dataCenterId');
+  if (!dcId) {
+    window.location.href = 'select-data-center.html';
+    return false;
+  }
+  return true;
+}
+
+var selectedOrgId = null;
+
+async function loadOrgs() {
+  if (!checkLogin()) return;
+
+  try {
+    var response = await fetch(API_BASE + '/orgs', {
+      headers: { 'Authorization': 'Bearer ' + getAccessToken() }
+    });
+
+    if (response.status === 401) {
+      localStorage.clear();
+      window.location.href = 'login.html';
+      return;
+    }
+
+    var data = await response.json();
+    var container = document.getElementById('orgList');
+
+    if (data.code === 200 && data.data) {
+      var orgList = data.data.list || data.data;
+
+      if (orgList.length === 0) {
+        container.innerHTML = `
+          <div class="empty-state">
+            <div class="empty-icon">&#127970;</div>
+            <p>暂无可用的组织</p>
+            <p>请联系管理员创建组织</p>
+            <a href="admin/index.html">前往管理端</a>
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = orgList.map(function(org) {
+        return `
+          <div class="org-item" onclick="selectOrg('${org.id}')">
+            <div class="org-radio"></div>
+            <div class="org-info">
+              <div class="org-name">${org.name}</div>
+              <div class="org-detail">${org.code || '无编码'} · ${org.parentId ? '子组织' : '根组织'}</div>
+            </div>
+            <div class="org-status ${org.status === 1 ? 'active' : 'inactive'}">
+              ${org.status === 1 ? '启用' : '停用'}
+            </div>
+          </div>
+        `;
+      }).join('');
+    } else {
+      container.innerHTML = `
+        <div class="empty-state">
+          <div class="empty-icon">&#128721;</div>
+          <p>加载组织失败</p>
+        </div>
+      `;
+    }
+  } catch (error) {
+    document.getElementById('orgList').innerHTML = `
+      <div class="empty-state">
+        <div class="empty-icon">&#128721;</div>
+        <p>加载组织失败: ${error.message}</p>
+      </div>
+    `;
+  }
+
+function selectOrg(id) {
+  selectedOrgId = id;
+  
+  document.querySelectorAll('.org-item').forEach(function(item) {
+    item.classList.remove('selected');
+  });
+  
+  var eventTarget = event.currentTarget;
+  if (eventTarget) {
+    eventTarget.classList.add('selected');
+  }
+  
+  document.getElementById('btnEnter').disabled = false;
+}
+
+document.getElementById('btnEnter').addEventListener('click', async function() {
+  if (!selectedOrgId) return;
+
+  try {
+    var response = await fetch(API_BASE + '/orgs/' + selectedOrgId, {
+      headers: { 'Authorization': 'Bearer ' + getAccessToken() }
+    });
+
+    var data = await response.json();
+    if (data.code === 200 && data.data) {
+      localStorage.setItem('org', JSON.stringify(data.data));
+      localStorage.setItem('orgId', selectedOrgId);
+      window.location.href = 'index.html';
+    } else {
+      document.getElementById('errorMessage').textContent = '获取组织信息失败';
+      document.getElementById('errorMessage').classList.add('show');
+    }
+  } catch (error) {
+    document.getElementById('errorMessage').textContent = '选择组织失败: ' + error.message;
+    document.getElementById('errorMessage').classList.add('show');
+  }
+});
+
+function showDataCenterInfo() {
+  var dc = localStorage.getItem('dataCenter');
+  if (dc) {
+    try {
+      dc = JSON.parse(dc);
+      document.getElementById('dcBadge').innerHTML = '当前数据中心: ' + (dc.name || dc.code);
+    } catch (e) {}
+  }
+}
+
+window.addEventListener('DOMContentLoaded', function() {
+  checkLogin();
+  showDataCenterInfo();
+  loadOrgs();
+});
+
+}
+}</script>
+</body>
+</html>

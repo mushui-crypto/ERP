@@ -1,0 +1,1050 @@
+<!DOCTYPE html>
+
+<html lang="zh-CN">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>组织架构管理 — 磐枢工业智能平台(管理端)</title>
+
+<link rel="stylesheet" href="../common-admin.css">
+
+<script src="../../common.js"></script>
+
+<style>
+
+.org-layout { display: grid; grid-template-columns: 280px 1fr; gap: 0; height: calc(100vh - 56px); overflow: hidden; }
+
+.org-tree-panel { background: var(--bg-surface); border-right: 1px solid #e8e8e8; overflow-y: auto; padding: 12px; display: flex; flex-direction: column; }
+
+.org-detail-panel { overflow-y: auto; padding: 20px 24px; }
+
+
+
+.org-tree-toolbar { display: flex; gap: 6px; margin-bottom: 10px; }
+
+.org-tree-toolbar .btn { flex: 1; }
+
+.org-tree-toolbar .btn-toggle { flex: 0 0 auto; min-width: 72px; }
+
+
+
+.org-tabs { display: flex; border-bottom: 1px solid #e8e8e8; background: var(--bg-surface); border-radius: var(--radius-md) var(--radius-md) 0 0; padding: 0 4px; }
+
+.org-tab { padding: 10px 18px; cursor: pointer; color: var(--text-tertiary); font-size: 13px; border-bottom: 2px solid transparent; transition: all var(--transition); white-space: nowrap; }
+
+.org-tab:hover { color: var(--text-primary); }
+
+.org-tab.active { color: var(--admin-accent); border-bottom-color: var(--admin-accent); font-weight: 500; }
+
+.org-tab-pane { display: none; }
+
+.org-tab-pane.active { display: block; }
+
+
+
+.param-section { margin-bottom: 18px; }
+
+.param-section:last-child { margin-bottom: 0; }
+
+.param-section-title { font-size: 12px; font-weight: 600; color: var(--admin-accent); margin-bottom: 10px; padding-left: 8px; border-left: 3px solid var(--admin-accent); }
+
+.param-value { font-size: 14px; font-weight: 500; color: var(--text-primary); }
+
+.param-value .unit { color: var(--text-tertiary); font-weight: 400; font-size: 12px; margin-left: 2px; }
+
+
+
+.org-code-cell { display: flex; align-items: center; gap: 6px; }
+
+.org-code-icon { color: var(--admin-accent); font-size: 13px; flex-shrink: 0; }
+
+
+
+.org-context-menu { display: none; position: fixed; background: var(--bg-raised); border: 1px solid var(--border-strong); border-radius: var(--radius-sm); padding: 4px 0; min-width: 150px; z-index: 1100; box-shadow: 0 6px 20px rgba(0,0,0,0.5); }
+
+.org-context-menu.show { display: block; }
+
+.org-context-menu-item { padding: 7px 14px; font-size: 12px; color: var(--text-secondary); cursor: pointer; transition: all var(--transition); display: flex; align-items: center; gap: 8px; }
+
+.org-context-menu-item:hover { background: var(--admin-accent-light); color: var(--admin-accent); }
+
+.org-context-menu-item.danger { color: var(--color-error); }
+
+.org-context-menu-item.danger:hover { background: rgba(239,68,68,0.12); color: var(--color-error); }
+
+.org-context-menu-divider { height: 1px; background: #e8e8e8; margin: 4px 0; }
+
+
+
+.role-assign-item { display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; border-bottom: 1px solid #e8e8e8; }
+
+.role-assign-item:last-child { border-bottom: none; }
+
+.role-assign-info { display: flex; align-items: center; gap: 10px; }
+
+.role-assign-name { font-size: 13px; font-weight: 500; color: var(--text-primary); }
+
+.role-assign-desc { font-size: 12px; color: var(--text-tertiary); }
+
+
+
+.modal-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:1000; justify-content:center; align-items:flex-start; padding-top:40px; }
+
+.modal-overlay.show { display:flex; }
+
+.modal-dialog { background:#fff; border:1px solid #e8e8e8; border-radius:4px; width:640px; max-height:80vh; overflow-y:auto; }
+
+.modal-header { display:flex; justify-content:space-between; align-items:center; padding:16px 20px; border-bottom:1px solid #e8e8e8; }
+
+.modal-header .modal-title { font-size: 15px; font-weight: 600; color:#333; }
+
+.modal-close { background: none; border: none; color:#666; font-size: 20px; cursor: pointer; line-height: 1; padding: 0 4px; transition: color var(--transition); }
+
+.modal-close:hover { color:#f5222d; }
+
+.modal-body { padding:20px; color:#333; }
+
+.modal-footer { display:flex; gap:12px; justify-content:flex-end; padding:16px 20px; border-top:1px solid #e8e8e8; background:#f5f5f5; }
+
+
+
+.empty-detail { text-align: center; padding: 60px 20px; color: var(--text-tertiary); }
+
+.empty-detail .empty-icon { font-size: 48px; margin-bottom: 16px; }
+
+
+
+/* ===== Toast 提示框 ===== */
+.toast-container {
+  position: fixed; top: 20px; right: 20px; z-index: 10000;
+  display: flex; flex-direction: column; gap: 10px;
+}
+.toast {
+  display: flex; align-items: center; gap: 10px;
+  padding: 14px 18px; border-radius: var(--radius-md);
+  background: #fff; border: 1px solid #e8e8e8;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+  min-width: 280px; max-width: 420px;
+  animation: slideIn 0.3s ease;
+}
+@keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+.toast .toast-icon { font-size: 18px; flex-shrink: 0; }
+.toast .toast-content { flex: 1; font-size: 13px; }
+.toast .toast-title { font-weight: 600; margin-bottom: 2px; color: #333; }
+.toast .toast-message { color: #666; font-size: 12px; }
+.toast-success { border-color: #b7eb8f; background: #f6ffed; }
+.toast-success .toast-title { color: #52c41a; }
+.toast-success .toast-message { color: #52c41a; }
+.toast-warning { border-color: #ffe58f; background: #fffbe6; }
+.toast-warning .toast-title { color: #faad14; }
+.toast-warning .toast-message { color: #faad14; }
+.toast-error { border-color: #ffccc7; background: #fff2f0; }
+.toast-error .toast-title { color: #f5222d; }
+.toast-error .toast-message { color: #f5222d; }
+.toast-info { border-color: #91d5ff; background: #e6f7ff; }
+.toast-info .toast-title { color: #1890ff; }
+.toast-info .toast-message { color: #1890ff; }
+
+
+
+/* ===== 确认对话框 ===== */
+
+.confirm-modal-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:2000; justify-content:center; align-items:center; }
+
+.confirm-modal-overlay.show { display:flex; }
+
+.confirm-modal-dialog { background:#fff; border:1px solid #e8e8e8; border-radius:4px; width:420px; overflow:hidden; }
+
+.confirm-modal-header { padding:16px 20px; border-bottom:1px solid #e8e8e8; display:flex; align-items:center; gap:10px; }
+
+.confirm-modal-icon { font-size:20px; }
+
+.confirm-modal-title { font-size:15px; font-weight:600; color:#333; }
+
+.confirm-modal-body { padding:20px; text-align:center; }
+
+.confirm-modal-message { font-size:14px; color:#333; line-height:1.6; }
+
+.confirm-modal-footer { display:flex; gap:12px; justify-content:flex-end; padding:16px 20px; border-top:1px solid #e8e8e8; background:#f5f5f5; }
+
+</style>
+
+</head>
+
+<body>
+
+<aside class="sidebar admin-sidebar" id="sidebar">
+
+    <div class="sidebar-logo">
+
+    <img src="../../images/LOGO.png" alt="磐枢工业智能平台" style="width: 100%; max-width: 200px; margin-bottom: 8px;">
+
+    <h1 style="font-size: 16px; margin: 0;">磐枢工业智能平台</h1>
+
+  </div>
+
+  <nav class="sidebar-menu">
+
+    <div class="sidebar-menu-group"><div class="sidebar-menu-item" onclick="toggleGroup(this)"><span class="icon">&#128451;</span> 数据中心管理<span class="arrow">&#9654;</span></div><div class="sub-menu"><a class="sidebar-menu-item" href="../data-center/index.html">数据中心总览</a><a class="sidebar-menu-item" href="../data-center/new.html">新建数据中心</a><a class="sidebar-menu-item" href="../data-center/backup.html">备份管理</a></div></div>
+
+    <div class="sidebar-menu-group open"><div class="sidebar-menu-item" onclick="toggleGroup(this)"><span class="icon">&#128101;</span> 组织与权限<span class="arrow">&#9660;</span></div><div class="sub-menu"><a class="sidebar-menu-item active" href="org.html">组织架构</a><a class="sidebar-menu-item" href="user.html">用户管理</a><a class="sidebar-menu-item" href="role.html">角色管理</a><a class="sidebar-menu-item" href="menu.html">菜单管理</a></div></div>
+
+
+
+    <div class="sidebar-menu-group"><div class="sidebar-menu-item" onclick="toggleGroup(this)"><span class="icon">&#128187;</span> 开发设计<span class="arrow">&#9654;</span></div><div class="sub-menu"><a class="sidebar-menu-item" href="../dev-design/lowcode.html">低代码开发中心</a><a class="sidebar-menu-item" href="../dev-design/form-designer.html">表单设计器</a><a class="sidebar-menu-item" href="../dev-design/doc-flow.html">单据转换配置</a><a class="sidebar-menu-item" href="../dev-design/print-template.html">套打模板设计</a><a class="sidebar-menu-item" href="../dev-design/workflow.html">流程配置</a></div></div>
+
+
+
+    <div class="sidebar-menu-group"><div class="sidebar-menu-item" onclick="toggleGroup(this)"><span class="icon">&#129302;</span> 智能应用<span class="arrow">&#9654;</span></div><div class="sub-menu"><a class="sidebar-menu-item" href="../ai-config/api-manage.html">API管理</a><a class="sidebar-menu-item" href="../ai-config/nl-training.html">自然语言训练</a><a class="sidebar-menu-item" href="../ai-config/data-analysis.html">数据分析训练</a><a class="sidebar-menu-item" href="../ai-config/agent-config.html">Agent配置</a></div></div>
+
+
+
+    <div class="sidebar-menu-item" onclick="window.location.href='../../index.html'"><span class="icon">&#8592;</span> 返回应用端</div>
+
+  </nav>
+
+  <div class="sidebar-user"><div class="avatar" style="background:var(--admin-accent-light);color:var(--admin-accent);">管</div><div><div class="user-name">系统管理员</div><div class="user-role">超级管理员</div></div></div>
+
+</aside>
+
+<div class="main-content" id="mainContent">
+
+  <div class="page-header">
+
+    <div><div class="flex items-center gap-8"><button class="sidebar-toggle" onclick="toggleSidebar()">&#9776;</button><div><h2>组织架构管理</h2><div class="breadcrumb"><a href="../../index.html">首页</a><span>/</span><a href="../index.html">管理端</a><span>/</span><a href="org.html">组织与权限</a><span>/</span><span>组织架构</span></div></div></div></div>
+
+    <div class="page-actions"><button class="btn btn-primary btn-sm" onclick="openOrgModal()" style="background:var(--admin-accent);border-color:var(--admin-accent);color:#0a0e1a;">+ 新建组织</button></div>
+
+  </div>
+
+  <div class="org-layout">
+
+    <div class="org-tree-panel">
+
+      <div class="org-tree-toolbar">
+
+        <button class="btn btn-sm btn-ghost" onclick="openOrgModal()" style="border-color:var(--admin-accent-glow);color:var(--admin-accent);">+ 新建组织</button>
+
+        <button class="btn btn-sm btn-ghost btn-toggle" onclick="expandAllOrgNodes(true)">&#9660; 展开全部</button>
+
+        <button class="btn btn-sm btn-ghost btn-toggle" onclick="expandAllOrgNodes(false)">&#9654; 折叠全部</button>
+
+      </div>
+
+      <div class="form-search" style="margin-bottom:12px;"><input type="text" class="form-input" id="orgSearch" placeholder="搜索组织..." style="padding-left:34px;" onkeyup="searchOrgs()"></div>
+
+      <div class="org-tree" id="orgTree" style="flex:1;">
+
+        <div class="loading" style="text-align:center;padding:40px;color:#666;">加载中...</div>
+
+      </div>
+
+    </div>
+
+    <div class="org-detail-panel" id="orgDetail">
+
+      <div class="empty-detail">
+
+        <div class="empty-icon">&#127970;</div>
+
+        <div>请选择一个组织查看详情</div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
+
+
+
+<div class="org-context-menu" id="orgContextMenu">
+
+  <div class="org-context-menu-item" onclick="editOrgFromMenu()">&#9998;&nbsp; 编辑组织</div>
+
+  <div class="org-context-menu-item" onclick="createSubOrgFromMenu()">&#10010;&nbsp; 新建下级</div>
+
+  <div class="org-context-menu-divider"></div>
+
+  <div class="org-context-menu-item danger" onclick="deleteOrgFromMenu()">&#128465;&nbsp; 删除组织</div>
+
+</div>
+
+
+
+<div class="modal-overlay" id="orgModal">
+
+  <div class="modal-dialog">
+
+    <div class="modal-header">
+
+      <span class="modal-title" id="modalTitle">新建组织</span>
+
+      <button class="modal-close" onclick="closeOrgModal()">&times;</button>
+
+    </div>
+
+    <div class="modal-body">
+
+      <form id="orgForm">
+
+        <input type="hidden" id="orgId">
+
+        <div class="grid-2" style="gap:16px;">
+
+          <div class="form-group mb-0"><label class="form-label">组织编码 *</label><input type="text" class="form-input" id="orgCode" placeholder="请输入组织编码" required></div>
+
+          <div class="form-group mb-0"><label class="form-label">组织名称 *</label><input type="text" class="form-input" id="orgName" placeholder="请输入组织名称" required></div>
+
+          <div class="form-group mb-0"><label class="form-label">组织简称</label><input type="text" class="form-input" id="orgShortName" placeholder="请输入组织简称"></div>
+
+          <div class="form-group mb-0"><label class="form-label">上级组织</label><select class="form-select" id="parentOrgId"><option value="">无（根组织）</option></select></div>
+
+          <div class="form-group mb-0"><label class="form-label">组织类型</label><select class="form-select" id="orgType"><option value="1">集团</option><option value="2">子公司</option></select></div>
+
+          <div class="form-group mb-0"><label class="form-label">状态</label><select class="form-select" id="orgStatus"><option value="1">启用</option><option value="0">停用</option></select></div>
+
+          <div class="form-group mb-0"><label class="form-label">负责人</label><input type="text" class="form-input" id="orgContact" placeholder="请输入负责人"></div>
+
+          <div class="form-group mb-0"><label class="form-label">联系电话</label><input type="text" class="form-input" id="orgPhone" placeholder="请输入联系电话"></div>
+
+        </div>
+
+      </form>
+
+    </div>
+
+    <div class="modal-footer">
+
+      <button class="btn btn-ghost btn-sm" onclick="closeOrgModal()">取消</button>
+
+      <button class="btn btn-sm" onclick="saveOrg()" style="background:var(--admin-accent);border-color:var(--admin-accent);color:#0a0e1a;">保存</button>
+
+    </div>
+
+  </div>
+
+</div>
+
+
+
+<div id="sidebarOverlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:99;" onclick="toggleSidebar()"></div>
+
+
+
+<!-- Toast 容器 -->
+
+<div class="toast-container" id="toastContainer"></div>
+
+
+
+<!-- 确认对话框 -->
+
+<div class="confirm-modal-overlay" id="confirmModal">
+
+  <div class="confirm-modal-dialog">
+
+    <div class="confirm-modal-header">
+
+      <span class="confirm-modal-icon" id="confirmIcon">&#9888;</span>
+
+      <span class="confirm-modal-title" id="confirmTitle">温馨提示</span>
+
+    </div>
+
+    <div class="confirm-modal-body">
+
+      <div class="confirm-modal-message" id="confirmMessage"></div>
+
+    </div>
+
+    <div class="confirm-modal-footer">
+
+      <button class="btn btn-sm btn-cancel" onclick="closeConfirmModal(false)">取消</button>
+
+      <button class="btn btn-sm btn-primary" style="background:var(--admin-accent);border-color:var(--admin-accent);color:#0a0e1a;" onclick="closeConfirmModal(true)">确定</button>
+
+    </div>
+
+  </div>
+
+</div>
+
+
+
+<script>
+
+var confirmCallback = null;
+
+
+
+function showToast(message, type = 'info') {
+
+  var container = document.getElementById('toastContainer');
+
+  var icons = { success: '&#9989;', warning: '&#9888;', error: '&#10060;', info: '&#9432;' };
+
+  var titles = { success: '操作成功', warning: '温馨提示', error: '系统提示', info: '系统提示' };
+
+  var toast = document.createElement('div');
+
+  toast.className = 'toast toast-' + type;
+
+  toast.innerHTML = '<div class="toast-icon">' + icons[type] + '</div><div class="toast-content"><div class="toast-title">' + titles[type] + '</div><div class="toast-message">' + message + '</div></div>';
+
+  container.appendChild(toast);
+
+  setTimeout(function() { toast.style.opacity = '0'; toast.style.transform = 'translateX(100%)'; setTimeout(function() { toast.remove(); }, 300); }, 3000);
+
+}
+
+
+
+function showConfirm(message, type = 'warning', callback) {
+
+  document.getElementById('confirmMessage').textContent = message;
+
+  document.getElementById('confirmTitle').textContent = type === 'warning' ? '温馨提示' : '系统提示';
+
+  document.getElementById('confirmIcon').innerHTML = type === 'warning' ? '&#9888;' : '&#10060;';
+
+  confirmCallback = callback;
+
+  document.getElementById('confirmModal').classList.add('show');
+
+}
+
+function closeConfirmModal(result) {
+
+  document.getElementById('confirmModal').classList.remove('show');
+
+  if (confirmCallback) {
+
+    confirmCallback(result);
+
+    confirmCallback = null;
+
+  }
+
+}
+
+</script>
+
+<script>
+
+const API_BASE = 'http://localhost:3001/api';
+
+var currentOrgId = null;
+
+var contextOrgId = null;
+
+
+
+function getAccessToken() { return localStorage.getItem('accessToken'); }
+
+function checkLogin() { if (!getAccessToken()) { localStorage.setItem('accessToken', 'local-dev-token-' + Date.now()); } return true; }
+
+
+
+
+
+
+
+
+
+async function loadOrgs() {
+
+  if (!checkLogin()) return;
+
+  
+
+  var localOrgs = JSON.parse(localStorage.getItem('erp_orgs') || '[]');
+
+  
+
+  if (localOrgs.length === 0) {
+
+    localOrgs = [
+
+      { id: 'org-001', code: 'GROUP', name: '磐枢集团', shortName: '磐枢', parentId: null, orgType: 1, status: 1, contact: '张明', phone: '13800000001', createdAt: new Date().toISOString() },
+
+      { id: 'org-002', code: 'SUZHOU', name: '苏州智能制造有限公司', shortName: '苏州公司', parentId: 'org-001', orgType: 2, status: 1, contact: '李强', phone: '13800000002', createdAt: new Date().toISOString() },
+
+      { id: 'org-003', code: 'SHANGHAI', name: '上海电子科技有限公司', shortName: '上海公司', parentId: 'org-001', orgType: 2, status: 1, contact: '陈刚', phone: '13800000003', createdAt: new Date().toISOString() },
+
+      { id: 'org-004', code: 'GUANGZHOU', name: '广州销售有限公司', shortName: '广州公司', parentId: 'org-001', orgType: 2, status: 1, contact: '赵伟', phone: '13800000004', createdAt: new Date().toISOString() }
+
+    ];
+
+  }
+
+  
+
+  renderOrgTree(localOrgs);
+
+  populateParentSelect(localOrgs);
+
+  
+
+  try {
+
+    var response = await fetch(API_BASE + '/orgs', { headers: { 'Authorization': 'Bearer ' + getAccessToken() } });
+
+    var data = await response.json();
+
+    if (data.code === 200 && data.data) {
+
+      var list = data.data.list || data.data;
+
+      if (list.length > 0) {
+
+        localStorage.setItem('erp_orgs', JSON.stringify(list));
+
+        renderOrgTree(list);
+
+        populateParentSelect(list);
+
+      }
+
+    }
+
+  } catch (e) { console.warn('后端组织API不可用，使用本地缓存数据'); }
+
+}
+
+
+
+function renderOrgTree(list) {
+
+  var tree = buildTree(list);
+
+  document.getElementById('orgTree').innerHTML = tree.map(n => renderTreeNode(n)).join('');
+
+}
+
+
+
+function buildTree(list, parentId = null) {
+
+  return list.filter(n => n.parentId === parentId).map(n => ({ ...n, children: buildTree(list, n.id) }));
+
+}
+
+
+
+function renderTreeNode(node) {
+
+  var hasChildren = node.children && node.children.length > 0;
+
+  var toggleIcon = hasChildren ? '\u25BC' : '\u00A0';
+
+  return `
+
+    <div class="org-node${hasChildren ? ' expanded' : ''}" data-id="${node.id}">
+
+      <div class="org-node-header${currentOrgId === node.id ? ' active' : ''}" onclick="selectOrg('${node.id}')" oncontextmenu="showOrgContextMenu(event,'${node.id}');return false;">
+
+        <span class="org-toggle">${toggleIcon}</span>
+
+        <span class="org-icon">&#127970;</span> ${node.name}
+
+      </div>
+
+      ${hasChildren ? `<div class="org-children" style="display:block;">${node.children.map(renderTreeNode).join('')}</div>` : ''}
+
+    </div>
+
+  `;
+
+}
+
+
+
+function populateParentSelect(list) {
+
+  var select = document.getElementById('parentOrgId');
+
+  select.innerHTML = '<option value="">无（根组织）</option>' + list.map(o => `<option value="${o.id}">${o.name}</option>`).join('');
+
+}
+
+
+
+function selectOrg(id) {
+
+  currentOrgId = id;
+
+  document.querySelectorAll('.org-node-header').forEach(el => el.classList.remove('active'));
+
+  document.querySelector(`.org-node[data-id="${id}"] .org-node-header`).classList.add('active');
+
+  loadOrgDetail(id);
+
+}
+
+
+
+async function loadOrgDetail(id) {
+  if (!checkLogin()) return;
+  
+  var localOrgs = JSON.parse(localStorage.getItem('erp_orgs') || '[]');
+  var org = localOrgs.find(function(o) { return o.id === id; });
+  
+  if (org) {
+    renderOrgDetail(org);
+  }
+  
+  try {
+    var response = await fetch(API_BASE + '/orgs/' + id, { headers: { 'Authorization': 'Bearer ' + getAccessToken() } });
+    var data = await response.json();
+    if (data.code === 200 && data.data) {
+      renderOrgDetail(data.data);
+    }
+  } catch (e) { console.warn('后端组织详情API不可用，使用本地缓存数据'); }
+}
+
+
+
+function renderOrgDetail(org) {
+
+  var typeNames = { '1': '集团', '2': '子公司' };
+
+  var statusNames = { '1': '启用', '0': '停用' };
+
+  
+
+  document.getElementById('orgDetail').innerHTML = `
+
+    <div class="org-tabs">
+
+      <div class="org-tab active" onclick="switchOrgTab(this,'tab-info')">基本信息</div>
+
+      <div class="org-tab" onclick="switchOrgTab(this,'tab-users')">关联用户</div>
+
+      <div class="org-tab" onclick="switchOrgTab(this,'tab-roles')">角色分配</div>
+
+    </div>
+
+    <div class="org-tab-pane active" id="tab-info">
+
+      <div class="card" style="margin-top:12px;">
+
+        <div class="card-header">
+
+          <span>${org.name}</span>
+
+          <div class="flex gap-8">
+
+            <span class="badge ${org.status === 1 ? 'badge-success' : 'badge-warning'}">${statusNames[org.status] || '未知'}</span>
+
+            <button class="btn btn-sm btn-ghost" onclick="editOrg('${org.id}')">&#9998; 编辑</button>
+
+            <button class="btn btn-sm btn-ghost" style="color:#f5222d;" onclick="deleteOrg('${org.id}','${org.name}')">&#128465; 删除</button>
+
+          </div>
+
+        </div>
+
+        <div class="card-body">
+
+          <div class="grid-2" style="gap:16px;">
+
+            <div class="param-section">
+
+              <div class="param-section-title">基本信息</div>
+
+              <div class="param-item"><span class="param-label">组织编码</span><span class="param-value">${org.code || '-'}</span></div>
+
+              <div class="param-item"><span class="param-label">组织名称</span><span class="param-value">${org.name}</span></div>
+
+              <div class="param-item"><span class="param-label">组织简称</span><span class="param-value">${org.shortName || '-'}</span></div>
+
+              <div class="param-item"><span class="param-label">上级组织</span><span class="param-value">${org.parentId ? '已设置' : '无'}</span></div>
+
+            </div>
+
+            <div class="param-section">
+
+              <div class="param-section-title">类型与状态</div>
+
+              <div class="param-item"><span class="param-label">组织类型</span><span class="param-value">${typeNames[org.orgType] || org.orgType || '-'}</span></div>
+
+              <div class="param-item"><span class="param-label">状态</span><span class="param-value">${statusNames[org.status] || '未知'}</span></div>
+
+              <div class="param-item"><span class="param-label">负责人</span><span class="param-value">${org.contact || '-'}</span></div>
+
+              <div class="param-item"><span class="param-label">联系电话</span><span class="param-value">${org.phone || '-'}</span></div>
+
+            </div>
+
+            <div class="param-section">
+
+              <div class="param-section-title">完整信息</div>
+
+              <div class="param-item"><span class="param-label">全称</span><span class="param-value">${org.fullName || '-'}</span></div>
+
+              <div class="param-item"><span class="param-label">地址</span><span class="param-value">${org.address || '-'}</span></div>
+
+              <div class="param-item"><span class="param-label">创建时间</span><span class="param-value">${formatDate(org.createdAt)}</span></div>
+
+              <div class="param-item"><span class="param-label">更新时间</span><span class="param-value">${formatDate(org.updatedAt)}</span></div>
+
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+    <div class="org-tab-pane" id="tab-users">
+
+      <div class="card" style="margin-top:12px;">
+
+        <div class="card-header"><span>关联用户 (0)</span><button class="btn btn-sm btn-ghost" style="color:var(--admin-accent);border-color:var(--admin-accent-glow);">+ 添加用户</button></div>
+
+        <div class="table-wrapper">
+
+          <table class="data-table">
+
+            <thead><tr><th>用户名</th><th>姓名</th><th>角色</th><th>状态</th><th>操作</th></tr></thead>
+
+            <tbody><tr><td colspan="5" style="text-align:center;color:#666;padding:20px;">暂无关联用户</td></tr></tbody>
+
+          </table>
+
+        </div>
+
+      </div>
+
+    </div>
+
+    <div class="org-tab-pane" id="tab-roles">
+
+      <div class="card" style="margin-top:12px;">
+
+        <div class="card-header"><span>已分配角色 (0)</span><button class="btn btn-sm btn-ghost" style="color:var(--admin-accent);border-color:var(--admin-accent-glow);">+ 添加角色</button></div>
+
+        <div style="padding:20px;text-align:center;color:#666;">暂无已分配角色</div>
+
+      </div>
+
+    </div>
+
+  `;
+
+}
+
+
+
+function formatDate(dateStr) {
+
+  if (!dateStr) return '-';
+
+  var d = new Date(dateStr);
+
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
+
+}
+
+
+
+function toggleOrgNode(el){var n=el.closest('.org-node');n.classList.toggle('expanded');var t=el.querySelector('.org-toggle');if(t)t.textContent=n.classList.contains('expanded')?'\u25BC':'\u25B6';var c=n.querySelector(':scope > .org-children');if(c)c.style.display=n.classList.contains('expanded')?'block':'none';}
+
+function expandAllOrgNodes(expand){document.querySelectorAll('.org-tree .org-node').forEach(function(n){var t=n.querySelector(':scope > .org-node-header .org-toggle');if(!t)return;if(expand){n.classList.add('expanded');t.textContent='\u25BC';var c=n.querySelector(':scope > .org-children');if(c)c.style.display='block';}else{if(n.querySelector(':scope > .org-children')){n.classList.remove('expanded');t.textContent='\u25B6';var c2=n.querySelector(':scope > .org-children');if(c2)c2.style.display='none';}}});}
+
+function switchOrgTab(el,paneId){document.querySelectorAll('.org-tab').forEach(function(t){t.classList.remove('active');});el.classList.add('active');document.querySelectorAll('.org-tab-pane').forEach(function(p){p.classList.remove('active');});document.getElementById(paneId).classList.add('active');}
+
+function showOrgContextMenu(e,id){contextOrgId=id;var m=document.getElementById('orgContextMenu');m.classList.add('show');m.style.left=Math.min(e.clientX,window.innerWidth-160)+'px';m.style.top=e.clientY+'px';}
+
+function hideOrgContextMenu(){document.getElementById('orgContextMenu').classList.remove('show');}
+
+document.addEventListener('click',function(){hideOrgContextMenu();});
+
+
+
+function openOrgModal(parentId = null) {
+
+  document.getElementById('modalTitle').textContent = '新建组织';
+
+  document.getElementById('orgId').value = '';
+
+  document.getElementById('parentOrgId').value = parentId || '';
+
+  document.getElementById('orgCode').value = '';
+
+  document.getElementById('orgName').value = '';
+
+  document.getElementById('orgShortName').value = '';
+
+  document.getElementById('orgType').value = '1';
+
+  document.getElementById('orgStatus').value = '1';
+
+  document.getElementById('orgContact').value = '';
+
+  document.getElementById('orgPhone').value = '';
+
+  document.getElementById('orgModal').classList.add('show');
+
+}
+
+
+
+function editOrg(id) {
+
+  contextOrgId = id;
+
+  editOrgFromMenu();
+
+}
+
+
+
+async function editOrgFromMenu() {
+
+  if (!contextOrgId) return;
+
+  try {
+
+    var response = await fetch(API_BASE + '/orgs/' + contextOrgId, { headers: { 'Authorization': 'Bearer ' + getAccessToken() } });
+
+    var data = await response.json();
+
+    if (data.code === 200 && data.data) {
+
+      var org = data.data;
+
+      document.getElementById('modalTitle').textContent = '编辑组织';
+
+      document.getElementById('orgId').value = org.id;
+
+      document.getElementById('parentOrgId').value = org.parentId || '';
+
+      document.getElementById('orgCode').value = org.code || '';
+
+      document.getElementById('orgName').value = org.name || '';
+
+      document.getElementById('orgShortName').value = org.shortName || '';
+
+      document.getElementById('orgType').value = org.orgType || '1';
+
+      document.getElementById('orgStatus').value = org.status || '1';
+
+      document.getElementById('orgContact').value = org.contact || '';
+
+      document.getElementById('orgPhone').value = org.phone || '';
+
+      hideOrgContextMenu();
+
+      document.getElementById('orgModal').classList.add('show');
+
+    }
+
+  } catch (e) { console.error('加载组织信息失败:', e); }
+
+}
+
+
+
+function createSubOrgFromMenu() {
+
+  hideOrgContextMenu();
+
+  openOrgModal(contextOrgId);
+
+}
+
+
+
+async function deleteOrg(id, name) {
+
+  showConfirm(`确定要删除组织 "${name}" 吗？`, 'warning', async function(result) {
+
+    if (result) await doDeleteOrg(id);
+
+  });
+
+}
+
+
+
+async function deleteOrgFromMenu() {
+
+  if (!contextOrgId) return;
+
+  try {
+
+    var response = await fetch(API_BASE + '/orgs/' + contextOrgId, { headers: { 'Authorization': 'Bearer ' + getAccessToken() } });
+
+    var data = await response.json();
+
+    if (data.code === 200 && data.data) {
+
+      hideOrgContextMenu();
+
+      showConfirm(`确定要删除组织 "${data.data.name}" 吗？`, 'warning', async function(result) {
+
+        if (result) await doDeleteOrg(contextOrgId);
+
+      });
+
+    }
+
+  } catch (e) { console.error('获取组织信息失败:', e); }
+
+}
+
+
+
+async function doDeleteOrg(id) {
+  var localOrgs = JSON.parse(localStorage.getItem('erp_orgs') || '[]');
+  localOrgs = localOrgs.filter(function(o) { return o.id !== id; });
+  localStorage.setItem('erp_orgs', JSON.stringify(localOrgs));
+  
+  showToast('删除成功', 'success');
+  currentOrgId = null;
+  document.getElementById('orgDetail').innerHTML = '<div class="empty-detail"><div class="empty-icon">&#127970;</div><div>请选择一个组织查看详情</div></div>';
+  loadOrgs();
+  
+  try {
+    var response = await fetch(API_BASE + '/orgs/' + id, { method: 'DELETE', headers: { 'Authorization': 'Bearer ' + getAccessToken() } });
+    var data = await response.json();
+    if (data.code !== 200) {
+      console.warn('后端删除失败，但已从本地缓存删除');
+    }
+  } catch (e) {
+    console.warn('后端不可用，已从本地缓存删除');
+  }
+}
+
+
+
+async function saveOrg() {
+  var id = document.getElementById('orgId').value;
+  var orgTypeVal = parseInt(document.getElementById('orgType').value);
+  var statusVal = parseInt(document.getElementById('orgStatus').value);
+  
+  var data = {
+    code: document.getElementById('orgCode').value.trim(),
+    name: document.getElementById('orgName').value.trim(),
+    shortName: document.getElementById('orgShortName').value.trim(),
+    parentId: document.getElementById('parentOrgId').value || null,
+    orgType: isNaN(orgTypeVal) ? 1 : orgTypeVal,
+    status: isNaN(statusVal) ? 1 : statusVal,
+    contact: document.getElementById('orgContact').value.trim(),
+    phone: document.getElementById('orgPhone').value.trim()
+  };
+
+  if (!data.code || !data.name) {
+    showToast('请填写组织编码和组织名称', 'warning');
+    return;
+  }
+
+  var newId = saveOrgToLocal(id, data);
+  showToast(id ? '更新成功' : '创建成功', 'success');
+  closeOrgModal();
+  loadOrgs();
+  setTimeout(function() { selectOrg(newId); }, 100);
+
+  
+
+  try {
+
+    var response;
+
+    if (id) {
+
+      response = await fetch(API_BASE + '/orgs/' + id, { method: 'PUT', headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + getAccessToken() }, body: JSON.stringify(data) });
+
+    } else {
+
+      response = await fetch(API_BASE + '/orgs', { method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + getAccessToken() }, body: JSON.stringify(data) });
+
+    }
+
+    var result = await response.json();
+
+    if (result.code !== 200) {
+
+      console.warn('后端保存失败，但已保存到本地缓存');
+
+    }
+
+  } catch (e) {
+
+    console.warn('后端不可用，数据已保存到本地缓存');
+
+  }
+
+}
+
+
+
+function saveOrgToLocal(id, data) {
+  var orgList = JSON.parse(localStorage.getItem('erp_orgs') || '[]');
+  if (id) {
+    var index = orgList.findIndex(function(o) { return o.id === id; });
+    if (index !== -1) {
+      orgList[index] = Object.assign({}, orgList[index], data);
+    }
+    localStorage.setItem('erp_orgs', JSON.stringify(orgList));
+    return id;
+  } else {
+    var newId = 'org-' + Date.now();
+    orgList.push({
+      id: newId,
+      ...data,
+      createdAt: new Date().toISOString()
+    });
+    localStorage.setItem('erp_orgs', JSON.stringify(orgList));
+    return newId;
+  }
+}
+
+
+
+function closeOrgModal() {
+
+  document.getElementById('orgModal').classList.remove('show');
+
+}
+
+
+
+function searchOrgs() {
+
+  var keyword = document.getElementById('orgSearch').value.toLowerCase();
+
+  document.querySelectorAll('.org-node').forEach(function(node) {
+
+    var name = node.querySelector('.org-node-header').textContent.toLowerCase();
+
+    node.style.display = name.includes(keyword) ? '' : 'none';
+
+  });
+
+}
+
+
+
+window.addEventListener('DOMContentLoaded', function() {
+
+  checkLogin();
+
+  loadOrgs();
+
+});
+
+</script>
+
+</body>
+
+</html>

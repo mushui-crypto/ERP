@@ -1,0 +1,745 @@
+﻿﻿﻿﻿﻿﻿<!DOCTYPE html>
+
+<html lang="zh-CN">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>数据分析训练 — 磐枢工业智能平台(管理端)</title>
+
+<link rel="stylesheet" href="../common-admin.css">
+
+<style>
+
+.modal-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:2000; justify-content:center; align-items:flex-start; padding-top:40px; }
+
+.modal-overlay.active { display:flex; }
+
+.modal-dialog { background:#fff; border:1px solid #e8e8e8; border-radius:4px; width:640px; max-height:80vh; overflow-y:auto; position:relative; z-index:2001; }
+
+.modal-header { display:flex; justify-content:space-between; align-items:center; padding:16px 20px; border-bottom:1px solid #e8e8e8; }
+
+.modal-header .modal-title { font-size: 15px; font-weight: 600; color:#333; }
+
+.modal-close { background: none; border: none; color:#666; font-size: 20px; cursor: pointer; line-height: 1; padding: 0 4px; transition: color var(--transition); }
+
+.modal-close:hover { color:#f5222d; }
+
+.modal-body { padding:20px; color:#333; }
+
+.modal-footer { display:flex; gap:12px; justify-content:flex-end; padding:16px 20px; border-top:1px solid #e8e8e8; background:#f5f5f5; }
+
+</style>
+
+</head>
+
+<body>
+
+
+
+<header class="main-header">
+
+  <div class="header-left">
+
+    <button class="sidebar-toggle" onclick="toggleSidebar()">☰</button>
+
+    <div class="logo">磐枢工业智能平台</div>
+
+  </div>
+
+  <div class="header-right">
+
+    <span class="user-info">管理员</span>
+
+    <button class="btn btn-ghost" onclick="window.location.href='../index.html'">退出</button>
+
+  </div>
+
+</header>
+
+
+
+<aside class="sidebar" id="sidebar">
+
+  <nav class="sidebar-menu">
+
+    <div class="sidebar-menu-item" onclick="window.location.href='../index.html'"><span class="icon">📊</span> 仪表盘</div>
+
+    <div class="sidebar-section-title">AI配置</div>
+
+    <div class="sidebar-menu-item" onclick="window.location.href='./data-center.html'"><span class="icon">🗂️</span> 数据中心</div>
+
+    <div class="sidebar-menu-item active" onclick="window.location.href='./data-analysis.html'"><span class="icon">🤖</span> 数据分析训练</div>
+
+    <div class="sidebar-menu-item" onclick="window.location.href='./knowledge-base.html'"><span class="icon">📚</span> 知识库管理</div>
+
+    <div class="sidebar-section-title">组织权限</div>
+
+    <div class="sidebar-menu-item" onclick="window.location.href='../org-perm/org.html'"><span class="icon">🏢</span> 组织架构</div>
+
+    <div class="sidebar-menu-item" onclick="window.location.href='../org-perm/user.html'"><span class="icon">👤</span> 用户管理</div>
+
+    <div class="sidebar-menu-item" onclick="window.location.href='../org-perm/role.html'"><span class="icon">🔑</span> 角色管理</div>
+
+    <div class="sidebar-section-title">系统</div>
+
+    <div class="sidebar-menu-item" onclick="window.location.href='../system/logs.html'"><span class="icon">📋</span> 操作日志</div>
+
+  </nav>
+
+</aside>
+
+
+
+<main class="main-content" id="mainContent">
+
+  <div class="page-header">
+
+    <div class="page-title">数据分析训练</div>
+
+    <div class="page-actions">
+
+      <button class="btn btn-primary" onclick="showModelCreateModal()">+ 新建分析模型</button>
+
+    </div>
+
+  </div>
+
+
+
+  <div class="filter-bar">
+
+    <div class="filter-tabs">
+
+      <span class="filter-tab active">全部</span>
+
+      <span class="filter-tab">待训练</span>
+
+      <span class="filter-tab">训练中</span>
+
+      <span class="filter-tab">已完成</span>
+
+    </div>
+
+    <div class="filter-actions">
+
+      <button class="btn btn-ghost" onclick="loadAnalysisModels()">刷新</button>
+
+    </div>
+
+  </div>
+
+
+
+  <div class="card" id="data-analysis">
+
+    <div class="data-table-wrapper">
+
+      <table class="data-table">
+
+        <thead>
+
+          <tr>
+
+            <th><input type="checkbox" class="select-all"></th>
+
+            <th>模型名称</th>
+
+            <th>模型类型</th>
+
+            <th>训练数据</th>
+
+            <th>准确率</th>
+
+            <th>状态</th>
+
+            <th>操作</th>
+
+          </tr>
+
+        </thead>
+
+        <tbody></tbody>
+
+      </table>
+
+    </div>
+
+    <div class="pagination">
+
+      <span class="page-info">共 0 条记录，第 0/0 页</span>
+
+    </div>
+
+  </div>
+
+</main>
+
+
+
+<div id="sidebarOverlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:99;" onclick="toggleSidebar()"></div>
+
+
+
+<div class="toast-container" id="toastContainer"></div>
+
+
+
+<div class="modal-overlay" id="modelCreateModal">
+
+  <div class="modal-dialog">
+
+    <div class="modal-header">
+
+      <span class="modal-title">新建分析模型</span>
+
+      <button class="modal-close" onclick="hideModelCreateModal()">×</button>
+
+    </div>
+
+    <div class="modal-body">
+
+      <div class="form-group">
+
+        <label>模型名称 <span class="required">*</span></label>
+
+        <input type="text" placeholder="请输入模型名称">
+
+      </div>
+
+      <div class="form-group">
+
+        <label>模型类型 <span class="required">*</span></label>
+
+        <select>
+
+          <option value="分类">分类</option>
+
+          <option value="回归">回归</option>
+
+          <option value="预测">预测</option>
+
+        </select>
+
+      </div>
+
+      <div class="form-group">
+
+        <label>训练数据来源</label>
+
+        <select>
+
+          <option value="">请选择</option>
+
+          <option value="production">生产数据</option>
+
+          <option value="quality">质量数据</option>
+
+          <option value="inventory">库存数据</option>
+
+        </select>
+
+      </div>
+
+      <div class="form-group">
+
+        <label>描述</label>
+
+        <textarea placeholder="请输入模型描述"></textarea>
+
+      </div>
+
+    </div>
+
+    <div class="modal-footer">
+
+      <button class="btn btn-ghost" onclick="hideModelCreateModal()">取消</button>
+
+      <button class="btn btn-primary" style="background: #1890ff;border-color: #1890ff;color:#0a0e1a;" onclick="createModel()">创建模型</button>
+
+    </div>
+
+  </div>
+
+</div>
+
+
+
+<div class="modal-overlay" id="modelDetailModal">
+
+  <div class="modal-dialog">
+
+    <div class="modal-header">
+
+      <span class="modal-title">模型详情</span>
+
+      <button class="modal-close" onclick="hideModelDetailModal()">×</button>
+
+    </div>
+
+    <div class="modal-body">
+
+      <div class="detail-row"><span class="detail-label">模型名称</span><span class="detail-value">供应商信用评分模型</span></div>
+
+      <div class="detail-row"><span class="detail-label">模型类型</span><span class="detail-value">分类</span></div>
+
+      <div class="detail-row"><span class="detail-label">状态</span><span class="detail-value">已完成</span></div>
+
+      <div class="detail-row"><span class="detail-label">准确率</span><span class="detail-value">94%</span></div>
+
+      <div class="detail-row"><span class="detail-label">训练时间</span><span class="detail-value">2024-01-15 10:30</span></div>
+
+      <div class="detail-row"><span class="detail-label">训练数据量</span><span class="detail-value">10,000 条</span></div>
+
+    </div>
+
+    <div class="modal-footer">
+
+      <button class="btn btn-primary" style="background: #1890ff;border-color: #1890ff;color:#0a0e1a;">开始训练</button>
+
+      <button class="btn btn-ghost" onclick="hideModelDetailModal()">关闭</button>
+
+    </div>
+
+  </div>
+
+</div>
+
+
+
+<div class="confirm-modal-overlay" id="confirmModal">
+
+  <div class="confirm-modal-dialog">
+
+    <div class="confirm-modal-header">
+
+      <span class="confirm-modal-icon" id="confirmIcon">&#9888;</span>
+
+      <span class="confirm-modal-title" id="confirmTitle">温馨提示</span>
+
+    </div>
+
+    <div class="confirm-modal-body">
+
+      <div class="confirm-modal-message" id="confirmMessage"></div>
+
+    </div>
+
+    <div class="confirm-modal-footer">
+
+      <button class="btn btn-sm btn-cancel" onclick="closeConfirmModal(false)">取消</button>
+
+      <button class="btn btn-sm btn-primary" style="background: #1890ff;border-color: #1890ff;color:#0a0e1a;" onclick="closeConfirmModal(true)">确定</button>
+
+    </div>
+
+  </div>
+
+</div>
+
+
+
+<script>
+
+var confirmCallback = null;
+
+
+
+function toggleSidebar() {
+
+  var sidebar = document.getElementById('sidebar');
+
+  var mainContent = document.getElementById('mainContent');
+
+  var overlay = document.getElementById('sidebarOverlay');
+
+  if (sidebar) sidebar.classList.toggle('collapsed');
+
+  if (mainContent) mainContent.classList.toggle('expanded');
+
+  if (overlay) overlay.style.display = (overlay.style.display === 'block') ? 'none' : 'block';
+
+}
+
+
+
+function getAccessToken() { return localStorage.getItem('accessToken'); }
+
+
+
+function checkLogin() {
+
+  if (!getAccessToken()) {
+
+    localStorage.setItem('accessToken', 'local-dev-token-' + Date.now());
+
+  }
+
+  return true;
+
+}
+
+
+
+function showToast(message, type) {
+
+  var container = document.getElementById('toastContainer');
+
+  if (!container) {
+
+    container = document.createElement('div');
+
+    container.id = 'toastContainer';
+
+    container.className = 'toast-container';
+
+    document.body.appendChild(container);
+
+  }
+
+  var icons = { success: '&#9989;', warning: '&#9888;', error: '&#10060;', info: '&#9432;' };
+
+  var titles = { success: '操作成功', warning: '温馨提示', error: '系统提示', info: '系统提示' };
+
+  var t = type || 'info';
+
+  var toast = document.createElement('div');
+
+  toast.className = 'toast toast-' + t;
+
+  toast.innerHTML = '<div class="toast-icon">' + icons[t] + '</div><div class="toast-content"><div class="toast-title">' + titles[t] + '</div><div class="toast-message">' + message + '</div></div>';
+
+  container.appendChild(toast);
+
+  setTimeout(function() {
+
+    toast.style.opacity = '0';
+
+    toast.style.transform = 'translateX(100%)';
+
+    setTimeout(function() { toast.remove(); }, 300);
+
+  }, 3000);
+
+}
+
+
+
+function showConfirm(message, type, callback) {
+
+  confirmCallback = callback;
+
+  document.getElementById('confirmMessage').textContent = message;
+
+  document.getElementById('confirmTitle').textContent = (type === 'warning') ? '温馨提示' : '系统提示';
+
+  document.getElementById('confirmIcon').innerHTML = (type === 'warning') ? '&#9888;' : '&#10060;';
+
+  document.getElementById('confirmModal').classList.add('show');
+
+}
+
+
+
+function closeConfirmModal(result) {
+
+  document.getElementById('confirmModal').classList.remove('show');
+
+  if (confirmCallback) {
+
+    confirmCallback(result);
+
+    confirmCallback = null;
+
+  }
+
+}
+
+
+
+function showModelCreateModal() {
+
+  document.getElementById('modelCreateModal').classList.add('active');
+
+}
+
+
+
+function hideModelCreateModal() {
+
+  document.getElementById('modelCreateModal').classList.remove('active');
+
+}
+
+
+
+function saveModelToLocal(modelName, modelType) {
+
+  var modelList = JSON.parse(localStorage.getItem('erp_analysis_models') || '[]');
+
+  var newModel = {
+
+    id: 'model-' + Date.now(),
+
+    modelName: modelName,
+
+    modelType: modelType,
+
+    trainStatus: 'pending',
+
+    accuracy: null,
+
+    createdAt: new Date().toISOString()
+
+  };
+
+  modelList.push(newModel);
+
+  localStorage.setItem('erp_analysis_models', JSON.stringify(modelList));
+
+}
+
+
+
+async function createModel() {
+
+  var modelName = document.querySelector('#modelCreateModal input[placeholder*="模型名称"]').value;
+
+  var modelType = document.querySelector('#modelCreateModal select').value;
+
+  
+
+  if (!modelName.trim()) {
+
+    showToast('请输入模型名称', 'warning');
+
+    return;
+
+  }
+
+  
+
+  saveModelToLocal(modelName, modelType);
+
+  showToast('模型创建成功', 'success');
+
+  hideModelCreateModal();
+
+  loadAnalysisModels();
+
+  
+
+  try {
+
+    var response = await fetch('http://localhost:3001/api/analysis-model', {
+
+      method: 'POST',
+
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + getAccessToken() },
+
+      body: JSON.stringify({ modelName, modelType })
+
+    });
+
+    var data = await response.json();
+
+    if (data.code !== 200) {
+
+      console.warn('后端创建失败，但已保存到本地缓存');
+
+    }
+
+  } catch (e) {
+
+    console.warn('后端不可用，数据已保存到本地缓存');
+
+  }
+
+}
+
+
+
+function showModelDetail(index) {
+
+  document.getElementById('modelDetailModal').classList.add('active');
+
+}
+
+
+
+function hideModelDetailModal() {
+
+  document.getElementById('modelDetailModal').classList.remove('active');
+
+}
+
+
+
+async function loadAnalysisModels() {
+
+  var finalModels = JSON.parse(localStorage.getItem('erp_analysis_models') || '[]');
+
+  
+
+  if (finalModels.length === 0) {
+
+    finalModels = [
+
+      { id: 'model-001', modelName: '供应商信用评分模型', modelType: '分类', trainStatus: 'completed', accuracy: 0.94, createdAt: new Date().toISOString() },
+
+      { id: 'model-002', modelName: '销售预测模型', modelType: '预测', trainStatus: 'pending', accuracy: null, createdAt: new Date().toISOString() },
+
+      { id: 'model-003', modelName: '库存需求预测', modelType: '回归', trainStatus: 'training', accuracy: null, createdAt: new Date().toISOString() }
+
+    ];
+
+  }
+
+  
+
+  renderModelTable({ list: finalModels, total: finalModels.length, page: 1, pageSize: 20 });
+
+  updateModelStats(finalModels.length);
+
+  
+
+  try {
+
+    var response = await fetch('http://localhost:3001/api/analysis-model?page=1&pageSize=20', {
+
+      headers: { 'Authorization': 'Bearer ' + getAccessToken() }
+
+    });
+
+    var data = await response.json();
+
+    if (data.code === 200 && data.data) {
+
+      var apiModels = data.data.list || [];
+
+      if (apiModels.length > 0) {
+
+        localStorage.setItem('erp_analysis_models', JSON.stringify(apiModels));
+
+        renderModelTable(data.data);
+
+        updateModelStats(data.data.total);
+
+      }
+
+    }
+
+  } catch (e) {
+
+    console.warn('后端模型API不可用，使用本地缓存数据');
+
+  }
+
+}
+
+
+
+function renderModelTable(data) {
+
+  var tbody = document.querySelector('#data-analysis .data-table tbody');
+
+  if (data.list && data.list.length > 0) {
+
+    tbody.innerHTML = data.list.map(function(model) {
+
+      var statusText = { 'pending': '待训练', 'training': '训练中', 'completed': '已完成', 'failed': '训练失败' }[model.trainStatus] || model.trainStatus;
+
+      return '<tr><td><input type="checkbox" class="row-checkbox"></td><td>' + model.modelName + '</td><td>' + model.modelType + '</td><td>-</td><td>' + (model.accuracy ? model.accuracy.toFixed(2) : '-') + '</td><td>' + statusText + '</td><td><button class="btn btn-ghost btn-sm" onclick="editModel(\'' + model.id + '\')">编辑</button><button class="btn btn-danger btn-sm" onclick="deleteModel(\'' + model.id + '\')">删除</button></td></tr>';
+
+    }).join('');
+
+    document.querySelector('#data-analysis .page-info').textContent = '共 ' + data.total + ' 条记录，第 ' + data.page + '/' + Math.ceil(data.total / data.pageSize) + ' 页';
+
+  } else {
+
+    tbody.innerHTML = '<tr><td colspan="100%" style="text-align:center;color:#999;padding:20px;">暂无数据</td></tr>';
+
+    document.querySelector('#data-analysis .page-info').textContent = '共 0 条记录，第 0/0 页';
+
+  }
+
+}
+
+
+
+function updateModelStats(total) {
+
+  var filterTabs = document.querySelectorAll('#data-analysis .filter-tab');
+
+  filterTabs[0].textContent = '全部 (' + total + ')';
+
+}
+
+
+
+async function deleteModel(id) {
+
+  showConfirm('确定要删除该模型吗？', 'warning', async function(result) {
+
+    if (result) {
+
+      try {
+
+        var response = await fetch('http://localhost:3001/api/analysis-model/' + id, {
+
+          method: 'DELETE',
+
+          headers: { 'Authorization': 'Bearer ' + getAccessToken() }
+
+        });
+
+        var data = await response.json();
+
+        if (data.code === 200) {
+
+          showToast('删除成功', 'success');
+
+          loadAnalysisModels();
+
+        } else {
+
+          showToast(data.message || '删除失败', 'error');
+
+        }
+
+      } catch (e) {
+
+        showToast('网络错误', 'error');
+
+      }
+
+    }
+
+  });
+
+}
+
+
+
+function editModel(id) {
+
+  showToast('编辑功能开发中', 'info');
+
+}
+
+
+
+document.addEventListener('DOMContentLoaded', function() {
+
+  loadAnalysisModels();
+
+});
+
+</script>
+
+</body>
+
+</html>

@@ -1,0 +1,6 @@
+<script>
+function toggleGroup(el){var sub=el.nextElementSibling;var arrow=el.querySelector('.arrow');if(sub){var isHidden=sub.style.display==='none';sub.style.display=isHidden?'block':'none';if(arrow)arrow.textContent=isHidden?'\u25BC':'\u25B4';}}
+function toggleSidebar(){document.getElementById('sidebar').classList.toggle('collapsed');document.getElementById('mainContent').classList.toggle('expanded');}
+function showModule(m){window.location.href='../index.html?module='+m;}
+document.querySelectorAll('.filter-tab').forEach(function(tab){tab.addEventListener('click',function(){this.parentElement.querySelectorAll('.filter-tab').forEach(function(t){t.classList.remove('active');});this.classList.add('active');});});
+</script>

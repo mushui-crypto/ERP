@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>员工管理 - 新增/编辑</title>
+<link rel="stylesheet" href="../common.css">
+<script src="../common.js"></script>
+<script></script>
+<style>
+.doc-page{display:flex;height:100vh;background:#f0f2f5;}
+.doc-sidebar{width:200px;background:#001529;color:#fff;display:flex;flex-direction:column;}
+.doc-sidebar-title{padding:16px 20px;font-size:15px;font-weight:600;border-bottom:1px solid #002140;background:#001529;}
+.doc-sidebar-menu{list-style:none;padding:0;margin:0;flex:1;}
+.doc-sidebar-menu li a{display:flex;align-items:center;padding:12px 20px;color:#bfbfbf;text-decoration:none;font-size:13px;transition:all 0.3s;}
+.doc-sidebar-menu li a:hover{background:#002140;color:#fff;}
+.doc-sidebar-menu li a.active{background:#1890ff;color:#fff;}
+.doc-content{flex:1;display:flex;flex-direction:column;overflow:hidden;}
+.doc-header{background:#fff;border-bottom:1px solid #e8e8e8;padding:16px 20px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:100;}
+.doc-header-title{font-size:20px;font-weight:600;color:#333;margin-bottom:4px;}
+.doc-header-subtitle{font-size:13px;color:#999;}
+.doc-toolbar{display:flex;gap:8px;flex-wrap:wrap;}
+.toolbar-btn{padding:6px 12px;border-radius:4px;font-size:13px;cursor:pointer;border:1px solid #d9d9d9;background:#fff;color:#666;display:flex;align-items:center;gap:6px;transition:all 0.3s;}
+.toolbar-btn:hover{border-color:#1890ff;color:#1890ff;}
+.toolbar-btn.primary{background:#1890ff;color:#fff;border-color:#1890ff;}
+.doc-body{flex:1;padding:16px;overflow-y:auto;}
+.doc-card{background:#fff;border-radius:4px;box-shadow:0 1px 2px rgba(0,0,0,0.05);overflow:hidden;margin-bottom:16px;}
+.doc-card-title{padding:14px 20px;border-bottom:1px solid #e8e8e8;font-weight:600;font-size:14px;color:#333;background:#fafafa;}
+.form-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px 16px;padding:20px;}
+.form-item{display:flex;flex-direction:column;}
+.form-item label{font-size:13px;color:#666;margin-bottom:4px;font-weight:500;}
+.form-item label .required{color:#f5222d;margin-left:2px;}
+.form-item input,.form-item select{padding:6px 10px;border:1px solid #e8e8e8;border-radius:4px;font-size:13px;color:#333;}
+.form-item input:focus,.form-item select:focus{outline:none;border-color:#1890ff;}
+.form-item input.error,.form-item select.error{border-color:#f5222d;}
+.lookup-field{display:flex;align-items:center;}
+.lookup-field input{flex:1;border-radius:4px 0 0 4px;}
+.lookup-field button{width:28px;height:28px;border:1px solid #e8e8e8;border-left:none;border-radius:0 4px 4px 0;background:#fff;cursor:pointer;}
+.toast{position:fixed;top:20px;right:20px;padding:12px 24px;border-radius:4px;color:#fff;font-size:14px;z-index:9999;box-shadow:0 2px 8px rgba(0,0,0,0.15);}
+.toast-success{background:#52c41a;}
+.toast-warning{background:#faad14;}
+.toast-error{background:#f5222d;}
+.toast-info{background:#1890ff;}
+</style>
+</head>
+<body>
+<div class="doc-page">
+  <aside class="doc-sidebar">
+    <div class="doc-sidebar-title">业务导航</div>
+    <ul class="doc-sidebar-menu">
+      <li><a href="hr-employee.html"><span class="menu-icon">&#128203;</span> 员工管理列表</a></li>
+      <li><a href="#" class="active"><span class="menu-icon">&#10010;</span> 员工管理新增</a></li>
+    </ul>
+  </aside>
+  <div class="doc-content">
+    <header class="doc-header">
+      <div>
+        <div class="doc-header-title">员工管理 - 新增</div>
+        <div class="doc-header-subtitle">新建员工管理</div>
+      </div>
+      <div class="doc-toolbar">
+        <button class="toolbar-btn" onclick="goToList()"><span class="icon">📋</span> 列表</button>
+        <button class="toolbar-btn primary" onclick="saveDoc()"><span class="icon">✓</span> 保存</button>
+      </div>
+    </header>
+    <div class="doc-body">
+      <div class="doc-card">
+        <div class="doc-card-title">基本信息</div>
+        <div class="form-grid">
+          <div class="form-item"><label>员工编号<span class="required">*</span></label><input type="text" id="field_code" placeholder="请输入员工编号"></div>
+          <div class="form-item"><label>员工姓名<span class="required">*</span></label><input type="text" id="field_name" placeholder="请输入员工姓名"></div>
+          <div class="form-item"><label>性别</label><select id="field_gender"><option value="">请选择</option><option value="male">男</option><option value="female">女</option></select></div>
+          <div class="form-item"><label>所属部门<span class="required">*</span></label><input type="text" id="field_department" placeholder="请输入所属部门"></div>
+          <div class="form-item"><label>职位</label><input type="text" id="field_position" placeholder="请输入职位"></div>
+          <div class="form-item"><label>入职日期</label><input type="date" id="field_hireDate"></div>
+          <div class="form-item"><label>手机号</label><input type="text" id="field_phone" placeholder="请输入手机号"></div>
+          <div class="form-item"><label>邮箱</label><input type="text" id="field_email" placeholder="请输入邮箱"></div>
+          <div class="form-item"><label>身份证号</label><input type="text" id="field_idCard" placeholder="请输入身份证号"></div>
+          <div class="form-item"><label>状态</label><select id="field_status"><option value="1">在职</option><option value="0">离职</option></select></div>
+          <div class="form-item"><label>薪资</label><input type="text" id="field_salary" placeholder="请输入薪资"></div>
+          <div class="form-item"><label>备注</label><input type="text" id="field_remark" placeholder="请输入备注"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+function goToList() { location.href = 'hr-employee.html'; }
+
+, 3000);
+}
+
+function saveDoc() {
+  var code = document.getElementById('field_code').value.trim();
+  var name = document.getElementById('field_name').value.trim();
+  var department = document.getElementById('field_department').value.trim();
+  
+  if (!code) {
+    showToast('请输入员工编号', 'warning');
+    document.getElementById('field_code').focus();
+    return;
+  }
+  
+  if (!name) {
+    showToast('请输入员工姓名', 'warning');
+    document.getElementById('field_name').focus();
+    return;
+  }
+  
+  if (!department) {
+    showToast('请输入所属部门', 'warning');
+    document.getElementById('field_department').focus();
+    return;
+  }
+  
+  var phone = document.getElementById('field_phone').value.trim();
+  if (phone && !/^1[3-9]\d{9}$/.test(phone)) {
+    showToast('请输入正确的手机号', 'warning');
+    document.getElementById('field_phone').focus();
+    return;
+  }
+  
+  var email = document.getElementById('field_email').value.trim();
+  if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    showToast('请输入正确的邮箱地址', 'warning');
+    document.getElementById('field_email').focus();
+    return;
+  }
+  
+  var employee = {
+    id: Date.now().toString(),
+    code: code,
+    name: name,
+    gender: document.getElementById('field_gender').value,
+    department: department,
+    position: document.getElementById('field_position').value.trim(),
+    hireDate: document.getElementById('field_hireDate').value,
+    phone: phone,
+    email: email,
+    idCard: document.getElementById('field_idCard').value.trim(),
+    status: document.getElementById('field_status').value || '1',
+    salary: document.getElementById('field_salary').value.trim(),
+    remark: document.getElementById('field_remark').value.trim(),
+    createdAt: new Date().toISOString()
+  };
+  
+  var list = JSON.parse(localStorage.getItem('erp_employees_cache') || '[]');
+  list.push(employee);
+  localStorage.setItem('erp_employees_cache', JSON.stringify(list));
+  
+  showToast('保存成功！', 'success');
+}
+</script>
+</body>
+</html>

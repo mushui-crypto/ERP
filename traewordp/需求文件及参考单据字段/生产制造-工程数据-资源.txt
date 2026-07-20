@@ -1,0 +1,52 @@
+生产制造-工程数据-资源
+
+
+段说明：
+单据头：FBillHead 
+	 实体主键：FID 
+	 数据状态：FDocumentStatus 
+	 禁用状态：FForbidStatus 
+	 名称：FName  (必填项)
+	 编码：FNumber 
+	 描述：FDescription 
+	 创建组织：FCreateOrgId  (必填项)
+	 使用组织：FUseOrgId  (必填项)
+	 创建人：FCreatorId 
+	 修改人：FModifierId 
+	 创建日期：FCreateDate 
+	 修改日期：FModifyDate 
+	 禁用人：FForbidderId 
+	 审核人：FApproverId 
+	 禁用日期：FForbidDate 
+	 审核日期：FApproveDate 
+	 资源数量：FQty 
+	 工作中心共享：FIsShareRsc 
+	 资源类别：FRSRCCategory  (必填项)
+	 数量单位：FUnitID  (必填项)
+	 生效日期：FEffectDate  (必填项)
+	 失效日期：FExpireDate  (必填项)
+	 计算能力：FIsCalcCapacity 
+	 能力单位：FCapacityUnitID 
+	 利用率%：FEfficiency 
+	 按有限产能排产：FIsLimitedCap 
+	 独占资源：FIsOneselfRsrc 
+	 已设置工作日历：FIsSetWorCal 
+	 能力单位类别：FCapaUnitType 
+	 作业：FProcessId 
+能力例外：FCapaExceptionEntity 
+	 实体主键：FEntryID 
+	 起始日期：FBgDate 
+	 结束日期：FEndDate 
+	 效率：FExcptEfficient 
+	 备注：FExcptRemark 
+	 资源数量：FRsrcQty 
+资源明细：FResourceDetailEntry 
+	 实体主键：FEntryID 
+	 编码：FResId  (必填项)
+	 资源类别：FResourceTypeId  (必填项)
+	 名称：FResName 
+	 禁用：FIsForbidden 
+	 名称：FResourceName 
+	 组别：FGroupId 
+	 生产顺序：FPrdSeq 
+	 代理报工：FIsAgentReport 

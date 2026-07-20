@@ -1,0 +1,3859 @@
+<!DOCTYPE html>
+
+
+
+<html lang="zh-CN">
+
+
+
+<head>
+
+
+
+<meta charset="UTF-8">
+
+
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+
+
+<title>企业驾驶舱 — 磐枢工业智能平台</title>
+
+
+
+<link rel="stylesheet" href="../common.css">
+
+
+
+<script src="../common.js"></script>
+<script>
+</script>
+
+
+
+<style>
+
+
+
+
+
+
+
+.toast-container {
+
+
+
+  position: fixed;
+
+
+
+  top: 60px;
+
+
+
+  right: 20px;
+
+
+
+  z-index: 1000;
+
+
+
+  display: flex;
+
+
+
+  flex-direction: column;
+
+
+
+  gap: 8px;
+
+
+
+}
+
+
+
+.toast {
+
+
+
+  padding: 12px 16px;
+
+
+
+  border-radius: var(--radius-md);
+
+
+
+  font-size: 13px;
+
+
+
+  color: var(--text-primary);
+
+
+
+  min-width: 280px;
+
+
+
+  max-width: 400px;
+
+
+
+  display: flex;
+
+
+
+  align-items: center;
+
+
+
+  gap: 8px;
+
+
+
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+
+
+
+  animation: toastIn 0.3s ease;
+
+
+
+}
+
+
+
+@keyframes toastIn {
+
+
+
+  from { opacity: 0; transform: translateX(100%); }
+
+
+
+  to { opacity: 1; transform: translateX(0); }
+
+
+
+}
+
+
+
+.toast-success { background: rgba(34,197,94,0.9); }
+
+
+
+.toast-error { background: rgba(239,68,68,0.9); }
+
+
+
+.toast-warning { background: rgba(234,179,8,0.9); }
+
+
+
+.toast-info { background: rgba(6,182,212,0.9); }
+
+
+
+.toast-icon { font-size: 16px; }
+
+
+
+
+
+
+
+.confirm-modal-overlay {
+
+
+
+  position: fixed;
+
+
+
+  inset: 0;
+
+
+
+  background: rgba(0,0,0,0.6);
+
+
+
+  display: none;
+
+
+
+  align-items: center;
+
+
+
+  justify-content: center;
+
+
+
+  z-index: 2000;
+
+
+
+}
+
+
+
+.confirm-modal-overlay.show { display: flex; }
+
+
+
+.confirm-modal {
+
+
+
+  background: var(--bg-surface);
+
+
+
+  border: 1px solid var(--border-normal);
+
+
+
+  border-radius: var(--radius-lg);
+
+
+
+  padding: 24px;
+
+
+
+  min-width: 360px;
+
+
+
+  max-width: 480px;
+
+
+
+  box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+
+
+
+}
+
+
+
+.confirm-modal-header {
+
+
+
+  font-size: 14px;
+
+
+
+  font-weight: 600;
+
+
+
+  color: var(--text-primary);
+
+
+
+  margin-bottom: 12px;
+
+
+
+}
+
+
+
+.confirm-modal-body {
+
+
+
+  font-size: 13px;
+
+
+
+  color: var(--text-secondary);
+
+
+
+  line-height: 1.6;
+
+
+
+  margin-bottom: 20px;
+
+
+
+}
+
+
+
+.confirm-modal-footer {
+
+
+
+  display: flex;
+
+
+
+  justify-content: flex-end;
+
+
+
+  gap: 8px;
+
+
+
+}
+
+
+
+
+
+
+
+
+.lookup-modal { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:2000; justify-content:center; align-items:center; }
+.lookup-modal.show { display:flex; }
+.lookup-dialog { background:#fff; border:1px solid #e8e8e8; border-radius:4px; width:720px; max-height:70vh; overflow:hidden; }
+.lookup-header { padding:14px 20px; border-bottom:1px solid #e8e8e8; display:flex; align-items:center; justify-content:space-between; }
+.lookup-title { font-size:15px; font-weight:600; color:#333; }
+.lookup-close { font-size:20px; color:#666; cursor:pointer; background:none; border:none; }
+.lookup-close:hover { color:#333; }
+.lookup-body { padding:16px; }
+.lookup-search { display:flex; gap:8px; margin-bottom:12px; }
+.lookup-search input { flex:1; padding:6px 10px; border:1px solid #e8e8e8; border-radius:4px; font-size:13px; }
+.lookup-search button { padding:6px 16px; background:#1890ff; color:#fff; border:none; border-radius:4px; cursor:pointer; }
+.lookup-table { width:100%; border-collapse:collapse; font-size:13px; }
+.lookup-table th, .lookup-table td { padding:10px 12px; text-align:left; border-bottom:1px solid #e8e8e8; }
+.lookup-table th { background:#fafafa; font-weight:600; color:#333; }
+.lookup-table tr:hover { background:#f5f5f5; }
+.lookup-table .checkbox-cell { width:40px; }
+.lookup-footer { padding:12px 20px; border-top:1px solid #e8e8e8; display:flex; justify-content:flex-end; gap:8px; }
+.lookup-field { display:flex; align-items:center; }
+.lookup-field input { flex:1; padding:6px 10px; border:1px solid #e8e8e8; border-radius:4px 0 0 4px; font-size:13px; }
+.lookup-field button { width:28px; height:28px; border:1px solid #e8e8e8; border-left:none; border-radius:0 4px 4px 0; background:#fff; cursor:pointer; display:flex; align-items:center; justify-content:center; }
+.lookup-field button:hover { background:#f5f5f5; }
+
+</style>
+
+
+
+<style>
+
+
+
+/* KPI Stat Cards */
+
+
+
+.page-body .kpi-row {
+
+
+
+  display: flex !important;
+
+
+
+  flex-wrap: nowrap !important;
+
+
+
+  gap: 12px;
+
+
+
+  margin-bottom: 20px;
+
+
+
+  width: 100%;
+
+
+
+}
+
+
+
+.page-body .kpi-card {
+
+
+
+  flex: 0 0 calc((100% - 60px) / 6) !important;
+
+
+
+  min-width: 0;
+
+
+
+  background: var(--bg-surface);
+
+
+
+  border: 1px solid var(--border-normal);
+
+
+
+  border-radius: var(--radius-md);
+
+
+
+  padding: 12px 12px;
+
+
+
+  transition: border-color var(--transition);
+
+
+
+  position: relative;
+
+
+
+  overflow: hidden;
+
+
+
+}
+
+
+
+.kpi-card:hover { border-color: var(--border-strong); }
+
+
+
+.kpi-card .kpi-icon {
+
+
+
+  font-size: 14px;
+
+
+
+  opacity: 0.5;
+
+
+
+  margin-bottom: 3px;
+
+
+
+}
+
+
+
+.kpi-card .kpi-value {
+
+
+
+  font-family: var(--font-mono);
+
+
+
+  font-size: 20px;
+
+
+
+  font-weight: 700;
+
+
+
+  color: var(--text-primary);
+
+
+
+  line-height: 1.2;
+
+
+
+  white-space: nowrap;
+
+
+
+  overflow: hidden;
+
+
+
+  text-overflow: ellipsis;
+
+
+
+}
+
+
+
+.kpi-card .kpi-value .unit {
+
+
+
+  font-size: 11px;
+
+
+
+  font-weight: 400;
+
+
+
+  color: var(--text-tertiary);
+
+
+
+  margin-left: 2px;
+
+
+
+}
+
+
+
+.kpi-card .kpi-label {
+
+
+
+  font-size: 11px;
+
+
+
+  color: var(--text-tertiary);
+
+
+
+  margin-top: 3px;
+
+
+
+  white-space: nowrap;
+
+
+
+  overflow: hidden;
+
+
+
+  text-overflow: ellipsis;
+
+
+
+}
+
+
+
+.kpi-card .kpi-trend {
+
+
+
+  font-size: 10px;
+
+
+
+  font-family: var(--font-mono);
+
+
+
+  margin-top: 3px;
+
+
+
+  font-weight: 500;
+
+
+
+  white-space: nowrap;
+
+
+
+  overflow: hidden;
+
+
+
+  text-overflow: ellipsis;
+
+
+
+}
+
+
+
+.kpi-card .kpi-trend.up { color: var(--color-success); }
+
+
+
+.kpi-card .kpi-trend.down { color: var(--color-error); }
+
+
+
+
+
+
+
+/* Section title */
+
+
+
+.section-title {
+
+
+
+  font-size: 14px;
+
+
+
+  font-weight: 600;
+
+
+
+  color: var(--text-primary);
+
+
+
+  margin-bottom: 12px;
+
+
+
+  display: flex;
+
+
+
+  align-items: center;
+
+
+
+  gap: 8px;
+
+
+
+}
+
+
+
+.section-title .dot {
+
+
+
+  width: 3px;
+
+
+
+  height: 14px;
+
+
+
+  border-radius: 1px;
+
+
+
+  background: var(--text-accent);
+
+
+
+  flex-shrink: 0;
+
+
+
+}
+
+
+
+
+
+
+
+/* Middle row layout */
+
+
+
+.chart-row-mid {
+
+
+
+  display: grid;
+
+
+
+  grid-template-columns: 3fr 2fr;
+
+
+
+  gap: 16px;
+
+
+
+  margin-bottom: 20px;
+
+
+
+}
+
+
+
+.chart-row-bottom {
+
+
+
+  display: grid;
+
+
+
+  grid-template-columns: 4fr 3fr 3fr;
+
+
+
+  gap: 16px;
+
+
+
+  margin-bottom: 20px;
+
+
+
+}
+
+
+
+
+
+
+
+/* CSS Bar Chart */
+
+
+
+.bar-chart-wrapper { position: relative; }
+
+
+
+.bar-chart {
+
+
+
+  display: flex;
+
+
+
+  align-items: flex-end;
+
+
+
+  gap: 24px;
+
+
+
+  height: 200px;
+
+
+
+  padding-top: 24px;
+
+
+
+  border-bottom: 1px solid var(--border-normal);
+
+
+
+  position: relative;
+
+
+
+}
+
+
+
+.sales-trend-line {
+
+
+
+  position: absolute;
+
+
+
+  top: 0;
+
+
+
+  left: 0;
+
+
+
+  width: 100%;
+
+
+
+  height: calc(100% - 32px);
+
+
+
+  pointer-events: none;
+
+
+
+  z-index: 2;
+
+
+
+}
+
+
+
+.sales-trend-line polyline {
+
+
+
+  fill: none;
+
+
+
+  stroke: #f59e0b;
+
+
+
+  stroke-width: 2.5;
+
+
+
+  stroke-linecap: round;
+
+
+
+  stroke-linejoin: round;
+
+
+
+  filter: drop-shadow(0 0 4px rgba(245,158,11,0.4));
+
+
+
+}
+
+
+
+.sales-trend-line circle {
+
+
+
+  fill: #f59e0b;
+
+
+
+  stroke: var(--bg-surface);
+
+
+
+  stroke-width: 2;
+
+
+
+  r: 4;
+
+
+
+}
+
+
+
+.sales-trend-line .trend-label {
+
+
+
+  fill: #f59e0b;
+
+
+
+  font-size: 10px;
+
+
+
+  font-family: var(--font-mono);
+
+
+
+  font-weight: 600;
+
+
+
+  text-anchor: middle;
+
+
+
+}
+
+
+
+.bar-chart .bar-item {
+
+
+
+  flex: 1;
+
+
+
+  display: flex;
+
+
+
+  flex-direction: column;
+
+
+
+  align-items: center;
+
+
+
+  gap: 6px;
+
+
+
+  position: relative;
+
+
+
+}
+
+
+
+.bar-chart .bar-fill {
+
+
+
+  width: 32px;
+
+
+
+  border-radius: 3px 3px 0 0;
+
+
+
+  transition: height 300ms ease;
+
+
+
+  position: relative;
+
+
+
+}
+
+
+
+.bar-chart .bar-fill::before {
+
+
+
+  content: attr(data-value);
+
+
+
+  position: absolute;
+
+
+
+  top: -20px;
+
+
+
+  left: 50%;
+
+
+
+  transform: translateX(-50%);
+
+
+
+  font-size: 11px;
+
+
+
+  font-family: var(--font-mono);
+
+
+
+  color: var(--text-secondary);
+
+
+
+  white-space: nowrap;
+
+
+
+}
+
+
+
+.bar-chart .bar-label {
+
+
+
+  font-size: 11px;
+
+
+
+  color: var(--text-tertiary);
+
+
+
+  position: absolute;
+
+
+
+  bottom: -24px;
+
+
+
+}
+
+
+
+
+
+
+
+/* Production progress list */
+
+
+
+.prod-list { list-style: none; padding: 0; margin: 0; }
+
+
+
+.prod-list li {
+
+
+
+  display: flex;
+
+
+
+  flex-direction: column;
+
+
+
+  gap: 4px;
+
+
+
+  padding: 10px 0;
+
+
+
+  border-bottom: 1px solid var(--border-normal);
+
+
+
+}
+
+
+
+.prod-list li:last-child { border-bottom: none; }
+
+
+
+.prod-list .prod-header {
+
+
+
+  display: flex;
+
+
+
+  align-items: center;
+
+
+
+  justify-content: space-between;
+
+
+
+  font-size: 13px;
+
+
+
+}
+
+
+
+.prod-list .prod-name { color: var(--text-secondary); }
+
+
+
+.prod-list .prod-pct { color: var(--text-accent); font-family: var(--font-mono); font-weight: 600; font-size: 12px; }
+
+
+
+.prod-list .prod-bar {
+
+
+
+  width: 100%;
+
+
+
+  height: 6px;
+
+
+
+  background: var(--bg-inset);
+
+
+
+  border-radius: 3px;
+
+
+
+  overflow: hidden;
+
+
+
+}
+
+
+
+.prod-list .prod-bar .fill {
+
+
+
+  height: 100%;
+
+
+
+  border-radius: 3px;
+
+
+
+  transition: width 500ms ease;
+
+
+
+}
+
+
+
+.prod-list .prod-meta {
+
+
+
+  font-size: 11px;
+
+
+
+  color: var(--text-tertiary);
+
+
+
+}
+
+
+
+
+
+
+
+/* Inventory warning list */
+
+
+
+.warn-list { list-style: none; padding: 0; margin: 0; }
+
+
+
+.warn-list li {
+
+
+
+  padding: 10px 0;
+
+
+
+  border-bottom: 1px solid var(--border-normal);
+
+
+
+}
+
+
+
+.warn-list li:last-child { border-bottom: none; }
+
+
+
+.warn-list .warn-header {
+
+
+
+  display: flex;
+
+
+
+  align-items: center;
+
+
+
+  justify-content: space-between;
+
+
+
+  font-size: 13px;
+
+
+
+  margin-bottom: 4px;
+
+
+
+}
+
+
+
+.warn-list .warn-name { color: var(--text-secondary); }
+
+
+
+.warn-list .warn-ratio { font-family: var(--font-mono); font-size: 12px; font-weight: 600; }
+
+
+
+.warn-list .warn-bar {
+
+
+
+  width: 100%;
+
+
+
+  height: 6px;
+
+
+
+  background: var(--bg-inset);
+
+
+
+  border-radius: 3px;
+
+
+
+  overflow: hidden;
+
+
+
+}
+
+
+
+.warn-list .warn-bar .fill {
+
+
+
+  height: 100%;
+
+
+
+  border-radius: 3px;
+
+
+
+}
+
+
+
+
+
+
+
+/* Quality Pareto */
+
+
+
+.pareto-list { list-style: none; padding: 0; margin: 0; }
+
+
+
+.pareto-list li {
+
+
+
+  margin-bottom: 10px;
+
+
+
+}
+
+
+
+.pareto-list .pareto-header {
+
+
+
+  display: flex;
+
+
+
+  align-items: center;
+
+
+
+  justify-content: space-between;
+
+
+
+  font-size: 12px;
+
+
+
+  margin-bottom: 4px;
+
+
+
+}
+
+
+
+.pareto-list .pareto-name { color: var(--text-secondary); }
+
+
+
+.pareto-list .pareto-count { color: var(--text-accent); font-family: var(--font-mono); font-weight: 600; }
+
+
+
+.pareto-list .pareto-bar {
+
+
+
+  width: 100%;
+
+
+
+  height: 8px;
+
+
+
+  background: var(--bg-inset);
+
+
+
+  border-radius: 3px;
+
+
+
+  overflow: hidden;
+
+
+
+}
+
+
+
+.pareto-list .pareto-bar .fill {
+
+
+
+  height: 100%;
+
+
+
+  border-radius: 3px;
+
+
+
+}
+
+
+
+
+
+
+
+/* Circular gauge */
+
+
+
+.gauge-row {
+
+
+
+  display: flex;
+
+
+
+  gap: 16px;
+
+
+
+  justify-content: center;
+
+
+
+  flex-wrap: wrap;
+
+
+
+}
+
+
+
+.gauge-item {
+
+
+
+  display: flex;
+
+
+
+  flex-direction: column;
+
+
+
+  align-items: center;
+
+
+
+  gap: 8px;
+
+
+
+}
+
+
+
+.gauge-circle {
+
+
+
+  width: 80px;
+
+
+
+  height: 80px;
+
+
+
+  border-radius: 50%;
+
+
+
+  position: relative;
+
+
+
+  display: flex;
+
+
+
+  align-items: center;
+
+
+
+  justify-content: center;
+
+
+
+}
+
+
+
+.gauge-circle .gauge-bg {
+
+
+
+  position: absolute;
+
+
+
+  width: 100%;
+
+
+
+  height: 100%;
+
+
+
+  border-radius: 50%;
+
+
+
+  border: 4px solid var(--bg-inset);
+
+
+
+}
+
+
+
+.gauge-circle .gauge-ring {
+
+
+
+  position: absolute;
+
+
+
+  width: 100%;
+
+
+
+  height: 100%;
+
+
+
+  border-radius: 50%;
+
+
+
+  border: 4px solid transparent;
+
+
+
+  border-top-color: var(--text-accent);
+
+
+
+  border-right-color: var(--text-accent);
+
+
+
+  transform: rotate(-45deg);
+
+
+
+  clip-path: none;
+
+
+
+}
+
+
+
+.gauge-circle .gauge-value {
+
+
+
+  font-family: var(--font-mono);
+
+
+
+  font-size: 16px;
+
+
+
+  font-weight: 700;
+
+
+
+  color: var(--text-primary);
+
+
+
+  z-index: 1;
+
+
+
+}
+
+
+
+.gauge-label {
+
+
+
+  font-size: 12px;
+
+
+
+  color: var(--text-tertiary);
+
+
+
+}
+
+
+
+.gauge-name {
+
+
+
+  font-size: 13px;
+
+
+
+  color: var(--text-secondary);
+
+
+
+  font-weight: 500;
+
+
+
+}
+
+
+
+
+
+
+
+/* CSS Conic gradient gauge */
+
+
+
+.gauge-conic {
+
+
+
+  width: 80px;
+
+
+
+  height: 80px;
+
+
+
+  border-radius: 50%;
+
+
+
+  position: relative;
+
+
+
+  display: flex;
+
+
+
+  align-items: center;
+
+
+
+  justify-content: center;
+
+
+
+}
+
+
+
+.gauge-conic .gauge-inner {
+
+
+
+  width: 62px;
+
+
+
+  height: 62px;
+
+
+
+  border-radius: 50%;
+
+
+
+  background: var(--bg-surface);
+
+
+
+  display: flex;
+
+
+
+  align-items: center;
+
+
+
+  justify-content: center;
+
+
+
+  z-index: 1;
+
+
+
+}
+
+
+
+.gauge-conic .gauge-val {
+
+
+
+  font-family: var(--font-mono);
+
+
+
+  font-size: 15px;
+
+
+
+  font-weight: 700;
+
+
+
+  color: var(--text-primary);
+
+
+
+}
+
+
+
+
+
+
+
+/* Responsive */
+
+
+
+@media (max-width: 1200px) {
+
+
+
+  .page-body .kpi-row { flex-wrap: wrap !important; }
+
+
+
+  .page-body .kpi-card { flex: 0 0 calc(33.33% - 8px) !important; }
+
+
+
+  .chart-row-mid { grid-template-columns: 1fr; }
+
+
+
+  .chart-row-bottom { grid-template-columns: 1fr; }
+
+
+
+}
+
+
+
+@media (max-width: 900px) {
+
+
+
+  .page-body .kpi-card { flex: 0 0 calc(50% - 6px) !important; }
+
+
+
+}
+
+
+
+@media (max-width: 768px) {
+
+
+
+  .page-body .kpi-card { flex: 0 0 calc(50% - 6px) !important; }
+
+
+
+  .page-body .kpi-card .kpi-value { font-size: 20px; }
+
+
+
+}
+
+
+
+
+.lookup-modal { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:2000; justify-content:center; align-items:center; }
+.lookup-modal.show { display:flex; }
+.lookup-dialog { background:#fff; border:1px solid #e8e8e8; border-radius:4px; width:720px; max-height:70vh; overflow:hidden; }
+.lookup-header { padding:14px 20px; border-bottom:1px solid #e8e8e8; display:flex; align-items:center; justify-content:space-between; }
+.lookup-title { font-size:15px; font-weight:600; color:#333; }
+.lookup-close { font-size:20px; color:#666; cursor:pointer; background:none; border:none; }
+.lookup-close:hover { color:#333; }
+.lookup-body { padding:16px; }
+.lookup-search { display:flex; gap:8px; margin-bottom:12px; }
+.lookup-search input { flex:1; padding:6px 10px; border:1px solid #e8e8e8; border-radius:4px; font-size:13px; }
+.lookup-search button { padding:6px 16px; background:#1890ff; color:#fff; border:none; border-radius:4px; cursor:pointer; }
+.lookup-table { width:100%; border-collapse:collapse; font-size:13px; }
+.lookup-table th, .lookup-table td { padding:10px 12px; text-align:left; border-bottom:1px solid #e8e8e8; }
+.lookup-table th { background:#fafafa; font-weight:600; color:#333; }
+.lookup-table tr:hover { background:#f5f5f5; }
+.lookup-table .checkbox-cell { width:40px; }
+.lookup-footer { padding:12px 20px; border-top:1px solid #e8e8e8; display:flex; justify-content:flex-end; gap:8px; }
+.lookup-field { display:flex; align-items:center; }
+.lookup-field input { flex:1; padding:6px 10px; border:1px solid #e8e8e8; border-radius:4px 0 0 4px; font-size:13px; }
+.lookup-field button { width:28px; height:28px; border:1px solid #e8e8e8; border-left:none; border-radius:0 4px 4px 0; background:#fff; cursor:pointer; display:flex; align-items:center; justify-content:center; }
+.lookup-field button:hover { background:#f5f5f5; }
+
+</style>
+
+
+
+</head>
+
+
+
+<body>
+
+
+
+
+
+
+
+<aside class="sidebar" id="sidebar">
+
+
+
+<div class="sidebar-logo">
+
+
+
+    <img src="../images/logo.png" alt="磐枢工业智能平台" style="width: 100%; max-width: 200px; margin-bottom: 8px;">
+
+
+
+    <h1 style="font-size: 16px; margin: 0;">磐枢工业智能平台</h1>
+
+
+
+  </div>
+
+
+
+  <nav class="sidebar-menu"></nav>
+
+
+
+<div class="sidebar-user"><div class="avatar">管</div>
+
+
+
+</aside>
+
+
+
+
+
+
+
+<div class="main-content" id="mainContent" id="mainContent">
+
+
+
+  <div class="page-header" style="position:sticky;top:0;z-index:100;">
+
+
+
+    <div>
+
+
+
+      <div class="flex items-center gap-8">
+
+
+
+        <button class="sidebar-toggle" onclick="toggleSidebar()">☰</button>
+
+
+
+        <div>
+
+
+
+          <h2>企业驾驶舱</h2>
+
+
+
+          <div class="breadcrumb"><a href="../index.html">首页</a><span>></span><span>驾驶舱</span></div></div>
+
+
+
+        </div>
+
+
+
+      </div>
+
+
+
+    </div>
+
+
+
+    <div class="page-actions">
+
+
+
+      <select class="form-select" style="width:120px;">
+
+
+
+        <option>2026年7月</option>
+
+
+
+        <option>2026年6月</option>
+
+
+
+        <option>2026年5月</option>
+
+
+
+      </select>
+
+
+
+      <button class="btn btn-primary btn-sm" onclick="showAIReportModal()">🤖 AI生成经营报告</button>
+
+
+
+      <button class="btn btn-ghost btn-sm">🔄 刷新</button>
+
+
+
+      <button class="btn btn-ghost btn-sm">🔔 消息</button>
+
+
+
+    </div>
+
+
+
+  </div>
+
+  <div class="doc-header" style="background:#fff;border-bottom:1px solid #e8e8e8;padding:12px 20px;display:flex;justify-content:space-between;align-items:center;">
+    <div style="font-size:14px;color:#666;">快捷操作</div>
+    <div class="doc-toolbar" style="display:flex;gap:8px;flex-wrap:wrap;">
+      <button class="toolbar-btn" style="padding:6px 12px;border-radius:4px;font-size:13px;cursor:pointer;border:1px solid #d9d9d9;background:#fff;color:#666;display:flex;align-items:center;gap:6px;transition:all 0.3s;" onclick="showToast('刷新功能开发中...', 'info')"><span>🔄</span> 刷新</button>
+      <button class="toolbar-btn" style="padding:6px 12px;border-radius:4px;font-size:13px;cursor:pointer;border:1px solid #d9d9d9;background:#fff;color:#666;display:flex;align-items:center;gap:6px;transition:all 0.3s;" onclick="showToast('列设置功能开发中...', 'info')"><span>⚙️</span> 显示/隐藏列</button>
+      <button class="toolbar-btn" style="padding:6px 12px;border-radius:4px;font-size:13px;cursor:pointer;border:1px solid #d9d9d9;background:#fff;color:#666;display:flex;align-items:center;gap:6px;transition:all 0.3s;" onclick="showToast('导出功能开发中...', 'info')"><span>📤</span> 导出</button>
+      <button class="toolbar-btn danger" style="padding:6px 12px;border-radius:4px;font-size:13px;cursor:pointer;border:1px solid #f5222d;background:#f5222d;color:#fff;display:flex;align-items:center;gap:6px;transition:all 0.3s;" onclick="showConfirm('确认退出？', function() {location.href='../index.html';});)"><span>✖️</span> 退出</button>
+    </div>
+  </div>
+
+  <div class="page-body">
+
+
+
+
+
+
+
+    <!-- Row 1: KPI Cards -->
+
+
+
+    <div class="kpi-row">
+
+
+
+      <div class="kpi-card">
+
+
+
+        <div class="kpi-icon">💰</div>
+
+
+
+        <div class="kpi-value">2,340<span class="unit">万</span></div>
+
+
+
+        <div class="kpi-label">本月销售额</div>
+
+
+
+        <div class="kpi-trend up">&#9650; +8.5% 同比增长</div>
+
+
+
+      </div>
+
+
+
+      <div class="kpi-card">
+
+
+
+        <div class="kpi-icon">📊</div>
+
+
+
+        <div class="kpi-value">87.2<span class="unit">%</span></div>
+
+
+
+        <div class="kpi-label">生产订单完成率</div>
+
+
+
+        <div class="kpi-trend up">&#9650; +3.2% 较上月</div>
+
+
+
+      </div>
+
+
+
+      <div class="kpi-card">
+
+
+
+        <div class="kpi-icon">📦</div>
+
+
+
+        <div class="kpi-value">18.5<span class="unit">天</span></div>
+
+
+
+        <div class="kpi-label">库存周转天数</div>
+
+
+
+        <div class="kpi-trend down">&#9660; -2.1天 优于目标</div>
+
+
+
+      </div>
+
+
+
+      <div class="kpi-card">
+
+
+
+        <div class="kpi-icon">✅</div>
+
+
+
+        <div class="kpi-value">98.6<span class="unit">%</span></div>
+
+
+
+        <div class="kpi-label">良品率</div>
+
+
+
+        <div class="kpi-trend up">&#9650; +0.3% 较上月</div>
+
+
+
+      </div>
+
+
+
+      <div class="kpi-card">
+
+
+
+        <div class="kpi-icon">💳</div>
+
+
+
+        <div class="kpi-value">1,562<span class="unit">万</span></div>
+
+
+
+        <div class="kpi-label">应收账款</div>
+
+
+
+        <div class="kpi-trend down">&#9660; +12.6% 需关注</div>
+
+
+
+      </div>
+
+
+
+      <div class="kpi-card">
+
+
+
+        <div class="kpi-icon">👥</div>
+
+
+
+        <div class="kpi-value">96.8<span class="unit">%</span></div>
+
+
+
+        <div class="kpi-label">人员出勤率</div>
+
+
+
+        <div class="kpi-trend up">&#9650; +0.5% 较上月</div>
+
+
+
+      </div>
+
+
+
+    </div>
+
+
+
+
+
+
+
+    <!-- Row 2: Sales Chart + Production Progress -->
+
+
+
+    <div class="chart-row-mid">
+
+
+
+      <!-- Sales Bar Chart -->
+
+
+
+      <div class="card">
+
+
+
+        <div class="card-header"><span class="section-title" style="margin-bottom:0;"><span class="dot"></span>月度销售趋势</span><span class="text-sm text-muted">单位：万元</span></div>
+
+
+
+        <div class="card-body">
+
+
+
+          <div class="bar-chart-wrapper">
+
+
+
+          <div class="bar-chart" style="margin-bottom:32px;">
+
+
+
+            <div class="bar-item">
+
+
+
+              <div class="bar-fill" data-value="1,820" style="height:60%;background:linear-gradient(to top,#0ea5e9,#38bdf8);"></div>
+
+
+
+              <span class="bar-label">1月</span>
+
+
+
+            </div>
+
+
+
+            <div class="bar-item">
+
+
+
+              <div class="bar-fill" data-value="1,560" style="height:51%;background:linear-gradient(to top,#0ea5e9,#38bdf8);"></div>
+
+
+
+              <span class="bar-label">2月</span>
+
+
+
+            </div>
+
+
+
+            <div class="bar-item">
+
+
+
+              <div class="bar-fill" data-value="2,080" style="height:68%;background:linear-gradient(to top,#0ea5e9,#38bdf8);"></div>
+
+
+
+              <span class="bar-label">3月</span>
+
+
+
+            </div>
+
+
+
+            <div class="bar-item">
+
+
+
+              <div class="bar-fill" data-value="1,960" style="height:64%;background:linear-gradient(to top,#0ea5e9,#38bdf8);"></div>
+
+
+
+              <span class="bar-label">4月</span>
+
+
+
+            </div>
+
+
+
+            <div class="bar-item">
+
+
+
+              <div class="bar-fill" data-value="2,158" style="height:71%;background:linear-gradient(to top,#0ea5e9,#38bdf8);"></div>
+
+
+
+              <span class="bar-label">5月</span>
+
+
+
+            </div>
+
+
+
+            <div class="bar-item">
+
+
+
+              <div class="bar-fill" data-value="2,340" style="height:77%;background:linear-gradient(to top,#0ea5e9,#7dd3fc);box-shadow:0 0 12px rgba(56,189,248,0.4);"></div>
+
+
+
+              <span class="bar-label" style="color:var(--text-accent);font-weight:600;">6月</span>
+
+
+
+            </div>
+
+
+
+          </div>
+
+
+
+          <svg class="sales-trend-line" viewBox="0 0 600 168" preserveAspectRatio="none">
+
+
+
+            <polyline points="50,72 150,96 250,56 350,64 450,48 550,40" />
+
+
+
+            <circle cx="50" cy="72" r="4" /><circle cx="150" cy="96" r="4" /><circle cx="250" cy="56" r="4" /><circle cx="350" cy="64" r="4" /><circle cx="450" cy="48" r="4" /><circle cx="550" cy="40" r="4" />
+
+
+
+            <text class="trend-label" x="50" y="64">1,820</text>
+
+
+
+            <text class="trend-label" x="150" y="88">1,560</text>
+
+
+
+            <text class="trend-label" x="250" y="48">2,080</text>
+
+
+
+            <text class="trend-label" x="350" y="56">1,960</text>
+
+
+
+            <text class="trend-label" x="450" y="40">2,158</text>
+
+
+
+            <text class="trend-label" x="550" y="32">2,340</text>
+
+
+
+          </svg>
+
+
+
+          </div>
+
+
+
+          <div style="display:flex;justify-content:space-between;margin-top:20px;font-size:12px;color:var(--text-tertiary);">
+
+
+
+            <span>季度累计: <strong style="color:var(--text-primary);font-family:var(--font-mono);">12,918万</strong></span>
+
+
+
+            <span style="display:flex;align-items:center;gap:16px;">
+
+
+
+              <span style="display:flex;align-items:center;gap:4px;"><span style="width:12px;height:8px;border-radius:2px;background:linear-gradient(to right,#0ea5e9,#38bdf8);display:inline-block;"></span> 销售额</span>
+
+
+
+              <span style="display:flex;align-items:center;gap:4px;"><span style="width:16px;height:2px;background:#f59e0b;display:inline-block;border-radius:1px;"></span> 趋势线</span>
+
+
+
+            </span>
+
+
+
+            <span>目标达成率: <strong style="color:var(--color-success);font-family:var(--font-mono);">103.2%</strong></span>
+
+
+
+          </div>
+
+
+
+        </div>
+
+
+
+      </div>
+
+
+
+
+
+
+
+      <!-- Production Progress -->
+
+
+
+      <div class="card">
+
+
+
+        <div class="card-header"><span class="section-title" style="margin-bottom:0;"><span class="dot"></span>生产进度概览</span><span class="badge badge-info">5 在产</span></div>
+
+
+
+        <div class="card-body">
+
+
+
+          <ul class="prod-list">
+
+
+
+            <li>
+
+
+
+              <div class="prod-header">
+
+
+
+                <span class="prod-name text-mono">MO-2026-0345 仪表盘外壳</span>
+
+
+
+                <span class="prod-pct" style="color:var(--color-success);">92%</span>
+
+
+
+              </div>
+
+
+
+              <div class="prod-bar"><div class="fill fill-success" style="width:92%;"></div></div>
+
+
+
+              <div class="prod-meta">计划 2,000 SET | 已入库 1,840 SET | 预计 07/12 完工</div>
+
+
+
+            </li>
+
+
+
+            <li>
+
+
+
+              <div class="prod-header">
+
+
+
+                <span class="prod-name text-mono">MO-2026-0346 门板内饰件</span>
+
+
+
+                <span class="prod-pct" style="color:var(--color-success);">78%</span>
+
+
+
+              </div>
+
+
+
+              <div class="prod-bar"><div class="fill fill-success" style="width:78%;"></div></div>
+
+
+
+              <div class="prod-meta">计划 3,000 SET | 已入库 2,340 SET | 预计 07/15 完工</div>
+
+
+
+            </li>
+
+
+
+            <li>
+
+
+
+              <div class="prod-header">
+
+
+
+                <span class="prod-name text-mono">MO-2026-0347 保险杠支架</span>
+
+
+
+                <span class="prod-pct" style="color:var(--color-info);">55%</span>
+
+
+
+              </div>
+
+
+
+              <div class="prod-bar"><div class="fill fill-info" style="width:55%;"></div></div>
+
+
+
+              <div class="prod-meta">计划 1,500 SET | 已入库 825 SET | 预计 07/20 完工</div>
+
+
+
+            </li>
+
+
+
+            <li>
+
+
+
+              <div class="prod-header">
+
+
+
+                <span class="prod-name text-mono">MO-2026-0348 仪表盘面板组件</span>
+
+
+
+                <span class="prod-pct" style="color:var(--color-warning);">32%</span>
+
+
+
+              </div>
+
+
+
+              <div class="prod-bar"><div class="fill fill-warning" style="width:32%;"></div></div>
+
+
+
+              <div class="prod-meta">计划 5,000 PCS | 已入库 1,600 PCS | 预计 07/25 完工</div>
+
+
+
+            </li>
+
+
+
+            <li>
+
+
+
+              <div class="prod-header">
+
+
+
+                <span class="prod-name text-mono">MO-2026-0349 门板骨架组件</span>
+
+
+
+                <span class="prod-pct" style="color:var(--color-warning);">18%</span>
+
+
+
+              </div>
+
+
+
+              <div class="prod-bar"><div class="fill fill-warning" style="width:18%;"></div></div>
+
+
+
+              <div class="prod-meta">计划 4,000 PCS | 已入库 720 PCS | 预计 07/28 完工</div>
+
+
+
+            </li>
+
+
+
+          </ul>
+
+
+
+        </div>
+
+
+
+      </div>
+
+
+
+    </div>
+
+
+
+
+
+
+
+    <!-- Row 3: Inventory Warning + Quality Pareto + Equipment Gauges -->
+
+
+
+    <div class="chart-row-bottom">
+
+
+
+
+
+
+
+      <!-- Inventory Warning -->
+
+
+
+      <div class="card">
+
+
+
+        <div class="card-header"><span class="section-title" style="margin-bottom:0;"><span class="dot"></span>库存预警</span><span class="badge badge-warning">5 项</span></div>
+
+
+
+        <div class="card-body">
+
+
+
+          <ul class="warn-list">
+
+
+
+            <li>
+
+
+
+              <div class="warn-header">
+
+
+
+                <span class="warn-name">ABS树脂 PC-770</span>
+
+
+
+                <span class="warn-ratio text-error">库存/安全库存 32%</span>
+
+
+
+              </div>
+
+
+
+              <div class="warn-bar"><div class="fill" style="width:32%;background:var(--color-error);"></div></div>
+
+
+
+              <div style="font-size:11px;color:var(--text-tertiary);margin-top:3px;">当前 160 KG / 安全库存 500 KG</div>
+
+
+
+            </li>
+
+
+
+            <li>
+
+
+
+              <div class="warn-header">
+
+
+
+                <span class="warn-name">PMMA亚克力 MH-655</span>
+
+
+
+                <span class="warn-ratio text-warning">库存/安全库存 45%</span>
+
+
+
+              </div>
+
+
+
+              <div class="warn-bar"><div class="fill" style="width:45%;background:var(--color-warning);"></div></div>
+
+
+
+              <div style="font-size:11px;color:var(--text-tertiary);margin-top:3px;">当前 90 KG / 安全库存 200 KG</div>
+
+
+
+            </li>
+
+
+
+            <li>
+
+
+
+              <div class="warn-header">
+
+
+
+                <span class="warn-name">TPU弹性体 1185A</span>
+
+
+
+                <span class="warn-ratio text-warning">库存/安全库存 52%</span>
+
+
+
+              </div>
+
+
+
+              <div class="warn-bar"><div class="fill" style="width:52%;background:var(--color-warning);"></div></div>
+
+
+
+              <div style="font-size:11px;color:var(--text-tertiary);margin-top:3px;">当前 130 KG / 安全库存 250 KG</div>
+
+
+
+            </li>
+
+
+
+            <li>
+
+
+
+              <div class="warn-header">
+
+
+
+                <span class="warn-name">PA66尼龙66 A3HG6</span>
+
+
+
+                <span class="warn-ratio" style="color:var(--color-info);">库存/安全库存 68%</span>
+
+
+
+              </div>
+
+
+
+              <div class="warn-bar"><div class="fill" style="width:68%;background:var(--color-info);"></div></div>
+
+
+
+              <div style="font-size:11px;color:var(--text-tertiary);margin-top:3px;">当前 340 KG / 安全库存 500 KG</div>
+
+
+
+            </li>
+
+
+
+            <li>
+
+
+
+              <div class="warn-header">
+
+
+
+                <span class="warn-name">玻纤增强PP GF20-PP</span>
+
+
+
+                <span class="warn-ratio" style="color:var(--color-info);">库存/安全库存 72%</span>
+
+
+
+              </div>
+
+
+
+              <div class="warn-bar"><div class="fill" style="width:72%;background:var(--color-info);"></div></div>
+
+
+
+              <div style="font-size:11px;color:var(--text-tertiary);margin-top:3px;">当前 360 KG / 安全库存 500 KG</div>
+
+
+
+            </li>
+
+
+
+          </ul>
+
+
+
+        </div>
+
+
+
+      </div>
+
+
+
+
+
+
+
+      <!-- Quality Pareto -->
+
+
+
+      <div class="card">
+
+
+
+        <div class="card-header"><span class="section-title" style="margin-bottom:0;"><span class="dot"></span>质量不良TOP5</span><span class="text-sm text-muted">本月累计</span></div>
+
+
+
+        <div class="card-body">
+
+
+
+          <ul class="pareto-list">
+
+
+
+            <li>
+
+
+
+              <div class="pareto-header">
+
+
+
+                <span class="pareto-name">缩水凹陷</span>
+
+
+
+                <span class="pareto-count">28件</span>
+
+
+
+              </div>
+
+
+
+              <div class="pareto-bar"><div class="fill" style="width:100%;background:var(--color-error);"></div></div>
+
+
+
+            </li>
+
+
+
+            <li>
+
+
+
+              <div class="pareto-header">
+
+
+
+                <span class="pareto-name">熔接痕</span>
+
+
+
+                <span class="pareto-count">19件</span>
+
+
+
+              </div>
+
+
+
+              <div class="pareto-bar"><div class="fill" style="width:68%;background:var(--color-warning);"></div></div>
+
+
+
+            </li>
+
+
+
+            <li>
+
+
+
+              <div class="pareto-header">
+
+
+
+                <span class="pareto-name">翘曲变形</span>
+
+
+
+                <span class="pareto-count">14件</span>
+
+
+
+              </div>
+
+
+
+              <div class="pareto-bar"><div class="fill" style="width:50%;background:var(--color-warning);"></div></div>
+
+
+
+            </li>
+
+
+
+            <li>
+
+
+
+              <div class="pareto-header">
+
+
+
+                <span class="pareto-name">表面流纹</span>
+
+
+
+                <span class="pareto-count">8件</span>
+
+
+
+              </div>
+
+
+
+              <div class="pareto-bar"><div class="fill" style="width:29%;background:var(--color-info);"></div></div>
+
+
+
+            </li>
+
+
+
+            <li>
+
+
+
+              <div class="pareto-header">
+
+
+
+                <span class="pareto-name">尺寸超差</span>
+
+
+
+                <span class="pareto-count">5件</span>
+
+
+
+              </div>
+
+
+
+              <div class="pareto-bar"><div class="fill" style="width:18%;background:var(--color-info);"></div></div>
+
+
+
+            </li>
+
+
+
+          </ul>
+
+
+
+          <div style="margin-top:12px;font-size:11px;color:var(--text-tertiary);">
+
+
+
+            总不良数: <strong style="color:var(--text-primary);font-family:var(--font-mono);">74件</strong> | 不良率: <strong style="color:var(--color-warning);font-family:var(--font-mono);">1.4%</strong>
+
+
+
+          </div>
+
+
+
+        </div>
+
+
+
+      </div>
+
+
+
+
+
+
+
+      <!-- Equipment OEE Gauges -->
+
+
+
+      <div class="card">
+
+
+
+        <div class="card-header"><span class="section-title" style="margin-bottom:0;"><span class="dot"></span>设备稼动率</span><span class="text-sm text-muted">实时</span></div>
+
+
+
+        <div class="card-body">
+
+
+
+          <div class="gauge-row">
+
+
+
+            <div class="gauge-item">
+
+
+
+              <div class="gauge-conic" style="background:conic-gradient(#38bdf8 0deg, #38bdf8 280.8deg, var(--bg-inset) 280.8deg);">
+
+
+
+                <div class="gauge-inner">
+
+
+
+                  <span class="gauge-val">78%</span>
+
+
+
+                </div>
+
+
+
+              </div>
+
+
+
+              <div class="gauge-name">注塑一车间</div>
+
+
+
+              <div class="gauge-label text-sm">12台设备运行中</div>
+
+
+
+            </div>
+
+
+
+            <div class="gauge-item">
+
+
+
+              <div class="gauge-conic" style="background:conic-gradient(#22c55e 0deg, #22c55e 295.2deg, var(--bg-inset) 295.2deg);">
+
+
+
+                <div class="gauge-inner">
+
+
+
+                  <span class="gauge-val">82%</span>
+
+
+
+                </div>
+
+
+
+              </div>
+
+
+
+              <div class="gauge-name">注塑二车间</div>
+
+
+
+              <div class="gauge-label text-sm">10台设备运行中</div>
+
+
+
+            </div>
+
+
+
+            <div class="gauge-item">
+
+
+
+              <div class="gauge-conic" style="background:conic-gradient(#eab308 0deg, #eab308 259.2deg, var(--bg-inset) 259.2deg);">
+
+
+
+                <div class="gauge-inner">
+
+
+
+                  <span class="gauge-val">72%</span>
+
+
+
+                </div>
+
+
+
+              </div>
+
+
+
+              <div class="gauge-name">模具车间</div>
+
+
+
+              <div class="gauge-label text-sm">1台维修中</div>
+
+
+
+            </div>
+
+
+
+          </div>
+
+
+
+          <div style="margin-top:20px;font-size:11px;color:var(--text-tertiary);text-align:center;">
+
+
+
+            综合稼动率: <strong style="color:var(--text-accent);font-family:var(--font-mono);">77.3%</strong> | 目标: 80%
+
+
+
+          </div>
+
+
+
+        </div>
+
+
+
+      </div>
+
+
+
+
+
+
+
+    </div>
+
+
+
+  </div>
+
+
+
+</div>
+
+
+
+
+
+
+
+<div id="aiReportModal" class="modal-overlay">
+
+
+
+  <div class="modal">
+
+
+
+    <div class="modal-header">
+
+
+
+      <div style="display:flex;align-items:center;gap:10px;">
+
+
+
+        <span style="font-size:20px;">🤖</span>
+
+
+
+        <div>
+
+
+
+          <div style="font-size:15px;font-weight:600;">AI生成经营报告</div>
+
+
+
+          <div style="font-size:12px;color:var(--text-tertiary);">智能分析企业经营数据，生成专业分析报告</div>
+
+
+
+        </div>
+
+
+
+      </div>
+
+
+
+      <button class="chat-close" onclick="hideAIReportModal()" style="padding:4px 8px;">✕</button>
+
+
+
+    </div>
+
+
+
+    <div class="modal-body">
+
+
+
+      <div class="form-group">
+
+
+
+        <label class="form-label">分析周期</label>
+
+
+
+        <div style="display:flex;gap:8px;">
+
+
+
+          <button class="btn btn-primary btn-sm active-period" onclick="selectPeriod('daily')">日报</button>
+
+
+
+          <button class="btn btn-ghost btn-sm" onclick="selectPeriod('weekly')">周报</button>
+
+
+
+          <button class="btn btn-ghost btn-sm" onclick="selectPeriod('monthly')">月报</button>
+
+
+
+          <button class="btn btn-ghost btn-sm" onclick="selectPeriod('custom')">自定义</button>
+
+
+
+        </div>
+
+
+
+      </div>
+
+
+
+      <div class="form-group" id="customDateInputs" style="display:none;">
+
+
+
+        <label class="form-label">日期范围</label>
+
+
+
+        <div style="display:flex;gap:12px;">
+
+
+
+          <input type="date" class="form-input" style="width:auto;" value="2026-06-01">
+
+
+
+          <span style="color:var(--text-tertiary);margin-top:8px;">至</span>
+
+
+
+          <input type="date" class="form-input" style="width:auto;" value="2026-06-30">
+
+
+
+        </div>
+
+
+
+      </div>
+
+
+
+      <div class="form-group">
+
+
+
+        <label class="form-label">分析维度</label>
+
+
+
+        <div style="display:flex;flex-wrap:wrap;gap:8px;">
+
+
+
+          <label style="display:flex;align-items:center;gap:4px;font-size:13px;color:var(--text-secondary);cursor:pointer;">
+
+
+
+            <input type="checkbox" checked style="accent-color:var(--text-accent);"> 销售分析
+
+
+
+          </label>
+
+
+
+          <label style="display:flex;align-items:center;gap:4px;font-size:13px;color:var(--text-secondary);cursor:pointer;">
+
+
+
+            <input type="checkbox" checked style="accent-color:var(--text-accent);"> 生产分析
+
+
+
+          </label>
+
+
+
+          <label style="display:flex;align-items:center;gap:4px;font-size:13px;color:var(--text-secondary);cursor:pointer;">
+
+
+
+            <input type="checkbox" checked style="accent-color:var(--text-accent);"> 库存分析
+
+
+
+          </label>
+
+
+
+          <label style="display:flex;align-items:center;gap:4px;font-size:13px;color:var(--text-secondary);cursor:pointer;">
+
+
+
+            <input type="checkbox" checked style="accent-color:var(--text-accent);"> 质量分析
+
+
+
+          </label>
+
+
+
+          <label style="display:flex;align-items:center;gap:4px;font-size:13px;color:var(--text-secondary);cursor:pointer;">
+
+
+
+            <input type="checkbox" checked style="accent-color:var(--text-accent);"> 财务分析
+
+
+
+          </label>
+
+
+
+        </div>
+
+
+
+      </div>
+
+
+
+      <div class="form-group">
+
+
+
+        <label class="form-label">报告格式</label>
+
+
+
+        <div style="display:flex;gap:8px;">
+
+
+
+          <label style="display:flex;align-items:center;gap:4px;font-size:13px;color:var(--text-secondary);cursor:pointer;">
+
+
+
+            <input type="radio" name="reportFormat" value="pdf" checked style="accent-color:var(--text-accent);"> PDF
+
+
+
+          </label>
+
+
+
+          <label style="display:flex;align-items:center;gap:4px;font-size:13px;color:var(--text-secondary);cursor:pointer;">
+
+
+
+            <input type="radio" name="reportFormat" value="word" style="accent-color:var(--text-accent);"> Word
+
+
+
+          </label>
+
+
+
+          <label style="display:flex;align-items:center;gap:4px;font-size:13px;color:var(--text-secondary);cursor:pointer;">
+
+
+
+            <input type="radio" name="reportFormat" value="excel" style="accent-color:var(--text-accent);"> Excel
+
+
+
+          </label>
+
+
+
+        </div>
+
+
+
+      </div>
+
+
+
+      <div style="background:rgba(56,189,248,0.06);border:1px solid rgba(56,189,248,0.15);border-radius:var(--radius-sm);padding:12px;margin-top:16px;">
+
+
+
+        <div style="font-size:12px;color:var(--text-accent);font-weight:500;margin-bottom:6px;">🤖 AI能力说明</div>
+
+
+
+        <div style="font-size:12px;color:var(--text-tertiary);line-height:1.6;">
+
+
+
+          系统将自动汇总ERP、MES、PLM、WMS、HR五大系统数据，通过AI智能分析生成包含执行摘要、详细分析、数据图表、AI洞察和改进建议的完整分析报告。
+
+
+
+        </div>
+
+
+
+      </div>
+
+
+
+    </div>
+
+
+
+    <div class="modal-footer">
+
+
+
+      <button class="btn btn-ghost" onclick="hideAIReportModal()">取消</button>
+
+
+
+      <button class="btn btn-primary" onclick="generateAIReport()">生成报告</button>
+
+
+
+    </div>
+
+
+
+  </div>
+
+
+
+</div>
+
+
+
+
+
+
+
+<script>
+
+
+
+
+
+
+
+
+
+
+;
+
+
+
+  toast.className = 'toast toast-' + (type || 'info');
+
+
+
+  toast.innerHTML = '<span class="toast-icon">' + (icons[type] || icons.info) + '</span><span>' + message + '</span>';
+
+
+
+  container.appendChild(toast);
+
+
+
+  setTimeout(function() { toast.remove(); }, 3000);
+
+
+
+}
+function closeConfirmModal() {
+
+
+
+  document.getElementById('confirmModal').classList.remove('show');
+
+
+
+  confirmCallback = null;
+
+
+
+}
+
+
+
+
+
+
+
+function confirmOk() {
+
+
+
+  if (confirmCallback) {
+
+
+
+    confirmCallback();
+
+
+
+  }
+
+
+
+  closeConfirmModal();
+
+
+
+
+
+
+
+function showAIReportModal() {
+
+
+
+  document.getElementById('aiReportModal').classList.add('active');
+
+
+
+}
+
+
+
+
+
+
+
+function hideAIReportModal() {
+
+
+
+  document.getElementById('aiReportModal').classList.remove('active');
+
+
+
+}
+
+
+
+
+
+
+
+function selectPeriod(period) {
+
+
+
+  document.querySelectorAll('.active-period').forEach(function(btn) {
+
+
+
+    btn.classList.remove('btn-primary');
+
+
+
+    btn.classList.add('btn-ghost');
+
+
+
+    btn.classList.remove('active-period');
+
+
+
+  });
+
+
+
+  event.target.classList.add('btn-primary');
+
+
+
+  event.target.classList.remove('btn-ghost');
+
+
+
+  event.target.classList.add('active-period');
+
+
+
+  
+
+
+
+  document.getElementById('customDateInputs').style.display = period === 'custom' ? 'block' : 'none';
+
+
+
+}
+
+
+
+
+
+
+
+function generateAIReport() {
+
+
+
+  hideAIReportModal();
+
+
+
+  showToast('🤖 AI报告生成中...\n\n系统正在分析企业经营数据，请稍候。\n\n生成完成后将自动跳转到智能分析中心查看报告。', 'info');
+
+
+
+  setTimeout(function() {
+
+
+
+    window.location.href = 'ai-analysis.html';
+
+
+
+  }, 2000);
+
+
+
+}
+
+
+
+
+
+
+
+}
+var currentLookupField = null;
+var currentLookupType = null;
+var lookupData = [];
+var lookupColumns = [];
+
+function openLookup(fieldId, type) {
+  currentLookupField = fieldId;
+  currentLookupType = type;
+  
+  if (type === 'org') {
+    lookupColumns = ['编码', '名称', '形态', '上级组织'];
+    lookupData = JSON.parse(localStorage.getItem('erp_orgs') || '[]');
+    document.getElementById('lookupTitle').textContent = '选择组织';
+  } else if (type === 'department') {
+    lookupColumns = ['编码', '名称'];
+    lookupData = JSON.parse(localStorage.getItem('erp_departments_cache') || '[]');
+    document.getElementById('lookupTitle').textContent = '选择部门';
+  } else if (type === 'employee') {
+    lookupColumns = ['编号', '姓名', '所属部门'];
+    lookupData = JSON.parse(localStorage.getItem('erp_employees_cache') || '[]');
+    document.getElementById('lookupTitle').textContent = '选择员工';
+  } else if (type === 'supplier') {
+    lookupColumns = ['编码', '名称'];
+    lookupData = JSON.parse(localStorage.getItem('erp_suppliers_cache') || '[]');
+    document.getElementById('lookupTitle').textContent = '选择供应商';
+  } else if (type === 'customer') {
+    lookupColumns = ['编码', '名称'];
+    lookupData = JSON.parse(localStorage.getItem('erp_customers_cache') || '[]');
+    document.getElementById('lookupTitle').textContent = '选择客户';
+  } else if (type === 'material') {
+    lookupColumns = ['物料编码', '物料名称', '规格型号', '基本单位'];
+    lookupData = JSON.parse(localStorage.getItem('erp_materials_cache') || '[]');
+    document.getElementById('lookupTitle').textContent = '选择物料';
+  } else if (type === 'warehouse') {
+    lookupColumns = ['编码', '名称'];
+    lookupData = JSON.parse(localStorage.getItem('erp_warehouses_cache') || '[]');
+    document.getElementById('lookupTitle').textContent = '选择仓库';
+  }
+  
+  renderLookupTable(lookupData);
+  document.getElementById('lookupModal').classList.add('show');
+}
+
+function closeLookup() {
+  document.getElementById('lookupModal').classList.remove('show');
+}
+
+function filterLookup() {
+  var keyword = document.getElementById('lookupKeyword').value.trim().toLowerCase();
+  var filtered = lookupData.filter(function(item) {
+    var code = item.code || '';
+    var name = item.name || '';
+    return code.toLowerCase().includes(keyword) || name.toLowerCase().includes(keyword);
+  });
+  renderLookupTable(filtered);
+}
+
+function renderLookupTable(data) {
+  var head = document.getElementById('lookupTableHead');
+  var body = document.getElementById('lookupTableBody');
+  
+  head.innerHTML = '<tr><th class="checkbox-cell"><input type="checkbox" onclick="selectAllLookup()"></th>' + lookupColumns.map(function(col) { return '<th>' + col + '</th>'; }).join('') + '</tr>';
+  
+  body.innerHTML = '';
+  data.forEach(function(item) {
+    var row = document.createElement('tr');
+    row.onclick = function() { selectLookupRow(this); };
+    var cells = ['<td class="checkbox-cell"><input type="checkbox" class="lookup-checkbox" value="' + item.id + '"></td>'];
+    if (currentLookupType === 'org') {
+      cells.push('<td>' + item.code + '</td><td>' + item.name + '</td><td>' + (item.form || '') + '</td><td>' + (item.parentName || '') + '</td>');
+    } else if (currentLookupType === 'department') {
+      cells.push('<td>' + item.code + '</td><td>' + item.name + '</td>');
+    } else if (currentLookupType === 'employee') {
+      cells.push('<td>' + item.code + '</td><td>' + item.name + '</td><td>' + (item.department || '') + '</td>');
+    } else if (currentLookupType === 'supplier' || currentLookupType === 'customer') {
+      cells.push('<td>' + item.code + '</td><td>' + item.name + '</td>');
+    } else if (currentLookupType === 'material') {
+      cells.push('<td>' + item.code + '</td><td>' + item.name + '</td><td>' + (item.specification || '') + '</td><td>' + (item.unit || '') + '</td>');
+    } else if (currentLookupType === 'warehouse') {
+      cells.push('<td>' + item.code + '</td><td>' + item.name + '</td>');
+    }
+    row.innerHTML = cells.join('');
+    body.appendChild(row);
+  });
+  
+  if (data.length === 0) {
+    body.innerHTML = '<tr><td colspan="' + (lookupColumns.length + 1) + '" style="text-align:center;padding:40px;color:#999;">暂无数据</td></tr>';
+  }
+}
+
+function selectAllLookup() {
+  var master = document.querySelector('.lookup-table th input');
+  var checkboxes = document.querySelectorAll('.lookup-checkbox');
+  checkboxes.forEach(function(cb) { cb.checked = master.checked; });
+}
+
+function selectLookupRow(row) {
+  var checkbox = row.querySelector('.lookup-checkbox');
+  checkbox.checked = !checkbox.checked;
+}
+
+function confirmLookup() {
+  var checkboxes = document.querySelectorAll('.lookup-checkbox:checked');
+  if (checkboxes.length === 0) {
+    showToast('请选择一条记录', 'warning');
+    return;
+  }
+  
+  var item = lookupData.find(function(d) { return d.id === checkboxes[0].value; });
+  if (item) {
+    var field = document.getElementById(currentLookupField);
+    if (field) {
+      field.value = item.name;
+      field.setAttribute('data-id', item.id);
+      field.setAttribute('data-code', item.code);
+      
+      if (currentLookupType === 'material') {
+        var row = field.closest('tr');
+        if (row) {
+          row.querySelector('.material-name').value = item.name;
+          row.querySelector('.material-spec').value = item.specification || '';
+          row.querySelector('.material-unit').value = item.unit || '';
+        }
+      }
+    }
+  }
+  
+  closeLookup();
+}
+
+function openMaterialLookup(btn) {
+  var field = btn.previousElementSibling;
+  field.id = 'lookupField_' + Date.now();
+  currentLookupField = field.id;
+  openLookup(field.id, 'material');
+}
+
+function openOrgLookup(btn) {
+  var field = btn.previousElementSibling;
+  field.id = 'lookupField_' + Date.now();
+  currentLookupField = field.id;
+  openLookup(field.id, 'org');
+}
+
+function openSupplierLookup(btn) {
+  var field = btn.previousElementSibling;
+  field.id = 'lookupField_' + Date.now();
+  currentLookupField = field.id;
+  openLookup(field.id, 'supplier');
+}
+
+function openWarehouseLookup(btn) {
+  var field = btn.previousElementSibling;
+  field.id = 'lookupField_' + Date.now();
+  currentLookupField = field.id;
+  openLookup(field.id, 'warehouse');
+}
+
+function initLookupData() {
+  if (!localStorage.getItem('erp_orgs')) {
+    localStorage.setItem('erp_orgs', JSON.stringify([
+      { id: 'org-001', code: 'ORG-HQ', name: '磐枢工业集团', form: '集团', parentName: '' },
+      { id: 'org-002', code: 'ORG-SM', name: '磐枢智能制造有限公司', form: '公司', parentName: '磐枢工业集团' },
+      { id: 'org-003', code: 'ORG-SM-PD', name: '生产制造部', form: '部门', parentName: '磐枢智能制造有限公司' },
+      { id: 'org-004', code: 'ORG-SM-FA', name: '财务部', form: '部门', parentName: '磐枢智能制造有限公司' },
+      { id: 'org-005', code: 'ORG-SM-SD', name: '销售部', form: '部门', parentName: '磐枢智能制造有限公司' }
+    ]));
+  }
+  if (!localStorage.getItem('erp_departments_cache')) {
+    localStorage.setItem('erp_departments_cache', JSON.stringify([
+      { id: 'dept-001', code: 'DEPT-PD', name: '生产制造部', status: 1 },
+      { id: 'dept-002', code: 'DEPT-FA', name: '财务部', status: 1 },
+      { id: 'dept-003', code: 'DEPT-SD', name: '销售部', status: 1 },
+      { id: 'dept-004', code: 'DEPT-AS', name: '装配车间', status: 1 },
+      { id: 'dept-005', code: 'DEPT-QC', name: '质检车间', status: 1 }
+    ]));
+  }
+  if (!localStorage.getItem('erp_employees_cache')) {
+    localStorage.setItem('erp_employees_cache', JSON.stringify([
+      { id: 'emp-001', code: 'EMP-001', name: '张三', department: '生产制造部', status: 1 },
+      { id: 'emp-002', code: 'EMP-002', name: '李四', department: '生产制造部', status: 1 },
+      { id: 'emp-003', code: 'EMP-003', name: '王五', department: '财务部', status: 1 },
+      { id: 'emp-004', code: 'EMP-004', name: '赵六', department: '销售部', status: 1 },
+      { id: 'emp-005', code: 'EMP-005', name: '钱七', department: '质检车间', status: 1 }
+    ]));
+  }
+  if (!localStorage.getItem('erp_suppliers_cache')) {
+    localStorage.setItem('erp_suppliers_cache', JSON.stringify([
+      { id: 'sup-001', code: 'S-001', name: '深圳电子元器件有限公司', status: 1 },
+      { id: 'sup-002', code: 'S-002', name: '杭州精密机械加工厂', status: 1 },
+      { id: 'sup-003', code: 'S-003', name: '上海材料科技有限公司', status: 1 },
+      { id: 'sup-004', code: 'S-004', name: '东莞五金制品厂', status: 1 }
+    ]));
+  }
+  if (!localStorage.getItem('erp_materials_cache')) {
+    localStorage.setItem('erp_materials_cache', JSON.stringify([
+      { id: 'mat-001', code: 'P-001', name: '高频传感器模块', specification: 'HT-2026', unit: '个', status: 1 },
+      { id: 'mat-002', code: 'P-002', name: '控制电路板', specification: 'CB-2026', unit: '块', status: 1 },
+      { id: 'mat-003', code: 'P-003', name: '智能控制器', specification: 'IC-V3', unit: '台', status: 1 },
+      { id: 'mat-004', code: 'P-004', name: '电源模块', specification: 'PM-500W', unit: '个', status: 1 },
+      { id: 'mat-005', code: 'M-001', name: 'PCB电路板', specification: 'FR-4双层', unit: '块', status: 1 },
+      { id: 'mat-006', code: 'M-002', name: '贴片电阻', specification: '10KΩ 0603', unit: '个', status: 1 },
+      { id: 'mat-007', code: 'M-003', name: '贴片电容', specification: '100μF 0805', unit: '个', status: 1 },
+      { id: 'mat-008', code: 'M-004', name: '螺丝', specification: 'M4x10', unit: '包', status: 1 }
+    ]));
+  }
+  if (!localStorage.getItem('erp_warehouses_cache')) {
+    localStorage.setItem('erp_warehouses_cache', JSON.stringify([
+      { id: 'wh-001', code: 'WH-001', name: '成品仓', status: 1 },
+      { id: 'wh-002', code: 'WH-002', name: '原料仓', status: 1 },
+      { id: 'wh-003', code: 'WH-003', name: '半成品仓', status: 1 },
+      { id: 'wh-004', code: 'WH-004', name: '辅料仓', status: 1 }
+    ]));
+  }
+}
+
+</script>
+
+
+
+
+<div class="lookup-modal" id="lookupModal">
+  <div class="lookup-dialog">
+    <div class="lookup-header">
+      <div class="lookup-title" id="lookupTitle">选择</div>
+      <button class="lookup-close" onclick="closeLookup()">×</button>
+    </div>
+    <div class="lookup-body">
+      <div class="lookup-search">
+        <input type="text" id="lookupKeyword" placeholder="请输入编码或名称搜索" onkeydown="if(event.key==='Enter')filterLookup()">
+        <button onclick="filterLookup()">搜索</button>
+      </div>
+      <table class="lookup-table">
+        <thead id="lookupTableHead"></thead>
+        <tbody id="lookupTableBody"></tbody>
+      </table>
+    </div>
+    <div class="lookup-footer">
+      <button class="btn btn-cancel" onclick="closeLookup()">取消</button>
+      <button class="btn btn-primary" onclick="confirmLookup()">确定</button>
+    </div>
+  </div>
+</div>
+
+
+<div class="confirm-modal-overlay" id="confirmModal">
+  <div class="confirm-modal-dialog">
+    <div class="confirm-modal-header">
+      <span class="confirm-modal-icon" id="confirmIcon">&#9888;</span>
+      <span class="confirm-modal-title" id="confirmTitle">系统提示</span>
+    </div>
+    <div class="confirm-modal-body">
+      <div class="confirm-modal-message" id="confirmMessage"></div>
+    </div>
+    <div class="confirm-modal-footer">
+      <button class="btn-cancel" onclick="closeConfirmModal(false)">取消</button>
+      <button class="btn-confirm" onclick="closeConfirmModal(true)">确定</button>
+    </div>
+  </div>
+</div>
+
+</body>
+
+
+
+</html>

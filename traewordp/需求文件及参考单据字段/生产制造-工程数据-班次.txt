@@ -1,0 +1,32 @@
+生产制造-工程数据-班次 
+
+字段说明：
+单据头：FBillHead 
+	 实体主键：FID 
+	 数据状态：FDocumentStatus 
+	 禁用状态：FForbidStatus 
+	 名称：FName  (必填项)
+	 编码：FNumber 
+	 描述：FDescription 
+	 创建组织：FCreateOrgId  (必填项)
+	 使用组织：FUseOrgId  (必填项)
+	 创建人：FCreatorId 
+	 修改人：FModifierId 
+	 创建日期：FCreateDate 
+	 修改日期：FModifyDate 
+	 禁用人：FForbidderId 
+	 审核人：FApproverId 
+	 禁用日期：FForbidDate 
+	 审核日期：FApproveDate 
+	 工作时间：FAllHours 
+	 生效日期：FEffectDate  (必填项)
+	 失效日期：FExpireDate  (必填项)
+	 系统预设：FIsSystemSet 
+	 是否私有：FIsPrivate 
+列表：FEntity 
+	 实体主键：FEntryID 
+	 开始时间：FStartTime 
+	 结束时间：FEndTime 
+	 工作小时数：FHours 
+	 班次编码：FShiftSliceId  (必填项)
+	 班次名称：FShiftName 

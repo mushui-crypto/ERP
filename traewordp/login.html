@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>登录 — 磐枢工业智能平台</title>
+<style>
+:root {
+  --bg-base: #0a0e1a;
+  --bg-surface: #111827;
+  --bg-raised: #1e293b;
+  --bg-inset: #0d1321;
+  --border-normal: rgba(56,189,248,0.12);
+  --border-strong: rgba(56,189,248,0.25);
+  --text-primary: #f1f5f9;
+  --text-secondary: #e2e8f0;
+  --text-tertiary: #cbd5e1;
+  --text-accent: #38bdf8;
+  --color-success: #22c55e;
+  --color-warning: #eab308;
+  --color-error: #ef4444;
+  --color-info: #06b6d4;
+  --radius-sm: 2px;
+  --radius-md: 6px;
+  --radius-lg: 10px;
+  --transition: 150ms ease;
+  --font-body: 'Inter', 'Noto Sans SC', 'Microsoft YaHei', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', 'Menlo', 'Consolas', monospace;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { font-size: 14px; -webkit-font-smoothing: antialiased; }
+body {
+  font-family: var(--font-body);
+  background: var(--bg-base);
+  color: var(--text-primary);
+  min-height: 100vh;
+  display: flex; align-items: center; justify-content: center;
+  overflow: hidden;
+}
+body::before {
+  content: ''; position: fixed; inset: 0;
+  background:
+    radial-gradient(ellipse 80% 60% at 20% 80%, rgba(56,189,248,0.06) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 50% at 80% 20%, rgba(6,182,212,0.04) 0%, transparent 60%);
+  pointer-events: none; z-index: 0;
+}
+body::after {
+  content: ''; position: fixed; inset: 0;
+  background-image:
+    linear-gradient(rgba(56,189,248,0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(56,189,248,0.03) 1px, transparent 1px);
+  background-size: 60px 60px;
+  pointer-events: none; z-index: 0;
+}
+
+.login-wrapper { position: relative; z-index: 1; width: 100%; max-width: 420px; padding: 20px; }
+
+.login-card {
+  position: relative; border-radius: var(--radius-lg); overflow: hidden;
+}
+.login-card::before {
+  content: ''; position: absolute; inset: 0;
+  border-radius: var(--radius-lg);
+  padding: 1px;
+  background: linear-gradient(135deg, rgba(56,189,248,0.4), rgba(6,182,212,0.2), rgba(56,189,248,0.1), rgba(6,182,212,0.4));
+  background-size: 300% 300%;
+  animation: gradientShift 6s ease infinite;
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor; mask-composite: exclude;
+  pointer-events: none;
+}
+@keyframes gradientShift {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+
+.login-card-inner {
+  background: var(--bg-surface);
+  border-radius: var(--radius-lg);
+  padding: 40px 32px;
+}
+
+.login-logo { text-align: center; margin-bottom: 36px; }
+.login-logo .logo-icon {
+  width: 56px; height: 56px; margin: 0 auto 16px;
+  border-radius: 14px;
+  background: linear-gradient(135deg, rgba(56,189,248,0.15), rgba(6,182,212,0.08));
+  border: 1px solid var(--border-normal);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 26px;
+}
+.login-logo h1 {
+  font-size: 20px; font-weight: 700;
+  color: var(--text-primary);
+  letter-spacing: 2px;
+}
+.login-logo .subtitle {
+  font-size: 12px; color: var(--text-tertiary);
+  margin-top: 8px; letter-spacing: 4px;
+}
+
+.form-group { margin-bottom: 20px; }
+.form-label {
+  display: block; margin-bottom: 6px;
+  font-size: 12px; font-weight: 500; color: var(--text-tertiary);
+}
+.form-input {
+  width: 100%; padding: 10px 14px;
+  background: var(--bg-inset);
+  border: 1px solid var(--border-normal);
+  border-radius: var(--radius-sm);
+  color: var(--text-primary);
+  font-size: 14px;
+  transition: border-color var(--transition);
+  outline: none;
+}
+.form-input:focus { border-color: var(--text-accent); }
+.form-input::placeholder { color: #475569; }
+
+.form-options {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 28px; font-size: 12px;
+}
+.form-options label {
+  display: flex; align-items: center; gap: 6px;
+  color: var(--text-tertiary); cursor: pointer;
+}
+.form-options input[type="checkbox"] {
+  accent-color: var(--text-accent); width: 14px; height: 14px;
+}
+.form-options a { color: var(--text-accent); font-size: 12px; }
+.form-options a:hover { color: #7dd3fc; }
+
+.btn-login {
+  width: 100%; padding: 12px;
+  background: var(--text-accent);
+  color: #0a0e1a;
+  border: none; border-radius: var(--radius-sm);
+  font-size: 15px; font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition);
+  letter-spacing: 2px;
+}
+.btn-login:hover { background: #7dd3fc; }
+.btn-login:active { transform: scale(0.99); }
+
+.login-footer {
+  text-align: center; margin-top: 24px;
+  font-size: 11px; color: var(--text-tertiary);
+  opacity: 0.6;
+}
+.login-footer span { margin: 0 6px; }
+
+.login-error {
+  display: none; text-align: center;
+  color: var(--color-error); font-size: 12px;
+  margin-bottom: 16px;
+  padding: 8px;
+  background: rgba(239,68,68,0.08);
+  border: 1px solid rgba(239,68,68,0.2);
+  border-radius: var(--radius-sm);
+}
+.login-error.show { display: block; }
+
+.login-type-tabs {
+  display: flex; gap: 8px; margin-bottom: 24px;
+}
+.login-type-tab {
+  flex: 1; padding: 8px; text-align: center;
+  background: var(--bg-inset);
+  border: 1px solid var(--border-normal);
+  border-radius: var(--radius-sm);
+  font-size: 12px;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all var(--transition);
+}
+.login-type-tab.active {
+  background: rgba(56,189,248,0.1);
+  border-color: var(--text-accent);
+  color: var(--text-accent);
+}
+
+.btn-login.loading {
+  pointer-events: none; opacity: 0.8;
+}
+.btn-login.loading::after {
+  content: ''; display: inline-block;
+  width: 16px; height: 16px; margin-left: 8px;
+  border: 2px solid transparent;
+  border-top-color: #0a0e1a;
+  border-radius: 50%;
+  animation: spin 0.6s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+</style>
+</head>
+<body>
+<div class="login-wrapper">
+  <div class="login-card">
+    <div class="login-card-inner">
+      <div class="login-logo">
+        <div class="logo-icon">&#9881;</div>
+        <h1>磐枢工业智能平台</h1>
+        <p class="subtitle">ERP / MES / PLM / WMS / HR</p>
+      </div>
+
+      <div class="login-error" id="loginError">请输入用户名和密码</div>
+
+      <div class="login-type-tabs">
+        <div class="login-type-tab active" onclick="setLoginType('admin', this)">管理中心</div>
+        <div class="login-type-tab" onclick="setLoginType('app', this)">应用端</div>
+      </div>
+
+      <form id="loginForm" autocomplete="off">
+        <div class="form-group">
+          <label class="form-label">用户名</label>
+          <input type="text" class="form-input" id="username" placeholder="请输入用户名" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">密码</label>
+          <input type="password" class="form-input" id="password" placeholder="请输入密码" />
+        </div>
+        <div class="form-options">
+          <label><input type="checkbox" /> 记住登录</label>
+          <a href="javascript:void(0)">忘记密码？</a>
+        </div>
+        <button type="submit" class="btn-login" id="btnLogin">登 录</button>
+      </form>
+
+      <div class="login-footer">
+        <span>v3.2.0</span> | <span>技术支持</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+var LOGIN_API = 'http://localhost:3001/api/auth/login';
+var loginType = 'admin';
+
+function setLoginType(type, element) {
+  loginType = type;
+  console.log('登录类型切换为:', type);
+  document.querySelectorAll('.login-type-tab').forEach(function(t) { t.classList.remove('active'); });
+  if (element) {
+    element.classList.add('active');
+  }
+}
+
+document.getElementById('loginForm').addEventListener('submit', async function(e) {
+  e.preventDefault();
+  var username = document.getElementById('username').value.trim();
+  var password = document.getElementById('password').value.trim();
+  var errorEl = document.getElementById('loginError');
+  var btn = document.getElementById('btnLogin');
+
+  if (!username || !password) {
+    errorEl.textContent = '请输入用户名和密码';
+    errorEl.classList.add('show');
+    return;
+  }
+
+  errorEl.classList.remove('show');
+  btn.classList.add('loading');
+  btn.textContent = '正在验证...';
+
+  var loggedIn = false;
+  
+  // 尝试后端API登录
+  try {
+    var response = await fetch(LOGIN_API, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ username: username, password: password })
+    });
+
+    var data = await response.json();
+
+    if (data.code === 200 && data.data) {
+      localStorage.setItem('accessToken', data.data.accessToken);
+      localStorage.setItem('user', JSON.stringify(data.data.user));
+      localStorage.setItem('loginType', loginType);
+      loggedIn = true;
+
+      if (loginType === 'admin') {
+        window.location.href = 'admin/index.html';
+      } else {
+        window.location.href = 'select-data-center.html';
+      }
+    } else {
+      errorEl.textContent = data.message || '登录失败，请检查用户名和密码';
+      errorEl.classList.add('show');
+    }
+  } catch (error) {
+    // 后端不可用，使用本地离线登录
+    console.warn('后端服务不可用，启用离线登录模式');
+  }
+
+  // 离线登录模式（后端不可用时）
+  if (!loggedIn) {
+    var localUsers = {
+      'admin': { password: 'admin123', username: 'admin', name: '系统管理员', roleIds: ['role-admin'], roleName: '系统管理员' },
+      'demo': { password: 'demo123', username: 'demo', name: '演示用户', roleIds: ['role-user'], roleName: '普通用户' },
+      'user': { password: 'user123', username: 'user', name: '业务用户', roleIds: ['role-user'], roleName: '普通用户' }
+    };
+    var localUser = localUsers[username];
+    if (localUser && localUser.password === password) {
+      localStorage.setItem('accessToken', 'offline_' + Date.now());
+      localStorage.setItem('user', JSON.stringify({ username: localUser.username, name: localUser.name, roleIds: localUser.roleIds, roleName: localUser.roleName }));
+      localStorage.setItem('loginType', loginType);
+      localStorage.setItem('savedUsername', username);
+      loggedIn = true;
+      
+      if (loginType === 'admin') {
+        window.location.href = 'admin/index.html';
+      } else {
+        window.location.href = 'select-data-center.html';
+      }
+    } else if (!loggedIn) {
+      errorEl.textContent = '登录失败，请检查用户名和密码（离线模式：admin/admin123 或 demo/demo123）';
+      errorEl.classList.add('show');
+    }
+  }
+    btn.classList.remove('loading');
+    btn.textContent = '登 录';
+});
+
+var savedUsername = localStorage.getItem('savedUsername');
+if (savedUsername) {
+  document.getElementById('username').value = savedUsername;
+}
+</script>
+</body>
+</html>

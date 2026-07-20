@@ -1,0 +1,716 @@
+﻿<!DOCTYPE html>
+
+<html lang="zh-CN">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>套打模板设计 — 磐枢工业智能平台(管理端)</title>
+
+<link rel="stylesheet" href="../common-admin.css">
+
+<script src="../../common.js"></script>
+
+<style>
+
+.print-layout { display: grid; grid-template-columns: 220px 1fr 240px; gap: 0; height: calc(100vh - 56px); overflow: hidden; }
+
+.print-left { background: #fff; border-right: 1px solid var(--border-normal); overflow-y: auto; }
+
+.print-right { background: #fff; border-left: 1px solid var(--border-normal); overflow-y: auto; padding: 12px; }
+
+.print-center { overflow-y: auto; padding: 20px; display: flex; justify-content: center; align-items: flex-start; }
+
+/* A4 纸张预览(代表实际打印纸，保持白色为打印效果呈现) */
+
+.print-paper { width: 794px; min-height: 1123px; background: #fff; border: 1px solid #ccc; padding: 40px; position: relative; color: #333; font-size: 13px; }
+
+.print-paper .pp-title { text-align: center; font-size: 20px; font-weight: 700; margin-bottom: 20px; }
+
+.print-paper .pp-field { border: 1px solid #ddd; padding: 6px 10px; margin-bottom: 8px; background: #f9f9f9; min-height: 28px; display: flex; align-items: center; }
+
+.print-paper .pp-field .pp-label { font-weight: 600; min-width: 80px; color: #555; }
+
+.print-paper .pp-table { width: 100%; border-collapse: collapse; margin-top: 16px; }
+
+.print-paper .pp-table th, .print-paper .pp-table td { border: 1px solid #ccc; padding: 8px; text-align: center; font-size: 12px; }
+
+/* ===== 左侧模板分类 ===== */
+
+.tpl-category { border-bottom: 1px solid var(--border-normal); }
+
+.tpl-cat-header { display: flex; align-items: center; justify-content: space-between; padding: 10px 12px; cursor: pointer; font-size: 12px; font-weight: 600; color: #999; text-transform: uppercase; letter-spacing: 1px; user-select: none; transition: color var(--transition); }
+
+.tpl-cat-header:hover { color: #1890ff; }
+
+.tpl-cat-header .cat-toggle { font-size: 10px; transition: transform var(--transition); }
+
+.tpl-category.open .cat-toggle { transform: rotate(90deg); }
+
+.tpl-cat-header .cat-count { font-size: 10px; background: #f5f5f5; color: #999; padding: 1px 6px; border-radius: 8px; font-weight: 500; }
+
+.tpl-cat-body { display: none; }
+
+.tpl-category.open .tpl-cat-body { display: block; }
+
+.tpl-item-card { padding: 9px 12px 9px 24px; border-top: 1px solid rgba(56,189,248,0.05); cursor: pointer; transition: all var(--transition); }
+
+.tpl-item-card:hover { background: #e6f7ff; }
+
+.tpl-item-card.active { background: #e6f7ff; border-left: 2px solid var(--admin-accent); }
+
+.tpl-item-card .tpl-name { font-size: 13px; color: #333; font-weight: 500; }
+
+.tpl-item-card.active .tpl-name { color: #1890ff; }
+
+.tpl-item-card .tpl-meta { display: flex; gap: 6px; margin-top: 4px; flex-wrap: wrap; }
+
+.tpl-item-card .tpl-meta .tpl-tag { font-size: 10px; padding: 1px 6px; border-radius: 3px; background: #f5f5f5; color: #999; border: 1px solid var(--border-normal); }
+
+.tpl-item-card .tpl-meta .tpl-tag.accent { color: #1890ff; border-color: rgba(245,158,11,0.3); }
+
+/* ===== 可用字段列表 ===== */
+
+.field-list { max-height: 200px; overflow-y: auto; border: 1px solid var(--border-normal); border-radius: var(--radius-sm); background: #f5f5f5; }
+
+.field-list .field-item { display: flex; align-items: center; gap: 6px; padding: 6px 10px; border-bottom: 1px solid var(--border-normal); font-size: 11px; color: #666; cursor: grab; transition: all var(--transition); font-family: var(--font-mono); }
+
+.field-list .field-item:last-child { border-bottom: none; }
+
+.field-list .field-item:hover { background: #e6f7ff; color: #1890ff; }
+
+.field-list .field-item .field-key { color: #1890ff; }
+
+/* ===== 开关 ===== */
+
+.switch-row { display: flex; align-items: center; justify-content: space-between; padding: 6px 0; }
+
+.switch { position: relative; display: inline-block; width: 38px; height: 20px; flex-shrink: 0; }
+
+.switch input { opacity: 0; width: 0; height: 0; }
+
+.switch .slider { position: absolute; cursor: pointer; inset: 0; background: #f5f5f5; border: 1px solid var(--border-normal); border-radius: 20px; transition: var(--transition); }
+
+.switch .slider::before { content: ''; position: absolute; height: 14px; width: 14px; left: 2px; top: 2px; background: var(--text-tertiary); border-radius: 50%; transition: var(--transition); }
+
+.switch input:checked + .slider { background: #e6f7ff; border-color: #1890ff; }
+
+.switch input:checked + .slider::before { transform: translateX(17px); background: #1890ff; }
+
+/* ===== 多选场景标签 ===== */
+
+.scene-tags { display: flex; flex-wrap: wrap; gap: 6px; }
+
+.scene-tag { display: inline-flex; align-items: center; gap: 4px; padding: 4px 10px; border: 1px solid var(--border-normal); border-radius: 12px; font-size: 11px; color: #666; cursor: pointer; transition: all var(--transition); user-select: none; }
+
+.scene-tag:hover { border-color: #d9d9d9; }
+
+.scene-tag.active { background: #e6f7ff; border-color: #1890ff; color: #1890ff; }
+
+/* ===== 元素工具分组 ===== */
+
+.elem-divider { height: 1px; background: var(--border-normal); margin: 12px 0; }
+
+/* 公司Logo占位 */
+
+.pp-logo-area { display: flex; align-items: center; gap: 14px; padding: 10px 12px; border: 1px dashed #bbb; background: #fafafa; margin-bottom: 16px; border-radius: 4px; }
+
+.pp-logo-box { width: 64px; height: 64px; border: 1px dashed #999; display: flex; align-items: center; justify-content: center; font-size: 11px; color: #999; background: #f0f0f0; flex-shrink: 0; }
+
+.pp-logo-text .pp-co-name { font-size: 16px; font-weight: 700; color: #333; }
+
+.pp-logo-text .pp-co-sub { font-size: 11px; color: #888; margin-top: 2px; }
+
+/* 页码与打印信息 */
+
+.pp-footer { margin-top: 20px; padding-top: 10px; border-top: 1px solid #ddd; }
+
+.pp-page-num { text-align: center; font-size: 11px; color: #888; }
+
+.pp-print-info { text-align: center; font-size: 10px; color: #aaa; margin-top: 6px; }
+
+</style>
+
+</head>
+
+<body>
+
+<aside class="sidebar admin-sidebar" id="sidebar">
+
+    <div class="sidebar-logo">
+
+    <img src="../../images/LOGO.png" alt="磐枢工业智能平台" style="width: 100%; max-width: 200px; margin-bottom: 8px;">
+
+    <h1 style="font-size: 16px; margin: 0;">磐枢工业智能平台</h1>
+
+  </div>
+
+  <nav class="sidebar-menu">
+
+    <div class="sidebar-menu-group"><div class="sidebar-menu-item" onclick="toggleGroup(this)"><span class="icon">&#128451;</span> 数据中心管理<span class="arrow">&#9654;</span></div><div class="sub-menu"><a class="sidebar-menu-item" href="../data-center/index.html">数据中心总览</a><a class="sidebar-menu-item" href="../data-center/new.html">新建数据中心</a><a class="sidebar-menu-item" href="../data-center/backup.html">备份管理</a></div></div>
+
+    <div class="sidebar-menu-group"><div class="sidebar-menu-item" onclick="toggleGroup(this)"><span class="icon">&#128101;</span> 组织与权限<span class="arrow">&#9654;</span></div><div class="sub-menu"><a class="sidebar-menu-item" href="../org-perm/org.html">组织架构</a><a class="sidebar-menu-item" href="../org-perm/user.html">用户管理</a><a class="sidebar-menu-item" href="../org-perm/role.html">角色管理</a><a class="sidebar-menu-item" href="../org-perm/menu.html">菜单管理</a></div></div>
+
+
+
+    <div class="sidebar-menu-group"><div class="sidebar-menu-item" onclick="toggleGroup(this)"><span class="icon">&#128187;</span> 开发设计<span class="arrow">&#9660;</span></div><div class="sub-menu"><a class="sidebar-menu-item" href="lowcode.html">低代码开发中心</a><a class="sidebar-menu-item" href="form-designer.html">表单设计器</a><a class="sidebar-menu-item" href="doc-flow.html">单据转换配置</a><a class="sidebar-menu-item active" href="print-template.html">套打模板设计</a><a class="sidebar-menu-item" href="workflow.html">流程配置</a></div></div>
+
+
+
+    <div class="sidebar-menu-group"><div class="sidebar-menu-item" onclick="toggleGroup(this)"><span class="icon">&#129302;</span> 智能应用<span class="arrow">&#9654;</span></div><div class="sub-menu"><a class="sidebar-menu-item" href="../ai-config/api-manage.html">API管理</a><a class="sidebar-menu-item" href="../ai-config/nl-training.html">自然语言训练</a><a class="sidebar-menu-item" href="../ai-config/data-analysis.html">数据分析训练</a><a class="sidebar-menu-item" href="../ai-config/agent-config.html">Agent配置</a></div></div>
+
+
+
+    <div class="sidebar-menu-item" onclick="window.location.href='../../index.html'"><span class="icon">&#8592;</span> 返回应用端</div>
+
+  </nav>
+
+  <div class="sidebar-user"><div class="avatar" style="background: #e6f7ff;color: #1890ff;">管</div><div><div class="user-name">系统管理员</div><div class="user-role">超级管理员</div></div></div>
+
+</aside>
+
+<div class="main-content" id="mainContent">
+
+  <div class="page-header">
+
+    <div><div class="flex items-center gap-8"><button class="sidebar-toggle" onclick="toggleSidebar()">&#9776;</button><div><h2>套打模板设计</h2><div class="breadcrumb"><a href="../../index.html">首页</a><span>/</span><a href="../index.html">管理端</a><span>/</span><span>开发设计 / 套打模板</span></div></div></div></div>
+
+    <div class="page-actions">
+
+      <button class="btn btn-ghost btn-sm">+ 新建模板</button>
+
+      <button class="btn btn-primary btn-sm">&#128190; 保存</button>
+
+      <button class="btn btn-ghost btn-sm">&#128424; 打印预览</button>
+
+    </div>
+
+  </div>
+
+  <div class="print-layout">
+
+    <!-- Left: Template List (分类) -->
+
+    <div class="print-left">
+
+      <div style="padding:12px;">
+
+        <input type="text" class="form-input" placeholder="搜索模板..." style="font-size:12px;">
+
+      </div>
+
+
+
+      <div class="tpl-category open">
+
+        <div class="tpl-cat-header" onclick="toggleCat(this)"><span>&#128722; 采购类</span><span class="cat-count">3</span></div>
+
+        <div class="tpl-cat-body">
+
+          <div class="tpl-item-card active">
+
+            <div class="tpl-name">采购订单模板</div>
+
+            <div class="tpl-meta"><span class="tpl-tag accent">采购订单</span><span class="tpl-tag">A4 纵向</span></div>
+
+          </div>
+
+          <div class="tpl-item-card">
+
+            <div class="tpl-name">采购入库单模板</div>
+
+            <div class="tpl-meta"><span class="tpl-tag accent">采购入库单</span><span class="tpl-tag">A4 纵向</span></div>
+
+          </div>
+
+          <div class="tpl-item-card">
+
+            <div class="tpl-name">采购退货单模板</div>
+
+            <div class="tpl-meta"><span class="tpl-tag accent">采购退货单</span><span class="tpl-tag">A5 纵向</span></div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+
+
+      <div class="tpl-category open">
+
+        <div class="tpl-cat-header" onclick="toggleCat(this)"><span>&#128200; 销售类</span><span class="cat-count">3</span></div>
+
+        <div class="tpl-cat-body">
+
+          <div class="tpl-item-card">
+
+            <div class="tpl-name">销售订单模板</div>
+
+            <div class="tpl-meta"><span class="tpl-tag accent">销售订单</span><span class="tpl-tag">A4 纵向</span></div>
+
+          </div>
+
+          <div class="tpl-item-card">
+
+            <div class="tpl-name">销售出库单模板</div>
+
+            <div class="tpl-meta"><span class="tpl-tag accent">销售出库单</span><span class="tpl-tag">A4 纵向</span></div>
+
+          </div>
+
+          <div class="tpl-item-card">
+
+            <div class="tpl-name">销售发票模板</div>
+
+            <div class="tpl-meta"><span class="tpl-tag accent">销售发票</span><span class="tpl-tag">A4 横向</span></div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+
+
+      <div class="tpl-category">
+
+        <div class="tpl-cat-header" onclick="toggleCat(this)"><span>&#9881; 生产类</span><span class="cat-count">3</span></div>
+
+        <div class="tpl-cat-body">
+
+          <div class="tpl-item-card">
+
+            <div class="tpl-name">生产工单模板</div>
+
+            <div class="tpl-meta"><span class="tpl-tag accent">生产工单</span><span class="tpl-tag">A4 纵向</span></div>
+
+          </div>
+
+          <div class="tpl-item-card">
+
+            <div class="tpl-name">生产领料单模板</div>
+
+            <div class="tpl-meta"><span class="tpl-tag accent">领料单</span><span class="tpl-tag">A5 纵向</span></div>
+
+          </div>
+
+          <div class="tpl-item-card">
+
+            <div class="tpl-name">生产入库单模板</div>
+
+            <div class="tpl-meta"><span class="tpl-tag accent">生产入库单</span><span class="tpl-tag">A5 纵向</span></div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+
+
+      <div class="tpl-category">
+
+        <div class="tpl-cat-header" onclick="toggleCat(this)"><span>&#9989; 质量类</span><span class="cat-count">2</span></div>
+
+        <div class="tpl-cat-body">
+
+          <div class="tpl-item-card">
+
+            <div class="tpl-name">质量检验单模板</div>
+
+            <div class="tpl-meta"><span class="tpl-tag accent">检验单</span><span class="tpl-tag">A4 纵向</span></div>
+
+          </div>
+
+          <div class="tpl-item-card">
+
+            <div class="tpl-name">不合格品处理单模板</div>
+
+            <div class="tpl-meta"><span class="tpl-tag accent">处理单</span><span class="tpl-tag">A5 纵向</span></div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+
+
+      <div class="tpl-category">
+
+        <div class="tpl-cat-header" onclick="toggleCat(this)"><span>&#128221; 其他</span><span class="cat-count">2</span></div>
+
+        <div class="tpl-cat-body">
+
+          <div class="tpl-item-card">
+
+            <div class="tpl-name">物料标签模板</div>
+
+            <div class="tpl-meta"><span class="tpl-tag accent">物料标签</span><span class="tpl-tag">自定义</span></div>
+
+          </div>
+
+          <div class="tpl-item-card">
+
+            <div class="tpl-name">委外加工单模板</div>
+
+            <div class="tpl-meta"><span class="tpl-tag accent">委外订单</span><span class="tpl-tag">A4 纵向</span></div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+
+
+    <!-- Center: Canvas -->
+
+    <div class="print-center">
+
+      <div class="print-paper">
+
+        <!-- 公司Logo占位 -->
+
+        <div class="pp-logo-area">
+
+          <div class="pp-logo-box">LOGO</div>
+
+          <div class="pp-logo-text">
+
+            <div class="pp-co-name">巨腾集团</div>
+
+            <div class="pp-co-sub">JUTENG INDUSTRIAL GROUP CO., LTD.</div>
+
+          </div>
+
+          <div style="margin-left:auto;text-align:right;font-size:11px;color:#888;">
+
+            <div>单据编号: {order_no}</div>
+
+            <div>打印日期: {print_date}</div>
+
+          </div>
+
+        </div>
+
+        <div class="pp-title">采购订单</div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px;">
+
+          <div class="pp-field"><span class="pp-label">订单编号:</span> {order_no}</div>
+
+          <div class="pp-field"><span class="pp-label">订单日期:</span> {order_date}</div>
+
+          <div class="pp-field"><span class="pp-label">供应商:</span> {supplier_name}</div>
+
+          <div class="pp-field"><span class="pp-label">联系人:</span> {contact}</div>
+
+          <div class="pp-field"><span class="pp-label">采购部门:</span> {department}</div>
+
+          <div class="pp-field"><span class="pp-label">采购员:</span> {buyer}</div>
+
+        </div>
+
+        <table class="pp-table">
+
+          <thead><tr><th>行号</th><th>物料编码</th><th>物料名称</th><th>规格</th><th>单位</th><th>数量</th><th>单价</th><th>金额</th><th>交货日期</th></tr></thead>
+
+          <tbody>
+
+            <tr><td>1</td><td>MTL-001</td><td>钢板 Q235</td><td>1000x2000x2mm</td><td>张</td><td>500.00</td><td>120.00</td><td>60,000.00</td><td>2026-07-15</td></tr>
+
+            <tr><td>2</td><td>MTL-002</td><td>螺丝 M6x20</td><td>M6x20mm</td><td>个</td><td>10,000.00</td><td>0.15</td><td>1,500.00</td><td>2026-07-15</td></tr>
+
+            <tr><td>3</td><td>MTL-003</td><td>密封圈 D50</td><td>DN50</td><td>个</td><td>200.00</td><td>8.50</td><td>1,700.00</td><td>2026-07-18</td></tr>
+
+          </tbody>
+
+          <tfoot><tr><td colspan="7" style="text-align:right;font-weight:700;">合计</td><td style="font-weight:700;">63,200.00</td><td></td></tr></tfoot>
+
+        </table>
+
+        <div style="margin-top:24px;display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+
+          <div class="pp-field"><span class="pp-label">备注:</span> {remark}</div>
+
+          <div class="pp-field"><span class="pp-label">付款条件:</span> {payment_term}</div>
+
+        </div>
+
+        <div style="margin-top:40px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;text-align:center;">
+
+          <div style="border-top:1px solid #ccc;padding-top:8px;">采购方签章</div>
+
+          <div style="border-top:1px solid #ccc;padding-top:8px;">供应商签章</div>
+
+          <div style="border-top:1px solid #ccc;padding-top:8px;">日期</div>
+
+        </div>
+
+        <!-- 打印人/打印时间 -->
+
+        <div style="margin-top:14px;text-align:center;font-size:11px;color:#777;">打印人: {print_user} &nbsp;&nbsp;|&nbsp;&nbsp; 打印时间: {print_time}</div>
+
+        <div style="text-align:center;margin-top:14px;font-size:11px;color:#999;">条码: {barcode} &nbsp;&nbsp;&nbsp; 二维码: {qrcode}</div>
+
+        <!-- 页码区域 -->
+
+        <div class="pp-footer">
+
+          <div class="pp-page-num">第 1 页 / 共 1 页</div>
+
+          <div class="pp-print-info">本单据由磐枢工业智能平台自动生成 · 仅供内部使用</div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+
+
+    <!-- Right: Elements + 模板属性 -->
+
+    <div class="print-right">
+
+      <div class="prop-group-title mb-8">元素工具</div>
+
+      <div class="element-tool"><span class="elem-icon">T</span> 文本</div>
+
+      <div class="element-tool"><span class="elem-icon">&#9633;</span> 表格</div>
+
+      <div class="element-tool"><span class="elem-icon">&#128206;</span> 条码</div>
+
+      <div class="element-tool"><span class="elem-icon">&#9641;</span> 二维码</div>
+
+      <div class="element-tool"><span class="elem-icon">&#128444;</span> 图片</div>
+
+      <div class="element-tool"><span class="elem-icon">&#9473;</span> 线条</div>
+
+      <div class="element-tool"><span class="elem-icon">&#9634;</span> 矩形</div>
+
+      <div class="element-tool"><span class="elem-icon">{}</span> 数据字段</div>
+
+      <div class="element-tool"><span class="elem-icon">&#128196;</span> 页码组件</div>
+
+      <div class="element-tool"><span class="elem-icon">&#128197;</span> 日期组件</div>
+
+      <div class="element-tool"><span class="elem-icon">&#127970;</span> 公司Logo组件</div>
+
+      <div class="element-tool"><span class="elem-icon">&#128100;</span> 当前用户组件</div>
+
+
+
+      <div class="elem-divider"></div>
+
+
+
+      <!-- 可用字段列表 -->
+
+      <div class="prop-group-title mb-8">可用字段列表 <span style="color: #1890ff;font-weight:400;text-transform:none;">(采购订单)</span></div>
+
+      <div class="field-list">
+
+        <div class="field-item"><span class="field-key">{order_no}</span> 订单编号</div>
+
+        <div class="field-item"><span class="field-key">{order_date}</span> 订单日期</div>
+
+        <div class="field-item"><span class="field-key">{supplier_name}</span> 供应商名称</div>
+
+        <div class="field-item"><span class="field-key">{supplier_code}</span> 供应商编码</div>
+
+        <div class="field-item"><span class="field-key">{contact}</span> 联系人</div>
+
+        <div class="field-item"><span class="field-key">{phone}</span> 联系电话</div>
+
+        <div class="field-item"><span class="field-key">{department}</span> 采购部门</div>
+
+        <div class="field-item"><span class="field-key">{buyer}</span> 采购员</div>
+
+        <div class="field-item"><span class="field-key">{payment_term}</span> 付款条件</div>
+
+        <div class="field-item"><span class="field-key">{delivery_date}</span> 交货日期</div>
+
+        <div class="field-item"><span class="field-key">{total_amount}</span> 合计金额</div>
+
+        <div class="field-item"><span class="field-key">{remark}</span> 备注</div>
+
+        <div class="field-item"><span class="field-key">{barcode}</span> 条码</div>
+
+        <div class="field-item"><span class="field-key">{qrcode}</span> 二维码</div>
+
+        <div class="field-item"><span class="field-key">{print_user}</span> 打印人</div>
+
+        <div class="field-item"><span class="field-key">{print_time}</span> 打印时间</div>
+
+        <div class="field-item"><span class="field-key">{detail.material_code}</span> 明细.物料编码</div>
+
+        <div class="field-item"><span class="field-key">{detail.qty}</span> 明细.数量</div>
+
+        <div class="field-item"><span class="field-key">{detail.price}</span> 明细.单价</div>
+
+      </div>
+
+
+
+      <div class="elem-divider"></div>
+
+
+
+      <!-- 模板属性 -->
+
+      <div class="prop-group-title mb-8">模板属性</div>
+
+      <div class="prop-field">
+
+        <div class="prop-label">关联单据类型</div>
+
+        <select class="prop-input" style="appearance:none;"><option>采购订单</option><option>销售订单</option><option>销售出库单</option><option>采购入库单</option><option>生产工单</option><option>质量检验单</option></select>
+
+      </div>
+
+      <div class="prop-field">
+
+        <div class="prop-label">模板名称</div>
+
+        <input type="text" class="prop-input" value="采购订单模板">
+
+      </div>
+
+      <div class="prop-field">
+
+        <div class="prop-label">适用场景</div>
+
+        <div class="scene-tags">
+
+          <span class="scene-tag active" onclick="toggleScene(this)">内部用</span>
+
+          <span class="scene-tag" onclick="toggleScene(this)">客户用</span>
+
+          <span class="scene-tag active" onclick="toggleScene(this)">供应商用</span>
+
+          <span class="scene-tag" onclick="toggleScene(this)">存档用</span>
+
+        </div>
+
+      </div>
+
+      <div class="prop-field">
+
+        <div class="prop-label">打印份数</div>
+
+        <input type="number" class="prop-input" value="2" min="1" style="font-family:var(--font-mono);">
+
+      </div>
+
+      <div class="prop-field">
+
+        <div class="switch-row">
+
+          <span style="font-size:12px;color: #666;">是否含水印</span>
+
+          <label class="switch"><input type="checkbox" checked><span class="slider"></span></label>
+
+        </div>
+
+        <input type="text" class="prop-input" value="内部使用 · 禁止外传" placeholder="水印文字" style="margin-top:6px;">
+
+      </div>
+
+
+
+      <div class="elem-divider"></div>
+
+
+
+      <div class="prop-group-title mb-8">模板设置</div>
+
+      <div class="prop-field">
+
+        <div class="prop-label">纸张大小</div>
+
+        <select class="prop-input" style="appearance:none;"><option>A4</option><option>A5</option><option>Letter</option><option>自定义</option></select>
+
+      </div>
+
+      <div class="prop-field">
+
+        <div class="prop-label">方向</div>
+
+        <select class="prop-input" style="appearance:none;"><option>纵向</option><option>横向</option></select>
+
+      </div>
+
+      <div class="prop-field">
+
+        <div class="prop-label">页边距</div>
+
+        <input type="text" class="prop-input" value="40px">
+
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
+
+<div id="sidebarOverlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:99;" onclick="toggleSidebar()"></div>
+
+<script>
+
+
+
+
+
+function toggleCat(el){el.closest('.tpl-category').classList.toggle('open');}
+
+function toggleScene(el){el.classList.toggle('active');}
+
+</script>
+
+
+
+<div class="toast-container" id="toastContainer"></div>
+
+<div class="confirm-modal-overlay" id="confirmModal">
+
+  <div class="confirm-modal-dialog">
+
+    <div class="confirm-modal-header">
+
+      <span class="confirm-modal-icon" id="confirmIcon">&#9888;</span>
+
+      <span class="confirm-modal-title" id="confirmTitle">温馨提示</span>
+
+    </div>
+
+    <div class="confirm-modal-body">
+
+      <div class="confirm-modal-message" id="confirmMessage"></div>
+
+    </div>
+
+    <div class="confirm-modal-footer">
+
+      <button class="btn btn-sm btn-cancel" onclick="closeConfirmModal(false)">取消</button>
+
+      <button class="btn btn-sm btn-primary" style="background: #1890ff;border-color: #1890ff;color:#0a0e1a;" onclick="closeConfirmModal(true)">确定</button>
+
+    </div>
+
+  </div>
+
+</div>
+
+</body>
+
+</html>
+

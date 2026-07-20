@@ -1,0 +1,85 @@
+出库申请单
+库存管理
+字段说明：
+基本信息：FBillHead 
+	 实体主键：FID 
+	 单据编号：FBillNo 
+	 单据状态：FDocumentStatus 
+	 申请组织：FStockOrgId  (必填项)
+	 申请日期：FDate  (必填项)
+	 单据类型：FBillTypeID  (必填项)
+	 领用部门：FDeptId 
+	 客户：FCustId 
+	 备注：FNote 
+	 创建人：FCreatorId 
+	 创建日期：FCreateDate 
+	 最后修改人：FModifierId 
+	 最后修改日期：FModifyDate 
+	 作废人：FCancellerId 
+	 审核人：FApproverId 
+	 作废状态：FCancelStatus 
+	 作废日期：FCancelDate 
+	 审核日期：FApproveDate 
+	 业务类型：FBizType 
+	 关闭状态：FCloseStatus 
+	 关闭日期：FCloseDate 
+	 关闭人：FCloserId 
+	 申请类型：FApplyType 
+	 手工关闭标识：FCloseFlag 
+	 货主类型：FOwnerTypeIdHead  (必填项)
+明细信息：FEntity 
+	 实体主键：FEntryID 
+	 物料编码：FMaterialId  (必填项)
+	 物料名称：FMaterialName 
+	 仓库：FStockId 
+	 申请数量：FQty 
+	 申请数量(基本单位)：FBaseQty 
+	 申请数量(库存辅单位)：FSecQty 
+	 单位：FUnitID  (必填项)
+	 规格型号：FModel 
+	 生产日期：FProduceDate 
+	 保质期：FKFPeriod 
+	 保质期单位：FKFPeriodUnit 
+	 有效期至：FExpiryDate 
+	 计划跟踪号：FMtoNo 
+	 库存状态：FStockStatusId 
+	 货主类型：FOwnerTypeId  (必填项)
+	 货主：FOwnerId 
+	 BOM版本：FBomId 
+	 基本单位：FBaseUnitId  (必填项)
+	 库存辅单位：FSecUnitId 
+	 辅助属性：FAuxPropId 
+	 普通出库关联数量（基本单位）：FNormalJoinBaseQty 
+	 仓位：FStockLocId 
+	 货位：FF100001
+	 批号：FLot 
+	 备注：FEntryNote 
+	 服务上下文：FServiceContext 
+	 辅单位：FExtAuxUnitId 
+	 申请数量（辅单位）：FExtAuxUnitQty 
+	 累计出库数量（基本单位）：FTotalBaseQty 
+	 退货出库数量（基本单位）：FReturnBaseQty 
+	 退货出库关联数量（基本单位）：FReturnJoinBaseQty 
+	 普通出库数量（基本单位）：FNormalBaseQty 
+	 普通出库关联数量（库存辅单位）：FNormalJoinQty 
+	 普通出库数量（库存辅单位）：FNormalQty 
+	 退货出库关联数量（库存辅单位）：FReturnJoinSecQty 
+	 退货出库数量（库存辅单位）：FReturnSecQty 
+	 累计出库数量（库存辅单位）：FTotalSecQty 
+	 业务终止：FBusinessEnd 
+	 终止人：FBusinessEnderId 
+	 终止日期：FEndDate 
+	 业务关闭：FBUSINESSCLOSED 
+	 库存组织：FStockOrgIdEntry  (必填项)
+	 即时库存：FInvQty 
+关联关系表：FEntity_Link 
+	 实体主键：FLinkId 
+	 业务流程图：FEntity_Link_FFlowId 
+	 推进路线：FEntity_Link_FFlowLineId 
+	 转换规则：FEntity_Link_FRuleId 
+	 源单表内码：FEntity_Link_FSTableId 
+	 源单表：FEntity_Link_FSTableName 
+	 源单内码：FEntity_Link_FSBillId 
+	 源单分录内码：FEntity_Link_FSId 
+	 原始携带量：FEntity_Link_FBaseQtyOld 
+	 修改携带量：FEntity_Link_FBaseQty 

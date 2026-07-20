@@ -1,0 +1,31 @@
+业务员
+
+字段说明：
+业务员：FBillHead 
+	 实体主键：FOperatorId 
+	 单据编号：FBillNo 
+	 描述：FDescription 
+	 业务员类型：FOperatorType  (必填项)
+	 创建人：FCreatorId 
+	 创建日期：FCreateDate 
+	 最后修改人：FModifierId 
+	 最后修改日期：FModifyDate 
+业务员分录：FEntity 
+	 实体主键：FEntryId 
+	 业务员类型：FOperatorType_ETY 
+	 职员：FStaffId  (必填项)
+	 部门：Fdept 
+	 业务组织：FBizOrgId  (必填项)
+	 启用：FIsUse 
+	 任职岗位：FPosition 
+	 所属门店：FBranchId 
+	 业务员名称：FName 
+	 业务员编码：FNumber 
+	 禁用状态：FForbiddenStatus  (必填项)
+	 员工编码：FEmpNumber 
+业务员子表：FBD_OPERATORDETAILS 
+	 实体主键：FSubEntryId 
+	 业务组编码：FOperatorGroupId 
+	 业务组名称：FOperatorGroupName 
+	 描述：Fdescription_SETY 
+	 默认：FIsDefault 

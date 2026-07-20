@@ -1,0 +1,136 @@
+生产管理-生产退料单
+
+
+
+字段说明：
+单据头：FBillHead 
+	 实体主键：FID 
+	 单据编号：FBillNo 
+	 单据状态：FDocumentStatus 
+	 审核人：FApproverId 
+	 审核日期：FApproveDate 
+	 修改人：FModifierId 
+	 创建日期：FCreateDate 
+	 创建人：FCreatorId 
+	 修改日期：FModifyDate 
+	 作废日期：FCancelDate 
+	 作废人：FCanceler 
+	 作废状态：FCancelStatus 
+	 备注：FDescription 
+	 生产组织：FPrdOrgId  (必填项)
+	 收料组织：FStockOrgId  (必填项)
+	 日期：FDate  (必填项)
+	 生产车间：FWorkShopId 
+	 仓库：FStockId0 
+	 单据类型：FBillType  (必填项)
+	 货主：FOwnerId0 
+	 货主类型：FOwnerTypeId0 
+	 本位币：FCurrId 
+	 跨组织业务类型：FTransferBizType 
+	 仓管员：FSTOCKERID 
+	 退料人：FReturnerId 
+	 跨法人交易：FIsCrossTrade 
+	 VMI业务：FVmiBusiness 
+	 序列号上传：FScanBox 
+	 倒冲来源：FSourceType 
+	 货主含组织：FIsOwnerTInclOrg 
+明细：FEntity 
+	 实体主键：FEntryID 
+	 用料清单分录ID：FPPBOMEntryId 
+	 物料编码：FMaterialId  (必填项)
+	 物料名称：FMaterialName 
+	 规格型号：FSpecification 
+	 单位：FUnitID  (必填项)
+	 申请数量：FAPPQty 
+	 实退数量：FQty 
+	 退料类型：FReturnType  (必填项)
+	 仓库：FStockId  (必填项)
+	 生产订单ID：FMoId 
+	 生产订单编号：FMoBillNo 
+	 生产订单分录ID：FMoEntryId 
+	 生产订单行号：FMoEntrySeq 
+	 辅助属性：FAuxPropId 
+	 基本单位申请数量：FBaseAppQty 
+	 主库存单位：FStockUnitId 
+	 主库存申请数量：FStockAppQty 
+	 辅库存单位：FSecUnitId 
+	 辅库存实退数量：FSecStockQty 
+	 主库存实退数量：FStockQty 
+	 基本单位实退数量：FBaseQty 
+	 计划跟踪号：FMtoNo 
+	 项目编号：FProjectNo 
+	 批号：FLot 
+	 库存状态：FStockStatusId  (必填项)
+	 保质期单位：FExpUnit 
+	 保质期：FExpPeriod 
+	 保管者类型：FKeeperTypeId  (必填项)
+	 保管者：FKeeperId  (必填项)
+	 工序号：FOperId 
+	 成本价：FPrice 
+	 总成本：FAmount 
+	 BOM版本：FBomId 
+	 仓位：FStockLocId 
+	 货位：FF100001
+	 作业：FProcessId 
+	 系统源单类型：FSrcBillType  (必填项)
+	 系统源单编号：FSrcBillNo 
+	 补料选单数：FSelRePickedQty 
+	 基本单位补料选单数：FBaseSelRePickedQty 
+	 基本单位：FBaseUnitId 
+	 更新库存标志位：FStockFlag 
+	 货主类型：FOwnerTypeId  (必填项)
+	 货主：FOwnerId  (必填项)
+	 系统源单内码：FEntrySrcInterId 
+	 系统源单分录内码：FEntrySrcEnteryId 
+	 系统源单行号：FEntrySrcEntrySeq 
+	 生产日期：FProduceDate 
+	 有效期至：FExpiryDate 
+	 用料清单编号：FPPBomBillNo 
+	 车间：FWorkShopId1 
+	 退料原因：FReturnReason 
+	 备注：FEntrtyMemo 
+	 产品货主类型：FParentOwnerTypeId  (必填项)
+	 产品货主：FParentOwnerId  (必填项)
+	 业务流程：FBFLowId 
+	 产品编码：FParentMaterialId 
+	 业务源单类型：FSrcBizBillType 
+	 业务源单编号：FSrcBizBillNo 
+	 业务源单内码：FSrcBizInterId 
+	 业务源单分录内码：FSrcBizEntryId 
+	 业务源单行号：FSrcBizEntrySeq 
+	 序列号单位：FSNUnitID 
+	 序列号单位数量：FSNQty 
+	 预留类型：FReserveType 
+	 主库存基本单位实退数量：FBASESTOCKQTY 
+	 消耗汇总：FConsome 
+	 VMI业务：FEntryVmiBusiness 
+	 工序序列：FOptQueue 
+	 工序计划单编号：FOptPlanBillNo 
+	 工序计划单内码：FOptPlanBillId 
+	 工作中心：FWorkCenterId 
+	 工序计划工序内码：FOptDetailId 
+	 需求来源：FReqSrc 
+	 需求单据：FReqBillNo 
+	 需求单据内码：FReqBillId 
+	 需求单据行号：FReqEntrySeq 
+	 需求单据分录内码：FReqEntryId 
+	 设备：FEquipmentId 
+	 不更新未领：FIsUpdateQty 
+	 组织间结算跨法人标识：FIsOverLegalOrg 
+	 生产退料检验：FCheckReturnMtrl 
+序列号子单据体：FSerialSubEntity 
+	 实体主键：FDetailID 
+	 序列号：FSerialNo 
+	 序列号：FSerialId 
+	 备注：FSerialNote 
+关联关系表：FEntity_Link 
+	 实体主键：FLinkId 
+	 业务流程图：FEntity_Link_FFlowId 
+	 推进路线：FEntity_Link_FFlowLineId 
+	 转换规则：FEntity_Link_FRuleId 
+	 源单表内码：FEntity_Link_FSTableId 
+	 源单表：FEntity_Link_FSTableName 
+	 源单内码：FEntity_Link_FSBillId 
+	 源单分录内码：FEntity_Link_FSId 
+	 原始携带量：FEntity_Link_FBaseQtyOld 
+	 修改携带量：FEntity_Link_FBaseQty 

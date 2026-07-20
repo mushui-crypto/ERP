@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI智能助手</title>
+  <style>
+    body { margin: 0; padding: 0; background: transparent; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
+    .chat-widget { position: relative; width: 56px; height: 56px; border-radius: 50%; background: linear-gradient(135deg, #6366f1, #8b5cf6); cursor: pointer; box-shadow: 0 4px 20px rgba(99, 102, 241, 0.4); transition: all 0.3s ease; overflow: hidden; }
+    .chat-widget:hover { transform: scale(1.05); box-shadow: 0 6px 30px rgba(99, 102, 241, 0.5); }
+    .chat-widget.open { width: 360px; height: 480px; border-radius: 16px; }
+    .chat-icon { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 28px; color: white; transition: opacity 0.3s; }
+    .chat-widget.open .chat-icon { opacity: 0; }
+    .chat-panel { position: relative; width: 100%; height: 100%; background: #1e1e2e; border-radius: 16px; display: none; flex-direction: column; }
+    .chat-widget.open .chat-panel { display: flex; }
+    .chat-header { padding: 16px; background: linear-gradient(135deg, #6366f1, #8b5cf6); color: white; border-radius: 16px 16px 0 0; }
+    .chat-header h3 { margin: 0; font-size: 14px; font-weight: 600; }
+    .chat-header p { margin: 4px 0 0; font-size: 12px; opacity: 0.8; }
+    .chat-messages { flex: 1; padding: 12px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; }
+    .message { display: flex; gap: 8px; max-width: 95%; }
+    .message.user-message { align-self: flex-end; flex-direction: row-reverse; }
+    .message-avatar { width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px; flex-shrink: 0; }
+    .user-message .message-avatar { background: #6366f1; }
+    .ai-message .message-avatar { background: #374151; }
+    .message-bubble { padding: 10px 14px; border-radius: 16px; font-size: 13px; line-height: 1.5; }
+    .user-message .message-bubble { background: #6366f1; color: white; border-bottom-right-radius: 4px; }
+    .ai-message .message-bubble { background: #374151; color: #e5e7eb; border-bottom-left-radius: 4px; }
+    .chat-input-area { padding: 10px; border-top: 1px solid #374151; display: flex; gap: 8px; }
+    .chat-input { flex: 1; padding: 10px 14px; border: none; border-radius: 20px; background: #374151; color: white; font-size: 13px; outline: none; }
+    .chat-input::placeholder { color: #6b7280; }
+    .chat-send { width: 36px; height: 36px; border: none; border-radius: 50%; background: #6366f1; color: white; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 14px; }
+    .chat-send:hover { background: #4f46e5; }
+    .quick-questions { padding: 8px 12px; border-top: 1px solid #374151; display: flex; flex-wrap: wrap; gap: 6px; }
+    .quick-btn { padding: 5px 12px; background: #374151; border: none; border-radius: 12px; color: #9ca3af; font-size: 11px; cursor: pointer; }
+    .quick-btn:hover { background: #4b5563; color: white; }
+    .ai-table { width: 100%; border-collapse: collapse; margin: 8px 0; font-size: 12px; }
+    .ai-table th { background: rgba(99, 102, 241, 0.2); padding: 6px 8px; text-align: left; border-bottom: 1px solid #4b5563; }
+    .ai-table td { padding: 6px 8px; border-bottom: 1px solid #374151; }
+    .text-accent { color: #a5b4fc; }
+    .text-success { color: #4ade80; }
+    .text-warning { color: #fbbf24; }
+    .text-error { color: #f87171; }
+    .text-info { color: #60a5fa; }
+    .badge { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 10px; font-weight: 500; }
+    .badge-success { background: rgba(74, 222, 128, 0.2); color: #4ade80; }
+    .badge-warning { background: rgba(251, 191, 36, 0.2); color: #fbbf24; }
+    .badge-error { background: rgba(248, 113, 113, 0.2); color: #f87171; }
+    .badge-info { background: rgba(96, 165, 250, 0.2); color: #60a5fa; }
+    .close-btn { position: absolute; top: 12px; right: 12px; font-size: 20px; cursor: pointer; opacity: 0.7; }
+    .close-btn:hover { opacity: 1; }
+  </style>
+</head>
+<body>
+  <div class="chat-widget" id="chatWidget">
+    <div class="chat-icon">🤖</div>
+    <div class="chat-panel">
+      <div class="chat-header">
+        <span class="close-btn" onclick="toggleChat()">×</span>
+        <h3>AI智能助手</h3>
+        <p>随时为您提供数据分析和业务咨询</p>
+      </div>
+      <div class="chat-messages" id="chatMessages">
+        <div class="message ai-message">
+          <div class="message-avatar">🤖</div>
+          <div class="message-bubble">
+            <div class="message-content">您好！我是您的AI智能助手。请问有什么可以帮助您的？<br><br>您可以尝试询问：<br>• 本月销售额<br>• 库存预警<br>• 生产进度<br>• 采购分析</div>
+          </div>
+        </div>
+      </div>
+      <div class="quick-questions">
+        <button class="quick-btn" onclick="sendQuickQuestion('本月销售额')">本月销售额</button>
+        <button class="quick-btn" onclick="sendQuickQuestion('库存预警')">库存预警</button>
+        <button class="quick-btn" onclick="sendQuickQuestion('生产进度')">生产进度</button>
+        <button class="quick-btn" onclick="sendQuickQuestion('采购分析')">采购分析</button>
+        <button class="quick-btn" onclick="sendQuickQuestion('质量异常')">质量异常</button>
+        <button class="quick-btn" onclick="sendQuickQuestion('应收款情况')">应收款情况</button>
+      </div>
+      <div class="chat-input-area">
+        <input type="text" class="chat-input" id="chatInput" placeholder="输入您的问题..." onkeydown="handleKeyDown(event)">
+        <button class="chat-send" onclick="sendMessage()">➤</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    var chatWidget = document.getElementById('chatWidget');
+    var chatInput = document.getElementById('chatInput');
+    var chatMessages = document.getElementById('chatMessages');
+    var isChatOpen = false;
+
+    chatWidget.addEventListener('click', function(e) {
+      if (!e.target.closest('.close-btn')) {
+        toggleChat();
+      }
+    });
+
+    function toggleChat() {
+      isChatOpen = !isChatOpen;
+      if (isChatOpen) {
+        chatWidget.classList.add('open');
+      } else {
+        chatWidget.classList.remove('open');
+      }
+    }
+
+    function handleKeyDown(event) {
+      if (event.key === 'Enter') {
+        sendMessage();
+      }
+    }
+
+    function addMessage(content, isUser) {
+      var div = document.createElement('div');
+      div.className = 'message ' + (isUser ? 'user-message' : 'ai-message');
+      
+      var avatar = isUser ? '👤' : '🤖';
+      var bubbleClass = isUser ? 'user-bubble' : '';
+      
+      div.innerHTML = `
+        <div class="message-avatar">${avatar}</div>
+        <div class="message-bubble ${bubbleClass}">
+          <div class="message-content">${content}</div>
+        </div>
+      `;
+      
+      chatMessages.appendChild(div);
+      chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+
+    function sendMessage() {
+      var text = chatInput.value.trim();
+      if (!text) return;
+      
+      addMessage(text, true);
+      chatInput.value = '';
+      
+      simulateAIResponse(text);
+    }
+
+    function sendQuickQuestion(question) {
+      chatInput.value = question;
+      sendMessage();
+    }
+
+    function simulateAIResponse(question) {
+      var responses = {
+        '本月销售额': '📊 <strong>本月销售概况</strong><br><br><table class="ai-table"><tr><th>指标</th><th>数值</th></tr><tr><td>本月销售额</td><td class="text-accent">2,340.00万元</td></tr><tr><td>同比增长</td><td class="text-success">+8.5%</td></tr><tr><td>目标达成率</td><td class="text-success">103.2%</td></tr><tr><td>订单数量</td><td>1,286单</td></tr></table><br><strong>AI洞察：</strong>本月销售额表现良好，超出目标3.2%。建议关注华东区域的增长潜力，可加大市场投入。',
+        '库存预警': '⚠️ <strong>库存预警清单</strong><br><br><table class="ai-table"><tr><th>物料名称</th><th>当前库存</th><th>安全库存</th><th>状态</th></tr><tr><td>ABS树脂 PC-770</td><td>160 KG</td><td>500 KG</td><td><span class="badge badge-error">紧急</span></td></tr><tr><td>PMMA亚克力 MH-655</td><td>90 KG</td><td>200 KG</td><td><span class="badge badge-warning">预警</span></td></tr><tr><td>TPU弹性体 1185A</td><td>130 KG</td><td>250 KG</td><td><span class="badge badge-warning">预警</span></td></tr><tr><td>PA66尼龙66 A3HG6</td><td>340 KG</td><td>500 KG</td><td><span class="badge badge-info">关注</span></td></tr></table><br><strong>建议：</strong>紧急物料需在48小时内完成采购下单，避免影响生产进度。',
+        '生产进度': '🏭 <strong>生产订单进度</strong><br><br><table class="ai-table"><tr><th>订单号</th><th>产品名称</th><th>完成率</th><th>状态</th></tr><tr><td>MO-2026-0345</td><td>仪表盘外壳</td><td class="text-success">92%</td><td><span class="badge badge-success">即将完工</span></td></tr><tr><td>MO-2026-0346</td><td>门板内饰件</td><td class="text-success">78%</td><td><span class="badge badge-info">生产中</span></td></tr><tr><td>MO-2026-0347</td><td>保险杠支架</td><td class="text-info">55%</td><td><span class="badge badge-info">生产中</span></td></tr><tr><td>MO-2026-0348</td><td>仪表盘面板组件</td><td class="text-warning">32%</td><td><span class="badge badge-warning">进度偏慢</span></td></tr><tr><td>MO-2026-0349</td><td>门板骨架组件</td><td class="text-warning">18%</td><td><span class="badge badge-warning">刚开工</span></td></tr></table><br><strong>AI建议：</strong>MO-2026-0348进度偏慢，建议检查设备稼动情况或增加人力投入。',
+        '采购分析': '📦 <strong>采购分析报告</strong><br><br><table class="ai-table"><tr><th>供应商</th><th>采购金额</th><th>准时交货率</th><th>质量合格率</th></tr><tr><td>深圳材料科技</td><td>850.00万元</td><td class="text-success">98.5%</td><td class="text-success">99.2%</td></tr><tr><td>东莞塑胶有限公司</td><td>620.00万元</td><td class="text-success">96.8%</td><td class="text-success">98.8%</td></tr><tr><td>广州化工集团</td><td>480.00万元</td><td class="text-info">94.2%</td><td class="text-info">97.5%</td></tr><tr><td>佛山新材料</td><td>320.00万元</td><td class="text-warning">89.6%</td><td class="text-success">98.2%</td></tr></table><br><strong>AI洞察：</strong>佛山新材料交货准时率较低，建议与供应商沟通改进，或考虑备选供应商方案。',
+        '质量异常': '🔍 <strong>本月质量异常分析</strong><br><br><table class="ai-table"><tr><th>不良类型</th><th>数量</th><th>占比</th><th>主要原因</th></tr><tr><td>缩水凹陷</td><td>28件</td><td>37.8%</td><td>注塑压力不足</td></tr><tr><td>熔接痕</td><td>19件</td><td>25.7%</td><td>模具浇口设计</td></tr><tr><td>翘曲变形</td><td>14件</td><td>18.9%</td><td>冷却时间不足</td></tr><tr><td>表面流纹</td><td>8件</td><td>10.8%</td><td>注塑速度过快</td></tr><tr><td>尺寸超差</td><td>5件</td><td>6.8%</td><td>模具磨损</td></tr></table><br><strong>改进建议：</strong>优先解决缩水凹陷问题，建议调整注塑工艺参数，增加保压时间。',
+        '应收款情况': '💰 <strong>应收账款分析</strong><br><br><table class="ai-table"><tr><th>客户名称</th><th>应收金额</th><th>账龄</th><th>状态</th></tr><tr><td>华东科技有限公司</td><td>380.00万元</td><td>30天以内</td><td><span class="badge badge-success">正常</span></td></tr><tr><td>华南电子集团</td><td>260.00万元</td><td>31-60天</td><td><span class="badge badge-info">关注</span></td></tr><tr><td>华中汽车配件</td><td>210.00万元</td><td>61-90天</td><td><span class="badge badge-warning">逾期</span></td></tr><tr><td>华北重工机械</td><td>180.00万元</td><td>90天以上</td><td><span class="badge badge-error">高风险</span></td></tr></table><br><strong>AI建议：</strong>华北重工机械账款逾期超过90天，建议财务部门立即采取催收措施，必要时暂停供货。'
+      };
+      
+      setTimeout(function() {
+        var response = responses[question] || '感谢您的提问！我正在分析您的问题，请稍候...<br><br>您可以尝试询问：<br>• 本月销售额<br>• 库存预警<br>• 生产进度<br>• 采购分析';
+        addMessage(response, false);
+      }, 800);
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,52 @@
+生产管理-生产订单领料汇总表
+
+段说明：
+	 计划完工日期：FBeginPlanFinishDate  (必填项)
+	 至：：FEndPlanFinishDate  (必填项)
+	 计划开工日期：FBeginPlanStartDate  (必填项)
+	 至：：FEndPlanStartDate  (必填项)
+	 至：：FEndMaterialId 
+	 产品编码：FBeginMaterialId 
+	 业务状态：FStatus  (必填项)
+	 至：：FEndMONumber 
+	 生产订单：FBeginMONumber 
+	 汇总依据：FSummaryBasis  (必填项)
+	 单据类型：FMOBillType  (必填项)
+	 挂起状态：FIsSuspend  (必填项)
+	 至：：FEndPickedRate 
+	 领料比例%：FBeginPickedRate 
+	 物料控制项：FCtrlItem  (必填项)
+	 生产组织：FPrdOrgId 
+	 生产车间：FWorkshopId  (必填项)
+	 参与查询：FStartDateInvolve 
+	 参与查询：FFinishDateInvolve 
+	 产品编码：FMulMaterial 
+
+参数FieldKeys显示列：
+	 生产车间：FWORKSHOPID 
+	 产品编码：FMATERIALID 
+	 产品名称：FMATERIALNAME 
+	 规格型号：FMATERIALMODEL 
+	 辅助属性：FAUXPROP 
+	 BOM版本：FBOMID 
+	 计划跟踪号：FMTONO 
+	 生产订单编号：FMOBILLNO 
+	 生产订单行号：FMOENTRYSEQ 
+	 计划开工日期：FPLANSTARTDATE 
+	 计划完工日期：FPLANFINISHDATE 
+	 需求来源：FREQSRC 
+	 需求单据：FSALEORDERNO 
+	 需求单据行号：FSALEORDERENTRYSEQ 
+	 生产单位：FPRDUNITID 
+	 计划生产数量：FPLANQTY 
+	 合格品入库数量：FSTOCKINQUAQTY 
+	 不合格品入库数量：FSTOCKINFAILQTY 
+	 报废品入库数量：FStockInScrapQty 
+	 返工品入库数量：FSTOCKINREMADEQTY 
+	 退库数量：FReStkQty 
+	 计划材料套数：FPLANPICKEDQTY 
+	 材料套数：FPICKEDQTY 
+	 领料比例%：FPICKEDRATE 
+	 入库货主：FInStockOwnerName 
+	 计划组：FWORKGROUPID 
+	 计划员：FPLANNERID 

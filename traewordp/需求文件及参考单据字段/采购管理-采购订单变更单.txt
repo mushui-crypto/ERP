@@ -1,0 +1,105 @@
+采购订单变更单
+
+字段说明：
+基本信息：FBillHead 
+	 实体主键：FID 
+	 编号：FBillNo 
+	 单据状态：FDocumentStatus 
+	 日期：FDate  (必填项)
+	 采购组织：FPurchaseOrgId 
+	 供应商：FSupplierId 
+	 供货方：FSupplyId 
+	 采购组：FPurchaserGroupId 
+	 采购部门：FPurchaseDeptId 
+	 采购员：FPurchaserId 
+	 供货地址：FSupplyAddress 
+	 变更原因：FChangeReason  (必填项)
+	 最后修改日期：FModifyDate 
+	 创建人：FCreatorId 
+	 创建日期：FCreateDate 
+	 审核人：FApproverId 
+	 作废日期：FCancelDate 
+	 审核日期：FApproveDate 
+	 作废人：FCancellerId 
+	 作废状态：FCancelStatus 
+	 最后修改人：FModifierId 
+	 供货方联系人：FSupplyContact 
+	 结算币别：FSettleCurrId 
+	 单据类型：FBillTypeID  (必填项)
+	 业务类型：FBusinessType  (必填项)
+	 是否单据转换：FIsConvert 
+	 生效状态：FIsActive 
+	 生效人：FActiverId 
+	 生效日期：FActiveDate 
+	 确认状态：FConfirmStatus 
+	 确认人：FConfirmerId 
+	 确认日期：FConfirmDate 
+明细信息：FEntity 
+	 实体主键：FEntryID 
+	 物料编码：FMaterialId  (必填项)
+	 物料名称：FMaterialName 
+	 规格型号：FMaterialModel 
+	 物料类别：FMaterialCategory 
+	 原采购数量：FOQty 
+	 累计入库数量：FSumInQty 
+	 新采购数量：FNQty 
+	 原单价：FOPrice 
+	 新单价：FNPrice 
+	 原交货地点：FOLocationId 
+	 原订单行内码：FOFEntryId 
+	 备注：FNOTE 
+	 变更类型：FChangeType  (必填项)
+	 新交货地点：FNLocationId 
+	 原订单内码：FOFid 
+	 采购单位：FUnitId  (必填项)
+	 基础资料属性：FBaseProperty 
+	 价格上限：FUpPrice 
+	 价格下限：FDownPrice 
+	 原订单编号：FOFBillNo  (必填项)
+	 源单类型：FSourceBillType 
+	 原交货日期：FODeliveryDate 
+	 新交货日期：FNDeliveryDate 
+	 联副产品分录id：FCopyEntryId 
+	 行产品主键：FRowId 
+	 父产品行主键：FParentRowId 
+	 产品类型：FProductType 
+	 组别：FGroup 
+	 BOM版本：FBomId 
+	 基本单位：FBaseUnitId 
+	 新采购基本数量：FNBaseUnitQty 
+	 原采购基本数量：FOBaseUnitQty 
+	 是否赠品：FGiveAway 
+	 辅助属性：FAuxPropId 
+	 计价单位：FPRICEUNITID 
+	 原计价数量：FOPRICEQTY 
+	 新计价数量：FNPRICEQTY 
+	 库存单位：FSTOCKUNITID 
+	 原库存单位数量：FOSTOCKQTY 
+	 新库存单位数量：FNSTOCKQTY 
+	 携带的主业务单位：FSRCBIZUNITID 
+	 采购基本分子：FPurBaseNum 
+	 库存基本分母：FStockBaseDen 
+	 新库存基本数量：FNSTOCKBASEQTY 
+	 新计价基本数量：FNPRICEBASEQTY 
+	 原需求组织：FORequireOrgId 
+	 新需求组织：FNRequireOrgId  (必填项)
+交货明细：FDeliEntity 
+	 实体主键：FDetailID 
+	 原数量：FDeliOQty 
+	 新数量：FDeliNQty 
+	 原订单交货明细行内码：FOFDetailId 
+	 原交货日期：FDeliODeliveryDate 
+	 新交货日期：FDeliNDeliveryDate 
+	 已交货数量：FDeliCommitQty 
+	 确认交货数量：FConfirmDeliQty 
+	 确认交货日期：FConfirmDeliDate 
+	 确认意见：FConfirmInfo 
+关联关系表：FEntity_Link 
+	 实体主键：FLinkId 
+	 业务流程图：FEntity_Link_FFlowId 
+	 推进路线：FEntity_Link_FFlowLineId 
+	 转换规则：FEntity_Link_FRuleId 
+	 源单表内码：FEntity_Link_FSTableId 
+	 源单表：FEntity_Link_FSTableName 
+	 源单内码：FEntity_Link_FSBillId 
+	 源单分录内码：FEntity_Link_FSId 

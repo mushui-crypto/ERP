@@ -1,0 +1,51 @@
+# macOS
+.DS_Store
+
+# Dependencies
+node_modules/
+**/node_modules/
+
+# Environment / secrets
+.env
+.env.*
+!.env.example
+
+# Runtime logs and pids
+*.log
+*.pid
+.backend-local.log
+.backend-local.pid
+.frontend-local.log
+.frontend-local.pid
+
+# Local databases / runtime data
+*.db
+*.sqlite
+*.sqlite3
+server/*.db
+server/*.sqlite
+server/*.sqlite3
+
+# Uploads / generated local files
+.uploads/
+data/
+
+# Build outputs
+/dist/
+/build/
+/coverage/
+server/dist/
+server/coverage/
+traewordp/dist/
+traewordp/coverage/
+
+# Archives / temporary packages
+*.rar
+*.zip
+*.7z
+*.tar
+*.tar.gz
+
+# IDE
+.vscode/
+.idea/

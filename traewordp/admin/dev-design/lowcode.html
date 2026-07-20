@@ -1,0 +1,1818 @@
+﻿<!DOCTYPE html>
+
+<html lang="zh-CN">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>低代码开发中心 — 磐枢工业智能平台(管理端)</title>
+
+<link rel="stylesheet" href="../common-admin.css">
+
+<script src="../../common.js"></script>
+
+<style>
+
+/* ===== 实体管理区域 ===== */
+
+.entity-section {
+
+  background: #fff;
+
+  border: 1px solid var(--border-normal);
+
+  border-radius: var(--radius-md);
+
+  margin-top: 24px;
+
+  overflow: hidden;
+
+}
+
+.entity-tabs {
+
+  display: flex;
+
+  border-bottom: 1px solid var(--border-normal);
+
+  background: #f5f5f5;
+
+  padding: 0 8px;
+
+}
+
+.entity-tab {
+
+  padding: 12px 22px;
+
+  cursor: pointer;
+
+  color: #999;
+
+  font-size: 13px;
+
+  font-weight: 500;
+
+  border-bottom: 2px solid transparent;
+
+  transition: all var(--transition);
+
+}
+
+.entity-tab:hover { color: #333; }
+
+.entity-tab.active {
+
+  color: #1890ff;
+
+  border-bottom-color: #1890ff;
+
+}
+
+.entity-pane { display: none; padding: 16px; }
+
+.entity-pane.active { display: block; }
+
+
+
+/* 实体操作栏 */
+
+.entity-toolbar {
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: space-between;
+
+  gap: 12px;
+
+  margin-bottom: 14px;
+
+  flex-wrap: wrap;
+
+}
+
+.entity-toolbar-left,
+
+.entity-toolbar-right { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+
+.entity-toolbar .search-box { position: relative; }
+
+.entity-toolbar .search-box input {
+
+  padding: 6px 10px 6px 28px;
+
+  background: #f5f5f5;
+
+  border: 1px solid var(--border-normal);
+
+  border-radius: var(--radius-sm);
+
+  color: #333;
+
+  font-size: 12px;
+
+  outline: none;
+
+  width: 220px;
+
+}
+
+.entity-toolbar .search-box input:focus { border-color: #1890ff; }
+
+.entity-toolbar .search-box::before {
+
+  content: '⌕';
+
+  position: absolute;
+
+  left: 8px; top: 50%;
+
+  transform: translateY(-50%);
+
+  color: #999;
+
+  font-size: 14px;
+
+  pointer-events: none;
+
+}
+
+.entity-toolbar .filter-select {
+
+  padding: 6px 10px;
+
+  background: #f5f5f5;
+
+  border: 1px solid var(--border-normal);
+
+  border-radius: var(--radius-sm);
+
+  color: #333;
+
+  font-size: 12px;
+
+  outline: none;
+
+  appearance: none;
+
+}
+
+.entity-toolbar .tl-btn {
+
+  display: inline-flex;
+
+  align-items: center;
+
+  gap: 4px;
+
+  padding: 6px 12px;
+
+  background: var(--bg-raised);
+
+  border: 1px solid var(--border-normal);
+
+  border-radius: var(--radius-sm);
+
+  color: #666;
+
+  font-size: 12px;
+
+  cursor: pointer;
+
+  transition: all var(--transition);
+
+}
+
+.entity-toolbar .tl-btn:hover { border-color: #1890ff; color: #333; }
+
+.entity-toolbar .tl-btn.primary {
+
+  background: #1890ff;
+
+  border-color: #1890ff;
+
+  color: #0a0e1a;
+
+  font-weight: 500;
+
+}
+
+.entity-toolbar .tl-btn.primary:hover { background: var(--admin-accent-hover); }
+
+
+
+/* 实体表格 */
+
+.entity-table {
+
+  width: 100%;
+
+  border-collapse: collapse;
+
+  font-size: 13px;
+
+}
+
+.entity-table th {
+
+  padding: 10px 12px;
+
+  text-align: left;
+
+  background: #f5f5f5;
+
+  color: #666;
+
+  font-weight: 600;
+
+  border-bottom: 1px solid var(--border-strong);
+
+  font-size: 12px;
+
+  white-space: nowrap;
+
+}
+
+.entity-table td {
+
+  padding: 11px 12px;
+
+  border-bottom: 1px solid var(--border-normal);
+
+  color: #666;
+
+  white-space: nowrap;
+
+}
+
+.entity-table .col-code { font-family: var(--font-mono); color: #1890ff; }
+
+.entity-table .col-table { font-family: var(--font-mono); color: #999; font-size: 12px; }
+
+.entity-table .row-action a {
+
+  color: #1890ff;
+
+  font-size: 12px;
+
+  cursor: pointer;
+
+  margin-right: 10px;
+
+}
+
+.entity-table .row-action a:hover { text-decoration: underline; }
+
+.entity-table .row-action a.danger { color: #f5222d; }
+
+.entity-table .row-action a.muted { color: #999; }
+
+
+
+/* 状态徽章 */
+
+.status-badge {
+
+  display: inline-block;
+
+  padding: 2px 9px;
+
+  border-radius: 10px;
+
+  font-size: 11px;
+
+  font-weight: 500;
+
+}
+
+.status-draft { background: rgba(148,163,184,0.18); color: #cbd5e1; }
+
+.status-published { background: rgba(34,197,94,0.15); color: #52c41a; }
+
+.status-disabled { background: rgba(239,68,68,0.15); color: #f5222d; }
+
+
+
+/* 模板卡片 */
+
+.template-grid {
+
+  display: grid;
+
+  grid-template-columns: repeat(4, 1fr);
+
+  gap: 16px;
+
+}
+
+.template-card {
+
+  background: var(--bg-raised);
+
+  border: 1px solid var(--border-normal);
+
+  border-radius: var(--radius-md);
+
+  padding: 20px 16px;
+
+  text-align: center;
+
+  transition: all var(--transition);
+
+}
+
+.template-card:hover {
+
+  border-color: #91d5ff;
+
+  transform: translateY(-2px);
+
+  box-shadow: 0 4px 16px rgba(0,0,0,0.25);
+
+}
+
+.template-card .tpl-icon { font-size: 30px; margin-bottom: 10px; }
+
+.template-card .tpl-name {
+
+  font-size: 13px;
+
+  font-weight: 600;
+
+  color: #333;
+
+  margin-bottom: 4px;
+
+}
+
+.template-card .tpl-fields {
+
+  font-size: 11px;
+
+  color: #999;
+
+  margin-bottom: 12px;
+
+}
+
+.template-card .tpl-use-btn {
+
+  padding: 4px 16px;
+
+  background: #e6f7ff;
+
+  border: 1px solid rgba(245,158,11,0.3);
+
+  border-radius: var(--radius-sm);
+
+  color: #1890ff;
+
+  cursor: pointer;
+
+  font-size: 12px;
+
+  transition: all var(--transition);
+
+}
+
+.template-card .tpl-use-btn:hover {
+
+  background: rgba(245,158,11,0.22);
+
+  border-color: #1890ff;
+
+}
+
+
+
+/* 导入导出区域 */
+
+.io-grid {
+
+  display: grid;
+
+  grid-template-columns: 1fr 1fr;
+
+  gap: 16px;
+
+}
+
+.io-box {
+
+  background: var(--bg-raised);
+
+  border: 1px solid var(--border-normal);
+
+  border-radius: var(--radius-md);
+
+  padding: 16px;
+
+}
+
+.io-box-title {
+
+  font-size: 13px;
+
+  font-weight: 600;
+
+  color: #333;
+
+  margin-bottom: 12px;
+
+  display: flex;
+
+  align-items: center;
+
+  gap: 6px;
+
+}
+
+.drop-zone {
+
+  border: 2px dashed var(--border-strong);
+
+  border-radius: var(--radius-md);
+
+  padding: 34px 16px;
+
+  text-align: center;
+
+  color: #999;
+
+  font-size: 13px;
+
+  transition: all var(--transition);
+
+  cursor: pointer;
+
+  background: #f5f5f5;
+
+}
+
+.drop-zone:hover {
+
+  border-color: #1890ff;
+
+  background: #e6f7ff;
+
+}
+
+.drop-zone .dz-icon { font-size: 36px; margin-bottom: 8px; opacity: 0.7; }
+
+.drop-zone .dz-hint { font-size: 11px; margin-top: 6px; color: #999; }
+
+.io-preview {
+
+  margin-top: 12px;
+
+  background: #f5f5f5;
+
+  border: 1px solid var(--border-normal);
+
+  border-radius: var(--radius-sm);
+
+  padding: 10px;
+
+  font-family: var(--font-mono);
+
+  font-size: 11px;
+
+  color: #999;
+
+  max-height: 130px;
+
+  overflow: auto;
+
+  line-height: 1.6;
+
+}
+
+.export-list {
+
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 6px;
+
+  margin-bottom: 12px;
+
+  max-height: 200px;
+
+  overflow-y: auto;
+
+}
+
+.export-item {
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: space-between;
+
+  padding: 8px 10px;
+
+  background: #f5f5f5;
+
+  border: 1px solid var(--border-normal);
+
+  border-radius: var(--radius-sm);
+
+  font-size: 12px;
+
+  color: #666;
+
+}
+
+.export-item .ex-code { font-family: var(--font-mono); color: #1890ff; font-size: 11px; }
+
+.export-item input[type="checkbox"] { accent-color: #1890ff; }
+
+
+
+/* 字段定义区域 */
+
+.field-def-section {
+
+  background: #fff;
+
+  border: 1px solid var(--border-normal);
+
+  border-radius: var(--radius-md);
+
+  margin-top: 24px;
+
+  overflow: hidden;
+
+}
+
+.field-def-header {
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: space-between;
+
+  padding: 14px 16px;
+
+  border-bottom: 1px solid var(--border-normal);
+
+  background: #f5f5f5;
+
+  flex-wrap: wrap;
+
+  gap: 10px;
+
+}
+
+.field-def-header .fd-title {
+
+  font-size: 14px;
+
+  font-weight: 600;
+
+  color: #333;
+
+  display: flex;
+
+  align-items: center;
+
+  gap: 10px;
+
+}
+
+.field-def-header .fd-entity-tag {
+
+  font-family: var(--font-mono);
+
+  font-size: 11px;
+
+  color: #1890ff;
+
+  background: #e6f7ff;
+
+  padding: 2px 9px;
+
+  border-radius: 10px;
+
+  border: 1px solid rgba(245,158,11,0.3);
+
+}
+
+.field-def-header .fd-info {
+
+  font-size: 11px;
+
+  color: #999;
+
+  display: flex;
+
+  gap: 14px;
+
+}
+
+.field-table {
+
+  width: 100%;
+
+  border-collapse: collapse;
+
+  font-size: 12.5px;
+
+}
+
+.field-table th {
+
+  padding: 9px 12px;
+
+  text-align: left;
+
+  background: #f5f5f5;
+
+  color: #666;
+
+  font-weight: 600;
+
+  border-bottom: 1px solid var(--border-strong);
+
+  font-size: 11px;
+
+  white-space: nowrap;
+
+}
+
+.field-table td {
+
+  padding: 10px 12px;
+
+  border-bottom: 1px solid var(--border-normal);
+
+  color: #666;
+
+  white-space: nowrap;
+
+}
+
+.field-table .col-code { font-family: var(--font-mono); color: #1890ff; font-size: 12px; }
+
+.field-table .row-action a {
+
+  color: #1890ff;
+
+  font-size: 11px;
+
+  cursor: pointer;
+
+  margin-right: 8px;
+
+}
+
+.field-table .row-action a:hover { text-decoration: underline; }
+
+.field-table .row-action a.danger { color: #f5222d; }
+
+
+
+/* 字段类型徽章 */
+
+.type-badge {
+
+  display: inline-block;
+
+  padding: 2px 9px;
+
+  border-radius: 10px;
+
+  font-size: 11px;
+
+  font-weight: 500;
+
+}
+
+.type-text { background: rgba(56,189,248,0.15); color: #38bdf8; }
+
+.type-number { background: rgba(6,182,212,0.15); color: #06b6d4; }
+
+.type-date { background: rgba(245,158,11,0.15); color: #f59e0b; }
+
+.type-select { background: rgba(168,85,247,0.15); color: #a855f7; }
+
+.type-relate { background: rgba(34,197,94,0.15); color: #22c55e; }
+
+.type-file { background: rgba(148,163,184,0.18); color: #94a3b8; }
+
+.type-subtable { background: rgba(239,68,68,0.15); color: #ef4444; }
+
+.type-money { background: rgba(234,179,8,0.15); color: #eab308; }
+
+
+
+/* 是否标记 */
+
+.flag-yes { color: #f5222d; font-weight: 600; }
+
+.flag-no { color: #999; }
+
+.flag-uniq { color: #1890ff; font-weight: 600; }
+
+
+
+.field-def-footer {
+
+  padding: 12px 16px;
+
+  border-top: 1px solid var(--border-normal);
+
+  background: #f5f5f5;
+
+}
+
+
+
+@media (max-width: 992px) {
+
+  .template-grid { grid-template-columns: repeat(2, 1fr); }
+
+  .io-grid { grid-template-columns: 1fr; }
+
+}
+
+</style>
+
+</head>
+
+<body>
+
+<aside class="sidebar admin-sidebar" id="sidebar">
+
+    <div class="sidebar-logo">
+
+    <img src="../../images/LOGO.png" alt="磐枢工业智能平台" style="width: 100%; max-width: 200px; margin-bottom: 8px;">
+
+    <h1 style="font-size: 16px; margin: 0;">磐枢工业智能平台</h1>
+
+  </div>
+
+  <nav class="sidebar-menu">
+
+    <div class="sidebar-menu-group"><div class="sidebar-menu-item" onclick="toggleGroup(this)"><span class="icon">&#128451;</span> 数据中心管理<span class="arrow">&#9654;</span></div><div class="sub-menu"><a class="sidebar-menu-item" href="../data-center/index.html">数据中心总览</a><a class="sidebar-menu-item" href="../data-center/new.html">新建数据中心</a><a class="sidebar-menu-item" href="../data-center/backup.html">备份管理</a></div></div>
+
+    <div class="sidebar-menu-group"><div class="sidebar-menu-item" onclick="toggleGroup(this)"><span class="icon">&#128101;</span> 组织与权限<span class="arrow">&#9654;</span></div><div class="sub-menu"><a class="sidebar-menu-item" href="../org-perm/org.html">组织架构</a><a class="sidebar-menu-item" href="../org-perm/user.html">用户管理</a><a class="sidebar-menu-item" href="../org-perm/role.html">角色管理</a><a class="sidebar-menu-item" href="../org-perm/menu.html">菜单管理</a></div></div>
+
+    <div class="sidebar-menu-group open"><div class="sidebar-menu-item" onclick="toggleGroup(this)"><span class="icon">&#128187;</span> 开发设计<span class="arrow">&#9660;</span></div><div class="sub-menu"><a class="sidebar-menu-item active" href="lowcode.html">低代码开发中心</a><a class="sidebar-menu-item" href="form-designer.html">表单设计器</a><a class="sidebar-menu-item" href="doc-flow.html">单据转换配置</a><a class="sidebar-menu-item" href="print-template.html">套打模板设计</a><a class="sidebar-menu-item" href="workflow.html">流程配置</a></div></div>
+
+
+
+    <div class="sidebar-menu-group"><div class="sidebar-menu-item" onclick="toggleGroup(this)"><span class="icon">&#129302;</span> 智能应用<span class="arrow">&#9654;</span></div><div class="sub-menu"><a class="sidebar-menu-item" href="../ai-config/api-manage.html">API管理</a><a class="sidebar-menu-item" href="../ai-config/nl-training.html">自然语言训练</a><a class="sidebar-menu-item" href="../ai-config/data-analysis.html">数据分析训练</a><a class="sidebar-menu-item" href="../ai-config/agent-config.html">Agent配置</a></div></div>
+
+
+
+    <div class="sidebar-menu-item" onclick="window.location.href='../../index.html'"><span class="icon">&#8592;</span> 返回应用端</div>
+
+  </nav>
+
+  <div class="sidebar-user"><div class="avatar" style="background: #e6f7ff;color: #1890ff;">管</div><div><div class="user-name">系统管理员</div><div class="user-role">超级管理员</div></div></div>
+
+</aside>
+
+<div class="main-content" id="mainContent">
+
+  <div class="page-header">
+
+    <div><div class="flex items-center gap-8"><button class="sidebar-toggle" onclick="toggleSidebar()">&#9776;</button><div><h2>低代码开发中心</h2><div class="breadcrumb"><a href="../../index.html">首页</a><span>/</span><a href="../index.html">管理端</a><span>/</span><span>开发设计 / 低代码</span></div></div></div></div>
+
+  </div>
+
+  <div class="page-body">
+
+    <div class="flex-between mb-16">
+
+      <div>
+
+        <h3 style="font-size:16px;font-weight:600;">低代码开发中心</h3>
+
+        <p class="text-muted text-sm mt-8">通过可视化配置快速构建业务功能，无需编写代码</p>
+
+      </div>
+
+    </div>
+
+
+
+    <!-- Stats -->
+
+    <div class="grid-4 mb-24">
+
+      <div class="stat-card"><div class="stat-value">12</div><div class="stat-label">已设计表单</div></div>
+
+      <div class="stat-card"><div class="stat-value">8</div><div class="stat-label">已配置流程</div></div>
+
+      <div class="stat-card"><div class="stat-value">6</div><div class="stat-label">已配置报表</div></div>
+
+      <div class="stat-card"><div class="stat-value">3</div><div class="stat-label">API配置</div></div>
+
+    </div>
+
+
+
+    <!-- Function Cards -->
+
+    <div class="grid-4" style="gap:16px;">
+
+      <a class="lowcode-card" href="form-designer.html">
+
+        <div class="lc-icon">&#128221;</div>
+
+        <div class="lc-name">表单设计</div>
+
+        <div class="lc-desc">可视化拖拽设计业务表单</div>
+
+      </a>
+
+      <a class="lowcode-card" href="#">
+
+        <div class="lc-icon">&#128203;</div>
+
+        <div class="lc-name">列表设计</div>
+
+        <div class="lc-desc">配置数据列表展示与筛选</div>
+
+      </a>
+
+      <a class="lowcode-card" href="doc-flow.html">
+
+        <div class="lc-icon">&#128196;</div>
+
+        <div class="lc-name">单据设计</div>
+
+        <div class="lc-desc">设计业务单据模板与转换</div>
+
+      </a>
+
+      <a class="lowcode-card" href="workflow.html">
+
+        <div class="lc-icon">&#9989;</div>
+
+        <div class="lc-name">审批流设计</div>
+
+        <div class="lc-desc">可视化配置审批工作流</div>
+
+      </a>
+
+      <a class="lowcode-card" href="#">
+
+        <div class="lc-icon">&#128200;</div>
+
+        <div class="lc-name">报表设计</div>
+
+        <div class="lc-desc">拖拽式报表设计器</div>
+
+      </a>
+
+      <a class="lowcode-card" href="../ai-config/api-manage.html">
+
+        <div class="lc-icon">&#128279;</div>
+
+        <div class="lc-name">API配置</div>
+
+        <div class="lc-desc">配置外部API接口对接</div>
+
+      </a>
+
+      <a class="lowcode-card" href="#">
+
+        <div class="lc-icon">&#128172;</div>
+
+        <div class="lc-name">消息模板</div>
+
+        <div class="lc-desc">配置通知消息模板</div>
+
+      </a>
+
+      <a class="lowcode-card" href="#">
+
+        <div class="lc-icon">&#128197;</div>
+
+        <div class="lc-name">定时任务</div>
+
+        <div class="lc-desc">配置定时执行任务</div>
+
+      </a>
+
+    </div>
+
+
+
+    <!-- 实体管理区域 -->
+
+    <div class="entity-section">
+
+      <div class="entity-tabs">
+
+        <div class="entity-tab active" onclick="switchEntityTab(this,'entity-pane-list')">实体管理</div>
+
+        <div class="entity-tab" onclick="switchEntityTab(this,'entity-pane-tpl')">预制模板</div>
+
+        <div class="entity-tab" onclick="switchEntityTab(this,'entity-pane-io')">导入导出</div>
+
+      </div>
+
+
+
+      <!-- 实体管理 Tab -->
+
+      <div class="entity-pane active" id="entity-pane-list">
+
+        <div class="entity-toolbar">
+
+          <div class="entity-toolbar-left">
+
+            <button class="tl-btn primary">+ 新建实体</button>
+
+            <button class="tl-btn">&#8682; 导入实体</button>
+
+            <button class="tl-btn">&#8681; 导出实体</button>
+
+            <button class="tl-btn">&#8635; 刷新</button>
+
+          </div>
+
+          <div class="entity-toolbar-right">
+
+            <div class="search-box">
+
+              <input type="text" placeholder="搜索实体名称">
+
+            </div>
+
+            <select class="filter-select">
+
+              <option>全部状态</option>
+
+              <option>草稿</option>
+
+              <option>已发布</option>
+
+              <option>已停用</option>
+
+            </select>
+
+          </div>
+
+        </div>
+
+        <div class="table-wrapper">
+
+          <table class="entity-table">
+
+            <thead>
+
+              <tr>
+
+                <th>实体编码</th>
+
+                <th>实体名称</th>
+
+                <th>物理表名</th>
+
+                <th>字段数</th>
+
+                <th>状态</th>
+
+                <th>版本号</th>
+
+                <th>更新时间</th>
+
+                <th>操作</th>
+
+              </tr>
+
+            </thead>
+
+            <tbody>
+
+              <tr>
+
+                <td class="col-code">material</td>
+
+                <td>物料</td>
+
+                <td class="col-table">wms_material</td>
+
+                <td>12</td>
+
+                <td><span class="status-badge status-published">已发布</span></td>
+
+                <td>v1.2.0</td>
+
+                <td>2026-07-08 14:32</td>
+
+                <td class="row-action"><a>编辑字段</a><a>发布</a><a>复制</a><a class="danger">删除</a></td>
+
+              </tr>
+
+              <tr>
+
+                <td class="col-code">customer</td>
+
+                <td>客户</td>
+
+                <td class="col-table">crm_customer</td>
+
+                <td>18</td>
+
+                <td><span class="status-badge status-published">已发布</span></td>
+
+                <td>v1.1.0</td>
+
+                <td>2026-07-06 09:15</td>
+
+                <td class="row-action"><a>编辑字段</a><a class="muted">发布</a><a>复制</a><a class="danger">删除</a></td>
+
+              </tr>
+
+              <tr>
+
+                <td class="col-code">supplier</td>
+
+                <td>供应商</td>
+
+                <td class="col-table">scm_supplier</td>
+
+                <td>16</td>
+
+                <td><span class="status-badge status-published">已发布</span></td>
+
+                <td>v1.0.3</td>
+
+                <td>2026-07-05 16:48</td>
+
+                <td class="row-action"><a>编辑字段</a><a class="muted">发布</a><a>复制</a><a class="danger">删除</a></td>
+
+              </tr>
+
+              <tr>
+
+                <td class="col-code">bom</td>
+
+                <td>BOM</td>
+
+                <td class="col-table">pro_bom</td>
+
+                <td>9</td>
+
+                <td><span class="status-badge status-draft">草稿</span></td>
+
+                <td>v0.9.0</td>
+
+                <td>2026-07-09 11:20</td>
+
+                <td class="row-action"><a>编辑字段</a><a>发布</a><a>复制</a><a class="danger">删除</a></td>
+
+              </tr>
+
+              <tr>
+
+                <td class="col-code">sales_order</td>
+
+                <td>销售订单</td>
+
+                <td class="col-table">sds_sales_order</td>
+
+                <td>22</td>
+
+                <td><span class="status-badge status-published">已发布</span></td>
+
+                <td>v2.0.1</td>
+
+                <td>2026-07-04 10:05</td>
+
+                <td class="row-action"><a>编辑字段</a><a class="muted">发布</a><a>复制</a><a class="danger">删除</a></td>
+
+              </tr>
+
+              <tr>
+
+                <td class="col-code">purchase_order</td>
+
+                <td>采购订单</td>
+
+                <td class="col-table">scm_purchase_order</td>
+
+                <td>20</td>
+
+                <td><span class="status-badge status-published">已发布</span></td>
+
+                <td>v1.8.0</td>
+
+                <td>2026-07-03 15:42</td>
+
+                <td class="row-action"><a>编辑字段</a><a class="muted">发布</a><a>复制</a><a class="danger">删除</a></td>
+
+              </tr>
+
+              <tr>
+
+                <td class="col-code">production_order</td>
+
+                <td>生产工单</td>
+
+                <td class="col-table">pro_production_order</td>
+
+                <td>15</td>
+
+                <td><span class="status-badge status-disabled">已停用</span></td>
+
+                <td>v1.3.2</td>
+
+                <td>2026-06-28 13:11</td>
+
+                <td class="row-action"><a>编辑字段</a><a>发布</a><a>复制</a><a class="danger">删除</a></td>
+
+              </tr>
+
+              <tr>
+
+                <td class="col-code">quality_inspect</td>
+
+                <td>质检单</td>
+
+                <td class="col-table">qms_quality_inspect</td>
+
+                <td>14</td>
+
+                <td><span class="status-badge status-draft">草稿</span></td>
+
+                <td>v0.5.0</td>
+
+                <td>2026-07-10 08:30</td>
+
+                <td class="row-action"><a>编辑字段</a><a>发布</a><a>复制</a><a class="danger">删除</a></td>
+
+              </tr>
+
+            </tbody>
+
+          </table>
+
+        </div>
+
+      </div>
+
+
+
+      <!-- 预制模板 Tab -->
+
+      <div class="entity-pane" id="entity-pane-tpl">
+
+        <div class="template-grid">
+
+          <div class="template-card">
+
+            <div class="tpl-icon">&#128230;</div>
+
+            <div class="tpl-name">物料</div>
+
+            <div class="tpl-fields">12 个字段</div>
+
+            <button class="tpl-use-btn">使用模板</button>
+
+          </div>
+
+          <div class="template-card">
+
+            <div class="tpl-icon">&#128100;</div>
+
+            <div class="tpl-name">客户</div>
+
+            <div class="tpl-fields">18 个字段</div>
+
+            <button class="tpl-use-btn">使用模板</button>
+
+          </div>
+
+          <div class="template-card">
+
+            <div class="tpl-icon">&#127981;</div>
+
+            <div class="tpl-name">供应商</div>
+
+            <div class="tpl-fields">16 个字段</div>
+
+            <button class="tpl-use-btn">使用模板</button>
+
+          </div>
+
+          <div class="template-card">
+
+            <div class="tpl-icon">&#128203;</div>
+
+            <div class="tpl-name">BOM</div>
+
+            <div class="tpl-fields">9 个字段</div>
+
+            <button class="tpl-use-btn">使用模板</button>
+
+          </div>
+
+          <div class="template-card">
+
+            <div class="tpl-icon">&#9881;</div>
+
+            <div class="tpl-name">工艺路线</div>
+
+            <div class="tpl-fields">11 个字段</div>
+
+            <button class="tpl-use-btn">使用模板</button>
+
+          </div>
+
+          <div class="template-card">
+
+            <div class="tpl-icon">&#128196;</div>
+
+            <div class="tpl-name">销售订单</div>
+
+            <div class="tpl-fields">22 个字段</div>
+
+            <button class="tpl-use-btn">使用模板</button>
+
+          </div>
+
+          <div class="template-card">
+
+            <div class="tpl-icon">&#128722;</div>
+
+            <div class="tpl-name">采购订单</div>
+
+            <div class="tpl-fields">20 个字段</div>
+
+            <button class="tpl-use-btn">使用模板</button>
+
+          </div>
+
+          <div class="template-card">
+
+            <div class="tpl-icon">&#128295;</div>
+
+            <div class="tpl-name">生产工单</div>
+
+            <div class="tpl-fields">15 个字段</div>
+
+            <button class="tpl-use-btn">使用模板</button>
+
+          </div>
+
+          <div class="template-card">
+
+            <div class="tpl-icon">&#9989;</div>
+
+            <div class="tpl-name">质检单</div>
+
+            <div class="tpl-fields">14 个字段</div>
+
+            <button class="tpl-use-btn">使用模板</button>
+
+          </div>
+
+          <div class="template-card">
+
+            <div class="tpl-icon">&#128666;</div>
+
+            <div class="tpl-name">委外订单</div>
+
+            <div class="tpl-fields">13 个字段</div>
+
+            <button class="tpl-use-btn">使用模板</button>
+
+          </div>
+
+          <div class="template-card">
+
+            <div class="tpl-icon">&#128230;</div>
+
+            <div class="tpl-name">领料单</div>
+
+            <div class="tpl-fields">10 个字段</div>
+
+            <button class="tpl-use-btn">使用模板</button>
+
+          </div>
+
+          <div class="template-card">
+
+            <div class="tpl-icon">&#128229;</div>
+
+            <div class="tpl-name">入库单</div>
+
+            <div class="tpl-fields">12 个字段</div>
+
+            <button class="tpl-use-btn">使用模板</button>
+
+          </div>
+
+        </div>
+
+      </div>
+
+
+
+      <!-- 导入导出 Tab -->
+
+      <div class="entity-pane" id="entity-pane-io">
+
+        <div class="io-grid">
+
+          <div class="io-box">
+
+            <div class="io-box-title">&#8682; 导入实体</div>
+
+            <div class="drop-zone">
+
+              <div class="dz-icon">&#128193;</div>
+
+              <div>将 JSON 文件拖拽到此处，或点击选择文件</div>
+
+              <div class="dz-hint">支持 .json 格式，单个文件不超过 5MB</div>
+
+            </div>
+
+            <div class="io-preview">{<br>&nbsp;&nbsp;"entityCode": "material",<br>&nbsp;&nbsp;"entityName": "物料",<br>&nbsp;&nbsp;"tableName": "wms_material",<br>&nbsp;&nbsp;"fields": [ ... ]<br>}</div>
+
+            <div class="flex gap-8 mt-12">
+
+              <button class="tl-btn primary">开始导入</button>
+
+              <button class="tl-btn">取消</button>
+
+            </div>
+
+          </div>
+
+          <div class="io-box">
+
+            <div class="io-box-title">&#8681; 导出实体</div>
+
+            <div class="export-list">
+
+              <label class="export-item"><span><input type="checkbox" checked> 物料 <span class="ex-code">material</span></span><span>12 字段</span></label>
+
+              <label class="export-item"><span><input type="checkbox" checked> 客户 <span class="ex-code">customer</span></span><span>18 字段</span></label>
+
+              <label class="export-item"><span><input type="checkbox"> 供应商 <span class="ex-code">supplier</span></span><span>16 字段</span></label>
+
+              <label class="export-item"><span><input type="checkbox" checked> BOM <span class="ex-code">bom</span></span><span>9 字段</span></label>
+
+              <label class="export-item"><span><input type="checkbox"> 销售订单 <span class="ex-code">sales_order</span></span><span>22 字段</span></label>
+
+              <label class="export-item"><span><input type="checkbox"> 采购订单 <span class="ex-code">purchase_order</span></span><span>20 字段</span></label>
+
+              <label class="export-item"><span><input type="checkbox"> 生产工单 <span class="ex-code">production_order</span></span><span>15 字段</span></label>
+
+              <label class="export-item"><span><input type="checkbox"> 质检单 <span class="ex-code">quality_inspect</span></span><span>14 字段</span></label>
+
+            </div>
+
+            <div class="flex gap-8">
+
+              <button class="tl-btn primary">导出为 JSON</button>
+
+              <button class="tl-btn">全选</button>
+
+              <button class="tl-btn">清空</button>
+
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+
+
+    <!-- 实体字段定义区域 -->
+
+    <div class="field-def-section">
+
+      <div class="field-def-header">
+
+        <div class="fd-title">
+
+          字段定义
+
+          <span class="fd-entity-tag">material · 物料</span>
+
+        </div>
+
+        <div class="fd-info">
+
+          <span>共 12 个字段</span>
+
+          <span>物理表：wms_material</span>
+
+          <span>版本：v1.2.0</span>
+
+        </div>
+
+      </div>
+
+      <div class="table-wrapper">
+
+        <table class="field-table">
+
+          <thead>
+
+            <tr>
+
+              <th>字段编码</th>
+
+              <th>字段名称</th>
+
+              <th>字段类型</th>
+
+              <th>必填</th>
+
+              <th>唯一</th>
+
+              <th>最大长度</th>
+
+              <th>精度</th>
+
+              <th>默认值</th>
+
+              <th>排序</th>
+
+              <th>操作</th>
+
+            </tr>
+
+          </thead>
+
+          <tbody>
+
+            <tr>
+
+              <td class="col-code">material_code</td>
+
+              <td>物料编码</td>
+
+              <td><span class="type-badge type-text">文本</span></td>
+
+              <td><span class="flag-yes">是</span></td>
+
+              <td><span class="flag-uniq">是</span></td>
+
+              <td>32</td>
+
+              <td>-</td>
+
+              <td>-</td>
+
+              <td>1</td>
+
+              <td class="row-action"><a>编辑</a><a class="danger">删除</a></td>
+
+            </tr>
+
+            <tr>
+
+              <td class="col-code">material_name</td>
+
+              <td>物料名称</td>
+
+              <td><span class="type-badge type-text">文本</span></td>
+
+              <td><span class="flag-yes">是</span></td>
+
+              <td><span class="flag-no">否</span></td>
+
+              <td>100</td>
+
+              <td>-</td>
+
+              <td>-</td>
+
+              <td>2</td>
+
+              <td class="row-action"><a>编辑</a><a class="danger">删除</a></td>
+
+            </tr>
+
+            <tr>
+
+              <td class="col-code">specification</td>
+
+              <td>规格型号</td>
+
+              <td><span class="type-badge type-text">文本</span></td>
+
+              <td><span class="flag-no">否</span></td>
+
+              <td><span class="flag-no">否</span></td>
+
+              <td>200</td>
+
+              <td>-</td>
+
+              <td>-</td>
+
+              <td>3</td>
+
+              <td class="row-action"><a>编辑</a><a class="danger">删除</a></td>
+
+            </tr>
+
+            <tr>
+
+              <td class="col-code">model</td>
+
+              <td>型号</td>
+
+              <td><span class="type-badge type-text">文本</span></td>
+
+              <td><span class="flag-no">否</span></td>
+
+              <td><span class="flag-no">否</span></td>
+
+              <td>64</td>
+
+              <td>-</td>
+
+              <td>-</td>
+
+              <td>4</td>
+
+              <td class="row-action"><a>编辑</a><a class="danger">删除</a></td>
+
+            </tr>
+
+            <tr>
+
+              <td class="col-code">unit</td>
+
+              <td>计量单位</td>
+
+              <td><span class="type-badge type-relate">关联</span></td>
+
+              <td><span class="flag-yes">是</span></td>
+
+              <td><span class="flag-no">否</span></td>
+
+              <td>-</td>
+
+              <td>-</td>
+
+              <td>-</td>
+
+              <td>5</td>
+
+              <td class="row-action"><a>编辑</a><a class="danger">删除</a></td>
+
+            </tr>
+
+            <tr>
+
+              <td class="col-code">category</td>
+
+              <td>物料分类</td>
+
+              <td><span class="type-badge type-select">下拉</span></td>
+
+              <td><span class="flag-no">否</span></td>
+
+              <td><span class="flag-no">否</span></td>
+
+              <td>-</td>
+
+              <td>-</td>
+
+              <td>原材料</td>
+
+              <td>6</td>
+
+              <td class="row-action"><a>编辑</a><a class="danger">删除</a></td>
+
+            </tr>
+
+            <tr>
+
+              <td class="col-code">purchase_price</td>
+
+              <td>采购单价</td>
+
+              <td><span class="type-badge type-money">金额</span></td>
+
+              <td><span class="flag-no">否</span></td>
+
+              <td><span class="flag-no">否</span></td>
+
+              <td>-</td>
+
+              <td>2</td>
+
+              <td>0.00</td>
+
+              <td>7</td>
+
+              <td class="row-action"><a>编辑</a><a class="danger">删除</a></td>
+
+            </tr>
+
+            <tr>
+
+              <td class="col-code">standard_cost</td>
+
+              <td>标准成本</td>
+
+              <td><span class="type-badge type-money">金额</span></td>
+
+              <td><span class="flag-no">否</span></td>
+
+              <td><span class="flag-no">否</span></td>
+
+              <td>-</td>
+
+              <td>2</td>
+
+              <td>0.00</td>
+
+              <td>8</td>
+
+              <td class="row-action"><a>编辑</a><a class="danger">删除</a></td>
+
+            </tr>
+
+            <tr>
+
+              <td class="col-code">safety_stock</td>
+
+              <td>安全库存</td>
+
+              <td><span class="type-badge type-number">数字</span></td>
+
+              <td><span class="flag-no">否</span></td>
+
+              <td><span class="flag-no">否</span></td>
+
+              <td>-</td>
+
+              <td>2</td>
+
+              <td>0.00</td>
+
+              <td>9</td>
+
+              <td class="row-action"><a>编辑</a><a class="danger">删除</a></td>
+
+            </tr>
+
+            <tr>
+
+              <td class="col-code">shelf_life</td>
+
+              <td>保质期(天)</td>
+
+              <td><span class="type-badge type-number">数字</span></td>
+
+              <td><span class="flag-no">否</span></td>
+
+              <td><span class="flag-no">否</span></td>
+
+              <td>-</td>
+
+              <td>0</td>
+
+              <td>365</td>
+
+              <td>10</td>
+
+              <td class="row-action"><a>编辑</a><a class="danger">删除</a></td>
+
+            </tr>
+
+            <tr>
+
+              <td class="col-code">barcode</td>
+
+              <td>条形码</td>
+
+              <td><span class="type-badge type-text">文本</span></td>
+
+              <td><span class="flag-no">否</span></td>
+
+              <td><span class="flag-uniq">是</span></td>
+
+              <td>32</td>
+
+              <td>-</td>
+
+              <td>-</td>
+
+              <td>11</td>
+
+              <td class="row-action"><a>编辑</a><a class="danger">删除</a></td>
+
+            </tr>
+
+            <tr>
+
+              <td class="col-code">remark</td>
+
+              <td>备注</td>
+
+              <td><span class="type-badge type-text">文本域</span></td>
+
+              <td><span class="flag-no">否</span></td>
+
+              <td><span class="flag-no">否</span></td>
+
+              <td>500</td>
+
+              <td>-</td>
+
+              <td>-</td>
+
+              <td>12</td>
+
+              <td class="row-action"><a>编辑</a><a class="danger">删除</a></td>
+
+            </tr>
+
+          </tbody>
+
+        </table>
+
+      </div>
+
+      <div class="field-def-footer">
+
+        <button class="tl-btn primary">+ 添加字段</button>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
+
+<div id="sidebarOverlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:99;" onclick="toggleSidebar()"></div>
+
+<script>
+
+
+
+
+
+function switchEntityTab(el,paneId){var section=el.closest('.entity-section');section.querySelectorAll('.entity-tab').forEach(function(t){t.classList.remove('active');});el.classList.add('active');section.querySelectorAll('.entity-pane').forEach(function(p){p.classList.remove('active');});document.getElementById(paneId).classList.add('active');}
+
+</script>
+
+
+
+<div class="toast-container" id="toastContainer"></div>
+
+<div class="confirm-modal-overlay" id="confirmModal">
+
+  <div class="confirm-modal-dialog">
+
+    <div class="confirm-modal-header">
+
+      <span class="confirm-modal-icon" id="confirmIcon">&#9888;</span>
+
+      <span class="confirm-modal-title" id="confirmTitle">温馨提示</span>
+
+    </div>
+
+    <div class="confirm-modal-body">
+
+      <div class="confirm-modal-message" id="confirmMessage"></div>
+
+    </div>
+
+    <div class="confirm-modal-footer">
+
+      <button class="btn btn-sm btn-cancel" onclick="closeConfirmModal(false)">取消</button>
+
+      <button class="btn btn-sm btn-primary" style="background: #1890ff;border-color: #1890ff;color:#0a0e1a;" onclick="closeConfirmModal(true)">确定</button>
+
+    </div>
+
+  </div>
+
+</div>
+
+</body>
+
+</html>
+

@@ -1,0 +1,35 @@
+计量单位
+
+字段说明：
+单据头：FBillHead 
+	 实体主键：FUNITID 
+	 数据状态：FDocumentStatus 
+	 禁用状态：FForbidStatus 
+	 名称：FName  (必填项)
+	 编码：FNumber 
+	 修改人：FModifierId 
+	 创建人：FCreatorId 
+	 创建日期：FCreateDate 
+	 修改日期：FModifyDate 
+	 描述：FDescription 
+	 系统预置：FIsSystemSet 
+	 基准计量单位：FIsBaseUnit 
+	 审核人：FApproverId 
+	 禁用日期：FForbidDate 
+	 禁用人：FForbidderId 
+	 审核日期：FApproveDate 
+	 所属组别：FUnitGroupId  (必填项)
+	 精度：FPrecision 
+	 舍入类型：FRoundType  (必填项)
+	 当前单位：FCurrentUnit 
+	 基准单位：FBaseUnit 
+转换率：SubHeadEntity 
+	 实体主键：FUNITCONVERTRATEID 
+	 换算类型：FConvertType 
+	 目标单位：FDestUnitId 
+	 当前单位：FCurrentUnitId 
+	 创建日期：FCreateDate1 
+	 创建人：FCreatorId1 
+	 修改日期：FModifyDate1 
+	 换算分母：FConvertDenominator 
+	 换算分子：FConvertNumerator 

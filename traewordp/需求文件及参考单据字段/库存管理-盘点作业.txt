@@ -1,0 +1,101 @@
+盘点作业
+库存管理
+
+字段说明：
+基本信息：FBillHead 
+	 实体主键：FID 
+	 单据编码：FBillNo 
+	 状态：FDocumentStatus 
+	 库存组织：FStockOrgId  (必填项)
+	 日期：FDate 
+	 财务日期：FFinDate 
+	 账存日期：FBackUpDate 
+	 盘点来源编码：FSchemeNo 
+	 盘点来源名称：FSchemeName 
+	 盘点来源内码：FSchemeId 
+	 创建人：FCreatorId 
+	 创建日期：FCreateDate 
+	 最后修改人：FModifierId 
+	 最后修改日期：FModifyDate 
+	 审核人：FApproverId 
+	 审核日期：FApproveDate 
+	 备注：FNoteHead 
+	 来源：FSource  (必填项)
+	 周期盘点计划序号：FCycleCountSeq 
+	 生成盘盈或盘亏单：FUpdateStock 
+	 零库存参与盘点：FZeroStockInCount 
+	 物料盘点作业允许增加物料：FAllowAddMaterial 
+	 周期盘点计划编码：FCycleCountNo 
+	 执行状态：FExecuteStatus 
+	 单据类型：FBillTypeID  (必填项)
+	 新增物料不校验库存管理维度必录：FNewRowIgnoMatdim 
+物料明细：FBillEntry 
+	 实体主键：FEntryID 
+	 仓库编码：FStockId  (必填项)
+	 仓库名称：FStockName 
+	 库存状态：FStockStatusId  (必填项)
+	 物料编码：FMaterialId  (必填项)
+	 物料名称：FMaterialName 
+	 规格型号：FMaterialModel 
+	 单位：FUnitID  (必填项)
+	 账存数量：FAcctQty 
+	 盘点数量：FCountQty 
+	 盘盈数量：FGainQty 
+	 盘亏数量：FLossQty 
+	 货主类型：FOwnerTypeId  (必填项)
+	 货主：FOwnerId  (必填项)
+	 保管者类型：FKeeperTypeId  (必填项)
+	 保管者：FKeeperId  (必填项)
+	 备注：FNote 
+	 项目跟踪号：FProjectNo 
+	 计划跟踪号：FMtoNo 
+	 物料类别：FMaterialType 
+	 BOM版本：FBomId 
+	 生产日期：FProduceDate 
+	 保质期单位：FExpUnit 
+	 保质期：FExpPeriod 
+	 到期日：FExpiryDate 
+	 基本单位：FBaseUnitId 
+	 账存数量(基本)：FBaseAcctQty 
+	 盘点数量（基本）：FBaseCountQty 
+	 盘盈数量（基本）：FBaseGainQty 
+	 盘亏数量（基本）：FBaseLossQty 
+	 库存辅单位：FSecUnitId 
+	 账存数量(库存辅单位)：FSecAcctQty 
+	 盘点数量(库存辅单位)：FSecCountQty 
+	 盘盈数量(库存辅单位)：FSecGainQty 
+	 盘亏数量(库存辅单位)：FSecLossQty 
+	 辅助属性：FAuxpropId 
+	 仓位：FStockLocId 
+	 货位：FF100001
+	 批号：FLot 
+	 是否盘点方案系统生成：FIsSystem 
+	 盘点误差%：FCountError 
+	 获取账存日期：FGetBackUpDate 
+	 计划盘点日期：FPlanDate 
+	 序列号单位：FSNUnitID 
+	 序列号单位盘盈数量：FSNGainQty 
+	 序列号单位盘亏数量：FSNLossQty 
+	 基本单位序列号盘盈个数：FBaseGainSNCount 
+	 基本单位序列号盘亏个数：FBaseLossSNCount 
+	 序列号盘盈个数：FGainSNCount 
+	 序列号盘亏个数：FLossSNCount 
+	 盘盈单据类型：FGainBillTypeId 
+	 盘亏单据类型：FLossBillTypeId 
+	 辅单位：FExtAuxUnitId 
+	 盘点数量（辅单位）：FExtAuxUnitQty 
+	 账存数量（辅单位）：FExtSecAcctQty 
+	 盘盈数量（辅单位）：FExtSecGAINQty 
+	 盘亏数量（辅单位）：FExtSecLOSSQty 
+	 盘点误差%(辅单位)：FSecCountError 
+	 即时库存：FInvQty 
+序列号：FEntrySerial 
+	 实体主键：FDetailID 
+	 序列号：FSerialNo  (必填项)
+	 序列号：FSerialId 
+	 在库：FStatus 
+	 盘盈：FIsGain 
+	 盘亏：FIsLoss 
+	 备注：FSNNote 
+	 是否账存：FIsAccount 
+	 是否扫描中：FIsScaning 

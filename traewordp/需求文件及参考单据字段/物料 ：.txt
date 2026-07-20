@@ -1,0 +1,341 @@
+物料字段说明：
+物料：FBillHead 
+	 实体主键：FMATERIALID 
+	 数据状态：FDocumentStatus 
+	 禁用状态：FForbidStatus 
+	 名称：FName  (必填项)
+	 编码：FNumber 
+	 描述：FDescription 
+	 创建组织：FCreateOrgId  (必填项)
+	 使用组织：FUseOrgId  (必填项)
+	 创建人：FCreatorId 
+	 修改人：FModifierId 
+	 创建日期：FCreateDate 
+	 修改日期：FModifyDate 
+	 助记码：FMnemonicCode 
+	 规格型号：FSpecification 
+	 禁用人：FForbidderId 
+	 禁用日期：FForbidDate 
+	 审核日期：FApproveDate 
+	 审核人：FApproverId 
+	 图片(数据库)：FImage1 
+	 物料分组：FMaterialGroup 
+	 物料分组编码：FBaseProperty 
+	 PLM物料内码：FPLMMaterialId 
+	 物料来源：FMaterialSRC 
+	 校验模式：FIsValidate 
+	 图片(文件服务器)：FImageFileServer 
+	 图片存储类型：FImgStorageType 
+	 图片(数据库)：FIsImgDataBase 
+	 图片(文件服务)：FIsImgFileServer 
+	 自动分配：FIsAutoAllocate 
+	 SPU信息：FSPUID 
+	 拼音：FPinYin 
+	 按批号匹配供需：FDSMatchByLot 
+	 禁用原因：FForbidReson 
+	 已使用：FRefStatus 
+	 扩展编码：FExtVar 
+	 可手工预留：FIsHandleReserve 
+	 销售出库替代物料：FMulReplaceMaterialId 
+条形码：FBarCodeEntity_CMK 
+	 实体主键：FEntryID 
+	 条形码类型：FCodeType_CMK  (必填项)
+	 条形码：FBarCode_CMK 
+	 计量单位：FUnitId_CMK  (必填项)
+	 零售价：FPrice_CMK 
+	 备注：FRemarks_CMK 
+	规格属性列表：FSpecialAttributeEntity 
+	 实体主键：FEntryID 
+	 规格属性类别：FSpecAttrCategoryID 
+	 规格属性：FSpecialAttributeID 
+基本：SubHeadEntity 
+	 实体主键：FEntryId 
+	 物料属性：FErpClsID  (必填项)
+	 允许库存：FIsInventory 
+	 允许销售：FIsSale 
+	 允许转资产：FIsAsset 
+	 允许委外：FIsSubContract 
+	 允许生产：FIsProduce 
+	 允许采购：FIsPurchase 
+	 即时核算：FIsRealTimeAccout 
+	 基本单位：FBaseUnitId  (必填项)
+	 税分类：FTaxType 
+	 物料分类：FTypeID 
+	 货位：FF100001
+	 存货类别：FCategoryID  (必填项)
+	 默认税率：FTaxRateId 
+	 条码：FBARCODE 
+	 重量单位：FWEIGHTUNITID 
+	 尺寸单位：FVOLUMEUNITID 
+	 毛重：FGROSSWEIGHT 
+	 净重：FNETWEIGHT 
+	 长：FLENGTH 
+	 体积：FVOLUME 
+	 宽：FWIDTH 
+	 高：FHEIGHT 
+	 配置生产：FCONFIGTYPE 
+	 套件：FSuite  (必填项)
+	 结算成本价加减价比例(%)：FCostPriceRate 
+	 英文名称：FNameEn 
+	 制式：FSysModel 
+	 颜色：FColor 
+	 传播名：FSpreadName 
+	 开票方：FMAKEINVOICEPARTY 
+	 特征件子项：FFeatureItem  (必填项)
+	 使用组织：FUseOrgId1 
+	 是否变更中：FIsChange 
+库存：SubHeadEntity1 
+	 实体主键：FEntryId 
+	 库存单位：FStoreUnitID  (必填项)
+	 辅助单位：FAuxUnitID 
+	 仓库：FStockId 
+	 可锁库：FIsLockStock 
+	 批号编码规则：FBatchRuleID 
+	 保质期单位：FExpUnit 
+	 仓位：FStockPlaceId 
+	 货位：FF100001
+	 在架寿命期：FOnlineLife 
+	 保质期：FExpPeriod 
+	 库存单位换算率分子：FStoreURNum 
+	 库存单位换算率分母：FStoreURNom 
+	 启用批号管理：FIsBatchManage 
+	 启用保质期管理：FIsKFPeriod 
+	 批号附属信息：FIsExpParToFlot 
+	 启用盘点周期：FIsCycleCounting 
+	 必盘：FIsMustCounting 
+	 币别：FCurrencyId  (必填项)
+	 参考成本：FRefCost 
+	 盘点周期单位：FCountCycle 
+	 盘点周期：FCountDay 
+	 库存管理：FIsSNManage 
+	 序列号编码规则：FSNCodeRule 
+	 序列号单位：FSNUnit 
+	 安全库存（基本单位）：FSafeStock 
+	 再订货点（基本单位）：FReOrderGood 
+	 最小库存（基本单位）：FMinStock 
+	 最大库存（基本单位）：FMaxStock 
+	 换算方向：FUnitConvertDir  (必填项)
+	 启用最小库存：FIsEnableMinStock 
+	 启用安全库存：FIsEnableSafeStock 
+	 启用最大库存：FIsEnableMaxStock 
+	 启用再订货点：FIsEnableReOrder 
+	 经济订货批量（基本单位）：FEconReOrderQty 
+	 生产追溯：FIsSNPRDTracy 
+	 序列号生成时机：FSNGenerateTime  (必填项)
+	 业务范围：FSNManageType  (必填项)
+	 单箱标准数量：FBoxStandardQty 
+	 使用组织：FUseOrgId2 
+销售：SubHeadEntity2 
+	 实体主键：FEntryId 
+	 ATP检查：FIsATPCheck 
+	 销售计价单位：FSalePriceUnitId  (必填项)
+	 销售单位：FSaleUnitId  (必填项)
+	 可开票：FIsInvoice 
+	 最大批量：FMaxQty 
+	 允许退货：FIsReturn 
+	 最小批量：FMinQty 
+	 部件可退：FIsReturnPart 
+	 起订量：FOrderQty 
+	 销售计价单位换算率分母：FSalePriceURNom 
+	 销售单位换算率分子：FSaleURNum 
+	 销售计价单位换算率分子：FSalePriceURNum 
+	 销售单位换算率分母：FSaleURNom 
+	 超发上限(%)：FOutStockLmtH 
+	 超发下限(%)：FOutStockLmtL 
+	 代理销售减价比例(%)：FAgentSalReduceRate 
+	 允许发布到订货平台：FAllowPublish 
+	 启用售后服务：FISAFTERSALE 
+	 生成产品档案：FISPRODUCTFILES 
+	 是否保修：FISWARRANTED 
+	 保修期：FWARRANTY 
+	 保修期单位：FWARRANTYUNITID 
+	 超发控制单位：FOutLmtUnit 
+	 税收分类编码：FTaxCategoryCodeId 
+	 销售分组：FSalGroup 
+	 税收优惠政策类型：FTaxDiscountsType 
+	 享受税收优惠政策：FIsTaxEnjoy 
+	 使用组织：FUseOrgId3 
+	 不参与可发量统计：FUnValidateExpQty 
+采购：SubHeadEntity3 
+	 实体主键：FEntryId 
+	 采购单位：FPurchaseUnitId  (必填项)
+	 采购员：FPurchaserId 
+	 默认供应商：FDefaultVendor 
+	 货源控制：FIsSourceControl 
+	 需要请购：FIsPR 
+	 收货下限比例(%)：FReceiveMinScale 
+	 采购组：FPurchaseGroupId 
+	 收货上限比例(%)：FReceiveMaxScale 
+	 采购计价单位：FPurchasePriceUnitId  (必填项)
+	 供应商资质：FIsVendorQualification 
+	 收货提前天数：FReceiveAdvanceDays 
+	 收货延迟天数：FReceiveDelayDays 
+	 采购单位换算率分子：FPurURNum 
+	 采购计价单位换算率分子：FPurPriceURNum 
+	 采购单位换算率分母：FPurURNom 
+	 采购计价单位换算率分母：FPurPriceURNom 
+	 配额管理：FIsQuota 
+	 配额方式：FQuotaType  (必填项)
+	 代理采购加成比例：FAgentPurPlusRate 
+	 费用项目：FChargeID 
+	 最小拆分数量：FMinSplitQty 
+	 基本单位最小拆分数量：FBaseMinSplitQty 
+	 VMI业务：FIsVmiBusiness 
+	 允许退料：FIsReturnMaterial 
+	 启用商联在线(6.1弃用)：FEnableSL 
+	 采购组织：FPurchaseOrgId 
+	 默认条码规则：FDefBarCodeRuleId 
+	 重复打印数：FPrintCount 
+	 采购类型：FPOBillTypeId 
+	 最小包装数：FMinPackCount 
+	 使用组织：FUseOrgId4 
+	 日产量：FDailyOutQtySub 
+	 默认产线：FDefaultLineIdSub 
+	 启用日排产：FIsEnableScheduleSub 
+计划：SubHeadEntity4 
+	 实体主键：FEntryId 
+	 计划员：FPlanerID 
+	 固定/经济批量：FEOQ 
+	 计划策略：FPlanningStrategy  (必填项)
+	 订货策略：FOrderPolicy  (必填项)
+	 计划区：FPlanWorkshop 
+	 固定提前期单位：FFixLeadTimeType  (必填项)
+	 固定提前期：FFixLeadTime 
+	 变动提前期单位：FVarLeadTimeType  (必填项)
+	 变动提前期：FVarLeadTime 
+	 检验提前期单位：FCheckLeadTimeType  (必填项)
+	 检验提前期：FCheckLeadTime 
+	 订货间隔期单位：FOrderIntervalTimeType  (必填项)
+	 订货间隔期：FOrderIntervalTime 
+	 批量拆分间隔天数：FPlanIntervalsDays 
+	 拆分批量：FPlanBatchSplitQty 
+	 计划时界：FPlanTimeZone 
+	 需求时界：FRequestTimeZone 
+	 MRP计算是否合并需求：FIsMrpComReq 
+	 预留类型：FReserveType  (必填项)
+	 允许提前天数：FCanLeadDays 
+	 提前宽限期：FLeadExtendDay 
+	 延后宽限期：FDelayExtendDay 
+	 允许延后天数：FCanDelayDays 
+	 时间单位：FPlanOffsetTimeType  (必填项)
+	 偏置时间：FPlanOffsetTime 
+	 最小订货量：FMinPOQty 
+	 最小包装量：FIncreaseQty 
+	 最大订货量：FMaxPOQty 
+	 变动提前期批量：FVarLeadTimeLotSize 
+	 基本变动提前期批量：FBaseVarLeadTimeLotSize 
+	 计划组：FPlanGroupId 
+	 制造策略：FMfgPolicyId 
+	 供应来源：FSupplySourceId 
+	 时间紧迫系数：FTimeFactorId 
+	 数量负荷系数：FQtyFactorId 
+	 计划模式：FPlanMode 
+	 预计入库允许部分延后：FAllowPartDelay 
+	 预计入库允许部分提前：FAllowPartAhead 
+	 安全库存：FPlanSafeStockQty 
+	 ATO预测冲销方案：FATOSchemeId 
+	 累计提前期：FAccuLeadTime 
+	 产品系列：FProductLine 
+	 冲销数量：FWriteOffQty 
+	 计划标识：FPlanIdent 
+	 订单进度分组：FProScheTrackId 
+	 日产量：FDailyOutQty 
+	 MRP计算是否按单合并：FIsMrpComBill 
+	 使用组织：FUseOrgId7 
+生产：SubHeadEntity5 
+	 实体主键：FEntryId 
+	 发料仓库：FPickStockId 
+	 子项单位：FBOMUnitId 
+	 生产车间：FWorkShopId 
+	 发料方式：FIssueType  (必填项)
+	 生产单位：FProduceUnitId 
+	 是否关键件：FIsKitting 
+	 默认工艺路线：FDefaultRouting 
+	 可为联副产品：FIsCoby 
+	 标准工时：FPerUnitStandHour 
+	 倒冲时机：FBKFLTime 
+	 入库超收比例(%)：FFinishReceiptOverRate 
+	 入库欠收比例(%)：FFinishReceiptShortRate 
+	 发料仓位：FPickBinId 
+	 货位：FF100001
+	 生产单位换算率分子：FPrdURNum 
+	 生产单位换算率分母：FPrdURNom 
+	 BOM单位换算率分子：FBOMURNum 
+	 BOM单位换算率分母：FBOMURNom 
+	 可为主产品：FIsMainPrd 
+	 是否齐套件：FIsCompleteSet 
+	 超发控制方式：FOverControlMode  (必填项)
+	 最小发料批量：FMinIssueQty 
+	 标准人员准备工时：FStdLaborPrePareTime 
+	 标准人员实作工时：FStdLaborProcessTime 
+	 标准机器准备工时：FStdMachinePrepareTime 
+	 标准机器实作工时：FStdMachineProcessTime 
+	 消耗波动(%)：FConsumVolatility 
+	 生产线生产：FIsProductLine 
+	 生产类型：FProduceBillType 
+	 组织间受托类型：FOrgTrustBillType 
+	 领料考虑最小发料批量：FISMinIssueQty 
+	 启用ECN：FIsECN 
+	 最小发料批量单位：FMinIssueUnitId  (必填项)
+	 产品模型：FMdlId 
+	 模型物料：FMdlMaterialId 
+	 变动损耗率(%)：FLOSSPERCENT 
+	 序列号携带到父项：FIsSNCarryToParent 
+	 工时单位：FStandHourUnitId  (必填项)
+	 倒冲数量：FBackFlushType  (必填项)
+	 固定损耗：FFIXLOSS 
+	 使用组织：FUseOrgId6 
+	 启用日排产：FIsEnableSchedule 
+	 默认产线：FDefaultLineId 
+辅助属性：FEntityAuxPty 
+	 实体主键：FEntryID 
+	 启用：FIsEnable1 
+	 必录：FIsMustInput 
+	 影响价格：FIsAffectPrice1 
+	 影响计划：FIsAffectPlan1 
+	 影响出库成本：FIsAffectCost1 
+	 组合控制：FIsComControl 
+	 辅助属性：FAuxPropertyId 
+	 取值方式：FValueType 
+	 值设置状态：FValueSet 
+	 使用组织：FUseOrgId11 
+库存属性：FEntityInvPty 
+	 实体主键：FEntryID 
+	 启用：FIsEnable 
+	 影响价格：FIsAffectPrice 
+	 影响计划：FIsAffectPlan 
+	 影响出库成本：FIsAffectCost 
+	 库存属性：FInvPtyId  (必填项)
+	 使用组织：FUseOrgId10 
+委外：SubHeadEntity7 
+	 实体主键：FEntryId 
+	 委外单位：FSubconUnitId 
+	 委外计价单位：FSubconPriceUnitId 
+	 委外单位换算率分子：FSUBCONURNUM 
+	 委外单位换算率分母：FSUBCONURNOM 
+	 委外计价单位换算率分子：FSUBCONPRICEURNUM 
+	 委外计价单位换算率分母：FSUBCONPRICEURNOM 
+	 委外类型：FSubBillType 
+	 使用组织：FUseOrgId8 
+质量：SubHeadEntity6 
+	 实体主键：FEntryId 
+	 产品检验：FCheckProduct 
+	 来料检验：FCheckIncoming 
+	 抽样方案：FIncSampSchemeId 
+	 质检方案：FIncQcSchemeId 
+	 库存检验：FCheckStock 
+	 启用库存周期复检：FEnableCyclistQCSTK 
+	 启用库存周期复检提醒：FEnableCyclistQCSTKEW 
+	 提醒提前期：FEWLeadDay 
+	 复检周期：FStockCycle 
+	 发货检验：FCheckDelivery 
+	 退货检验：FCheckReturn 
+	 质检组：FInspectGroupId 
+	 质检员：FInspectorId 
+	 受托材料检验：FCheckEntrusted 
+	 其他检验：FCheckOther 
+	 产品首检：FIsFirstInspect 
+	 使用组织：FUseOrgId5 
+	 生产退料检验：FCheckReturnMtrl 
+	 委外退料检验：FCheckSubRtnMtrl 
+	 首检控制方式：FFirstQCControlType  (必填项)

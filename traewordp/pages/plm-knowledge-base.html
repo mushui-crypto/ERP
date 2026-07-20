@@ -1,0 +1,3525 @@
+<!DOCTYPE html>
+
+
+
+<html lang="zh-CN">
+
+
+
+<head>
+
+
+
+<meta charset="UTF-8">
+
+
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+
+
+<title>知识库 — 磐枢工业智能平台</title>
+
+
+
+<link rel="stylesheet" href="../common.css">
+
+
+
+<script src="../common.js"></script>
+<script>
+</script>
+
+
+
+</head>
+
+
+
+<body>
+
+
+
+
+
+
+
+<aside class="sidebar" id="sidebar">
+
+
+
+<div class="sidebar-logo">
+
+
+
+    <img src="../images/logo.png" alt="磐枢工业智能平台" style="width: 100%; max-width: 200px; margin-bottom: 8px;">
+
+
+
+    <h1 style="font-size: 16px; margin: 0;">磐枢工业智能平台</h1>
+
+
+
+  </div>
+
+
+
+  <nav class="sidebar-menu"></nav>
+
+
+
+<div class="sidebar-user"><div class="avatar">管</div>
+
+
+
+</aside>
+
+
+
+
+
+
+
+<div class="main-content" id="mainContent">
+
+
+
+  <div class="page-header" style="position:sticky;top:0;z-index:100;">
+
+
+
+    <div>
+
+
+
+      <div class="flex items-center gap-8">
+
+
+
+        <button class="sidebar-toggle" onclick="toggleSidebar()">☰</button>
+
+
+
+        <div>
+
+
+
+          <h2>知识库</h2>
+
+
+
+          <div class="breadcrumb"><a href="../index.html">首页</a><span>></span><a href="#">PLM管理</a><span>></span><span>知识库</span></div></div>
+
+
+
+        </div>
+
+
+
+      </div>
+
+
+
+    </div>
+
+
+
+    <div class="page-actions">
+
+
+
+      <button class="btn btn-ghost btn-sm">&#128276; 消息</button>
+      </div>
+
+
+
+  </div>
+
+  <div class="doc-header" style="background:#fff;border-bottom:1px solid #e8e8e8;padding:12px 20px;display:flex;justify-content:space-between;align-items:center;">
+    <div style="font-size:14px;color:#666;">快捷操作</div>
+    <div class="doc-toolbar" style="display:flex;gap:8px;flex-wrap:wrap;">
+      <button class="toolbar-btn" style="padding:6px 12px;border-radius:4px;font-size:13px;cursor:pointer;border:1px solid #d9d9d9;background:#fff;color:#666;display:flex;align-items:center;gap:6px;transition:all 0.3s;" onclick="showToast('刷新功能开发中...', 'info')"><span>🔄</span> 刷新</button>
+      <button class="toolbar-btn" style="padding:6px 12px;border-radius:4px;font-size:13px;cursor:pointer;border:1px solid #d9d9d9;background:#fff;color:#666;display:flex;align-items:center;gap:6px;transition:all 0.3s;" onclick="showToast('列设置功能开发中...', 'info')"><span>⚙️</span> 显示/隐藏列</button>
+      <button class="toolbar-btn" style="padding:6px 12px;border-radius:4px;font-size:13px;cursor:pointer;border:1px solid #d9d9d9;background:#fff;color:#666;display:flex;align-items:center;gap:6px;transition:all 0.3s;" onclick="showToast('导出功能开发中...', 'info')"><span>📤</span> 导出</button>
+      <button class="toolbar-btn danger" style="padding:6px 12px;border-radius:4px;font-size:13px;cursor:pointer;border:1px solid #f5222d;background:#f5222d;color:#fff;display:flex;align-items:center;gap:6px;transition:all 0.3s;" onclick="showConfirm('确认退出？', function() {location.href='../index.html';});)"><span>✖️</span> 退出</button>
+    </div>
+  </div>
+
+  <div class="page-body">
+
+
+
+    <div class="tabs">
+
+
+
+      <div class="tab-item active" onclick="switchTab('standard')">标准规范库</div>
+
+
+
+      <div class="tab-item" onclick="switchTab('case')">典型案例库</div>
+
+
+
+      <div class="tab-item" onclick="switchTab('material')">物料信息库</div>
+
+
+
+      <div class="tab-item" onclick="switchTab('search')">知识检索</div>
+
+
+
+    </div>
+
+
+
+
+
+
+
+    <div class="tab-content">
+
+
+
+      <div class="tab-pane active" id="standard">
+
+
+
+        <div class="card">
+
+
+
+          <div class="card-header">标准规范库
+
+
+
+            <button class="btn btn-primary btn-sm" onclick="openModal('standardModal')">新增规范</button>
+
+
+
+          </div>
+
+
+
+          <div class="card-body">
+
+
+
+            <div class="list-filter-row">
+
+
+
+              <div class="filter-field">
+
+
+
+                <input type="text" placeholder="规范编号">
+
+
+
+              </div>
+
+
+
+              <div class="filter-field">
+
+
+
+                <input type="text" placeholder="规范名称">
+
+
+
+              </div>
+
+
+
+              <div class="filter-field">
+
+
+
+                <select>
+
+
+
+                  <option value="">类型</option>
+
+
+
+                  <option>国家标准</option>
+
+
+
+                  <option>行业标准</option>
+
+
+
+                  <option>企业标准</option>
+
+
+
+                  <option>工艺规范</option>
+
+
+
+                </select>
+
+
+
+              </div>
+
+
+
+              <div class="list-filter-btns">
+
+
+
+                <button class="btn-search">&#128269; 查询</button>
+
+
+
+                <button class="btn-reset">&#8634; 重置</button>
+
+
+
+              </div>
+
+
+
+            </div>
+
+
+
+            <table class="data-table">
+
+
+
+              <thead>
+
+
+
+                <tr>
+
+
+
+                  <th style="width:40px;"><input type="checkbox"></th>
+
+
+
+                  <th>规范编号</th>
+
+
+
+                  <th>规范名称</th>
+
+
+
+                  <th>类型</th>
+
+
+
+                  <th>发布日期</th>
+
+
+
+                  <th>版本</th>
+
+
+
+                  <th>状态</th>
+
+
+
+                  <th>操作</th>
+
+
+
+                </tr>
+
+
+
+              </thead>
+
+
+
+              <tbody>
+
+
+
+                <tr>
+
+
+
+                  <td><input type="checkbox"></td>
+
+
+
+                  <td>GB/T-2828.1</td>
+
+
+
+                  <td>计数抽样检验程序</td>
+
+
+
+                  <td>国家标准</td>
+
+
+
+                  <td>2026-01-01</td>
+
+
+
+                  <td>V1.0</td>
+
+
+
+                  <td><span class="badge badge-success">有效</span></td>
+
+
+
+                  <td class="row-action-links"><a>查看</a><a>下载</a></td>
+
+
+
+                </tr>
+
+
+
+                <tr>
+
+
+
+                  <td><input type="checkbox"></td>
+
+
+
+                  <td>Q/GL-001</td>
+
+
+
+                  <td>注塑工艺质量控制规范</td>
+
+
+
+                  <td>企业标准</td>
+
+
+
+                  <td>2026-03-15</td>
+
+
+
+                  <td>V2.0</td>
+
+
+
+                  <td><span class="badge badge-success">有效</span></td>
+
+
+
+                  <td class="row-action-links"><a>查看</a><a>下载</a><a>更新版本</a></td>
+
+
+
+                </tr>
+
+
+
+                <tr>
+
+
+
+                  <td><input type="checkbox"></td>
+
+
+
+                  <td>Q/GL-002</td>
+
+
+
+                  <td>产品设计开发流程规范</td>
+
+
+
+                  <td>企业标准</td>
+
+
+
+                  <td>2026-02-01</td>
+
+
+
+                  <td>V1.0</td>
+
+
+
+                  <td><span class="badge badge-success">有效</span></td>
+
+
+
+                  <td class="row-action-links"><a>查看</a><a>下载</a><a>更新版本</a></td>
+
+
+
+                </tr>
+
+
+
+                <tr>
+
+
+
+                  <td><input type="checkbox"></td>
+
+
+
+                  <td>QC/T-1000</td>
+
+
+
+                  <td>汽车零部件检验规则</td>
+
+
+
+                  <td>行业标准</td>
+
+
+
+                  <td>2026-04-01</td>
+
+
+
+                  <td>V1.0</td>
+
+
+
+                  <td><span class="badge badge-success">有效</span></td>
+
+
+
+                  <td class="row-action-links"><a>查看</a><a>下载</a></td>
+
+
+
+                </tr>
+
+
+
+                <tr>
+
+
+
+                  <td><input type="checkbox"></td>
+
+
+
+                  <td>PRC-SPEC-001</td>
+
+
+
+                  <td>喷涂工艺操作规范</td>
+
+
+
+                  <td>工艺规范</td>
+
+
+
+                  <td>2026-05-10</td>
+
+
+
+                  <td>V1.0</td>
+
+
+
+                  <td><span class="badge badge-success">有效</span></td>
+
+
+
+                  <td class="row-action-links"><a>查看</a><a>下载</a><a>更新版本</a></td>
+
+
+
+                </tr>
+
+
+
+                <tr>
+
+
+
+                  <td><input type="checkbox"></td>
+
+
+
+                  <td>Q/GL-003</td>
+
+
+
+                  <td>旧版质量手册</td>
+
+
+
+                  <td>企业标准</td>
+
+
+
+                  <td>2025-06-01</td>
+
+
+
+                  <td>V1.0</td>
+
+
+
+                  <td><span class="badge badge-error">已过期</span></td>
+
+
+
+                  <td class="row-action-links"><a>查看</a><a>下载</a></td>
+
+
+
+                </tr>
+
+
+
+                <tr>
+
+
+
+                  <td><input type="checkbox"></td>
+
+
+
+                  <td>PRC-SPEC-002</td>
+
+
+
+                  <td>焊接工艺操作规范</td>
+
+
+
+                  <td>工艺规范</td>
+
+
+
+                  <td>2026-06-01</td>
+
+
+
+                  <td>V1.0</td>
+
+
+
+                  <td><span class="badge badge-success">有效</span></td>
+
+
+
+                  <td class="row-action-links"><a>查看</a><a>下载</a><a>更新版本</a></td>
+
+
+
+                </tr>
+
+
+
+                <tr>
+
+
+
+                  <td><input type="checkbox"></td>
+
+
+
+                  <td>GB/T-19001</td>
+
+
+
+                  <td>质量管理体系要求</td>
+
+
+
+                  <td>国家标准</td>
+
+
+
+                  <td>2026-01-01</td>
+
+
+
+                  <td>V1.0</td>
+
+
+
+                  <td><span class="badge badge-success">有效</span></td>
+
+
+
+                  <td class="row-action-links"><a>查看</a><a>下载</a></td>
+
+
+
+                </tr>
+
+
+
+              </tbody>
+
+
+
+            </table>
+
+
+
+            <div class="pagination mt-16">
+
+
+
+              <span class="page-btn">&laquo;</span>
+
+
+
+              <span class="page-btn active">1</span>
+
+
+
+              <span class="page-btn">2</span>
+
+
+
+              <span class="page-btn">3</span>
+
+
+
+              <span class="page-btn">&raquo;</span>
+
+
+
+              <span class="page-info">共 26 条记录，每页 8 条</span>
+
+
+
+            </div>
+
+
+
+          </div>
+
+
+
+        </div>
+
+
+
+      </div>
+
+
+
+
+
+
+
+      <div class="tab-pane" id="case">
+
+
+
+        <div class="card">
+
+
+
+          <div class="card-header">典型案例库
+
+
+
+            <button class="btn btn-primary btn-sm" onclick="openModal('caseModal')">新增案例</button>
+
+
+
+          </div>
+
+
+
+          <div class="card-body">
+
+
+
+            <div class="list-filter-row">
+
+
+
+              <div class="filter-field">
+
+
+
+                <input type="text" placeholder="案例编号">
+
+
+
+              </div>
+
+
+
+              <div class="filter-field">
+
+
+
+                <input type="text" placeholder="案例名称">
+
+
+
+              </div>
+
+
+
+              <div class="filter-field">
+
+
+
+                <select>
+
+
+
+                  <option value="">工艺类型</option>
+
+
+
+                  <option>注塑</option>
+
+
+
+                  <option>装配</option>
+
+
+
+                  <option>喷涂</option>
+
+
+
+                  <option>焊接</option>
+
+
+
+                  <option>机加工</option>
+
+
+
+                </select>
+
+
+
+              </div>
+
+
+
+              <div class="list-filter-btns">
+
+
+
+                <button class="btn-search">&#128269; 查询</button>
+
+
+
+                <button class="btn-reset">&#8634; 重置</button>
+
+
+
+              </div>
+
+
+
+            </div>
+
+
+
+            <table class="data-table">
+
+
+
+              <thead>
+
+
+
+                <tr>
+
+
+
+                  <th style="width:40px;"><input type="checkbox"></th>
+
+
+
+                  <th>案例编号</th>
+
+
+
+                  <th>案例名称</th>
+
+
+
+                  <th>工艺类型</th>
+
+
+
+                  <th>问题描述</th>
+
+
+
+                  <th>解决方案</th>
+
+
+
+                  <th>发布日期</th>
+
+
+
+                  <th>操作</th>
+
+
+
+                </tr>
+
+
+
+              </thead>
+
+
+
+              <tbody>
+
+
+
+                <tr>
+
+
+
+                  <td><input type="checkbox"></td>
+
+
+
+                  <td>CASE-001</td>
+
+
+
+                  <td>ABS注塑件缩水问题解决</td>
+
+
+
+                  <td>注塑</td>
+
+
+
+                  <td>仪表盘外壳出现缩水缺陷</td>
+
+
+
+                  <td>调整保压压力和时间，优化浇口设计</td>
+
+
+
+                  <td>2026-01-20</td>
+
+
+
+                  <td class="row-action-links"><a>查看详情</a><a>编辑</a></td>
+
+
+
+                </tr>
+
+
+
+                <tr>
+
+
+
+                  <td><input type="checkbox"></td>
+
+
+
+                  <td>CASE-002</td>
+
+
+
+                  <td>喷涂色差问题分析</td>
+
+
+
+                  <td>喷涂</td>
+
+
+
+                  <td>中控屏外壳喷涂后出现色差</td>
+
+
+
+                  <td>标准化喷涂参数，控制环境温湿度</td>
+
+
+
+                  <td>2026-02-15</td>
+
+
+
+                  <td class="row-action-links"><a>查看详情</a><a>编辑</a></td>
+
+
+
+                </tr>
+
+
+
+                <tr>
+
+
+
+                  <td><input type="checkbox"></td>
+
+
+
+                  <td>CASE-003</td>
+
+
+
+                  <td>焊接气孔缺陷解决</td>
+
+
+
+                  <td>焊接</td>
+
+
+
+                  <td>座椅骨架焊接出现气孔</td>
+
+
+
+                  <td>优化焊接参数，清理焊接表面</td>
+
+
+
+                  <td>2026-03-10</td>
+
+
+
+                  <td class="row-action-links"><a>查看详情</a><a>编辑</a></td>
+
+
+
+                </tr>
+
+
+
+                <tr>
+
+
+
+                  <td><input type="checkbox"></td>
+
+
+
+                  <td>CASE-004</td>
+
+
+
+                  <td>装配干涉问题解决</td>
+
+
+
+                  <td>装配</td>
+
+
+
+                  <td>仪表盘总成装配时出现干涉</td>
+
+
+
+                  <td>优化零部件公差配合，调整装配顺序</td>
+
+
+
+                  <td>2026-04-05</td>
+
+
+
+                  <td class="row-action-links"><a>查看详情</a><a>编辑</a></td>
+
+
+
+                </tr>
+
+
+
+                <tr>
+
+
+
+                  <td><input type="checkbox"></td>
+
+
+
+                  <td>CASE-005</td>
+
+
+
+                  <td>CNC加工精度提升</td>
+
+
+
+                  <td>机加工</td>
+
+
+
+                  <td>铝合金型材加工精度不足</td>
+
+
+
+                  <td>优化刀具参数，改进装夹方式</td>
+
+
+
+                  <td>2026-05-20</td>
+
+
+
+                  <td class="row-action-links"><a>查看详情</a><a>编辑</a></td>
+
+
+
+                </tr>
+
+
+
+                <tr>
+
+
+
+                  <td><input type="checkbox"></td>
+
+
+
+                  <td>CASE-006</td>
+
+
+
+                  <td>注塑周期优化案例</td>
+
+
+
+                  <td>注塑</td>
+
+
+
+                  <td>生产效率低，周期过长</td>
+
+
+
+                  <td>优化冷却系统，调整工艺参数</td>
+
+
+
+                  <td>2026-06-10</td>
+
+
+
+                  <td class="row-action-links"><a>查看详情</a><a>编辑</a></td>
+
+
+
+                </tr>
+
+
+
+                <tr>
+
+
+
+                  <td><input type="checkbox"></td>
+
+
+
+                  <td>CASE-007</td>
+
+
+
+                  <td>喷涂附着力问题解决</td>
+
+
+
+                  <td>喷涂</td>
+
+
+
+                  <td>涂层附着力不足</td>
+
+
+
+                  <td>改进前处理工艺，选择合适涂料</td>
+
+
+
+                  <td>2026-07-01</td>
+
+
+
+                  <td class="row-action-links"><a>查看详情</a><a>编辑</a></td>
+
+
+
+                </tr>
+
+
+
+                <tr>
+
+
+
+                  <td><input type="checkbox"></td>
+
+
+
+                  <td>CASE-008</td>
+
+
+
+                  <td>装配效率提升案例</td>
+
+
+
+                  <td>装配</td>
+
+
+
+                  <td>仪表盘装配效率偏低</td>
+
+
+
+                  <td>优化装配流程，使用工装夹具</td>
+
+
+
+                  <td>2026-07-08</td>
+
+
+
+                  <td class="row-action-links"><a>查看详情</a><a>编辑</a></td>
+
+
+
+                </tr>
+
+
+
+              </tbody>
+
+
+
+            </table>
+
+
+
+            <div class="pagination mt-16">
+
+
+
+              <span class="page-btn">&laquo;</span>
+
+
+
+              <span class="page-btn active">1</span>
+
+
+
+              <span class="page-btn">2</span>
+
+
+
+              <span class="page-btn">3</span>
+
+
+
+              <span class="page-btn">&raquo;</span>
+
+
+
+              <span class="page-info">共 18 条记录，每页 8 条</span>
+
+
+
+            </div>
+
+
+
+          </div>
+
+
+
+        </div>
+
+
+
+      </div>
+
+
+
+
+
+
+
+      <div class="tab-pane" id="material">
+
+
+
+        <div class="card">
+
+
+
+          <div class="card-header">物料信息库
+
+
+
+            <button class="btn btn-primary btn-sm" onclick="openModal('materialInfoModal')">新增物料信息</button>
+
+
+
+          </div>
+
+
+
+          <div class="card-body">
+
+
+
+            <div class="list-filter-row">
+
+
+
+              <div class="filter-field">
+
+
+
+                <input type="text" placeholder="物料编码">
+
+
+
+              </div>
+
+
+
+              <div class="filter-field">
+
+
+
+                <input type="text" placeholder="物料名称">
+
+
+
+              </div>
+
+
+
+              <div class="filter-field">
+
+
+
+                <select>
+
+
+
+                  <option value="">供应商</option>
+
+
+
+                  <option>上海石化</option>
+
+
+
+                  <option>广东塑料</option>
+
+
+
+                  <option>深圳电子</option>
+
+
+
+                  <option>东莞五金</option>
+
+
+
+                </select>
+
+
+
+              </div>
+
+
+
+              <div class="list-filter-btns">
+
+
+
+                <button class="btn-search">&#128269; 查询</button>
+
+
+
+                <button class="btn-reset">&#8634; 重置</button>
+
+
+
+              </div>
+
+
+
+            </div>
+
+
+
+            <table class="data-table">
+
+
+
+              <thead>
+
+
+
+                <tr>
+
+
+
+                  <th style="width:40px;"><input type="checkbox"></th>
+
+
+
+                  <th>物料编码</th>
+
+
+
+                  <th>物料名称</th>
+
+
+
+                  <th>规格型号</th>
+
+
+
+                  <th>性能参数</th>
+
+
+
+                  <th>供应商</th>
+
+
+
+                  <th>操作</th>
+
+
+
+                </tr>
+
+
+
+              </thead>
+
+
+
+              <tbody>
+
+
+
+                <tr>
+
+
+
+                  <td><input type="checkbox"></td>
+
+
+
+                  <td>RM000001</td>
+
+
+
+                  <td>ABS树脂颗粒</td>
+
+
+
+                  <td>PA-757</td>
+
+
+
+                  <td>密度:1.05g/cm³,熔指:22g/10min</td>
+
+
+
+                  <td>上海石化</td>
+
+
+
+                  <td class="row-action-links"><a>查看详情</a><a>编辑</a></td>
+
+
+
+                </tr>
+
+
+
+                <tr>
+
+
+
+                  <td><input type="checkbox"></td>
+
+
+
+                  <td>RM000002</td>
+
+
+
+                  <td>PC/ABS合金</td>
+
+
+
+                  <td>CYCOLOY C1200HF</td>
+
+
+
+                  <td>密度:1.06g/cm³,熔指:18g/10min</td>
+
+
+
+                  <td>广东塑料</td>
+
+
+
+                  <td class="row-action-links"><a>查看详情</a><a>编辑</a></td>
+
+
+
+                </tr>
+
+
+
+                <tr>
+
+
+
+                  <td><input type="checkbox"></td>
+
+
+
+                  <td>RM000003</td>
+
+
+
+                  <td>PP塑料粒子</td>
+
+
+
+                  <td>PP-T20</td>
+
+
+
+                  <td>密度:0.90g/cm³,熔指:15g/10min</td>
+
+
+
+                  <td>上海石化</td>
+
+
+
+                  <td class="row-action-links"><a>查看详情</a><a>编辑</a></td>
+
+
+
+                </tr>
+
+
+
+                <tr>
+
+
+
+                  <td><input type="checkbox"></td>
+
+
+
+                  <td>RM000004</td>
+
+
+
+                  <td>铝合金型材</td>
+
+
+
+                  <td>6061-T6</td>
+
+
+
+                  <td>抗拉强度:265MPa,硬度:95HB</td>
+
+
+
+                  <td>东莞五金</td>
+
+
+
+                  <td class="row-action-links"><a>查看详情</a><a>编辑</a></td>
+
+
+
+                </tr>
+
+
+
+                <tr>
+
+
+
+                  <td><input type="checkbox"></td>
+
+
+
+                  <td>PO000001</td>
+
+
+
+                  <td>电子显示屏</td>
+
+
+
+                  <td>7寸 TFT</td>
+
+
+
+                  <td>分辨率:800×480,亮度:400cd/m²</td>
+
+
+
+                  <td>深圳电子</td>
+
+
+
+                  <td class="row-action-links"><a>查看详情</a><a>编辑</a></td>
+
+
+
+                </tr>
+
+
+
+                <tr>
+
+
+
+                  <td><input type="checkbox"></td>
+
+
+
+                  <td>RM000005</td>
+
+
+
+                  <td>304不锈钢板</td>
+
+
+
+                  <td>1.5mm</td>
+
+
+
+                  <td>抗拉强度:520MPa,硬度:187HB</td>
+
+
+
+                  <td>东莞五金</td>
+
+
+
+                  <td class="row-action-links"><a>查看详情</a><a>编辑</a></td>
+
+
+
+                </tr>
+
+
+
+                <tr>
+
+
+
+                  <td><input type="checkbox"></td>
+
+
+
+                  <td>PO000002</td>
+
+
+
+                  <td>扬声器</td>
+
+
+
+                  <td>4Ω 10W</td>
+
+
+
+                  <td>阻抗:4Ω,功率:10W,频响:80Hz-20kHz</td>
+
+
+
+                  <td>深圳电子</td>
+
+
+
+                  <td class="row-action-links"><a>查看详情</a><a>编辑</a></td>
+
+
+
+                </tr>
+
+
+
+                <tr>
+
+
+
+                  <td><input type="checkbox"></td>
+
+
+
+                  <td>RM000006</td>
+
+
+
+                  <td>硅胶密封圈</td>
+
+
+
+                  <td>Φ30×2.5</td>
+
+
+
+                  <td>硬度:70邵氏A,耐温:-40℃~200℃</td>
+
+
+
+                  <td>广东橡胶</td>
+
+
+
+                  <td class="row-action-links"><a>查看详情</a><a>编辑</a></td>
+
+
+
+                </tr>
+
+
+
+              </tbody>
+
+
+
+            </table>
+
+
+
+            <div class="pagination mt-16">
+
+
+
+              <span class="page-btn">&laquo;</span>
+
+
+
+              <span class="page-btn active">1</span>
+
+
+
+              <span class="page-btn">2</span>
+
+
+
+              <span class="page-btn">3</span>
+
+
+
+              <span class="page-btn">4</span>
+
+
+
+              <span class="page-btn">&raquo;</span>
+
+
+
+              <span class="page-info">共 35 条记录，每页 8 条</span>
+
+
+
+            </div>
+
+
+
+          </div>
+
+
+
+        </div>
+
+
+
+      </div>
+
+
+
+
+
+
+
+      <div class="tab-pane" id="search">
+
+
+
+        <div class="card">
+
+
+
+          <div class="card-header">知识检索</div>
+
+
+
+          <div class="card-body">
+
+
+
+            <div class="grid-3 gap-16">
+
+
+
+              <div class="form-group">
+
+
+
+                <label class="form-label">关键词</label>
+
+
+
+                <div class="form-search">
+
+
+
+                  <input type="text" class="form-input" placeholder="输入关键词进行搜索">
+
+
+
+                </div>
+
+
+
+              </div>
+
+
+
+              <div class="form-group">
+
+
+
+                <label class="form-label">分类</label>
+
+
+
+                <select class="form-select">
+
+
+
+                  <option value="">全部分类</option>
+
+
+
+                  <option>标准规范</option>
+
+
+
+                  <option>典型案例</option>
+
+
+
+                  <option>物料信息</option>
+
+
+
+                  <option>工艺文件</option>
+
+
+
+                </select>
+
+
+
+              </div>
+
+
+
+              <div class="form-group">
+
+
+
+                <label class="form-label">工艺类型</label>
+
+
+
+                <select class="form-select">
+
+
+
+                  <option value="">全部工艺</option>
+
+
+
+                  <option>注塑</option>
+
+
+
+                  <option>装配</option>
+
+
+
+                  <option>喷涂</option>
+
+
+
+                  <option>焊接</option>
+
+
+
+                  <option>机加工</option>
+
+
+
+                </select>
+
+
+
+              </div>
+
+
+
+            </div>
+
+
+
+            <div class="flex justify-end mt-16">
+
+
+
+              <button class="btn btn-primary" onclick="doSearch()">开始搜索</button>
+
+
+
+            </div>
+
+
+
+            <div class="mt-16">
+
+
+
+              <div class="flex items-center justify-between mb-12">
+
+
+
+                <div>
+
+
+
+                  <span class="text-primary font-bold">搜索结果</span>
+
+
+
+                  <span class="text-muted ml-4">共找到 12 条相关记录</span>
+
+
+
+                </div>
+
+
+
+                <div class="flex gap-8">
+
+
+
+                  <span class="text-sm">排序:</span>
+
+
+
+                  <select class="form-select" style="width:auto; font-size:12px;">
+
+
+
+                    <option>相关度</option>
+
+
+
+                    <option>发布时间</option>
+
+
+
+                    <option>访问次数</option>
+
+
+
+                  </select>
+
+
+
+                </div>
+
+
+
+              </div>
+
+
+
+              <div class="space-y-12">
+
+
+
+                <div class="card" style="cursor:pointer;">
+
+
+
+                  <div class="card-body">
+
+
+
+                    <div class="flex items-start justify-between">
+
+
+
+                      <div>
+
+
+
+                        <div class="text-primary font-bold" style="font-size:14px;">注塑工艺质量控制规范</div>
+
+
+
+                        <div class="text-muted text-sm mt-4">企业标准 | 发布时间: 2026-03-15 | 版本: V2.0</div>
+
+
+
+                        <div class="text-secondary mt-4" style="font-size:13px; line-height:1.6;">
+
+
+
+                          本规范规定了注塑工艺过程中的质量控制要求，包括原材料检验、工艺参数设定、过程监控、成品检验等环节的质量控制标准和方法...
+
+
+
+                        </div>
+
+
+
+                      </div>
+
+
+
+                      <div class="text-accent text-sm">查看详情 →</div>
+
+
+
+                    </div>
+
+
+
+                  </div>
+
+
+
+                </div>
+
+
+
+                <div class="card" style="cursor:pointer;">
+
+
+
+                  <div class="card-body">
+
+
+
+                    <div class="flex items-start justify-between">
+
+
+
+                      <div>
+
+
+
+                        <div class="text-primary font-bold" style="font-size:14px;">ABS注塑件缩水问题解决案例</div>
+
+
+
+                        <div class="text-muted text-sm mt-4">典型案例 | 工艺类型: 注塑 | 发布时间: 2026-01-20</div>
+
+
+
+                        <div class="text-secondary mt-4" style="font-size:13px; line-height:1.6;">
+
+
+
+                          针对仪表盘外壳注塑件出现的缩水缺陷，通过分析成型工艺参数，调整保压压力和时间，优化浇口设计等措施，成功解决了缩水问题...
+
+
+
+                        </div>
+
+
+
+                      </div>
+
+
+
+                      <div class="text-accent text-sm">查看详情 →</div>
+
+
+
+                    </div>
+
+
+
+                  </div>
+
+
+
+                </div>
+
+
+
+                <div class="card" style="cursor:pointer;">
+
+
+
+                  <div class="card-body">
+
+
+
+                    <div class="flex items-start justify-between">
+
+
+
+                      <div>
+
+
+
+                        <div class="text-primary font-bold" style="font-size:14px;">ABS树脂颗粒 PA-757</div>
+
+
+
+                        <div class="text-muted text-sm mt-4">物料信息 | 供应商: 上海石化</div>
+
+
+
+                        <div class="text-secondary mt-4" style="font-size:13px; line-height:1.6;">
+
+
+
+                          性能参数：密度1.05g/cm³，熔指22g/10min，拉伸强度42MPa，弯曲强度68MPa，冲击强度15kJ/m²...
+
+
+
+                        </div>
+
+
+
+                      </div>
+
+
+
+                      <div class="text-accent text-sm">查看详情 →</div>
+
+
+
+                    </div>
+
+
+
+                  </div>
+
+
+
+                </div>
+
+
+
+                <div class="card" style="cursor:pointer;">
+
+
+
+                  <div class="card-body">
+
+
+
+                    <div class="flex items-start justify-between">
+
+
+
+                      <div>
+
+
+
+                        <div class="text-primary font-bold" style="font-size:14px;">注塑工艺操作规范</div>
+
+
+
+                        <div class="text-muted text-sm mt-4">工艺规范 | 发布时间: 2026-05-10 | 版本: V1.0</div>
+
+
+
+                        <div class="text-secondary mt-4" style="font-size:13px; line-height:1.6;">
+
+
+
+                          本规范详细规定了注塑工艺的操作流程和安全要求，包括开机准备、工艺参数设定、生产过程监控、设备维护保养等内容...
+
+
+
+                        </div>
+
+
+
+                      </div>
+
+
+
+                      <div class="text-accent text-sm">查看详情 →</div>
+
+
+
+                    </div>
+
+
+
+                  </div>
+
+
+
+                </div>
+
+
+
+                <div class="card" style="cursor:pointer;">
+
+
+
+                  <div class="card-body">
+
+
+
+                    <div class="flex items-start justify-between">
+
+
+
+                      <div>
+
+
+
+                        <div class="text-primary font-bold" style="font-size:14px;">注塑周期优化案例</div>
+
+
+
+                        <div class="text-muted text-sm mt-4">典型案例 | 工艺类型: 注塑 | 发布时间: 2026-06-10</div>
+
+
+
+                        <div class="text-secondary mt-4" style="font-size:13px; line-height:1.6;">
+
+
+
+                          通过优化冷却系统设计和调整工艺参数，将注塑周期从原来的45秒缩短到32秒，生产效率提升28.9%...
+
+
+
+                        </div>
+
+
+
+                      </div>
+
+
+
+                      <div class="text-accent text-sm">查看详情 →</div>
+
+
+
+                    </div>
+
+
+
+                  </div>
+
+
+
+                </div>
+
+
+
+              </div>
+
+
+
+              <div class="pagination mt-16">
+
+
+
+                <span class="page-btn">&laquo;</span>
+
+
+
+                <span class="page-btn active">1</span>
+
+
+
+                <span class="page-btn">2</span>
+
+
+
+                <span class="page-btn">3</span>
+
+
+
+                <span class="page-btn">&raquo;</span>
+
+
+
+                <span class="page-info">共 12 条记录，每页 5 条</span>
+
+
+
+              </div>
+
+
+
+            </div>
+
+
+
+          </div>
+
+
+
+        </div>
+
+
+
+      </div>
+
+
+
+    </div>
+
+
+
+  </div>
+
+
+
+
+
+
+
+  <div class="modal-overlay" id="standardModal">
+
+
+
+    <div class="modal-dialog">
+
+
+
+      <div class="modal-header">
+
+
+
+        <h3>新增标准规范</h3>
+
+
+
+        <button class="modal-close" onclick="closeModal('standardModal')">×</button>
+
+
+
+      </div>
+
+
+
+      <div class="modal-body">
+
+
+
+        <div class="grid-2 gap-16">
+
+
+
+          <div class="form-group">
+
+
+
+            <label class="form-label">规范编号</label>
+
+
+
+            <input type="text" class="form-input" placeholder="请输入规范编号">
+
+
+
+          </div>
+
+
+
+          <div class="form-group">
+
+
+
+            <label class="form-label">规范名称</label>
+
+
+
+            <input type="text" class="form-input" placeholder="请输入规范名称">
+
+
+
+          </div>
+
+
+
+          <div class="form-group">
+
+
+
+            <label class="form-label">类型</label>
+
+
+
+            <select class="form-select">
+
+
+
+              <option value="">请选择类型</option>
+
+
+
+              <option>国家标准</option>
+
+
+
+              <option>行业标准</option>
+
+
+
+              <option>企业标准</option>
+
+
+
+              <option>工艺规范</option>
+
+
+
+            </select>
+
+
+
+          </div>
+
+
+
+          <div class="form-group">
+
+
+
+            <label class="form-label">版本</label>
+
+
+
+            <input type="text" class="form-input" value="V1.0">
+
+
+
+          </div>
+
+
+
+          <div class="form-group">
+
+
+
+            <label class="form-label">发布日期</label>
+
+
+
+            <input type="date" class="form-input">
+
+
+
+          </div>
+
+
+
+          <div class="form-group">
+
+
+
+            <label class="form-label">状态</label>
+
+
+
+            <select class="form-select">
+
+
+
+              <option>有效</option>
+
+
+
+              <option>已过期</option>
+
+
+
+            </select>
+
+
+
+          </div>
+
+
+
+          <div class="form-group">
+
+
+
+            <label class="form-label">上传文件</label>
+
+
+
+            <div style="border:1px dashed var(--border-normal); border-radius:var(--radius-sm); padding:24px; text-align:center; cursor:pointer;">
+
+
+
+              <div style="font-size:24px; margin-bottom:8px;">📁</div>
+
+
+
+              <div style="color:var(--text-tertiary); font-size:12px;">点击或拖拽文件到此处上传</div>
+
+
+
+              <input type="file" style="display:none;">
+
+
+
+            </div>
+
+
+
+          </div>
+
+
+
+          <div class="form-group">
+
+
+
+            <label class="form-label">摘要</label>
+
+
+
+            <textarea class="form-textarea" placeholder="请输入规范摘要"></textarea>
+
+
+
+          </div>
+
+
+
+        </div>
+
+
+
+      </div>
+
+
+
+      <div class="modal-footer">
+
+
+
+        <button class="btn btn-ghost" onclick="closeModal('standardModal')">取消</button>
+
+
+
+        <button class="btn btn-primary" onclick="saveStandard()">保存</button>
+
+
+
+      </div>
+
+
+
+    </div>
+
+
+
+  </div>
+
+
+
+
+
+
+
+  <div class="modal-overlay" id="caseModal">
+
+
+
+    <div class="modal-dialog">
+
+
+
+      <div class="modal-header">
+
+
+
+        <h3>新增典型案例</h3>
+
+
+
+        <button class="modal-close" onclick="closeModal('caseModal')">×</button>
+
+
+
+      </div>
+
+
+
+      <div class="modal-body">
+
+
+
+        <div class="grid-2 gap-16">
+
+
+
+          <div class="form-group">
+
+
+
+            <label class="form-label">案例编号</label>
+
+
+
+            <input type="text" class="form-input" placeholder="自动生成">
+
+
+
+          </div>
+
+
+
+          <div class="form-group">
+
+
+
+            <label class="form-label">案例名称</label>
+
+
+
+            <input type="text" class="form-input" placeholder="请输入案例名称">
+
+
+
+          </div>
+
+
+
+          <div class="form-group">
+
+
+
+            <label class="form-label">工艺类型</label>
+
+
+
+            <select class="form-select">
+
+
+
+              <option value="">请选择工艺类型</option>
+
+
+
+              <option>注塑</option>
+
+
+
+              <option>装配</option>
+
+
+
+              <option>喷涂</option>
+
+
+
+              <option>焊接</option>
+
+
+
+              <option>机加工</option>
+
+
+
+            </select>
+
+
+
+          </div>
+
+
+
+          <div class="form-group">
+
+
+
+            <label class="form-label">发布日期</label>
+
+
+
+            <input type="date" class="form-input">
+
+
+
+          </div>
+
+
+
+          <div class="form-group">
+
+
+
+            <label class="form-label">问题描述</label>
+
+
+
+            <textarea class="form-textarea" placeholder="请详细描述问题"></textarea>
+
+
+
+          </div>
+
+
+
+          <div class="form-group">
+
+
+
+            <label class="form-label">解决方案</label>
+
+
+
+            <textarea class="form-textarea" placeholder="请详细描述解决方案"></textarea>
+
+
+
+          </div>
+
+
+
+          <div class="form-group">
+
+
+
+            <label class="form-label">效果验证</label>
+
+
+
+            <textarea class="form-textarea" placeholder="请描述问题解决后的效果"></textarea>
+
+
+
+          </div>
+
+
+
+        </div>
+
+
+
+      </div>
+
+
+
+      <div class="modal-footer">
+
+
+
+        <button class="btn btn-ghost" onclick="closeModal('caseModal')">取消</button>
+
+
+
+        <button class="btn btn-primary" onclick="saveCase()">保存</button>
+
+
+
+      </div>
+
+
+
+    </div>
+
+
+
+  </div>
+
+
+
+
+
+
+
+  <div class="modal-overlay" id="materialInfoModal">
+
+
+
+    <div class="modal-dialog">
+
+
+
+      <div class="modal-header">
+
+
+
+        <h3>新增物料信息</h3>
+
+
+
+        <button class="modal-close" onclick="closeModal('materialInfoModal')">×</button>
+
+
+
+      </div>
+
+
+
+      <div class="modal-body">
+
+
+
+        <div class="grid-2 gap-16">
+
+
+
+          <div class="form-group">
+
+
+
+            <label class="form-label">物料编码</label>
+
+
+
+            <input type="text" class="form-input" placeholder="请输入物料编码">
+
+
+
+          </div>
+
+
+
+          <div class="form-group">
+
+
+
+            <label class="form-label">物料名称</label>
+
+
+
+            <input type="text" class="form-input" placeholder="请输入物料名称">
+
+
+
+          </div>
+
+
+
+          <div class="form-group">
+
+
+
+            <label class="form-label">规格型号</label>
+
+
+
+            <input type="text" class="form-input" placeholder="请输入规格型号">
+
+
+
+          </div>
+
+
+
+          <div class="form-group">
+
+
+
+            <label class="form-label">供应商</label>
+
+
+
+            <select class="form-select">
+
+
+
+              <option value="">请选择供应商</option>
+
+
+
+              <option>上海石化</option>
+
+
+
+              <option>广东塑料</option>
+
+
+
+              <option>深圳电子</option>
+
+
+
+              <option>东莞五金</option>
+
+
+
+              <option>广东橡胶</option>
+
+
+
+            </select>
+
+
+
+          </div>
+
+
+
+          <div class="form-group">
+
+
+
+            <label class="form-label">性能参数</label>
+
+
+
+            <textarea class="form-textarea" placeholder="请输入性能参数"></textarea>
+
+
+
+          </div>
+
+
+
+          <div class="form-group">
+
+
+
+            <label class="form-label">技术要求</label>
+
+
+
+            <textarea class="form-textarea" placeholder="请输入技术要求"></textarea>
+
+
+
+          </div>
+
+
+
+          <div class="form-group">
+
+
+
+            <label class="form-label">应用场景</label>
+
+
+
+            <input type="text" class="form-input" placeholder="请输入应用场景">
+
+
+
+          </div>
+
+
+
+          <div class="form-group">
+
+
+
+            <label class="form-label">备注</label>
+
+
+
+            <textarea class="form-textarea" placeholder="请输入备注信息"></textarea>
+
+
+
+          </div>
+
+
+
+        </div>
+
+
+
+      </div>
+
+
+
+      <div class="modal-footer">
+
+
+
+        <button class="btn btn-ghost" onclick="closeModal('materialInfoModal')">取消</button>
+
+
+
+        <button class="btn btn-primary" onclick="saveMaterialInfo()">保存</button>
+
+
+
+      </div>
+
+
+
+    </div>
+
+
+
+  </div>
+
+
+
+</div>
+
+
+
+
+
+
+
+<script>
+
+
+
+function switchTab(tabId) {
+
+
+
+  document.querySelectorAll('.tab-item').forEach(function(t) { t.classList.remove('active'); });
+
+
+
+  document.querySelectorAll('.tab-pane').forEach(function(p) { p.classList.remove('active'); });
+
+
+
+  event.target.classList.add('active');
+
+
+
+  document.getElementById(tabId).classList.add('active');
+
+
+
+}
+
+
+
+function openModal(id) {
+
+
+
+  document.getElementById(id).classList.add('show');
+
+
+
+}
+
+
+
+function closeModal(id) {
+
+
+
+  document.getElementById(id).classList.remove('show');
+
+
+
+}
+
+
+
+function validateStandardForm() {
+
+
+
+  var stdCode = document.querySelector('#standardModal .form-input:nth-of-type(1)').value.trim();
+
+
+
+  var stdName = document.querySelector('#standardModal .form-input:nth-of-type(2)').value.trim();
+
+
+
+  var stdType = document.querySelector('#standardModal .form-select:nth-of-type(1)').value;
+
+
+
+  var pubDate = document.querySelector('#standardModal .form-input:nth-of-type(3)').value;
+
+
+
+  if (!stdCode) { showToast('请输入规范编号', 'info'); return false; }
+
+
+
+  if (!stdName) { showToast('请输入规范名称', 'info'); return false; }
+
+
+
+  if (!stdType) { showToast('请选择类型', 'info'); return false; }
+
+
+
+  if (!pubDate) { showToast('请选择发布日期', 'info'); return false; }
+
+
+
+  return true;
+
+
+
+}
+
+
+
+function saveStandard() {
+
+
+
+  if (!validateStandardForm()) return;
+
+
+
+  currentStatus = 'saved';
+
+
+
+  showToast('标准规范保存成功！', 'info');
+
+
+
+  closeModal('standardModal');
+
+
+
+}
+
+
+
+function validateCaseForm() {
+
+
+
+  var caseName = document.querySelector('#caseModal .form-input:nth-of-type(2)').value.trim();
+
+
+
+  var caseType = document.querySelector('#caseModal .form-select:nth-of-type(1)').value;
+
+
+
+  var problem = document.querySelector('#caseModal .form-textarea:nth-of-type(1)').value.trim();
+
+
+
+  var solution = document.querySelector('#caseModal .form-textarea:nth-of-type(2)').value.trim();
+
+
+
+  if (!caseName) { showToast('请输入案例名称', 'info'); return false; }
+
+
+
+  if (!caseType) { showToast('请选择工艺类型', 'info'); return false; }
+
+
+
+  if (!problem) { showToast('请描述问题', 'info'); return false; }
+
+
+
+  if (!solution) { showToast('请描述解决方案', 'info'); return false; }
+
+
+
+  return true;
+
+
+
+}
+
+
+
+function saveCase() {
+
+
+
+  if (!validateCaseForm()) return;
+
+
+
+  currentStatus = 'saved';
+
+
+
+  showToast('典型案例保存成功！', 'info');
+
+
+
+  closeModal('caseModal');
+
+
+
+}
+
+
+
+function validateMaterialInfoForm() {
+
+
+
+  var matCode = document.querySelector('#materialInfoModal .form-input:nth-of-type(1)').value.trim();
+
+
+
+  var matName = document.querySelector('#materialInfoModal .form-input:nth-of-type(2)').value.trim();
+
+
+
+  var spec = document.querySelector('#materialInfoModal .form-input:nth-of-type(3)').value.trim();
+
+
+
+  var supplier = document.querySelector('#materialInfoModal .form-select:nth-of-type(1)').value;
+
+
+
+  if (!matCode) { showToast('请输入物料编码', 'info'); return false; }
+
+
+
+  if (!matName) { showToast('请输入物料名称', 'info'); return false; }
+
+
+
+  if (!spec) { showToast('请输入规格型号', 'info'); return false; }
+
+
+
+  if (!supplier) { showToast('请选择供应商', 'info'); return false; }
+
+
+
+  return true;
+
+
+
+}
+
+
+
+function saveMaterialInfo() {
+
+
+
+  if (!validateMaterialInfoForm()) return;
+
+
+
+  currentStatus = 'saved';
+
+
+
+  showToast('物料信息保存成功！', 'info');
+
+
+
+  closeModal('materialInfoModal');
+
+
+
+}
+
+
+
+function doSearch() {
+
+
+
+}
+
+
+
+
+var currentLookupField = null;
+var currentLookupType = null;
+var lookupData = [];
+var lookupColumns = [];
+
+function openLookup(fieldId, type) {
+  currentLookupField = fieldId;
+  currentLookupType = type;
+  
+  if (type === 'org') {
+    lookupColumns = ['编码', '名称', '形态', '上级组织'];
+    lookupData = JSON.parse(localStorage.getItem('erp_orgs') || '[]');
+    document.getElementById('lookupTitle').textContent = '选择组织';
+  } else if (type === 'department') {
+    lookupColumns = ['编码', '名称'];
+    lookupData = JSON.parse(localStorage.getItem('erp_departments_cache') || '[]');
+    document.getElementById('lookupTitle').textContent = '选择部门';
+  } else if (type === 'employee') {
+    lookupColumns = ['编号', '姓名', '所属部门'];
+    lookupData = JSON.parse(localStorage.getItem('erp_employees_cache') || '[]');
+    document.getElementById('lookupTitle').textContent = '选择员工';
+  } else if (type === 'supplier') {
+    lookupColumns = ['编码', '名称'];
+    lookupData = JSON.parse(localStorage.getItem('erp_suppliers_cache') || '[]');
+    document.getElementById('lookupTitle').textContent = '选择供应商';
+  } else if (type === 'customer') {
+    lookupColumns = ['编码', '名称'];
+    lookupData = JSON.parse(localStorage.getItem('erp_customers_cache') || '[]');
+    document.getElementById('lookupTitle').textContent = '选择客户';
+  } else if (type === 'material') {
+    lookupColumns = ['物料编码', '物料名称', '规格型号', '基本单位'];
+    lookupData = JSON.parse(localStorage.getItem('erp_materials_cache') || '[]');
+    document.getElementById('lookupTitle').textContent = '选择物料';
+  } else if (type === 'warehouse') {
+    lookupColumns = ['编码', '名称'];
+    lookupData = JSON.parse(localStorage.getItem('erp_warehouses_cache') || '[]');
+    document.getElementById('lookupTitle').textContent = '选择仓库';
+  }
+  
+  renderLookupTable(lookupData);
+  document.getElementById('lookupModal').classList.add('show');
+}
+
+function closeLookup() {
+  document.getElementById('lookupModal').classList.remove('show');
+}
+
+function filterLookup() {
+  var keyword = document.getElementById('lookupKeyword').value.trim().toLowerCase();
+  var filtered = lookupData.filter(function(item) {
+    var code = item.code || '';
+    var name = item.name || '';
+    return code.toLowerCase().includes(keyword) || name.toLowerCase().includes(keyword);
+  });
+  renderLookupTable(filtered);
+}
+
+function renderLookupTable(data) {
+  var head = document.getElementById('lookupTableHead');
+  var body = document.getElementById('lookupTableBody');
+  
+  head.innerHTML = '<tr><th class="checkbox-cell"><input type="checkbox" onclick="selectAllLookup()"></th>' + lookupColumns.map(function(col) { return '<th>' + col + '</th>'; }).join('') + '</tr>';
+  
+  body.innerHTML = '';
+  data.forEach(function(item) {
+    var row = document.createElement('tr');
+    row.onclick = function() { selectLookupRow(this); };
+    var cells = ['<td class="checkbox-cell"><input type="checkbox" class="lookup-checkbox" value="' + item.id + '"></td>'];
+    if (currentLookupType === 'org') {
+      cells.push('<td>' + item.code + '</td><td>' + item.name + '</td><td>' + (item.form || '') + '</td><td>' + (item.parentName || '') + '</td>');
+    } else if (currentLookupType === 'department') {
+      cells.push('<td>' + item.code + '</td><td>' + item.name + '</td>');
+    } else if (currentLookupType === 'employee') {
+      cells.push('<td>' + item.code + '</td><td>' + item.name + '</td><td>' + (item.department || '') + '</td>');
+    } else if (currentLookupType === 'supplier' || currentLookupType === 'customer') {
+      cells.push('<td>' + item.code + '</td><td>' + item.name + '</td>');
+    } else if (currentLookupType === 'material') {
+      cells.push('<td>' + item.code + '</td><td>' + item.name + '</td><td>' + (item.specification || '') + '</td><td>' + (item.unit || '') + '</td>');
+    } else if (currentLookupType === 'warehouse') {
+      cells.push('<td>' + item.code + '</td><td>' + item.name + '</td>');
+    }
+    row.innerHTML = cells.join('');
+    body.appendChild(row);
+  });
+  
+  if (data.length === 0) {
+    body.innerHTML = '<tr><td colspan="' + (lookupColumns.length + 1) + '" style="text-align:center;padding:40px;color:#999;">暂无数据</td></tr>';
+  }
+}
+
+function selectAllLookup() {
+  var master = document.querySelector('.lookup-table th input');
+  var checkboxes = document.querySelectorAll('.lookup-checkbox');
+  checkboxes.forEach(function(cb) { cb.checked = master.checked; });
+}
+
+function selectLookupRow(row) {
+  var checkbox = row.querySelector('.lookup-checkbox');
+  checkbox.checked = !checkbox.checked;
+}
+
+function confirmLookup() {
+  var checkboxes = document.querySelectorAll('.lookup-checkbox:checked');
+  if (checkboxes.length === 0) {
+    showToast('请选择一条记录', 'warning');
+    return;
+  }
+  
+  var item = lookupData.find(function(d) { return d.id === checkboxes[0].value; });
+  if (item) {
+    var field = document.getElementById(currentLookupField);
+    if (field) {
+      field.value = item.name;
+      field.setAttribute('data-id', item.id);
+      field.setAttribute('data-code', item.code);
+      
+      if (currentLookupType === 'material') {
+        var row = field.closest('tr');
+        if (row) {
+          row.querySelector('.material-name').value = item.name;
+          row.querySelector('.material-spec').value = item.specification || '';
+          row.querySelector('.material-unit').value = item.unit || '';
+        }
+      }
+    }
+  }
+  
+  closeLookup();
+}
+
+function openMaterialLookup(btn) {
+  var field = btn.previousElementSibling;
+  field.id = 'lookupField_' + Date.now();
+  currentLookupField = field.id;
+  openLookup(field.id, 'material');
+}
+
+function openOrgLookup(btn) {
+  var field = btn.previousElementSibling;
+  field.id = 'lookupField_' + Date.now();
+  currentLookupField = field.id;
+  openLookup(field.id, 'org');
+}
+
+function openSupplierLookup(btn) {
+  var field = btn.previousElementSibling;
+  field.id = 'lookupField_' + Date.now();
+  currentLookupField = field.id;
+  openLookup(field.id, 'supplier');
+}
+
+function openWarehouseLookup(btn) {
+  var field = btn.previousElementSibling;
+  field.id = 'lookupField_' + Date.now();
+  currentLookupField = field.id;
+  openLookup(field.id, 'warehouse');
+}
+
+function initLookupData() {
+  if (!localStorage.getItem('erp_orgs')) {
+    localStorage.setItem('erp_orgs', JSON.stringify([
+      { id: 'org-001', code: 'ORG-HQ', name: '磐枢工业集团', form: '集团', parentName: '' },
+      { id: 'org-002', code: 'ORG-SM', name: '磐枢智能制造有限公司', form: '公司', parentName: '磐枢工业集团' },
+      { id: 'org-003', code: 'ORG-SM-PD', name: '生产制造部', form: '部门', parentName: '磐枢智能制造有限公司' },
+      { id: 'org-004', code: 'ORG-SM-FA', name: '财务部', form: '部门', parentName: '磐枢智能制造有限公司' },
+      { id: 'org-005', code: 'ORG-SM-SD', name: '销售部', form: '部门', parentName: '磐枢智能制造有限公司' }
+    ]));
+  }
+  if (!localStorage.getItem('erp_departments_cache')) {
+    localStorage.setItem('erp_departments_cache', JSON.stringify([
+      { id: 'dept-001', code: 'DEPT-PD', name: '生产制造部', status: 1 },
+      { id: 'dept-002', code: 'DEPT-FA', name: '财务部', status: 1 },
+      { id: 'dept-003', code: 'DEPT-SD', name: '销售部', status: 1 },
+      { id: 'dept-004', code: 'DEPT-AS', name: '装配车间', status: 1 },
+      { id: 'dept-005', code: 'DEPT-QC', name: '质检车间', status: 1 }
+    ]));
+  }
+  if (!localStorage.getItem('erp_employees_cache')) {
+    localStorage.setItem('erp_employees_cache', JSON.stringify([
+      { id: 'emp-001', code: 'EMP-001', name: '张三', department: '生产制造部', status: 1 },
+      { id: 'emp-002', code: 'EMP-002', name: '李四', department: '生产制造部', status: 1 },
+      { id: 'emp-003', code: 'EMP-003', name: '王五', department: '财务部', status: 1 },
+      { id: 'emp-004', code: 'EMP-004', name: '赵六', department: '销售部', status: 1 },
+      { id: 'emp-005', code: 'EMP-005', name: '钱七', department: '质检车间', status: 1 }
+    ]));
+  }
+  if (!localStorage.getItem('erp_suppliers_cache')) {
+    localStorage.setItem('erp_suppliers_cache', JSON.stringify([
+      { id: 'sup-001', code: 'S-001', name: '深圳电子元器件有限公司', status: 1 },
+      { id: 'sup-002', code: 'S-002', name: '杭州精密机械加工厂', status: 1 },
+      { id: 'sup-003', code: 'S-003', name: '上海材料科技有限公司', status: 1 },
+      { id: 'sup-004', code: 'S-004', name: '东莞五金制品厂', status: 1 }
+    ]));
+  }
+  if (!localStorage.getItem('erp_materials_cache')) {
+    localStorage.setItem('erp_materials_cache', JSON.stringify([
+      { id: 'mat-001', code: 'P-001', name: '高频传感器模块', specification: 'HT-2026', unit: '个', status: 1 },
+      { id: 'mat-002', code: 'P-002', name: '控制电路板', specification: 'CB-2026', unit: '块', status: 1 },
+      { id: 'mat-003', code: 'P-003', name: '智能控制器', specification: 'IC-V3', unit: '台', status: 1 },
+      { id: 'mat-004', code: 'P-004', name: '电源模块', specification: 'PM-500W', unit: '个', status: 1 },
+      { id: 'mat-005', code: 'M-001', name: 'PCB电路板', specification: 'FR-4双层', unit: '块', status: 1 },
+      { id: 'mat-006', code: 'M-002', name: '贴片电阻', specification: '10KΩ 0603', unit: '个', status: 1 },
+      { id: 'mat-007', code: 'M-003', name: '贴片电容', specification: '100μF 0805', unit: '个', status: 1 },
+      { id: 'mat-008', code: 'M-004', name: '螺丝', specification: 'M4x10', unit: '包', status: 1 }
+    ]));
+  }
+  if (!localStorage.getItem('erp_warehouses_cache')) {
+    localStorage.setItem('erp_warehouses_cache', JSON.stringify([
+      { id: 'wh-001', code: 'WH-001', name: '成品仓', status: 1 },
+      { id: 'wh-002', code: 'WH-002', name: '原料仓', status: 1 },
+      { id: 'wh-003', code: 'WH-003', name: '半成品仓', status: 1 },
+      { id: 'wh-004', code: 'WH-004', name: '辅料仓', status: 1 }
+    ]));
+  }
+}
+
+</script>
+
+
+
+
+<div class="lookup-modal" id="lookupModal">
+  <div class="lookup-dialog">
+    <div class="lookup-header">
+      <div class="lookup-title" id="lookupTitle">选择</div>
+      <button class="lookup-close" onclick="closeLookup()">×</button>
+    </div>
+    <div class="lookup-body">
+      <div class="lookup-search">
+        <input type="text" id="lookupKeyword" placeholder="请输入编码或名称搜索" onkeydown="if(event.key==='Enter')filterLookup()">
+        <button onclick="filterLookup()">搜索</button>
+      </div>
+      <table class="lookup-table">
+        <thead id="lookupTableHead"></thead>
+        <tbody id="lookupTableBody"></tbody>
+      </table>
+    </div>
+    <div class="lookup-footer">
+      <button class="btn btn-cancel" onclick="closeLookup()">取消</button>
+      <button class="btn btn-primary" onclick="confirmLookup()">确定</button>
+    </div>
+  </div>
+</div>
+
+</body>
+
+
+
+</html>

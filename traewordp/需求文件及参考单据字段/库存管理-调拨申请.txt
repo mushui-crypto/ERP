@@ -1,0 +1,110 @@
+调拨申请
+
+库存管理
+
+字段说明：
+基本信息：FBillHead 
+	 实体主键：FID 
+	 单据编号：FBillNo 
+	 单据状态：FDocumentStatus 
+	 单据类型：FBillTypeID  (必填项)
+	 申请日期：FDate  (必填项)
+	 调拨类型：FTRANSTYPE  (必填项)
+	 申请组织：FAPPORGID  (必填项)
+	 创建人：FCreatorId 
+	 创建日期：FCreateDate 
+	 最后修改人：FModifierId 
+	 最后修改日期：FModifyDate 
+	 审核人：FAPPROVERID 
+	 审核日期：FAPPROVEDATE 
+	 作废人：FCANCELLERID 
+	 作废日期：FCANCELDATE 
+	 作废状态：FCANCELSTATUS 
+	 业务类型：FBusinessType 
+	 备注：FRemarks 
+	 关闭人：FCloserId 
+	 关闭日期：FCloseDate 
+	 关闭状态：FCloseStatus 
+	 手工关闭标识：FCloseFlag 
+	 调入货主类型：FOwnerTypeInIdHead  (必填项)
+	 调出货主类型：FOwnerTypeIdHead  (必填项)
+	 调拨方向：FTransferDirect  (必填项)
+	 需求单据号：F_QEIO_Text_z3v 
+	 生产订单编号：F_QEIO_Text_jzl 
+	 需求单行号：F_QEIO_Integer_ci7 
+	 生产订单行号：F_QEIO_Integer_3wa 
+明细信息：FEntity 
+	 实体主键：FEntryID 
+	 物料编码：FMATERIALID  (必填项)
+	 物料名称：FMaterialName 
+	 规格型号：FUOM 
+	 BOM版本：FBOMID 
+	 申请数量（基本单位）：FBASEQTY 
+	 单位：FUNITID  (必填项)
+	 调出批号：FLot 
+	 计划跟踪号：FMtoNo 
+	 生产日期：FProduceDate 
+	 有效期至：FExpiryDate 
+	 保质期单位：FExpUnit 
+	 保质期：FExpPeriod 
+	 辅助属性：FAuxPropId 
+	 调出仓位：FStockLocId 
+	 货位：FF100001
+	 调入仓位：FStockLocInId 
+	 货位：FF100001
+	 调出仓库：FStockId 
+	 调入仓库：FStockInId 
+	 调出库存状态：FStockStatusId 
+	 调入库存状态：FStockStatusInId 
+	 调出货主类型：FOwnerTypeId  (必填项)
+	 调出货主：FOwnerId  (必填项)
+	 调入货主类型：FOwnerTypeInId  (必填项)
+	 调入货主：FOwnerInId  (必填项)
+	 基本单位：FBaseUnitID  (必填项)
+	 申请数量：FQty 
+	 辅单位：FExtAuxUnitId 
+	 申请数量（辅单位）：FExtAuxUnitQty 
+	 库存辅单位：FSecUnitID 
+	 申请数量（库存辅单位）：FSecQty 
+	 备注：FNote 
+	 终止人：FEnderId 
+	 终止日期：FEndDate 
+	 普通调出关联数量（基本单位）：FNOTransOutReBaseQty 
+	 普通调出数量（基本单位）：FNOTransOutBaseQty 
+	 普通调入数量（基本单位）：FNOTransInBaseQty 
+	 退货调出关联数量（基本单位）：FRETransOutReBaseQty 
+	 退货调出数量（基本单位）：FRETransOutBaseQty 
+	 退货调入数量（基本单位）：FRETransInBaseQty 
+	 累计调出数量（基本单位）：FAllTransOutBaseQty 
+	 累计调入数量（基本单位）：FAllTransInBaseQty 
+	 普通调入途损数量（基本单位）：FNOTransInLoBaseQty 
+	 退货调入途损数量（基本单位）：FRETransInLoBaseQty 
+	 普通调出关联数量（库存辅单位）：FNOTransOutReSecQty 
+	 普通调出数量（库存辅单位）：FNOTransOutSecQty 
+	 普通调入数量（库存辅单位）：FNOTransInSecQty 
+	 退货调出关联数量（库存辅单位）：FRETransOutReSecQty 
+	 退货调出数量（库存辅单位）：FRETransOutSecQty 
+	 退货调入数量（库存辅单位）：FRETransInSecQty 
+	 累计调出数量（库存辅单位）：FAllTransOutSecQty 
+	 累计调入数量（库存辅单位） ：FAllTransInSecQty 
+	 普通调入途损数量（库存辅单位）：FNOTransInLoSecQty 
+	 退货调入途损数量（库存辅单位）：FRETransInLoSecQty 
+	 业务终止：FBusinessEnd 
+	 业务关闭：FBusinessClose 
+	 调出组织：FStockOrgId  (必填项)
+	 调入组织：FStockOrgInId  (必填项)
+	 零售条形码：FCMKBARCODE 
+	 即时库存(调入方)：FInInvQty 
+	 即时库存(调出方)：FOutInvQty 
+	 关联拣货安排数量(基本单位)：F_UN_JoinPrePickBaseQty 
+关联关系表：FEntity_Link 
+	 实体主键：FLinkId 
+	 业务流程图：FEntity_Link_FFlowId 
+	 推进路线：FEntity_Link_FFlowLineId 
+	 转换规则：FEntity_Link_FRuleId 
+	 源单表内码：FEntity_Link_FSTableId 
+	 源单表：FEntity_Link_FSTableName 
+	 源单内码：FEntity_Link_FSBillId 
+	 源单分录内码：FEntity_Link_FSId 
+	 原始携带量：FEntity_Link_FBASEQTYOld 
+	 修改携带量：FEntity_Link_FBASEQTY 

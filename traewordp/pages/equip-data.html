@@ -1,0 +1,944 @@
+<!DOCTYPE html>
+
+
+
+<html lang="zh-CN">
+
+
+
+<head>
+
+
+
+<meta charset="UTF-8">
+
+
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+
+
+<title>设备采集数据 - 磐枢工业智能平台</title>
+
+
+
+<link rel="stylesheet" href="../common.css">
+
+
+
+<script src="../common.js"></script>
+<script>
+</script>
+
+
+
+<style>
+
+
+
+.stat-card { background:var(--bg-surface); border:1px solid var(--border-normal); border-radius:var(--radius-md); padding:16px; display:flex; align-items:center; gap:12px; }
+
+
+
+.stat-card .stat-icon { width:40px; height:40px; border-radius:var(--radius-md); display:flex; align-items:center; justify-content:center; font-size:18px; }
+
+
+
+.stat-card .stat-icon.online { background:rgba(34,197,94,0.15); color:var(--color-success); }
+
+
+
+.stat-card .stat-icon.offline { background:rgba(239,68,68,0.15); color:var(--color-error); }
+
+
+
+.stat-card .stat-icon.running { background:rgba(56,189,248,0.15); color:var(--text-accent); }
+
+
+
+.stat-card .stat-icon.standby { background:rgba(6,182,212,0.15); color:var(--color-info); }
+
+
+
+.stat-card .stat-icon.fault { background:rgba(234,179,8,0.15); color:var(--color-warning); }
+
+
+
+.stat-card .stat-info .stat-value { font-size:24px; font-weight:700; color:var(--text-primary); font-family:var(--font-mono); }
+
+
+
+.stat-card .stat-info .stat-label { font-size:12px; color:var(--text-tertiary); }
+
+
+
+.chart-card { background:var(--bg-surface); border:1px solid var(--border-normal); border-radius:var(--radius-md); padding:16px; }
+
+
+
+.chart-card .chart-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:16px; }
+
+
+
+.chart-card .chart-title { font-size:14px; font-weight:600; color:var(--text-primary); }
+
+
+
+.chart-card .chart-tabs { display:flex; gap:4px; }
+
+
+
+.chart-card .chart-tab { padding:4px 10px; font-size:11px; color:var(--text-tertiary); cursor:pointer; border-radius:var(--radius-sm); transition:all var(--transition); }
+
+
+
+.chart-card .chart-tab.active { background:rgba(56,189,248,0.15); color:var(--text-accent); }
+
+
+
+.chart-container { height:200px; display:flex; align-items:flex-end; gap:3px; padding-top:8px; }
+
+
+
+.chart-bar { flex:1; border-radius:3px 3px 0 0; transition:height 300ms ease; min-height:4px; }
+
+
+
+.chart-bar.temp { background:linear-gradient(to top, rgba(234,179,8,0.6), rgba(234,179,8,0.2)); }
+
+
+
+.chart-bar.vibration { background:linear-gradient(to top, rgba(56,189,248,0.6), rgba(56,189,248,0.2)); }
+
+
+
+.chart-bar.output { background:linear-gradient(to top, rgba(34,197,94,0.6), rgba(34,197,94,0.2)); }
+
+
+
+.chart-labels { display:flex; justify-content:space-between; margin-top:8px; font-size:10px; color:var(--text-tertiary); }
+
+
+
+.list-filter-row .filter-field label { font-size:12px; color:var(--text-tertiary); padding:5px 8px; white-space:nowrap; border-right:1px solid var(--border-normal); }
+
+
+
+
+.lookup-modal { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:2000; justify-content:center; align-items:center; }
+.lookup-modal.show { display:flex; }
+.lookup-dialog { background:#fff; border:1px solid #e8e8e8; border-radius:4px; width:720px; max-height:70vh; overflow:hidden; }
+.lookup-header { padding:14px 20px; border-bottom:1px solid #e8e8e8; display:flex; align-items:center; justify-content:space-between; }
+.lookup-title { font-size:15px; font-weight:600; color:#333; }
+.lookup-close { font-size:20px; color:#666; cursor:pointer; background:none; border:none; }
+.lookup-close:hover { color:#333; }
+.lookup-body { padding:16px; }
+.lookup-search { display:flex; gap:8px; margin-bottom:12px; }
+.lookup-search input { flex:1; padding:6px 10px; border:1px solid #e8e8e8; border-radius:4px; font-size:13px; }
+.lookup-search button { padding:6px 16px; background:#1890ff; color:#fff; border:none; border-radius:4px; cursor:pointer; }
+.lookup-table { width:100%; border-collapse:collapse; font-size:13px; }
+.lookup-table th, .lookup-table td { padding:10px 12px; text-align:left; border-bottom:1px solid #e8e8e8; }
+.lookup-table th { background:#fafafa; font-weight:600; color:#333; }
+.lookup-table tr:hover { background:#f5f5f5; }
+.lookup-table .checkbox-cell { width:40px; }
+.lookup-footer { padding:12px 20px; border-top:1px solid #e8e8e8; display:flex; justify-content:flex-end; gap:8px; }
+.lookup-field { display:flex; align-items:center; }
+.lookup-field input { flex:1; padding:6px 10px; border:1px solid #e8e8e8; border-radius:4px 0 0 4px; font-size:13px; }
+.lookup-field button { width:28px; height:28px; border:1px solid #e8e8e8; border-left:none; border-radius:0 4px 4px 0; background:#fff; cursor:pointer; display:flex; align-items:center; justify-content:center; }
+.lookup-field button:hover { background:#f5f5f5; }
+
+.column-modal { display:none; position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.5); z-index:1000; align-items:center; justify-content:center; }
+.column-modal.show { display:flex; }
+.column-dialog { background:#fff; border-radius:8px; width:400px; max-height:80vh; overflow:hidden; box-shadow:0 4px 20px rgba(0,0,0,0.2); }
+.column-header { padding:16px 20px; border-bottom:1px solid #e8e8e8; display:flex; align-items:center; justify-content:space-between; }
+.column-title { font-size:16px; font-weight:600; color:#333; }
+.column-close { font-size:24px; color:#999; cursor:pointer; border:none; background:none; line-height:1; }
+.column-close:hover { color:#333; }
+.column-body { padding:16px 20px; max-height:400px; overflow-y:auto; }
+.column-item { display:flex; align-items:center; padding:8px 0; }
+.column-item input[type="checkbox"] { margin-right:8px; width:16px; height:16px; }
+.column-item label { flex:1; font-size:14px; color:#333; cursor:pointer; }
+.column-footer { padding:12px 20px; border-top:1px solid #e8e8e8; display:flex; justify-content:flex-end; gap:8px; }
+
+</style>
+
+
+
+</head>
+
+
+
+<body>
+
+
+
+<aside class="sidebar" id="sidebar">
+
+
+
+<div class="sidebar-logo">
+
+
+
+    <img src="../images/logo.png" alt="磐枢工业智能平台" style="width: 100%; max-width: 200px; margin-bottom: 8px;">
+
+
+
+    <h1 style="font-size: 16px; margin: 0;">磐枢工业智能平台</h1>
+
+
+
+  </div>
+
+
+
+  <nav class="sidebar-menu"></nav>
+
+
+
+<div class="sidebar-user"><div class="avatar">管</div>
+
+
+
+</aside>
+
+
+
+<div class="main-content" id="mainContent">
+
+
+
+  <div class="page-header" style="position:sticky;top:0;z-index:100;">
+
+
+
+    <div>
+
+
+
+      <div class="flex items-center gap-8">
+
+
+
+        <button class="sidebar-toggle" onclick="toggleSidebar()">&#9776;</button>
+
+
+
+        <div>
+
+
+
+          <h2>设备采集数据</h2>
+
+
+
+          <div class="breadcrumb"><a href="../index.html">首页</a> <span>/</span> <span>设备管理</span></div></div>
+
+
+
+        </div>
+
+
+
+      </div>
+
+
+
+    </div>
+
+
+
+  </div>
+
+
+
+  <div class="page-body" style="padding:20px 24px;">
+
+
+
+    <div class="grid-5" style="margin-bottom:20px;">
+
+
+
+      <div class="stat-card">
+
+
+
+        <div class="stat-icon online">&#128246;</div>
+
+
+
+        <div class="stat-info"><div class="stat-value">8</div><div class="stat-label">在线设备</div></div>
+
+
+
+      </div>
+
+
+
+      <div class="stat-card">
+
+
+
+        <div class="stat-icon offline">&#128247;</div>
+
+
+
+        <div class="stat-info"><div class="stat-value">2</div><div class="stat-label">离线设备</div></div>
+
+
+
+      </div>
+
+
+
+      <div class="stat-card">
+
+
+
+        <div class="stat-icon running">&#9654;</div>
+
+
+
+        <div class="stat-info"><div class="stat-value">6</div><div class="stat-label">运行中</div></div>
+
+
+
+      </div>
+
+
+
+      <div class="stat-card">
+
+
+
+        <div class="stat-icon standby">&#9208;</div>
+
+
+
+        <div class="stat-info"><div class="stat-value">2</div><div class="stat-label">待机</div></div>
+
+
+
+      </div>
+
+
+
+      <div class="stat-card">
+
+
+
+        <div class="stat-icon fault">&#9888;</div>
+
+
+
+        <div class="stat-info"><div class="stat-value">1</div><div class="stat-label">故障</div></div>
+
+
+
+      </div>
+
+
+
+    </div>
+
+
+
+    <div class="grid-2" style="margin-bottom:20px;">
+
+
+
+      <div class="chart-card">
+
+
+
+        <div class="chart-header">
+
+
+
+          <div class="chart-title">最近24小时温度趋势</div>
+
+
+
+          <div class="chart-tabs">
+
+
+
+            <span class="chart-tab active" onclick="switchChartTab(this,'temp')">温度</span>
+
+
+
+            <span class="chart-tab" onclick="switchChartTab(this,'vibration')">振动</span>
+
+
+
+            <span class="chart-tab" onclick="switchChartTab(this,'output')">产量</span>
+
+
+
+          </div>
+
+
+
+        </div>
+
+
+
+        <div class="chart-container">
+
+
+
+          <div class="chart-bar temp" style="height:60%;"></div><div class="chart-bar temp" style="height:65%;"></div><div class="chart-bar temp" style="height:58%;"></div><div class="chart-bar temp" style="height:70%;"></div><div class="chart-bar temp" style="height:75%;"></div><div class="chart-bar temp" style="height:80%;"></div><div class="chart-bar temp" style="height:85%;"></div><div class="chart-bar temp" style="height:90%;"></div><div class="chart-bar temp" style="height:88%;"></div><div class="chart-bar temp" style="height:92%;"></div><div class="chart-bar temp" style="height:95%;"></div><div class="chart-bar temp" style="height:98%;"></div><div class="chart-bar temp" style="height:100%;"></div><div class="chart-bar temp" style="height:96%;"></div><div class="chart-bar temp" style="height:90%;"></div><div class="chart-bar temp" style="height:85%;"></div><div class="chart-bar temp" style="height:80%;"></div><div class="chart-bar temp" style="height:75%;"></div><div class="chart-bar temp" style="height:70%;"></div><div class="chart-bar temp" style="height:65%;"></div><div class="chart-bar temp" style="height:62%;"></div><div class="chart-bar temp" style="height:58%;"></div><div class="chart-bar temp" style="height:55%;"></div><div class="chart-bar temp" style="height:52%;"></div>
+
+
+
+        </div>
+
+
+
+        <div class="chart-labels"><span>00:00</span><span>06:00</span><span>12:00</span><span>18:00</span><span>24:00</span></div>
+
+
+
+      </div>
+
+
+
+      <div class="chart-card">
+
+
+
+        <div class="chart-header">
+
+
+
+          <div class="chart-title">最近24小时产量趋势</div>
+
+
+
+        </div>
+
+
+
+        <div class="chart-container">
+
+
+
+          <div class="chart-bar output" style="height:30%;"></div><div class="chart-bar output" style="height:25%;"></div><div class="chart-bar output" style="height:20%;"></div><div class="chart-bar output" style="height:40%;"></div><div class="chart-bar output" style="height:60%;"></div><div class="chart-bar output" style="height:80%;"></div><div class="chart-bar output" style="height:95%;"></div><div class="chart-bar output" style="height:100%;"></div><div class="chart-bar output" style="height:98%;"></div><div class="chart-bar output" style="height:95%;"></div><div class="chart-bar output" style="height:90%;"></div><div class="chart-bar output" style="height:95%;"></div><div class="chart-bar output" style="height:100%;"></div><div class="chart-bar output" style="height:96%;"></div><div class="chart-bar output" style="height:85%;"></div><div class="chart-bar output" style="height:75%;"></div><div class="chart-bar output" style="height:80%;"></div><div class="chart-bar output" style="height:85%;"></div><div class="chart-bar output" style="height:90%;"></div><div class="chart-bar output" style="height:70%;"></div><div class="chart-bar output" style="height:50%;"></div><div class="chart-bar output" style="height:35%;"></div><div class="chart-bar output" style="height:30%;"></div><div class="chart-bar output" style="height:25%;"></div>
+
+
+
+        </div>
+
+
+
+        <div class="chart-labels"><span>00:00</span><span>06:00</span><span>12:00</span><span>18:00</span><span>24:00</span></div>
+
+
+
+      </div>
+
+
+
+    </div>
+
+
+
+    <div class="card">
+
+
+
+      <div class="card-header" style="display:flex;align-items:center;justify-content:space-between;">
+
+        <div>设备状态监控</div>
+
+        <div style="display:flex;align-items:center;gap:8px;">
+          <button class="btn btn-secondary" onclick="openColumnSettings()">显示/隐藏列</button>
+          <div class="list-filter-row" style="padding:0;gap:8px;">
+
+
+
+          <div class="filter-field">
+
+
+
+            <label>设备编号</label>
+
+
+
+            <input type="text" class="form-input" placeholder="请输入设备编号" style="width:120px;">
+
+
+
+          </div>
+
+
+
+          <div class="filter-field">
+
+
+
+            <label>设备名称</label>
+
+
+
+            <input type="text" class="form-input" placeholder="请输入设备名称" style="width:120px;">
+
+
+
+          </div>
+
+
+
+          <button class="btn-search" style="padding:5px 12px;font-size:12px;">查询</button>
+
+
+
+        </div>
+
+
+
+      </div>
+
+
+
+      <div class="card-body" style="padding:0;">
+
+
+
+        <table class="data-table">
+
+
+
+          <thead>
+
+
+
+            <tr>
+
+
+
+              <th style="width:40px;"><input type="checkbox" class="row-checkbox"></th>
+
+
+
+              <th data-column="equipCode">设备编号</th>
+
+
+
+              <th data-column="equipName">设备名称</th>
+
+
+
+              <th data-column="equipType">设备类型</th>
+
+
+
+              <th data-column="runStatus">运行状态</th>
+
+
+
+              <th data-column="output" style="text-align:right;">产量</th>
+
+
+
+              <th data-column="temperature" style="text-align:right;">温度</th>
+
+
+
+              <th data-column="vibration" style="text-align:right;">振动</th>
+
+
+
+              <th data-column="action">操作</th>
+
+
+
+            </tr>
+
+
+
+          </thead>
+
+
+
+          <tbody><tr><td colspan="100%" style="text-align:center;color:var(--text-tertiary);padding:20px;">暂无数据</td></tr></tbody>
+
+
+
+        </table>
+
+
+
+        <div class="list-pagination" style="border-top:1px solid var(--border-normal);">
+
+
+
+          <span class="page-info">共 15 条记录，每页 20 条</span>
+
+
+
+          <span class="page-btn">&laquo;</span>
+
+
+
+          <span class="page-btn active">1</span>
+
+
+
+          <span class="page-btn">&raquo;</span>
+
+
+
+        </div>
+
+
+
+      </div>
+
+
+
+    </div>
+
+
+
+  </div>
+
+
+
+</div>
+
+
+
+<script>
+
+
+
+function switchChartTab(el,type){ var tabs=el.parentElement.querySelectorAll('.chart-tab'); tabs.forEach(function(t){t.classList.remove('active');}); el.classList.add('active'); var bars=el.closest('.chart-card').querySelectorAll('.chart-bar'); bars.forEach(function(b){b.className='chart-bar '+type;}); }
+
+
+
+
+var currentLookupField = null;
+var currentLookupType = null;
+var lookupData = [];
+var lookupColumns = [];
+
+function openLookup(fieldId, type) {
+  currentLookupField = fieldId;
+  currentLookupType = type;
+  
+  if (type === 'org') {
+    lookupColumns = ['编码', '名称', '形态', '上级组织'];
+    lookupData = JSON.parse(localStorage.getItem('erp_orgs') || '[]');
+    document.getElementById('lookupTitle').textContent = '选择组织';
+  } else if (type === 'department') {
+    lookupColumns = ['编码', '名称'];
+    lookupData = JSON.parse(localStorage.getItem('erp_departments_cache') || '[]');
+    document.getElementById('lookupTitle').textContent = '选择部门';
+  } else if (type === 'employee') {
+    lookupColumns = ['编号', '姓名', '所属部门'];
+    lookupData = JSON.parse(localStorage.getItem('erp_employees_cache') || '[]');
+    document.getElementById('lookupTitle').textContent = '选择员工';
+  } else if (type === 'supplier') {
+    lookupColumns = ['编码', '名称'];
+    lookupData = JSON.parse(localStorage.getItem('erp_suppliers_cache') || '[]');
+    document.getElementById('lookupTitle').textContent = '选择供应商';
+  } else if (type === 'customer') {
+    lookupColumns = ['编码', '名称'];
+    lookupData = JSON.parse(localStorage.getItem('erp_customers_cache') || '[]');
+    document.getElementById('lookupTitle').textContent = '选择客户';
+  } else if (type === 'material') {
+    lookupColumns = ['物料编码', '物料名称', '规格型号', '基本单位'];
+    lookupData = JSON.parse(localStorage.getItem('erp_materials_cache') || '[]');
+    document.getElementById('lookupTitle').textContent = '选择物料';
+  } else if (type === 'warehouse') {
+    lookupColumns = ['编码', '名称'];
+    lookupData = JSON.parse(localStorage.getItem('erp_warehouses_cache') || '[]');
+    document.getElementById('lookupTitle').textContent = '选择仓库';
+  }
+  
+  renderLookupTable(lookupData);
+  document.getElementById('lookupModal').classList.add('show');
+}
+
+function closeLookup() {
+  document.getElementById('lookupModal').classList.remove('show');
+}
+
+function filterLookup() {
+  var keyword = document.getElementById('lookupKeyword').value.trim().toLowerCase();
+  var filtered = lookupData.filter(function(item) {
+    var code = item.code || '';
+    var name = item.name || '';
+    return code.toLowerCase().includes(keyword) || name.toLowerCase().includes(keyword);
+  });
+  renderLookupTable(filtered);
+}
+
+function renderLookupTable(data) {
+  var head = document.getElementById('lookupTableHead');
+  var body = document.getElementById('lookupTableBody');
+  
+  head.innerHTML = '<tr><th class="checkbox-cell"><input type="checkbox" onclick="selectAllLookup()"></th>' + lookupColumns.map(function(col) { return '<th>' + col + '</th>'; }).join('') + '</tr>';
+  
+  body.innerHTML = '';
+  data.forEach(function(item) {
+    var row = document.createElement('tr');
+    row.onclick = function() { selectLookupRow(this); };
+    var cells = ['<td class="checkbox-cell"><input type="checkbox" class="lookup-checkbox" value="' + item.id + '"></td>'];
+    if (currentLookupType === 'org') {
+      cells.push('<td>' + item.code + '</td><td>' + item.name + '</td><td>' + (item.form || '') + '</td><td>' + (item.parentName || '') + '</td>');
+    } else if (currentLookupType === 'department') {
+      cells.push('<td>' + item.code + '</td><td>' + item.name + '</td>');
+    } else if (currentLookupType === 'employee') {
+      cells.push('<td>' + item.code + '</td><td>' + item.name + '</td><td>' + (item.department || '') + '</td>');
+    } else if (currentLookupType === 'supplier' || currentLookupType === 'customer') {
+      cells.push('<td>' + item.code + '</td><td>' + item.name + '</td>');
+    } else if (currentLookupType === 'material') {
+      cells.push('<td>' + item.code + '</td><td>' + item.name + '</td><td>' + (item.specification || '') + '</td><td>' + (item.unit || '') + '</td>');
+    } else if (currentLookupType === 'warehouse') {
+      cells.push('<td>' + item.code + '</td><td>' + item.name + '</td>');
+    }
+    row.innerHTML = cells.join('');
+    body.appendChild(row);
+  });
+  
+  if (data.length === 0) {
+    body.innerHTML = '<tr><td colspan="' + (lookupColumns.length + 1) + '" style="text-align:center;padding:40px;color:#999;">暂无数据</td></tr>';
+  }
+}
+
+function selectAllLookup() {
+  var master = document.querySelector('.lookup-table th input');
+  var checkboxes = document.querySelectorAll('.lookup-checkbox');
+  checkboxes.forEach(function(cb) { cb.checked = master.checked; });
+}
+
+function selectLookupRow(row) {
+  var checkbox = row.querySelector('.lookup-checkbox');
+  checkbox.checked = !checkbox.checked;
+}
+
+function confirmLookup() {
+  var checkboxes = document.querySelectorAll('.lookup-checkbox:checked');
+  if (checkboxes.length === 0) {
+    showToast('请选择一条记录', 'warning');
+    return;
+  }
+  
+  var item = lookupData.find(function(d) { return d.id === checkboxes[0].value; });
+  if (item) {
+    var field = document.getElementById(currentLookupField);
+    if (field) {
+      field.value = item.name;
+      field.setAttribute('data-id', item.id);
+      field.setAttribute('data-code', item.code);
+      
+      if (currentLookupType === 'material') {
+        var row = field.closest('tr');
+        if (row) {
+          row.querySelector('.material-name').value = item.name;
+          row.querySelector('.material-spec').value = item.specification || '';
+          row.querySelector('.material-unit').value = item.unit || '';
+        }
+      }
+    }
+  }
+  
+  closeLookup();
+}
+
+function openMaterialLookup(btn) {
+  var field = btn.previousElementSibling;
+  field.id = 'lookupField_' + Date.now();
+  currentLookupField = field.id;
+  openLookup(field.id, 'material');
+}
+
+function openOrgLookup(btn) {
+  var field = btn.previousElementSibling;
+  field.id = 'lookupField_' + Date.now();
+  currentLookupField = field.id;
+  openLookup(field.id, 'org');
+}
+
+function openSupplierLookup(btn) {
+  var field = btn.previousElementSibling;
+  field.id = 'lookupField_' + Date.now();
+  currentLookupField = field.id;
+  openLookup(field.id, 'supplier');
+}
+
+function openWarehouseLookup(btn) {
+  var field = btn.previousElementSibling;
+  field.id = 'lookupField_' + Date.now();
+  currentLookupField = field.id;
+  openLookup(field.id, 'warehouse');
+}
+
+function initLookupData() {
+  if (!localStorage.getItem('erp_orgs')) {
+    localStorage.setItem('erp_orgs', JSON.stringify([
+      { id: 'org-001', code: 'ORG-HQ', name: '磐枢工业集团', form: '集团', parentName: '' },
+      { id: 'org-002', code: 'ORG-SM', name: '磐枢智能制造有限公司', form: '公司', parentName: '磐枢工业集团' },
+      { id: 'org-003', code: 'ORG-SM-PD', name: '生产制造部', form: '部门', parentName: '磐枢智能制造有限公司' },
+      { id: 'org-004', code: 'ORG-SM-FA', name: '财务部', form: '部门', parentName: '磐枢智能制造有限公司' },
+      { id: 'org-005', code: 'ORG-SM-SD', name: '销售部', form: '部门', parentName: '磐枢智能制造有限公司' }
+    ]));
+  }
+  if (!localStorage.getItem('erp_departments_cache')) {
+    localStorage.setItem('erp_departments_cache', JSON.stringify([
+      { id: 'dept-001', code: 'DEPT-PD', name: '生产制造部', status: 1 },
+      { id: 'dept-002', code: 'DEPT-FA', name: '财务部', status: 1 },
+      { id: 'dept-003', code: 'DEPT-SD', name: '销售部', status: 1 },
+      { id: 'dept-004', code: 'DEPT-AS', name: '装配车间', status: 1 },
+      { id: 'dept-005', code: 'DEPT-QC', name: '质检车间', status: 1 }
+    ]));
+  }
+  if (!localStorage.getItem('erp_employees_cache')) {
+    localStorage.setItem('erp_employees_cache', JSON.stringify([
+      { id: 'emp-001', code: 'EMP-001', name: '张三', department: '生产制造部', status: 1 },
+      { id: 'emp-002', code: 'EMP-002', name: '李四', department: '生产制造部', status: 1 },
+      { id: 'emp-003', code: 'EMP-003', name: '王五', department: '财务部', status: 1 },
+      { id: 'emp-004', code: 'EMP-004', name: '赵六', department: '销售部', status: 1 },
+      { id: 'emp-005', code: 'EMP-005', name: '钱七', department: '质检车间', status: 1 }
+    ]));
+  }
+  if (!localStorage.getItem('erp_suppliers_cache')) {
+    localStorage.setItem('erp_suppliers_cache', JSON.stringify([
+      { id: 'sup-001', code: 'S-001', name: '深圳电子元器件有限公司', status: 1 },
+      { id: 'sup-002', code: 'S-002', name: '杭州精密机械加工厂', status: 1 },
+      { id: 'sup-003', code: 'S-003', name: '上海材料科技有限公司', status: 1 },
+      { id: 'sup-004', code: 'S-004', name: '东莞五金制品厂', status: 1 }
+    ]));
+  }
+  if (!localStorage.getItem('erp_materials_cache')) {
+    localStorage.setItem('erp_materials_cache', JSON.stringify([
+      { id: 'mat-001', code: 'P-001', name: '高频传感器模块', specification: 'HT-2026', unit: '个', status: 1 },
+      { id: 'mat-002', code: 'P-002', name: '控制电路板', specification: 'CB-2026', unit: '块', status: 1 },
+      { id: 'mat-003', code: 'P-003', name: '智能控制器', specification: 'IC-V3', unit: '台', status: 1 },
+      { id: 'mat-004', code: 'P-004', name: '电源模块', specification: 'PM-500W', unit: '个', status: 1 },
+      { id: 'mat-005', code: 'M-001', name: 'PCB电路板', specification: 'FR-4双层', unit: '块', status: 1 },
+      { id: 'mat-006', code: 'M-002', name: '贴片电阻', specification: '10KΩ 0603', unit: '个', status: 1 },
+      { id: 'mat-007', code: 'M-003', name: '贴片电容', specification: '100μF 0805', unit: '个', status: 1 },
+      { id: 'mat-008', code: 'M-004', name: '螺丝', specification: 'M4x10', unit: '包', status: 1 }
+    ]));
+  }
+  if (!localStorage.getItem('erp_warehouses_cache')) {
+    localStorage.setItem('erp_warehouses_cache', JSON.stringify([
+      { id: 'wh-001', code: 'WH-001', name: '成品仓', status: 1 },
+      { id: 'wh-002', code: 'WH-002', name: '原料仓', status: 1 },
+      { id: 'wh-003', code: 'WH-003', name: '半成品仓', status: 1 },
+      { id: 'wh-004', code: 'WH-004', name: '辅料仓', status: 1 }
+    ]));
+  }
+}
+
+var allColumns = ['equipCode', 'equipName', 'equipType', 'runStatus', 'output', 'temperature', 'vibration', 'action'];
+var visibleColumns = JSON.parse(localStorage.getItem('equip_data_columns') || JSON.stringify(allColumns));
+
+function updateColumnVisibility() {
+  document.querySelectorAll('th[data-column], td[data-column]').forEach(function(el) {
+    var col = el.getAttribute('data-column');
+    el.style.display = visibleColumns.includes(col) ? '' : 'none';
+  });
+}
+
+function openColumnSettings() {
+  var container = document.getElementById('columnCheckboxes');
+  container.innerHTML = '';
+  var colNames = {
+    'equipCode': '设备编号',
+    'equipName': '设备名称',
+    'equipType': '设备类型',
+    'runStatus': '运行状态',
+    'output': '产量',
+    'temperature': '温度',
+    'vibration': '振动',
+    'action': '操作'
+  };
+  allColumns.forEach(function(col) {
+    var item = document.createElement('div');
+    item.className = 'column-item';
+    item.innerHTML = '<input type="checkbox" id="col_' + col + '" ' + (visibleColumns.includes(col) ? 'checked' : '') + ' onchange="toggleColumn(this)">' +
+                     '<label for="col_' + col + '">' + colNames[col] + '</label>';
+    container.appendChild(item);
+  });
+  document.getElementById('columnModal').classList.add('show');
+}
+
+function closeColumnSettings() {
+  document.getElementById('columnModal').classList.remove('show');
+}
+
+function toggleColumn(cb) {
+  var col = cb.id.replace('col_', '');
+  if (cb.checked) {
+    if (!visibleColumns.includes(col)) {
+      visibleColumns.push(col);
+    }
+  } else {
+    var idx = visibleColumns.indexOf(col);
+    if (idx > -1) {
+      visibleColumns.splice(idx, 1);
+    }
+  }
+}
+
+function saveColumnSettings() {
+  localStorage.setItem('equip_data_columns', JSON.stringify(visibleColumns));
+  updateColumnVisibility();
+  closeColumnSettings();
+}
+
+window.addEventListener('load', function() {
+  updateColumnVisibility();
+});
+
+</script>
+
+<div class="lookup-modal" id="lookupModal">
+  <div class="lookup-dialog">
+    <div class="lookup-header">
+      <div class="lookup-title" id="lookupTitle">选择</div>
+      <button class="lookup-close" onclick="closeLookup()">×</button>
+    </div>
+    <div class="lookup-body">
+      <div class="lookup-search">
+        <input type="text" id="lookupKeyword" placeholder="请输入编码或名称搜索" onkeydown="if(event.key==='Enter')filterLookup()">
+        <button onclick="filterLookup()">搜索</button>
+      </div>
+      <table class="lookup-table">
+        <thead id="lookupTableHead"></thead>
+        <tbody id="lookupTableBody"></tbody>
+      </table>
+    </div>
+    <div class="lookup-footer">
+      <button class="btn btn-cancel" onclick="closeLookup()">取消</button>
+      <button class="btn btn-primary" onclick="confirmLookup()">确定</button>
+    </div>
+  </div>
+</div>
+
+<div class="column-modal" id="columnModal">
+  <div class="column-dialog">
+    <div class="column-header">
+      <div class="column-title">列设置</div>
+      <button class="column-close" onclick="closeColumnSettings()">×</button>
+    </div>
+    <div class="column-body">
+      <div id="columnCheckboxes"></div>
+    </div>
+    <div class="column-footer">
+      <button class="btn btn-cancel" onclick="closeColumnSettings()">取消</button>
+      <button class="btn btn-primary" onclick="saveColumnSettings()">确定</button>
+    </div>
+  </div>
+</div>
+
+</body>
+
+
+
+</html>

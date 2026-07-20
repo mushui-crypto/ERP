@@ -1,0 +1,1140 @@
+﻿﻿﻿﻿﻿﻿<!DOCTYPE html>
+
+<html lang="zh-CN">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>备份管理 — 磐枢工业智能平台(管理端)</title>
+
+<link rel="stylesheet" href="../common-admin.css">
+
+<script src="../../common.js"></script>
+
+<style>
+
+/* ===== 顶部策略与统计区（在 list-page-body 顶部） ===== */
+
+.backup-top-section {
+
+  padding: 16px;
+
+  border-bottom: 1px solid var(--border-normal);
+
+  background: #fff;
+
+  flex-shrink: 0;
+
+}
+
+.backup-strategy-card .card-body,
+
+.backup-stats .stat-card { background: #f5f5f5; }
+
+.backup-strategy-card { margin-bottom: 14px; }
+
+.backup-strategy-card .card-header { background: #f5f5f5; }
+
+
+
+/* 策略表单行 */
+
+.strategy-form {
+
+  display: grid;
+
+  grid-template-columns: repeat(3, 1fr);
+
+  gap: 14px;
+
+  align-items: end;
+
+}
+
+.strategy-form .form-group { margin-bottom: 0; }
+
+.path-selector {
+
+  display: flex;
+
+  gap: 8px;
+
+}
+
+.path-selector .form-input { flex: 1; }
+
+.btn-browse {
+
+  padding: 0 14px;
+
+  height: 36px;
+
+  border-radius: var(--radius-sm);
+
+  border: 1px solid var(--border-normal);
+
+  background: #fff;
+
+  color: #666;
+
+  cursor: pointer;
+
+  font-size: 12px;
+
+  transition: var(--transition);
+
+}
+
+.btn-browse:hover {
+
+  border-color: #1890ff;
+
+  color: #1890ff;
+
+}
+
+
+
+/* 开关组件 */
+
+.switch {
+
+  position: relative;
+
+  display: inline-block;
+
+  width: 40px;
+
+  height: 22px;
+
+  flex-shrink: 0;
+
+}
+
+.switch input { opacity: 0; width: 0; height: 0; }
+
+.switch .slider {
+
+  position: absolute;
+
+  cursor: pointer;
+
+  inset: 0;
+
+  background: #f5f5f5;
+
+  border: 1px solid var(--border-normal);
+
+  border-radius: 22px;
+
+  transition: var(--transition);
+
+}
+
+.switch .slider::before {
+
+  content: '';
+
+  position: absolute;
+
+  height: 16px;
+
+  width: 16px;
+
+  left: 2px;
+
+  top: 50%;
+
+  transform: translateY(-50%);
+
+  background: var(--text-tertiary);
+
+  border-radius: 50%;
+
+  transition: var(--transition);
+
+}
+
+.switch input:checked + .slider {
+
+  background: #e6f7ff;
+
+  border-color: #1890ff;
+
+}
+
+.switch input:checked + .slider::before {
+
+  transform: translate(18px, -50%);
+
+  background: #1890ff;
+
+}
+
+.strategy-switch-cell {
+
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 6px;
+
+}
+
+.strategy-switch-cell .switch-row {
+
+  display: flex;
+
+  align-items: center;
+
+  gap: 10px;
+
+}
+
+.strategy-switch-cell .switch-row .sw-text {
+
+  font-size: 13px;
+
+  color: #333;
+
+}
+
+
+
+/* 备份统计卡片 */
+
+.backup-stats {
+
+  display: grid;
+
+  grid-template-columns: repeat(4, 1fr);
+
+  gap: 14px;
+
+}
+
+.backup-stats .stat-card { padding: 14px; }
+
+.backup-stats .stat-value { font-size: 24px; }
+
+
+
+/* ===== 存储概览横条图 ===== */
+
+.storage-overview {
+
+  padding: 16px;
+
+  border-top: 1px solid var(--border-normal);
+
+  background: #fff;
+
+  flex-shrink: 0;
+
+}
+
+.storage-overview .so-title {
+
+  font-size: 13px;
+
+  font-weight: 600;
+
+  color: #333;
+
+  margin-bottom: 4px;
+
+}
+
+.storage-overview .so-sub {
+
+  font-size: 12px;
+
+  color: #999;
+
+  margin-bottom: 14px;
+
+}
+
+.storage-bar-row {
+
+  display: flex;
+
+  align-items: center;
+
+  gap: 12px;
+
+  margin-bottom: 10px;
+
+}
+
+.storage-bar-row:last-child { margin-bottom: 0; }
+
+.storage-bar-row .sb-label {
+
+  width: 170px;
+
+  font-size: 12px;
+
+  color: #666;
+
+  flex-shrink: 0;
+
+  white-space: nowrap;
+
+  overflow: hidden;
+
+  text-overflow: ellipsis;
+
+}
+
+.storage-bar-row .sb-track {
+
+  flex: 1;
+
+  height: 18px;
+
+  background: #f5f5f5;
+
+  border-radius: 3px;
+
+  overflow: hidden;
+
+  border: 1px solid var(--border-normal);
+
+}
+
+.storage-bar-row .sb-fill {
+
+  height: 100%;
+
+  border-radius: 3px;
+
+  background: linear-gradient(90deg, var(--admin-accent), rgba(245,158,11,0.5));
+
+  transition: width 400ms ease;
+
+}
+
+.storage-bar-row .sb-val {
+
+  width: 110px;
+
+  text-align: right;
+
+  font-size: 12px;
+
+  color: #666;
+
+  font-family: var(--font-mono);
+
+  flex-shrink: 0;
+
+}
+
+.storage-bar-row .sb-val .sb-pct {
+
+  color: #999;
+
+  margin-left: 4px;
+
+}
+
+
+
+@media (max-width: 992px) {
+
+  .strategy-form { grid-template-columns: repeat(2, 1fr); }
+
+  .backup-stats { grid-template-columns: repeat(2, 1fr); }
+
+}
+
+@media (max-width: 768px) {
+
+  .strategy-form { grid-template-columns: 1fr; }
+
+  .backup-stats { grid-template-columns: 1fr; }
+
+  .storage-bar-row .sb-label { width: 110px; }
+
+}
+
+
+
+/* ===== Toast 提示框 ===== */
+
+.toast-container {
+
+  position: fixed;
+
+  top: 20px;
+
+  right: 20px;
+
+  z-index: 10000;
+
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 10px;
+
+}
+
+.toast {
+
+  display: flex;
+
+  align-items: center;
+
+  gap: 10px;
+
+  padding: 14px 18px;
+
+  border-radius: var(--radius-md);
+
+  background: #fff;
+
+  border: 1px solid var(--border-normal);
+
+  box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+
+  min-width: 280px;
+
+  max-width: 420px;
+
+  animation: slideIn 0.3s ease;
+
+}
+
+@keyframes slideIn {
+
+  from { transform: translateX(100%); opacity: 0; }
+
+  to { transform: translateX(0); opacity: 1; }
+
+}
+
+.toast .toast-icon {
+
+  font-size: 18px;
+
+  flex-shrink: 0;
+
+}
+
+.toast .toast-content {
+
+  flex: 1;
+
+  font-size: 13px;
+
+  color: #333;
+
+}
+
+.toast .toast-title {
+
+  font-weight: 600;
+
+  margin-bottom: 2px;
+
+  color: #333;
+
+}
+
+.toast .toast-message {
+
+  color: #666;
+
+  font-size: 12px;
+
+}
+
+.toast-success { border-color: rgba(34,197,94,0.3); background: rgba(34,197,94,0.05); }
+
+.toast-success .toast-title { color: #52c41a; }
+
+.toast-warning { border-color: rgba(245,158,11,0.3); background: rgba(245,158,11,0.05); }
+
+.toast-warning .toast-title { color: #faad14; }
+
+.toast-error { border-color: rgba(239,68,68,0.3); background: rgba(239,68,68,0.05); }
+
+.toast-error .toast-title { color: #f5222d; }
+
+.toast-info { border-color: rgba(56,189,248,0.3); background: rgba(56,189,248,0.05); }
+
+.toast-info .toast-title { color: #1890ff; }
+
+</style>
+
+</head>
+
+<body>
+
+
+
+<aside class="sidebar admin-sidebar" id="sidebar">
+
+    <div class="sidebar-logo">
+
+    <img src="../../images/LOGO.png" alt="磐枢工业智能平台" style="width: 100%; max-width: 200px; display: block;">
+
+    <h1 style="font-size: 16px; margin: 4px 0 0;">磐枢工业智能平台</h1>
+
+  </div>
+
+  <nav class="sidebar-menu">
+
+    <div class="sidebar-menu-group open">
+
+      <div class="sidebar-menu-item" onclick="toggleGroup(this)">
+
+        <span class="icon">&#128451;</span> 数据中心管理
+
+        <span class="arrow">&#9660;</span>
+
+      </div>
+
+      <div class="sub-menu">
+
+        <a class="sidebar-menu-item" href="index.html"><span class="icon"></span> 数据中心总览</a>
+
+        <a class="sidebar-menu-item" href="new.html"><span class="icon"></span> 新建数据中心</a>
+
+        <a class="sidebar-menu-item active" href="backup.html"><span class="icon"></span> 备份管理</a>
+
+      </div>
+
+    </div>
+
+
+
+    <div class="sidebar-menu-group">
+
+      <div class="sidebar-menu-item" onclick="toggleGroup(this)">
+
+        <span class="icon">&#128101;</span> 组织与权限
+
+        <span class="arrow">&#9654;</span>
+
+      </div>
+
+      <div class="sub-menu">
+
+        <a class="sidebar-menu-item" href="../org-perm/org.html"><span class="icon"></span> 组织架构</a>
+
+        <a class="sidebar-menu-item" href="../org-perm/user.html"><span class="icon"></span> 用户管理</a>
+
+        <a class="sidebar-menu-item" href="../org-perm/role.html"><span class="icon"></span> 角色管理</a>
+
+        <a class="sidebar-menu-item" href="../org-perm/menu.html"><span class="icon"></span> 菜单管理</a>
+
+      </div>
+
+    </div>
+
+
+
+    <div class="sidebar-menu-group">
+
+      <div class="sidebar-menu-item" onclick="toggleGroup(this)">
+
+        <span class="icon">&#128187;</span> 开发设计
+
+        <span class="arrow">&#9654;</span>
+
+      </div>
+
+      <div class="sub-menu">
+
+        <a class="sidebar-menu-item" href="../dev-design/lowcode.html"><span class="icon"></span> 低代码开发中心</a>
+
+        <a class="sidebar-menu-item" href="../dev-design/form-designer.html"><span class="icon"></span> 表单设计器</a>
+
+        <a class="sidebar-menu-item" href="../dev-design/doc-flow.html"><span class="icon"></span> 单据转换配置</a>
+
+        <a class="sidebar-menu-item" href="../dev-design/print-template.html"><span class="icon"></span> 套打模板设计</a>
+
+        <a class="sidebar-menu-item" href="../dev-design/workflow.html"><span class="icon"></span> 流程配置</a>
+
+      </div>
+
+    </div>
+
+
+
+    <div class="sidebar-menu-group">
+
+      <div class="sidebar-menu-item" onclick="toggleGroup(this)">
+
+        <span class="icon">&#129302;</span> 智能应用
+
+        <span class="arrow">&#9654;</span>
+
+      </div>
+
+      <div class="sub-menu">
+
+        <a class="sidebar-menu-item" href="../ai-config/api-manage.html"><span class="icon"></span> API管理</a>
+
+        <a class="sidebar-menu-item" href="../ai-config/nl-training.html"><span class="icon"></span> 自然语言训练</a>
+
+        <a class="sidebar-menu-item" href="../ai-config/data-analysis.html"><span class="icon"></span> 数据分析训练</a>
+
+        <a class="sidebar-menu-item" href="../ai-config/agent-config.html"><span class="icon"></span> Agent配置</a>
+
+      </div>
+
+    </div>
+
+
+
+    <div class="sidebar-menu-item" onclick="window.location.href='../../index.html'">
+
+      <span class="icon">&#8592;</span> 返回应用端
+
+    </div>
+
+  </nav>
+
+  <div class="sidebar-user">
+
+    <div class="avatar" style="background: #e6f7ff;color: #1890ff;">管</div>
+
+    <div>
+
+      <div class="user-name">系统管理员</div>
+
+      <div class="user-role">超级管理员</div>
+
+    </div>
+
+  </div>
+
+</aside>
+
+
+
+<div class="main-content" id="mainContent">
+
+  <div class="page-header">
+
+    <div>
+
+      <div class="flex items-center gap-8">
+
+        <button class="sidebar-toggle" onclick="toggleSidebar()">&#9776;</button>
+
+        <div>
+
+          <h2>备份管理</h2>
+
+          <div class="breadcrumb"><a href="../../index.html">首页</a><span>/</span><a href="../index.html">管理端</a><span>/</span><span>备份管理</span></div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+    <div class="page-actions">
+
+      <button class="btn btn-primary btn-sm" onclick="showToast('新建备份任务功能开发中...')">&#128190; 新建备份</button>
+
+    </div>
+
+  </div>
+
+
+
+  <!-- List Page Body -->
+
+  <div class="list-page-body">
+
+    <!-- 顶部：备份策略配置 + 统计卡片 -->
+
+    <div class="backup-top-section">
+
+      <div class="card backup-strategy-card">
+
+        <div class="card-header">备份策略配置</div>
+
+        <div class="card-body">
+
+          <div class="strategy-form">
+
+            <div class="form-group">
+
+              <label class="form-label">备份频率</label>
+
+              <select class="form-select">
+
+                <option value="daily">每日</option>
+
+                <option value="weekly">每周</option>
+
+                <option value="custom">自定义</option>
+
+              </select>
+
+            </div>
+
+            <div class="form-group">
+
+              <label class="form-label">备份类型</label>
+
+              <select class="form-select">
+
+                <option value="full">全量备份</option>
+
+                <option value="incremental">增量备份</option>
+
+              </select>
+
+            </div>
+
+            <div class="form-group">
+
+              <label class="form-label">保留天数</label>
+
+              <input type="number" class="form-input" placeholder="例如：30" min="1" value="30">
+
+            </div>
+
+            <div class="strategy-switch-cell">
+
+              <label class="form-label">自动清理</label>
+
+              <div class="switch-row">
+
+                <label class="switch">
+
+                  <input type="checkbox" checked>
+
+                  <span class="slider"></span>
+
+                </label>
+
+                <span class="sw-text">到期自动清理</span>
+
+              </div>
+
+            </div>
+
+            <div class="form-group">
+
+              <label class="form-label">备份存储目录</label>
+
+              <div class="path-selector">
+
+                <input type="text" class="form-input" id="backupDir" placeholder="请选择备份目录" value="/data/backup/">
+
+                <button class="btn-browse" onclick="browseBackupFolder()">&#128193; 浏览...</button>
+
+              </div>
+
+            </div>
+
+            <div class="strategy-switch-cell" style="grid-column: span 3;">
+
+              <label class="form-label">备份策略开关</label>
+
+              <div class="switch-row">
+
+                <label class="switch">
+
+                  <input type="checkbox" checked>
+
+                  <span class="slider"></span>
+
+                </label>
+
+                <span class="sw-text">启用自动备份</span>
+
+              </div>
+
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+
+
+      <div class="backup-stats">
+
+        <div class="stat-card">
+
+          <div class="stat-value">28</div>
+
+          <div class="stat-label">总备份数</div>
+
+        </div>
+
+        <div class="stat-card">
+
+          <div class="stat-value text-success">24</div>
+
+          <div class="stat-label">成功数</div>
+
+        </div>
+
+        <div class="stat-card">
+
+          <div class="stat-value text-error">4</div>
+
+          <div class="stat-label">失败数</div>
+
+        </div>
+
+        <div class="stat-card">
+
+          <div class="stat-value text-mono">28.60<span style="font-size:13px;">GB</span></div>
+
+          <div class="stat-label">备份总大小</div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+
+
+    <!-- Action Bar -->
+
+    <div class="list-action-bar">
+
+      <button class="action-btn primary-action">&#128190; 新建备份</button>
+
+      <div class="action-separator"></div>
+
+      <button class="action-btn">&#128260; 批量恢复</button>
+
+      <button class="action-btn danger-action">&#128465; 批量删除</button>
+
+      <div class="action-separator"></div>
+
+      <button class="action-btn">&#128196; 导出列表</button>
+
+      <div style="flex:1;"></div>
+
+      <button class="action-btn">&#8635; 刷新</button>
+
+    </div>
+
+
+
+    <!-- Filter -->
+
+    <div class="list-filter-section">
+
+      <div class="list-filter-tabs">
+
+        <span class="filter-tab active">全部</span>
+
+        <span class="filter-tab">备份成功</span>
+
+        <span class="filter-tab">备份中</span>
+
+        <span class="filter-tab">备份失败</span>
+
+      </div>
+
+      <div class="list-filter-row">
+
+        <div class="filter-field">
+
+          <select><option>全部数据中心</option><option>巨腾集团主数据库</option><option>重庆工厂数据库</option><option>东莞分厂数据库</option></select>
+
+          <input type="text" placeholder="搜索备份文件名...">
+
+        </div>
+
+        <div class="list-filter-btns">
+
+          <button class="btn-search">&#128269; 查询</button>
+
+          <button class="btn-reset">&#8634; 重置</button>
+
+        </div>
+
+      </div>
+
+    </div>
+
+
+
+    <!-- Table -->
+
+    <div class="list-table-area">
+
+      <table class="data-table">
+
+        <thead>
+
+          <tr>
+
+            <th><input type="checkbox" class="row-checkbox"></th>
+
+            <th>备份时间</th>
+
+            <th>数据中心名称</th>
+
+            <th>备份类型</th>
+
+            <th>备份大小</th>
+
+            <th>存储路径</th>
+
+            <th>状态</th>
+
+            <th>耗时</th>
+
+            <th>操作</th>
+
+          </tr>
+
+        </thead>
+
+        <tbody><tr><td colspan="100%" style="text-align:center;color:#999;padding:20px;">暂无数据</td></tr></tbody>
+
+      </table>
+
+    </div>
+
+
+
+    <!-- Pagination -->
+
+    <div class="list-pagination">
+
+      <span class="page-info">共 28 条记录，第 1/6 页</span>
+
+      <div class="page-btns">
+
+        <button>&#9664;</button>
+
+        <button class="active">1</button>
+
+        <button>2</button>
+
+        <button>3</button>
+
+        <button>4</button>
+
+        <button>5</button>
+
+        <button>6</button>
+
+        <button>&#9654;</button>
+
+      </div>
+
+    </div>
+
+
+
+    <!-- 备份存储概览 -->
+
+    <div class="storage-overview">
+
+      <div class="so-title">备份存储概览</div>
+
+      <div class="so-sub">各数据中心备份文件大小占比（总计 28.60 GB）</div>
+
+      <div class="storage-bar-row">
+
+        <span class="sb-label">巨腾集团主数据库</span>
+
+        <div class="sb-track"><div class="sb-fill" style="width:64.3%;"></div></div>
+
+        <span class="sb-val">18.40 GB<span class="sb-pct">64.3%</span></span>
+
+      </div>
+
+      <div class="storage-bar-row">
+
+        <span class="sb-label">重庆工厂数据库</span>
+
+        <div class="sb-track"><div class="sb-fill" style="width:16.8%;"></div></div>
+
+        <span class="sb-val">4.80 GB<span class="sb-pct">16.8%</span></span>
+
+      </div>
+
+      <div class="storage-bar-row">
+
+        <span class="sb-label">东莞分厂数据库</span>
+
+        <div class="sb-track"><div class="sb-fill" style="width:9.1%;"></div></div>
+
+        <span class="sb-val">2.60 GB<span class="sb-pct">9.1%</span></span>
+
+      </div>
+
+      <div class="storage-bar-row">
+
+        <span class="sb-label">上海测试部门数据库</span>
+
+        <div class="sb-track"><div class="sb-fill" style="width:5.2%;"></div></div>
+
+        <span class="sb-val">1.50 GB<span class="sb-pct">5.2%</span></span>
+
+      </div>
+
+      <div class="storage-bar-row">
+
+        <span class="sb-label">武汉数据中心</span>
+
+        <div class="sb-track"><div class="sb-fill" style="width:2.8%;"></div></div>
+
+        <span class="sb-val">0.80 GB<span class="sb-pct">2.8%</span></span>
+
+      </div>
+
+      <div class="storage-bar-row">
+
+        <span class="sb-label">深圳分厂数据库</span>
+
+        <div class="sb-track"><div class="sb-fill" style="width:1.7%;"></div></div>
+
+        <span class="sb-val">0.50 GB<span class="sb-pct">1.7%</span></span>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
+
+
+
+<div id="sidebarOverlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:99;" onclick="toggleSidebar()"></div>
+
+
+
+<div id="toastContainer" class="toast-container"></div>
+
+
+
+<script>
+
+
+
+async function browseBackupFolder() {
+
+  if (window.showDirectoryPicker) {
+
+    try {
+
+      const handle = await window.showDirectoryPicker();
+
+      document.getElementById('backupDir').value = handle.name;
+
+    } catch (err) {
+
+      console.log('用户取消选择');
+
+    }
+
+  } else {
+
+    var path = prompt('请输入备份存储目录:', document.getElementById('backupDir').value || '/data/backup/');
+
+    if (path) {
+
+      document.getElementById('backupDir').value = path;
+
+    }
+
+  }
+
+}
+
+
+
+function showToast(message, type = 'info') {
+
+  var container = document.getElementById('toastContainer');
+
+  var icons = {
+
+    success: '&#9989;',
+
+    warning: '&#9888;',
+
+    error: '&#10060;',
+
+    info: '&#9432;'
+
+  };
+
+  var titles = {
+
+    success: '操作成功',
+
+    warning: '温馨提示',
+
+    error: '系统提示',
+
+    info: '系统提示'
+
+  };
+
+  
+
+  var toast = document.createElement('div');
+
+  toast.className = 'toast toast-' + type;
+
+  toast.innerHTML = `
+
+    <div class="toast-icon">${icons[type]}</div>
+
+    <div class="toast-content">
+
+      <div class="toast-title">${titles[type]}</div>
+
+      <div class="toast-message">${message}</div>
+
+    </div>
+
+  `;
+
+  
+
+  container.appendChild(toast);
+
+  
+
+  setTimeout(function() {
+
+    toast.style.opacity = '0';
+
+    toast.style.transform = 'translateX(100%)';
+
+    setTimeout(function() {
+
+      toast.remove();
+
+    }, 300);
+
+  }, 3000);
+
+}
+
+</script>
+
+</body>
+
+</html>
+

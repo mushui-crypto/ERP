@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>生产订单变更 - 新增/编辑</title>
+<link rel="stylesheet" href="../common.css">
+<script src="../common.js"></script>
+<script></script>
+<script src="../doc-data-store.js"></script>
+<script src="../doc-conversion.js"></script>
+<style>
+.doc-page{display:flex;height:100vh;background:#f0f2f5;}
+.doc-sidebar{width:200px;background:#001529;color:#fff;display:flex;flex-direction:column;}
+.doc-sidebar-title{padding:16px 20px;font-size:15px;font-weight:600;border-bottom:1px solid #002140;background:#001529;}
+.doc-sidebar-menu{list-style:none;padding:0;margin:0;flex:1;}
+.doc-sidebar-menu li a{display:flex;align-items:center;padding:12px 20px;color:#bfbfbf;text-decoration:none;font-size:13px;transition:all 0.3s;}
+.doc-sidebar-menu li a:hover{background:#002140;color:#fff;}
+.doc-sidebar-menu li a.active{background:#1890ff;color:#fff;}
+.doc-content{flex:1;display:flex;flex-direction:column;overflow:hidden;}
+.doc-header{position:sticky;top:0;z-index:100;background:#fff;border-bottom:1px solid #e8e8e8;padding:16px 20px;display:flex;justify-content:space-between;align-items:center;}
+.doc-header-title{font-size:20px;font-weight:600;color:#333;margin-bottom:4px;}
+.doc-header-subtitle{font-size:13px;color:#999;}
+.doc-toolbar{display:flex;gap:8px;flex-wrap:wrap;}
+.toolbar-btn{padding:6px 12px;border-radius:4px;font-size:13px;cursor:pointer;border:1px solid #d9d9d9;background:#fff;color:#666;display:flex;align-items:center;gap:6px;transition:all 0.3s;}
+.toolbar-btn:hover{border-color:#1890ff;color:#1890ff;}
+.toolbar-btn.primary{background:#1890ff;color:#fff;border-color:#1890ff;}
+.toolbar-btn.danger{background:#f5222d;color:#fff;border-color:#f5222d;}
+.doc-body{flex:1;padding:16px;overflow-y:auto;}
+.doc-card{background:#fff;border-radius:4px;box-shadow:0 1px 2px rgba(0,0,0,0.05);overflow:hidden;margin-bottom:16px;}
+.doc-card-title{padding:14px 20px;border-bottom:1px solid #e8e8e8;font-weight:600;font-size:14px;color:#333;background:#fafafa;}
+.form-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px 16px;padding:20px;}
+.form-item{display:flex;flex-direction:column;}
+.form-item label{font-size:13px;color:#666;margin-bottom:4px;font-weight:500;}
+.form-item label .required{color:#f5222d;margin-right:4px;}
+.form-item input,.form-item select,.form-item textarea{padding:6px 10px;border:1px solid #e8e8e8;border-radius:4px;font-size:13px;color:#333;background:#fff;box-sizing:border-box;}
+.form-item input:focus,.form-item select:focus{outline:none;border-color:#1890ff;}
+.form-item textarea{resize:vertical;min-height:60px;}
+.form-item .readonly{background:#fafafa;color:#999;}
+.lookup-field{display:flex;align-items:center;}
+.lookup-field input{flex:1;border-radius:4px 0 0 4px;}
+.lookup-field button{width:28px;height:28px;border:1px solid #e8e8e8;border-left:none;border-radius:0 4px 4px 0;background:#fff;cursor:pointer;}
+.lookup-field button:hover{background:#f5f5f5;}
+.detail-toolbar{display:flex;justify-content:flex-end;gap:8px;padding:12px 20px;border-bottom:1px solid #e8e8e8;background:#fafafa;}
+.data-table{width:100%;border-collapse:collapse;}
+.data-table th{background:#fafafa;padding:10px 12px;text-align:left;font-weight:600;font-size:12px;color:#666;border-bottom:2px solid #e8e8e8;}
+.data-table td{padding:10px 12px;border-bottom:1px solid #e8e8e8;font-size:13px;color:#333;}
+.data-table tr:hover{background:#f5f5f5;}
+.data-table input{width:100%;padding:4px 8px;border:1px solid #e8e8e8;border-radius:4px;font-size:12px;}
+.data-table select{width:100%;padding:4px 8px;border:1px solid #e8e8e8;border-radius:4px;font-size:12px;}
+.data-table .old-value{background:#f5f5f5;color:#999;text-decoration:line-through;}
+.data-table .new-value{background:#e6f7ff;color:#1890ff;font-weight:500;}
+.doc-footer{background:#fff;border-top:1px solid #e8e8e8;padding:12px 20px;display:flex;justify-content:flex-end;gap:24px;align-items:center;}
+.footer-item{display:flex;align-items:center;gap:8px;}
+.footer-item label{font-size:12px;color:#666;}
+.footer-item value{font-size:14px;font-weight:600;color:#333;}
+.footer-item value.important{color:#f5222d;}
+.toast{position:fixed;top:20px;right:20px;padding:12px 20px;border-radius:4px;color:#fff;font-size:13px;z-index:9999;}
+.toast-success{background:#52c41a;}
+.toast-warning{background:#faad14;}
+.toast-info{background:#1890ff;}
+.lookup-modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:2000;justify-content:center;align-items:center;}
+.lookup-modal.show{display:flex;}
+.lookup-dialog{background:#fff;border:1px solid #d9d9d9;border-radius:8px;width:800px;min-width:600px;max-width:90vw;height:500px;min-height:400px;max-height:70vh;overflow:hidden;box-shadow:0 10px 30px rgba(0,0,0,0.15);position:relative;resize:both;}
+.lookup-header{padding:16px 20px;border-bottom:1px solid #f0f0f0;background:#fafafa;display:flex;align-items:center;justify-content:space-between;cursor:move;}
+.lookup-title{font-size:16px;font-weight:600;color:#333;}
+.lookup-close{font-size:20px;color:#999;cursor:pointer;border:none;background:none;width:28px;height:28px;display:flex;align-items:center;justify-content:center;border-radius:4px;transition:all 0.3s;cursor:pointer;}
+.lookup-close:hover{background:#f5f5f5;color:#666;}
+.lookup-search{display:flex;gap:8px;margin-bottom:12px;}
+.lookup-search input{flex:1;padding:8px 12px;border:1px solid #e8e8e8;border-radius:4px;font-size:13px;}
+.lookup-search button{padding:8px 16px;border:none;background:#1890ff;color:#fff;border-radius:4px;cursor:pointer;font-size:13px;}
+.lookup-table{width:100%;border-collapse:collapse;}
+.lookup-table th,.lookup-table td{padding:10px 12px;text-align:left;border-bottom:1px solid #e8e8e8;}
+.lookup-table th{background:#fafafa;font-weight:600;color:#333;}
+.btn{padding:6px 16px;border-radius:4px;font-size:13px;cursor:pointer;border:1px solid #d9d9d9;background:#fff;color:#666;transition:all 0.3s;}
+.btn:hover{border-color:#1890ff;color:#1890ff;}
+.btn-primary{background:#1890ff;color:#fff;border-color:#1890ff;}
+.btn-cancel{border-color:#d9d9d9;color:#666;}
+.confirm-modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:3000;justify-content:center;align-items:center;}
+.confirm-modal.show{display:flex;}
+.confirm-dialog{background:#fff;border:1px solid #e8e8e8;border-radius:4px;width:420px;overflow:hidden;}
+.confirm-header{padding:14px 20px;border-bottom:1px solid #e8e8e8;display:flex;align-items:center;justify-content:space-between;background:#fafafa;}
+.confirm-title{font-size:14px;font-weight:600;color:#333;}
+.confirm-close{font-size:18px;color:#999;cursor:pointer;border:none;background:none;}
+.confirm-body{padding:24px 20px;font-size:14px;color:#333;line-height:1.6;background:#fff;}
+.confirm-footer{padding:12px 20px;border-top:1px solid #e8e8e8;display:flex;justify-content:flex-end;gap:8px;background:#fafafa;}
+</style>
+</head>
+<body>
+<div class="doc-page">
+  <aside class="doc-sidebar">
+    <div class="doc-sidebar-title">业务导航</div>
+    <ul class="doc-sidebar-menu">
+      <li><a href="production-order-change.html"><span class="menu-icon">&#128203;</span> 生产订单变更列表</a></li>
+      <li><a href="#" class="active"><span class="menu-icon">&#10010;</span> 生产订单变更新增</a></li>
+    </ul>
+  </aside>
+  <div class="doc-content">
+    <header class="doc-header">
+      <div>
+        <div class="doc-header-title" id="pageTitle">生产订单变更 - 新增</div>
+        <div class="doc-header-subtitle">新建生产订单变更单</div>
+      </div>
+      <div class="doc-toolbar">
+        <button class="toolbar-btn" onclick="copyDoc()"><span class="icon">📋</span> 复制</button>
+        <button class="toolbar-btn primary" onclick="saveDoc()"><span class="icon">✓</span> 保存</button>
+        <button class="toolbar-btn" onclick="submitDoc()"><span class="icon">✓</span> 提交</button>
+        <button class="toolbar-btn" onclick="approveDoc()"><span class="icon">✓</span> 审核</button>
+        <button class="toolbar-btn" onclick="reverseApproveDoc()"><span class="icon">↩️</span> 反审核</button>
+        <div style="width:1px;height:24px;background:#e8e8e8;margin:0 8px;"></div>
+        <button class="toolbar-btn" onclick="selectSourceDoc()"><span class="icon">🔗</span> 选单</button>
+        <button class="toolbar-btn" onclick="pushDownDoc()"><span class="icon">⬇️</span> 下推</button>
+        <button class="toolbar-btn" onclick="prevDoc()"><span class="icon">⬅️</span> 上查</button>
+        <button class="toolbar-btn" onclick="nextDoc()"><span class="icon">➡️</span> 下查</button>
+        
+        <div style="width:1px;height:24px;background:#e8e8e8;margin:0 8px;"></div>
+        <button class="toolbar-btn" onclick="goToList()"><span class="icon">📋</span> 列表</button>
+        <button class="toolbar-btn" onclick="printSettings()"><span class="icon">⚙️</span> 打印设置</button>
+        <button class="toolbar-btn" onclick="printDoc()"><span class="icon">🖨️</span> 打印</button>
+        <button class="toolbar-btn danger" onclick="exitDoc()"><span class="icon">✖️</span> 退出</button>
+      </div>
+    </header>
+    <div class="doc-body">
+      <div class="doc-card">
+        <div class="doc-card-title">基本信息</div>
+        <div class="form-grid">
+<div class="form-item"><label>变更单号</label><input type="text" id="field_变更单号" readonly class="readonly"></div><div class="form-item"><label><span class="required">*</span>日期</label><input type="date" id="field_日期"></div><div class="form-item"><label><span class="required">*</span>原工单号</label><div class="lookup-field"><input type="text" id="field_原工单号" readonly><button onclick="selectSourceDoc()">...</button></div></div><div class="form-item"><label>组织</label><div class="lookup-field"><input type="text" id="field_组织" readonly><button onclick="openLookup('组织', 'org')">...</button></div></div><div class="form-item"><label>变更类型</label><select id="field_变更类型"><option value="数量变更">数量变更</option><option value="交期变更">交期变更</option><option value="工艺变更">工艺变更</option><option value="BOM变更">BOM变更</option></select></div><div class="form-item"><label>变更原因</label><textarea id="field_变更原因" placeholder="请输入变更原因"></textarea></div><div class="form-item"><label>状态</label><input type="text" id="field_状态" readonly class="readonly"></div><div class="form-item"><label>创建时间</label><input type="text" id="field_创建时间" readonly class="readonly"></div>
+        </div>
+      </div>
+      <div class="doc-card">
+        <div class="doc-card-title">变更明细（原产品信息 → 变更后产品信息）</div>
+        <div class="detail-toolbar">
+          <button class="toolbar-btn primary" onclick="addDetailRow()"><span class="icon">+</span> 新增行</button>
+          <button class="toolbar-btn" onclick="deleteSelectedRows()">删除选中行</button>
+        </div>
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th><input type="checkbox" onclick="selectAllDetails()"></th>
+              <th>序号</th>
+              <th>原产品编码</th>
+              <th>原产品名称</th>
+              <th>原规格型号</th>
+              <th>原单位</th>
+              <th>原计划数量</th>
+              <th>原计划开工时间</th>
+              <th>原计划完工时间</th>
+              <th>变更后数量</th>
+              <th>变更后开工时间</th>
+              <th>变更后完工时间</th>
+              <th>变更后工艺路线</th>
+              <th>变更后BOM版本</th>
+              <th>变更说明</th>
+            </tr>
+          </thead>
+          <tbody id="detailBody"></tbody>
+        </table>
+      </div>
+    </div>
+    <footer class="doc-footer">
+      <div class="footer-item"><label>变更说明:</label><value id="footerRemark">无</value></div>
+    </footer>
+  </div>
+</div>
+
+    
+<div class="lookup-modal" id="lookupModal">
+  <div class="lookup-dialog">
+    <div class="lookup-header">
+      <div class="lookup-title" id="lookupTitle">选择</div>
+      <button onclick="closeLookup()">×</button>
+    </div>
+    <div class="lookup-body">
+      <div class="lookup-search">
+        <input type="text" id="lookupKeyword" placeholder="请输入编码或名称搜索" onkeydown="if(event.key==='Enter')filterLookup()">
+        <button onclick="filterLookup()">搜索</button>
+      </div>
+      <table class="lookup-table">
+        <thead id="lookupTableHead"></thead>
+        <tbody id="lookupTableBody"></tbody>
+      </table>
+    </div>
+    <div style="padding:12px 20px;border-top:1px solid #e8e8e8;display:flex;justify-content:flex-end;gap:8px;">
+      <button class="btn btn-cancel" onclick="closeLookup()">取消</button>
+      <button class="btn btn-primary" onclick="confirmLookup()">确定</button>
+    </div>
+  </div>
+</div>
+<script>
+var docType = 'production_order_change';
+var docName = '生产订单变更';
+var editingId = null;
+var headerFields = ["变更单号", "日期", "原工单号", "组织", "变更类型", "变更原因", "状态", "创建时间"];
+var detailFields = ["原产品编码", "原产品名称", "原规格型号", "原单位", "原计划数量", "原计划开工时间", "原计划完工时间", "变更后数量", "变更后开工时间", "变更后完工时间", "变更后工艺路线", "变更后BOM版本", "变更说明"];
+var currentLookupField = null;
+var currentLookupType = null;
+var lookupData = [];
+function init() {
+  var params = new URLSearchParams(window.location.search);
+  editingId = params.get('id');
+  var sourceId = params.get('sourceId');
+  if (editingId) {
+    document.getElementById('pageTitle').innerText = docName + ' - 编辑';
+    loadDoc(editingId);
+  } else if (sourceId) {
+    document.getElementById('pageTitle').innerText = docName + ' - 新增';
+    document.getElementById('field_变更单号').value = generateDocNo();
+    document.getElementById('field_日期').value = new Date().toISOString().split('T')[0];
+    document.getElementById('field_状态').value = '草稿';
+    loadSourceDoc(sourceId);
+  } else {
+    document.getElementById('field_变更单号').value = generateDocNo();
+    document.getElementById('field_日期').value = new Date().toISOString().split('T')[0];
+    document.getElementById('field_状态').value = '草稿';
+    addDetailRow();
+  }
+  initLookupData();
+}
+function generateDocNo() {
+  return 'PRODUCTIONORDERCHANGE' + new Date().toISOString().slice(2,10).replace(/-/g,'') + '0001';
+}
+function initLookupData() {
+  if (!localStorage.getItem('erp_orgs')) localStorage.setItem('erp_orgs', JSON.stringify([{id:'org-001',code:'ORG-HQ',name:'磐枢工业集团',form:'集团'}]));
+  if (!localStorage.getItem('erp_suppliers_cache')) localStorage.setItem('erp_suppliers_cache', JSON.stringify([{id:'sup-001',code:'S-001',name:'深圳电子元器件有限公司'}]));
+  if (!localStorage.getItem('erp_customers_cache')) localStorage.setItem('erp_customers_cache', JSON.stringify([{id:'cust-001',code:'C-001',name:'上海科技有限公司'}]));
+  if (!localStorage.getItem('erp_materials_cache')) localStorage.setItem('erp_materials_cache', JSON.stringify([{id:'mat-001',code:'P-001',name:'高频传感器模块',specification:'HT-2026',unit:'个'}]));
+  if (!localStorage.getItem('erp_warehouses_cache')) localStorage.setItem('erp_warehouses_cache', JSON.stringify([{id:'wh-001',code:'WH-001',name:'原料仓'}]));
+}
+function loadDoc(id) {
+  var list = JSON.parse(localStorage.getItem('erp_' + docType + '_list') || '[]');
+  var doc = list.find(function(item) { return item.id === id; });
+  if (doc) {
+    headerFields.forEach(function(f) {
+      var el = document.getElementById('field_' + f);
+      if (el) el.value = doc[f] || '';
+    });
+    if (doc.details) doc.details.forEach(function(d) { addDetailRow(d); });
+    else addDetailRow();
+  }
+}
+function saveDoc() {
+  if (!document.getElementById('field_日期').value.trim()) {
+    showToast('请输入日期', 'warning');
+    return;
+  }
+  if (!document.getElementById('field_原工单号').value.trim()) {
+    showToast('请选择原工单', 'warning');
+    return;
+  }
+  var detailRows = document.querySelectorAll('#detailBody tr');
+  var hasValidDetail = false;
+  detailRows.forEach(function(row) {
+    var originalCode = row.querySelector('[data-field="原产品编码"]');
+    if (originalCode && originalCode.value.trim()) {
+      hasValidDetail = true;
+    }
+  });
+  if (!hasValidDetail) {
+    showToast('请至少添加一条变更明细记录', 'warning');
+    return;
+  }
+  var doc = collectDocData();
+  var list = JSON.parse(localStorage.getItem('erp_' + docType + '_list') || '[]');
+  if (editingId) {
+    var idx = list.findIndex(function(item) { return item.id === editingId; });
+    if (idx !== -1) list[idx] = doc;
+  } else {
+    doc.id = Date.now().toString();
+    doc.createdAt = new Date().toISOString();
+    list.push(doc);
+    editingId = doc.id;
+  }
+  localStorage.setItem('erp_' + docType + '_list', JSON.stringify(list));
+  showToast('保存成功', 'success');
+}
+function collectDocData() {
+  var doc = {};
+  headerFields.forEach(function(f) {
+    var el = document.getElementById('field_' + f);
+    if (el) doc[f] = el.value;
+  });
+  doc.status = document.getElementById('field_状态').value;
+  doc.docNo = document.getElementById('field_变更单号').value;
+  doc.docDate = document.getElementById('field_日期').value;
+  doc.details = [];
+  document.querySelectorAll('#detailBody tr').forEach(function(row) {
+    var detail = {};
+    detailFields.forEach(function(f) {
+      detail[f] = row.querySelector('[data-field="' + f + '"]').value;
+    });
+    doc.details.push(detail);
+  });
+  return doc;
+}
+function submitDoc() {
+  if (!validateDoc(docType)) return;
+  showConfirm('确认提交此变更单？', function() {
+    document.getElementById('field_状态').value = '待审核';
+    saveDoc();
+    showToast('提交成功', 'success');
+  });
+}
+function approveDoc() {
+  if (!validateDoc(docType)) return;
+  showConfirm('确认审核此变更单？审核后将更新原生产订单数据', function() {
+    document.getElementById('field_状态').value = '已审核';
+    saveDoc();
+    showToast('审核成功，已更新原生产订单', 'success');
+  });
+}
+function reverseApproveDoc() {
+  showConfirm('确认反审核此变更单？', function() {
+    document.getElementById('field_状态').value = '待审核';
+    saveDoc();
+    showToast('反审核成功', 'success');
+  });
+}
+function copyDoc() {
+  showToast('复制功能开发中', 'info');
+}
+function selectSourceDoc() {
+  var sourceDocType = 'production_order';
+  var sourceList = JSON.parse(localStorage.getItem('erp_' + sourceDocType + '_list') || '[]');
+  sourceList = sourceList.filter(function(d) { return d.status === 'approved' || d.status === '已审核'; });
+  if (sourceList.length === 0) {
+    showToast('没有已审核的生产订单', 'warning');
+    return;
+  }
+  window._sourceList = sourceList;
+  document.getElementById('lookupTitle').innerText = '选择原生产订单';
+  var head = document.getElementById('lookupTableHead');
+  var body = document.getElementById('lookupTableBody');
+  head.innerHTML = '<tr><th><input type="checkbox" onclick="selectAllSource()"></th><th>单据编号</th><th>日期</th><th>生产部门</th></tr>';
+  body.innerHTML = '';
+  sourceList.forEach(function(doc) {
+    var row = document.createElement('tr');
+    row.style.cursor = 'pointer';
+    row.innerHTML = '<td><input type="checkbox" class="source-checkbox" value="' + doc.id + '"></td><td>' + doc.docNo + '</td><td>' + doc.docDate + '</td><td>' + (doc['生产部门'] || '') + '</td>';
+    body.appendChild(row);
+  });
+  document.getElementById('lookupModal').classList.add('show');
+  window._lookupMode = 'source_select';
+}
+function selectAllSource() {
+  document.querySelectorAll('.source-checkbox').forEach(function(cb) { cb.checked = event.target.checked; });
+}
+function confirmSourceSelect() {
+  var selectedIds = Array.from(document.querySelectorAll('.source-checkbox:checked')).map(function(cb) { return cb.value; });
+  if (selectedIds.length === 0) {
+    showToast('请选择原生产订单', 'warning');
+    return;
+  }
+  var sourceList = window._sourceList || [];
+  selectedIds.forEach(function(id) {
+    var sourceDoc = sourceList.find(function(d) { return d.id === id; });
+    if (sourceDoc) {
+      document.getElementById('field_原工单号').value = sourceDoc.docNo || '';
+      if (sourceDoc.details) {
+        document.getElementById('detailBody').innerHTML = '';
+        sourceDoc.details.forEach(function(detail) {
+          var newRow = {
+            '原产品编码': detail['产品编码'] || '',
+            '原产品名称': detail['产品名称'] || '',
+            '原规格型号': detail['规格型号'] || '',
+            '原单位': detail['单位'] || '',
+            '原计划数量': detail['计划数量'] || '',
+            '原计划开工时间': detail['计划开工时间'] || '',
+            '原计划完工时间': detail['计划完工时间'] || '',
+            '变更后数量': detail['计划数量'] || '',
+            '变更后开工时间': detail['计划开工时间'] || '',
+            '变更后完工时间': detail['计划完工时间'] || '',
+            '变更后工艺路线': detail['工艺路线'] || '',
+            '变更后BOM版本': detail['BOM版本'] || '',
+            '变更说明': ''
+          };
+          addDetailRow(newRow);
+        });
+      }
+    }
+  });
+  closeLookup();
+  showToast('已成功加载原生产订单信息', 'success');
+}
+function loadSourceDoc(sourceId) {
+  var sourceDocType = 'production_order';
+  var sourceList = JSON.parse(localStorage.getItem('erp_' + sourceDocType + '_list') || '[]');
+  var sourceDoc = sourceList.find(function(d) { return d.id === sourceId; });
+  if (!sourceDoc) {
+    showToast('未找到源单据', 'error');
+    return;
+  }
+  document.getElementById('field_原工单号').value = sourceDoc.docNo || '';
+  if (sourceDoc.details) {
+    document.getElementById('detailBody').innerHTML = '';
+    sourceDoc.details.forEach(function(detail) {
+      var newRow = {
+        '原产品编码': detail['产品编码'] || '',
+        '原产品名称': detail['产品名称'] || '',
+        '原规格型号': detail['规格型号'] || '',
+        '原单位': detail['单位'] || '',
+        '原计划数量': detail['计划数量'] || '',
+        '原计划开工时间': detail['计划开工时间'] || '',
+        '原计划完工时间': detail['计划完工时间'] || '',
+        '变更后数量': detail['计划数量'] || '',
+        '变更后开工时间': detail['计划开工时间'] || '',
+        '变更后完工时间': detail['计划完工时间'] || '',
+        '变更后工艺路线': detail['工艺路线'] || '',
+        '变更后BOM版本': detail['BOM版本'] || '',
+        '变更说明': ''
+      };
+      addDetailRow(newRow);
+    });
+  }
+}
+function pushDownDoc() {
+  showToast('此单据不支持下推', 'info');
+}
+function prevDoc() {
+  showToast('上查功能开发中', 'info');
+}
+function nextDoc() {
+  showToast('下查功能开发中', 'info');
+}
+function goToList() {
+  window.location.href = 'production-order-change.html';
+}
+function printSettings() {
+  showToast('打印设置功能开发中', 'info');
+}
+function printDoc() {
+  showToast('打印功能开发中', 'info');
+}
+function exitDoc() {
+  showConfirm('确认退出？', function() {
+    window.location.href = 'production-order-change.html';
+  });
+}
+function addDetailRow(data) {
+  var tbody = document.getElementById('detailBody');
+  var row = document.createElement('tr');
+  var idx = tbody.children.length + 1;
+  var cells = '<td><input type="checkbox" class="detail-checkbox"></td>';
+  cells += '<td>' + idx + '</td>';
+  detailFields.forEach(function(f) {
+    var val = data && data[f] ? data[f] : '';
+    if (f.startsWith('原')) {
+      cells += '<td><input type="text" data-field="' + f + '" value="' + val + '" readonly class="readonly old-value"></td>';
+    } else if (f === '变更说明') {
+      cells += '<td><textarea data-field="' + f + '" placeholder="请输入变更说明">' + val + '</textarea></td>';
+    } else if (f.includes('时间')) {
+      cells += '<td><input type="date" data-field="' + f + '" value="' + val + '"></td>';
+    } else {
+      cells += '<td><input type="text" data-field="' + f + '" value="' + val + '"></td>';
+    }
+  });
+  row.innerHTML = cells;
+  tbody.appendChild(row);
+}
+function deleteSelectedRows() {
+  document.querySelectorAll('.detail-checkbox:checked').forEach(function(cb) {
+    cb.closest('tr').remove();
+  });
+}
+function selectAllDetails() {
+  document.querySelectorAll('.detail-checkbox').forEach(function(cb) {
+    cb.checked = document.querySelector('.detail-toolbar + table th input').checked;
+  });
+}
+function openLookup(field, type) {
+  currentLookupField = field;
+  currentLookupType = type;
+  var titles = { 'supplier': '选择供应商', 'customer': '选择客户', 'org': '选择组织', 'warehouse': '选择仓库', 'material': '选择物料', 'employee': '选择员工', 'department': '选择部门' };
+  document.getElementById('lookupTitle').innerText = titles[type] || '选择';
+  var caches = { 'supplier': 'erp_suppliers_cache', 'customer': 'erp_customers_cache', 'org': 'erp_orgs', 'warehouse': 'erp_warehouses_cache', 'material': 'erp_materials_cache', 'employee': 'erp_employees_cache', 'department': 'erp_departments_cache' };
+  var data = JSON.parse(localStorage.getItem(caches[type]) || '[]');
+  if (type === 'material') {
+    renderLookupTable(data, ['code', 'name', 'specification', 'unit'], ['编码', '名称', '规格型号', '单位']);
+  } else {
+    renderLookupTable(data, ['code', 'name'], ['编码', '名称']);
+  }
+  document.getElementById('lookupModal').classList.add('show');
+}
+function renderLookupTable(data, keys, labels) {
+  var head = document.getElementById('lookupTableHead');
+  var body = document.getElementById('lookupTableBody');
+  head.innerHTML = '<tr>' + labels.map(function(l) { return '<th>' + l + '</th>'; }).join('') + '</tr>';
+  body.innerHTML = '';
+  data.forEach(function(item) {
+    var row = document.createElement('tr');
+    row.style.cursor = 'pointer';
+    row.onclick = function() { selectLookupItem(item); };
+    var cells = keys.map(function(k) { return '<td>' + (item[k] || '') + '</td>'; }).join('');
+    row.innerHTML = cells;
+    body.appendChild(row);
+  });
+}
+function filterLookup() {
+  var keyword = document.getElementById('lookupKeyword').value.toLowerCase();
+  document.querySelectorAll('#lookupTableBody tr').forEach(function(row) {
+    row.style.display = row.innerText.toLowerCase().includes(keyword) ? '' : 'none';
+  });
+}
+function selectLookupItem(item) {
+  window.selectedLookupItem = item;
+  document.querySelectorAll('#lookupTableBody tr').forEach(function(r) {
+    r.style.backgroundColor = '';
+    r.style.borderLeft = '';
+  });
+  var rows = document.querySelectorAll('#lookupTableBody tr');
+  rows.forEach(function(row) {
+    if (row.innerText.includes(item.code) && row.innerText.includes(item.name)) {
+      row.style.backgroundColor = '#e6f7ff';
+      row.style.borderLeft = '3px solid #1890ff';
+    }
+  });
+}
+function confirmLookup() {
+  if (window._lookupMode === 'source_select') {
+    confirmSourceSelect();
+    return;
+  }
+  if (window.selectedLookupItem) {
+    var displayName = window.selectedLookupItem.name || window.selectedLookupItem.code;
+    document.getElementById('field_' + currentLookupField).value = displayName;
+    closeLookup();
+  } else {
+    showToast('请选择一条记录', 'warning');
+  }
+}
+function closeLookup() {
+  document.getElementById('lookupModal').classList.remove('show');
+  window.selectedLookupItem = null;
+  window._lookupMode = null;
+}
+document.addEventListener('DOMContentLoaded', init);
+</script>
+</body>
+</html>

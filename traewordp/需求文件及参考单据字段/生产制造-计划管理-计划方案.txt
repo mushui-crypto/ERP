@@ -1,0 +1,174 @@
+生产制造-计划管理-计划方案
+
+字段说明：
+单据头：FBillHead 
+	 实体主键：FID 
+	 数据状态：FDocumentStatus 
+	 禁用状态：FForbidStatus 
+	 方案名称：FName  (必填项)
+	 方案编码：FNumber  (必填项)
+	 方案描述：FDescription 
+	 创建组织：FCreateOrgId  (必填项)
+	 使用组织：FUseOrgId  (必填项)
+	 创建人：FCreatorId 
+	 修改人：FModifierId 
+	 创建日期：FCreateDate 
+	 修改日期：FModifyDate 
+	 禁用人：FForbidderId 
+	 审核人：FApproverId 
+	 禁用日期：FForbidDate 
+	 审核日期：FApproveDate 
+	 计划展望期：FPlanHorizon 
+	 计划展望期单位：FPHTimeUnit  (必填项)
+	 计划方式：FPlanModel  (必填项)
+	 分层计划：FIsHierPlan 
+	 重复生产线计划：FIsProductLinePlan 
+	 ROP计划：FIsRopPlan 
+	 计划模拟：FIsPlanSimulate 
+需求来源配置：FDemandEntity 
+	 实体主键：FEntryID 
+	 选择：FDIsSelect 
+	 单据类型：FDBillTypeId 
+	 需求来源：FDFormId 
+	 取数策略：FDDataPolicy 
+	 需求名称：FDFormType 
+	 说明：FDDescription 
+	 自定义过滤条件：FDCustFilter 
+仓库信息：FStockEntity 
+	 实体主键：FEntryID 
+	 仓库编码：FStockId 
+	 仓库名称：FStockName 
+	 仓库属性：FStockProperty 
+	 本次运算MPS/MRP可用仓：FIsUsedStock 
+	 组织：FStockUseOrgId 
+	 优先级：FStockPriority 
+	 自定义过滤条件：FICustFilter 
+更多参数选项：FOtherSubEntity 
+	 实体主键：FEntryId 
+	 运算前自动维护低位码：FAutoMaintainLLC 
+	 自动关闭拖期预测单：FAutoCloseDelayFO 
+	 自动运算优先级：FAutoCalcPriority 
+	 只生成采购件计划：FPurchasePlanOnly 
+	 删除重复的MPS计划订单：FDelRepeatMPSPl 
+	 强制覆盖运算参数：FForceOverlay 
+	 计划运算前自动进行预测冲销：FAutoWriteOff 
+	 预测冲销方案：FWriteOffScheme 
+	 自动汇总供需明细：FAutoSumDSDetail 
+	 是否考虑拆分：FIsPlanSplit 
+	 ATO预测冲销方案：FATOSchemeId 
+	 仅计算MPS：FIsMPSOnly 
+	 计划标识：FPlanIdent 
+	 考虑保质期：FIsKFPeriod 
+	 仅计算MRP：FIsMRPOnly 
+	 生产/委外用料清单的替代比例重新计算：FIsPPBomSubReCal 
+	 不检查BOM完整性：FNoCheckBomIntegrity 
+	 不产生计划例外信息：FNoDealException 
+	 自动审核MTO库存调整：FAutoAuditMTOINVCON 
+	 MTO库存调整生成直接调拨：FMTOINVCONBuildZZDB 
+	 MTO考虑空计划跟踪号库存：FMTOINVEmptyMapAny 
+	 例外类型：FExceptionType 
+	 删除未审核MTO库存调整：FDelNoApproveMTOINVCON 
+	 仅删除当前方案产生的计划订单/组织间需求单：FOnlyDelCurrSchPORO 
+	 获取全部物料：FCalAllMaterial 
+	 MTO考虑空计划跟踪号预计入：FMTOCSDEmptyMapAny 
+	 考虑批号入库日期：FCsdLotInstockDate 
+MRP合并选项：FMergeSubEntity 
+	 实体主键：FEntryId 
+	 销售订单合并类型：FSOMergeType 
+	 按单合并：FRadio 
+	 按分录合并：FRadio1 
+	 启用合并规则：FAllowFOMerge 
+	 预测单合并类型：FFOMergeType 
+	 按单合并：FRadio2 
+	 POQ物料合并类型：FPOQMergeType 
+	 合并至周期内的第一笔净需求日期：FRadio5 
+	 POQ周期开始日期：FPOQStartDate 
+	 需求合并类物料允许对不同需求来源的单据进行合并：FAllowMergeAllSource 
+	 启用合并规则：FAllowSOMerge 
+	 合并至周期的第一天：FRadio4 
+	 按分录合并：FRadio3 
+	 以第一笔净需求为周期开始日期合并：FRadio8 
+投放参数选项：FReleaseSubEntity 
+	 实体主键：FEntryId 
+	 采购申请人默认值：FDefPurchaseMan 
+	 采购申请部门默认值：FDefPurchaseDeptId 
+	 采购申请单状态投放为：FPOReleaseStatus  (必填项)
+	 自制件默认生产部门：FDefWorkShopId 
+	 运算完成直接投放计划订单：FAutoRelease 
+	 距系统当前日期(x)天之内：FValidDays 
+	 默认采购单据类型：FPOBillTypeId 
+	 默认委外单据类型：FSubBillTypeId 
+	 默认生产单据类型：FMOBillTypeId 
+	 采购申请单的最大分录数：FPrMaxEntryNo 
+	 统一按方案指定采购负责人：FIsPurchaseManByPlan 
+	 默认组织间受托单据类型：FTrunstBillTypeId 
+	 生产订单的最大分录数：FProMaxEntryNo 
+	 委外订单最大分录数：FSubMaxEntryNo 
+	 运算完成自动审核组织间需求单：FAutoAuditRO 
+	 投放类型：FReleseType 
+运算参数选项：FCalcSubEntity 
+	 实体主键：FEntryId 
+	 考虑现有库存：FCsdStockQty 
+	 考虑成品率：FCsdYieldRate 
+	 考虑安全库存：FCsdSafeStockQty 
+	 考虑预计入库数量和已分配数量：FCsdWillQty 
+	 净需求考虑订货策略和批量调整：FCsdOrderStrategy 
+	 预计量运算有效期距系统当前日期之前：FCsdWillDays 
+	 考虑损耗率：FCsdScrapRate 
+	 需求左侧供给优先方式：FConsumeType  (必填项)
+	 预留释放方式：FLinkFreeType  (必填项)
+	 供给优先顺序：FSupplyOrder  (必填项)
+	 按优先级占用弱预留：FGrabReserveByPriority 
+	 考虑物料替代：FCsdSubsMtrl 
+	 库存需求独立产生计划：FStockDemandPlanIndep 
+	 预计量计划模拟调整：FSimulateAdjust 
+	 预计入库允许部分提前：FAllowPartAhead 
+	 预计入库允许部分延后：FAllowPartDelay 
+	 预计入库交期允许提前天数：FAllowStockAheadDay 
+	 预计入库交期允许推后天数：FAllowStockDelayDay 
+	 运算时是否考虑需求优先级：FCsdDemandPriority 
+	 空MTO号库存：FNoMtoStock 
+	 空MTO号供给单据：FNoMtoBill 
+	 其它无需求MTO库存：FSpareMtoStock 
+	 其它无需求MTO供给单据：FSpareMtoBill 
+	 提前宽限期（天）：FLeadExtendDay 
+	 延后宽限期（天）：FDelayExtendDay 
+	 仅释放参与计算单据的预留关系：FFreeLinkByCalBill 
+	 仅释放预测单产生的预留关系：FFreeLinkByForecast 
+	 精确选单计算：FIsPreciseSelBill 
+	 替代物料资源优先供应：FSubsResFirstSupply  (必填项)
+	 预计量计算有效期单位：FDateUnit  (必填项)
+	 仅运算无预留的需求单据：FIsOnlyShowUnCalcSO 
+	 仅运算未运算过的需求单据：FIsOnlyNoCalDemandBill 
+	 按优先级整理弱预留：FAdjustReserveByPriority 
+供给来源配置：FSupplyEntity 
+	 实体主键：FEntryID 
+	 选择：FSIsSelect 
+	 供给来源：FSFormId 
+	 单据类型：FSBillTypeId 
+	 取数策略：FSDataPolicy 
+	 供给名称：FSFormType 
+	 优先级：FSPriority 
+	 说明：FSDescription 
+	 计划状态单据参与运算：FCsdNoApproveS 
+	 自定义过滤条件：FSCustFilter 
+组织参数：FPlanAreaEntity 
+	 实体主键：FEntryID 
+	 需求组织：FDemandOrgId  (必填项)
+	 供应组织：FSupplyOrgId  (必填项)
+	 开始日期：FStartDate 
+	 截止日期：FEndDate 
+运算范围配置：FDSEntity 
+	 实体主键：FEntryID 
+	 选择：FDSIsSelect 
+	 需求来源：FDSFormId 
+	 需求名称：FDSFormType 
+	 单据类型：FDSBillTypeId 
+	 计划状态单据参与运算：FCsdNoApprove 
+	 取数策略：FDSDataPolicy 
+	 说明：FDSDescription 
+	 自定义过滤条件：FDSCustFilter 
+	 参考交货明细：FControlByPlan 
+运算范围选项：FDSSubEntity 
+	 实体主键：FEntryId 
+	 是否考虑需求时界和计划时界：FCsdTimeFence 

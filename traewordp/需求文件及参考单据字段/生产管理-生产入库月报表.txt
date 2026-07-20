@@ -1,0 +1,40 @@
+生产管理-生产入库月报表
+
+字段说明：
+	 生产车间：FWorkShopId 
+	 产品编码：FProdNumId 
+	 汇总依据：FSumBasis  (必填项)
+	 月份：FPickMtrlMonth 
+	 物料组：FProdTypeId 
+	 生产组织：FPrdOrgId  (必填项)
+	 期间从：FApprBeginDate 
+	 至：FApprEndDate 
+	 FMonDateChk：FMonDateChk 
+	 FRangeDateChk：FRangeDateChk 
+	 单据类型：FMoBillTypeId 
+	 统计单位：FSumUnit  (必填项)
+	 取数来源：FAccSource 
+	 单据状态：FDocStatus  (必填项)
+
+参数FieldKeys显示列：
+	 月份/期间：FPickMtrlMonth 
+	 生产车间：FWorkShopId 
+	 物料组：FProdTypeId 
+	 生产组织：FPrdOrgId 
+	 产品编码：FMATERIALID 
+	 产品名称：FProdName 
+	 规格型号：FSpecModel 
+	 单位：FUnitId 
+	 合格品入库数量：FPASSINSTOCKQTY 
+	 不合格品入库数量：FFAILINSTOCKQTY 
+	 报废品入库数量：FSCRAPINSTOCKQTY 
+	 返工品入库数量：FRETURNINSTOCKQTY 
+	 退库数量：FOUTSTOCKQTY 
+	 实际入库数量：FACTUALINSTOCKQTY 
+	 库存辅单位：FAUXUNITID 
+	 合格品入库数量（辅）：FSECPASSINSTOCKQTY 
+	 不合格品入库数量（辅）：FSECFAILINSTOCKQTY 
+	 报废品入库数量（辅）：FSECSCRAPINSTOCKQTY 
+	 返工品入库数量（辅）：FSECRETURNINSTOCKQTY 
+	 退库数量（辅）：FSECOUTSTOCKQTY 
+	 实际入库数量（辅）：FSECACTUALINSTOCKQTY

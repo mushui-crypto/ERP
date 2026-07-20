@@ -1,0 +1,332 @@
+import { MigrationInterface, QueryRunner } from 'typeorm';
+
+export class Phase7SqlServer1783770000003 implements MigrationInterface {
+  name = 'Phase7SqlServer1783770000003';
+
+  public async up(queryRunner: QueryRunner): Promise<void> {
+    await queryRunner.query(`CREATE TABLE [cost_center] (
+      [id] varchar(36) NOT NULL,
+      [created_at] datetime NOT NULL DEFAULT GETDATE(),
+      [updated_at] datetime NOT NULL DEFAULT GETDATE(),
+      [created_by] varchar(36) NULL,
+      [updated_by] varchar(36) NULL,
+      [data_center_id] varchar(36) NULL,
+      [org_id] varchar(36) NULL,
+      [is_deleted] bit NOT NULL DEFAULT 0,
+      [center_code] varchar(50) NOT NULL,
+      [center_name] varchar(200) NOT NULL,
+      [center_type] varchar(50) NOT NULL,
+      [parent_id] varchar(36) NULL,
+      [responsible_id] varchar(36) NULL,
+      [responsible_name] varchar(50) NULL,
+      [enabled] bit NOT NULL DEFAULT 1,
+      [description] text NULL,
+      [remark] varchar(500) NULL,
+      CONSTRAINT [PK_cost_center] PRIMARY KEY ([id]),
+      CONSTRAINT [UQ_cost_center_center_code] UNIQUE ([center_code])
+    )`);
+
+    await queryRunner.query(`CREATE TABLE [cost_allocation] (
+      [id] varchar(36) NOT NULL,
+      [created_at] datetime NOT NULL DEFAULT GETDATE(),
+      [updated_at] datetime NOT NULL DEFAULT GETDATE(),
+      [created_by] varchar(36) NULL,
+      [updated_by] varchar(36) NULL,
+      [data_center_id] varchar(36) NULL,
+      [org_id] varchar(36) NULL,
+      [is_deleted] bit NOT NULL DEFAULT 0,
+      [allocation_no] varchar(50) NOT NULL,
+      [source_center_id] varchar(36) NOT NULL,
+      [source_center_code] varchar(50) NOT NULL,
+      [source_center_name] varchar(200) NOT NULL,
+      [target_center_id] varchar(36) NOT NULL,
+      [target_center_code] varchar(50) NOT NULL,
+      [target_center_name] varchar(200) NOT NULL,
+      [allocation_type] varchar(50) NOT NULL,
+      [allocation_amount] decimal(18,4) NOT NULL,
+      [allocation_ratio] decimal(5,2) NULL,
+      [allocation_date] datetime NOT NULL,
+      [description] text NULL,
+      [status] int NOT NULL DEFAULT 1,
+      CONSTRAINT [PK_cost_allocation] PRIMARY KEY ([id]),
+      CONSTRAINT [UQ_cost_allocation_allocation_no] UNIQUE ([allocation_no])
+    )`);
+
+    await queryRunner.query(`CREATE TABLE [product_cost] (
+      [id] varchar(36) NOT NULL,
+      [created_at] datetime NOT NULL DEFAULT GETDATE(),
+      [updated_at] datetime NOT NULL DEFAULT GETDATE(),
+      [created_by] varchar(36) NULL,
+      [updated_by] varchar(36) NULL,
+      [data_center_id] varchar(36) NULL,
+      [org_id] varchar(36) NULL,
+      [is_deleted] bit NOT NULL DEFAULT 0,
+      [cost_no] varchar(50) NOT NULL,
+      [product_id] varchar(36) NOT NULL,
+      [product_code] varchar(50) NOT NULL,
+      [product_name] varchar(200) NOT NULL,
+      [product_version] varchar(20) NULL,
+      [material_cost] decimal(18,4) NOT NULL DEFAULT 0,
+      [labor_cost] decimal(18,4) NOT NULL DEFAULT 0,
+      [overhead_cost] decimal(18,4) NOT NULL DEFAULT 0,
+      [total_cost] decimal(18,4) NOT NULL DEFAULT 0,
+      [cost_date] datetime NOT NULL,
+      [cost_method] varchar(50) NOT NULL DEFAULT 'standard',
+      [batch_no] varchar(50) NULL,
+      [remark] varchar(500) NULL,
+      CONSTRAINT [PK_product_cost] PRIMARY KEY ([id]),
+      CONSTRAINT [UQ_product_cost_cost_no] UNIQUE ([cost_no])
+    )`);
+
+    await queryRunner.query(`CREATE TABLE [budget] (
+      [id] varchar(36) NOT NULL,
+      [created_at] datetime NOT NULL DEFAULT GETDATE(),
+      [updated_at] datetime NOT NULL DEFAULT GETDATE(),
+      [created_by] varchar(36) NULL,
+      [updated_by] varchar(36) NULL,
+      [data_center_id] varchar(36) NULL,
+      [org_id] varchar(36) NULL,
+      [is_deleted] bit NOT NULL DEFAULT 0,
+      [budget_no] varchar(50) NOT NULL,
+      [budget_name] varchar(200) NOT NULL,
+      [budget_type] varchar(50) NOT NULL,
+      [cost_center_id] varchar(36) NULL,
+      [cost_center_code] varchar(50) NULL,
+      [cost_center_name] varchar(200) NULL,
+      [period_type] varchar(20) NOT NULL DEFAULT 'year',
+      [period_start] datetime NOT NULL,
+      [period_end] datetime NOT NULL,
+      [total_amount] decimal(18,4) NOT NULL,
+      [used_amount] decimal(18,4) NOT NULL DEFAULT 0,
+      [balance_amount] decimal(18,4) NOT NULL DEFAULT 0,
+      [status] int NOT NULL DEFAULT 0,
+      [approved_by] varchar(36) NULL,
+      [approved_name] varchar(50) NULL,
+      [approved_time] datetime NULL,
+      [remark] varchar(500) NULL,
+      CONSTRAINT [PK_budget] PRIMARY KEY ([id]),
+      CONSTRAINT [UQ_budget_budget_no] UNIQUE ([budget_no])
+    )`);
+
+    await queryRunner.query(`CREATE TABLE [budget_item] (
+      [id] varchar(36) NOT NULL,
+      [created_at] datetime NOT NULL DEFAULT GETDATE(),
+      [updated_at] datetime NOT NULL DEFAULT GETDATE(),
+      [created_by] varchar(36) NULL,
+      [updated_by] varchar(36) NULL,
+      [data_center_id] varchar(36) NULL,
+      [org_id] varchar(36) NULL,
+      [is_deleted] bit NOT NULL DEFAULT 0,
+      [budget_id] varchar(36) NOT NULL,
+      [budget_no] varchar(50) NOT NULL,
+      [item_no] varchar(50) NOT NULL,
+      [item_name] varchar(200) NOT NULL,
+      [item_code] varchar(50) NULL,
+      [category] varchar(50) NULL,
+      [budget_amount] decimal(18,4) NOT NULL,
+      [used_amount] decimal(18,4) NOT NULL DEFAULT 0,
+      [balance_amount] decimal(18,4) NOT NULL DEFAULT 0,
+      [variance_amount] decimal(18,4) NOT NULL DEFAULT 0,
+      [variance_ratio] decimal(5,2) NOT NULL DEFAULT 0,
+      [description] text NULL,
+      CONSTRAINT [PK_budget_item] PRIMARY KEY ([id]),
+      CONSTRAINT [UQ_budget_item_item_no] UNIQUE ([item_no])
+    )`);
+
+    await queryRunner.query(`CREATE TABLE [fixed_asset] (
+      [id] varchar(36) NOT NULL,
+      [created_at] datetime NOT NULL DEFAULT GETDATE(),
+      [updated_at] datetime NOT NULL DEFAULT GETDATE(),
+      [created_by] varchar(36) NULL,
+      [updated_by] varchar(36) NULL,
+      [data_center_id] varchar(36) NULL,
+      [org_id] varchar(36) NULL,
+      [is_deleted] bit NOT NULL DEFAULT 0,
+      [asset_no] varchar(50) NOT NULL,
+      [asset_name] varchar(200) NOT NULL,
+      [asset_code] varchar(50) NOT NULL,
+      [asset_type] varchar(50) NOT NULL,
+      [category] varchar(50) NULL,
+      [brand] varchar(100) NULL,
+      [model] varchar(100) NULL,
+      [serial_no] varchar(100) NULL,
+      [purchase_date] datetime NOT NULL,
+      [purchase_price] decimal(18,4) NOT NULL,
+      [current_value] decimal(18,4) NOT NULL,
+      [depreciation_method] varchar(50) NOT NULL DEFAULT 'straight_line',
+      [depreciation_rate] decimal(5,2) NULL,
+      [useful_life] int NOT NULL DEFAULT 5,
+      [used_years] int NOT NULL DEFAULT 0,
+      [accumulated_depreciation] decimal(18,4) NOT NULL DEFAULT 0,
+      [location] varchar(200) NULL,
+      [responsible_id] varchar(36) NULL,
+      [responsible_name] varchar(50) NULL,
+      [department_id] varchar(36) NULL,
+      [department_name] varchar(200) NULL,
+      [status] int NOT NULL DEFAULT 1,
+      [remark] varchar(500) NULL,
+      CONSTRAINT [PK_fixed_asset] PRIMARY KEY ([id]),
+      CONSTRAINT [UQ_fixed_asset_asset_no] UNIQUE ([asset_no])
+    )`);
+
+    await queryRunner.query(`CREATE TABLE [asset_depreciation] (
+      [id] varchar(36) NOT NULL,
+      [created_at] datetime NOT NULL DEFAULT GETDATE(),
+      [updated_at] datetime NOT NULL DEFAULT GETDATE(),
+      [created_by] varchar(36) NULL,
+      [updated_by] varchar(36) NULL,
+      [data_center_id] varchar(36) NULL,
+      [org_id] varchar(36) NULL,
+      [is_deleted] bit NOT NULL DEFAULT 0,
+      [depreciation_no] varchar(50) NOT NULL,
+      [asset_id] varchar(36) NOT NULL,
+      [asset_no] varchar(50) NOT NULL,
+      [asset_name] varchar(200) NOT NULL,
+      [period_type] varchar(20) NOT NULL DEFAULT 'month',
+      [period_start] datetime NOT NULL,
+      [period_end] datetime NOT NULL,
+      [depreciation_amount] decimal(18,4) NOT NULL,
+      [accumulated_amount] decimal(18,4) NOT NULL,
+      [book_value] decimal(18,4) NOT NULL,
+      [depreciation_rate] decimal(5,2) NOT NULL,
+      [status] int NOT NULL DEFAULT 1,
+      [remark] varchar(500) NULL,
+      CONSTRAINT [PK_asset_depreciation] PRIMARY KEY ([id]),
+      CONSTRAINT [UQ_asset_depreciation_depreciation_no] UNIQUE ([depreciation_no])
+    )`);
+
+    await queryRunner.query(`CREATE TABLE [plm_product] (
+      [id] varchar(36) NOT NULL,
+      [created_at] datetime NOT NULL DEFAULT GETDATE(),
+      [updated_at] datetime NOT NULL DEFAULT GETDATE(),
+      [created_by] varchar(36) NULL,
+      [updated_by] varchar(36) NULL,
+      [data_center_id] varchar(36) NULL,
+      [org_id] varchar(36) NULL,
+      [is_deleted] bit NOT NULL DEFAULT 0,
+      [product_code] varchar(50) NOT NULL,
+      [product_name] varchar(200) NOT NULL,
+      [product_type] varchar(50) NULL,
+      [brand] varchar(100) NULL,
+      [model] varchar(100) NULL,
+      [specification] text NULL,
+      [version] varchar(20) NOT NULL DEFAULT 'V1.0',
+      [version_desc] text NULL,
+      [weight] decimal(12,4) NULL,
+      [unit] varchar(20) NULL,
+      [category_id] varchar(36) NULL,
+      [category_name] varchar(200) NULL,
+      [status] int NOT NULL DEFAULT 0,
+      [effective_date] datetime NULL,
+      [obsolete_date] datetime NULL,
+      [description] text NULL,
+      [remark] varchar(500) NULL,
+      CONSTRAINT [PK_plm_product] PRIMARY KEY ([id]),
+      CONSTRAINT [UQ_plm_product_product_code] UNIQUE ([product_code])
+    )`);
+
+    await queryRunner.query(`CREATE TABLE [plm_material] (
+      [id] varchar(36) NOT NULL,
+      [created_at] datetime NOT NULL DEFAULT GETDATE(),
+      [updated_at] datetime NOT NULL DEFAULT GETDATE(),
+      [created_by] varchar(36) NULL,
+      [updated_by] varchar(36) NULL,
+      [data_center_id] varchar(36) NULL,
+      [org_id] varchar(36) NULL,
+      [is_deleted] bit NOT NULL DEFAULT 0,
+      [material_code] varchar(50) NOT NULL,
+      [material_name] varchar(200) NOT NULL,
+      [material_type] varchar(50) NOT NULL,
+      [specification] text NULL,
+      [unit] varchar(20) NULL,
+      [category_id] varchar(36) NULL,
+      [category_name] varchar(200) NULL,
+      [brand] varchar(100) NULL,
+      [model] varchar(100) NULL,
+      [weight] decimal(12,4) NULL,
+      [volume] decimal(12,4) NULL,
+      [batch_control] bit NOT NULL DEFAULT 0,
+      [serial_control] bit NOT NULL DEFAULT 0,
+      [expiry_control] bit NOT NULL DEFAULT 0,
+      [safety_stock] decimal(18,4) NULL,
+      [min_stock] decimal(18,4) NULL,
+      [max_stock] decimal(18,4) NULL,
+      [lead_time] int NULL,
+      [status] int NOT NULL DEFAULT 1,
+      [description] text NULL,
+      [remark] varchar(500) NULL,
+      CONSTRAINT [PK_plm_material] PRIMARY KEY ([id]),
+      CONSTRAINT [UQ_plm_material_material_code] UNIQUE ([material_code])
+    )`);
+
+    await queryRunner.query(`CREATE TABLE [plm_document] (
+      [id] varchar(36) NOT NULL,
+      [created_at] datetime NOT NULL DEFAULT GETDATE(),
+      [updated_at] datetime NOT NULL DEFAULT GETDATE(),
+      [created_by] varchar(36) NULL,
+      [updated_by] varchar(36) NULL,
+      [data_center_id] varchar(36) NULL,
+      [org_id] varchar(36) NULL,
+      [is_deleted] bit NOT NULL DEFAULT 0,
+      [document_no] varchar(50) NOT NULL,
+      [document_name] varchar(200) NOT NULL,
+      [document_type] varchar(50) NOT NULL,
+      [file_path] varchar(500) NOT NULL,
+      [file_name] varchar(200) NOT NULL,
+      [file_size] bigint NOT NULL DEFAULT 0,
+      [version] varchar(20) NOT NULL DEFAULT 'V1.0',
+      [product_id] varchar(36) NULL,
+      [product_code] varchar(50) NULL,
+      [product_name] varchar(200) NULL,
+      [material_id] varchar(36) NULL,
+      [material_code] varchar(50) NULL,
+      [material_name] varchar(200) NULL,
+      [status] int NOT NULL DEFAULT 1,
+      [effective_date] datetime NULL,
+      [description] text NULL,
+      [remark] varchar(500) NULL,
+      CONSTRAINT [PK_plm_document] PRIMARY KEY ([id]),
+      CONSTRAINT [UQ_plm_document_document_no] UNIQUE ([document_no])
+    )`);
+
+    await queryRunner.query(`CREATE TABLE [plm_ecn] (
+      [id] varchar(36) NOT NULL,
+      [created_at] datetime NOT NULL DEFAULT GETDATE(),
+      [updated_at] datetime NOT NULL DEFAULT GETDATE(),
+      [created_by] varchar(36) NULL,
+      [updated_by] varchar(36) NULL,
+      [data_center_id] varchar(36) NULL,
+      [org_id] varchar(36) NULL,
+      [is_deleted] bit NOT NULL DEFAULT 0,
+      [ecn_no] varchar(50) NOT NULL,
+      [ecn_type] varchar(50) NOT NULL,
+      [title] varchar(200) NOT NULL,
+      [reason] text NOT NULL,
+      [affected_items] text NULL,
+      [change_content] text NOT NULL,
+      [implementation_plan] text NULL,
+      [effective_date] datetime NULL,
+      [status] int NOT NULL DEFAULT 0,
+      [approved_by] varchar(36) NULL,
+      [approved_name] varchar(50) NULL,
+      [approved_time] datetime NULL,
+      [remark] varchar(500) NULL,
+      CONSTRAINT [PK_plm_ecn] PRIMARY KEY ([id]),
+      CONSTRAINT [UQ_plm_ecn_ecn_no] UNIQUE ([ecn_no])
+    )`);
+  }
+
+  public async down(queryRunner: QueryRunner): Promise<void> {
+    await queryRunner.query(`DROP TABLE [plm_ecn]`);
+    await queryRunner.query(`DROP TABLE [plm_document]`);
+    await queryRunner.query(`DROP TABLE [plm_material]`);
+    await queryRunner.query(`DROP TABLE [plm_product]`);
+    await queryRunner.query(`DROP TABLE [asset_depreciation]`);
+    await queryRunner.query(`DROP TABLE [fixed_asset]`);
+    await queryRunner.query(`DROP TABLE [budget_item]`);
+    await queryRunner.query(`DROP TABLE [budget]`);
+    await queryRunner.query(`DROP TABLE [product_cost]`);
+    await queryRunner.query(`DROP TABLE [cost_allocation]`);
+    await queryRunner.query(`DROP TABLE [cost_center]`);
+  }
+}

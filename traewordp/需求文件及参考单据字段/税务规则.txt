@@ -1,0 +1,54 @@
+税务规则 
+
+
+字段说明：
+单据头：FBillHead 
+	 实体主键：FTaxRuleID 
+	 数据状态：FDocumentStatus 
+	 禁用状态：FForbidStatus 
+	 名称：FName  (必填项)
+	 编码：FNumber 
+	 描述：FDescription 
+	 创建组织：FCreateOrgId  (必填项)
+	 使用组织：FUseOrgId  (必填项)
+	 创建人：FCreatorId 
+	 修改人：FModifierId 
+	 创建日期：FCreateDate 
+	 修改日期：FModifyDate 
+	 税收制度：FTaxSystemID  (必填项)
+	 失效日期：FEndDate  (必填项)
+	 生效日期：FStartDate  (必填项)
+	 审核人：FAuditorID 
+	 审核日期：FAuditDate 
+	 禁用人：FForbidderID 
+	 禁用日期：FForbidDate 
+	 系统预置：FIsSysPreset 
+	 助记码：FMnemonic 
+	 税率/税组合类型：FDEFAULTISTAXMIX 
+	 缺省税率/税组合：FDEFAULTTAXMIXID 
+	 结果来源：FResultFromType 
+	 税率/税组合：FRadio 
+	 物料的税率：FRadio1 
+	 供应商的税率：FRadio3 
+	 客户的税率：FRadio4 
+	 费用项目的税率：FRadio5 
+决定性因素和条件：FEntityCondition 
+	 实体主键：FConditionID 
+	 运算符：FOperators 
+	 逻辑：FLogic 
+	 值/范围：FValueRange 
+	 分类限定词：FLimitedType 
+	 决定性因素分类：FDeterminants 
+	 决定性因素名称：FDeterminantsName 
+	 值/范围内码：FVALUERANGEKEY 
+	 选择决定性因素分类：FMARKSELECTED 
+税组合：FEntityTaxMix 
+	 实体主键：FEntryID 
+	 废弃代码：FTaxMixID1 
+	 基础资料属性：FBaseProperty 
+	 代码：FTaxMixID  (必填项)
+	 税率/税组合：FISTAXMIX  (必填项)
+条件值范围：FValueRangeEntity 
+	 实体主键：FValueRangeEntityId 
+	 值/范围：FValueRangeItem 
+	 值内码：FValueRangeItemKey 

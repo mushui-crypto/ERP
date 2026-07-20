@@ -1,0 +1,1329 @@
+﻿﻿﻿﻿﻿﻿<!DOCTYPE html>
+
+<html lang="zh-CN">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>角色管理 — 磐枢工业智能平台(管理端)</title>
+
+<link rel="stylesheet" href="../common-admin.css">
+
+<script src="../../common.js"></script>
+
+<style>
+
+.role-layout { display: grid; grid-template-columns: 1fr 400px; gap: 0; height: calc(100vh - 56px); overflow: hidden; }
+
+.role-list-panel { overflow-y: auto; }
+
+.role-perm-panel { background: var(--bg-surface); border-left: 1px solid #e8e8e8; overflow-y: auto; padding: 16px; }
+
+
+
+/* 表格内文字保持清晰可见 */
+
+.role-list-panel .data-table td { color: var(--text-secondary); }
+
+.role-list-panel .data-table .role-name-cell { color: var(--text-primary); font-weight: 600; }
+
+
+
+/* 数据范围 badge */
+
+.data-scope-badge {
+
+  display: inline-block; padding: 2px 8px;
+
+  border-radius: 10px; font-size: 11px; font-weight: 500;
+
+  background: var(--admin-accent-light); color: var(--admin-accent);
+
+  border: 1px solid rgba(245,158,11,0.25);
+
+}
+
+.data-scope-badge.scope-self { background: rgba(6,182,212,0.12); color: var(--color-info); border-color: rgba(6,182,212,0.25); }
+
+.data-scope-badge.scope-org { background: rgba(34,197,94,0.12); color: var(--color-success); border-color: rgba(34,197,94,0.25); }
+
+.data-scope-badge.scope-custom { background: rgba(234,179,8,0.12); color: var(--color-warning); border-color: rgba(234,179,8,0.25); }
+
+
+
+/* 权限面板 Tab */
+
+.perm-tabs {
+
+  display: flex; gap: 0;
+
+  border-bottom: 1px solid #e8e8e8;
+
+  margin-bottom: 12px;
+
+}
+
+.perm-tab {
+
+  padding: 8px 14px; cursor: pointer;
+
+  color: var(--text-tertiary); font-size: 12.5px;
+
+  border-bottom: 2px solid transparent;
+
+  transition: all var(--transition);
+
+  white-space: nowrap;
+
+}
+
+.perm-tab:hover { color: var(--text-primary); }
+
+.perm-tab.active { color: var(--admin-accent); border-bottom-color: var(--admin-accent); font-weight: 500; }
+
+.perm-tab-content { padding-top: 4px; }
+
+.perm-tab-pane { display: none; }
+
+.perm-tab-pane.active { display: block; }
+
+
+
+/* 权限树底部快捷按钮 */
+
+.perm-tree-actions {
+
+  display: flex; gap: 8px;
+
+  padding: 10px 12px;
+
+  border-top: 1px solid #e8e8e8;
+
+  margin-top: 8px;
+
+}
+
+.perm-tree-actions .quick-btn {
+
+  flex: 1; padding: 5px 10px;
+
+  font-size: 12px;
+
+  background: var(--bg-inset);
+
+  border: 1px solid #e8e8e8;
+
+  border-radius: var(--radius-sm);
+
+  color: var(--text-secondary);
+
+  cursor: pointer;
+
+  transition: all var(--transition);
+
+  font-family: var(--font-body);
+
+}
+
+.perm-tree-actions .quick-btn:hover {
+
+  border-color: var(--admin-accent);
+
+  color: var(--admin-accent);
+
+  background: var(--admin-accent-light);
+
+}
+
+
+
+/* 权限面板内嵌紧凑表格 */
+
+.perm-mini-table {
+
+  width: 100%; border-collapse: collapse; font-size: 12px;
+
+}
+
+.perm-mini-table th {
+
+  padding: 7px 8px; text-align: left;
+
+  background: var(--bg-inset);
+
+  color: var(--text-tertiary); font-weight: 600;
+
+  border-bottom: 1px solid var(--border-strong);
+
+  font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px;
+
+  white-space: nowrap;
+
+}
+
+.perm-mini-table td {
+
+  padding: 7px 8px;
+
+  border-bottom: 1px solid #e8e8e8;
+
+  color: var(--text-secondary);
+
+  vertical-align: middle;
+
+}
+
+.perm-mini-table tr:hover td { background: rgba(245,158,11,0.04); }
+
+
+
+/* 弹窗（沿用任务给定结构，覆盖 common.css 冲突项） */
+
+.modal-overlay {
+
+  display: none; position: fixed; inset: 0;
+
+  background: rgba(0,0,0,0.5); z-index: 1000;
+
+  justify-content: center; align-items: flex-start;
+
+  padding-top: 40px;
+
+  opacity: 1; pointer-events: none;
+
+}
+
+.modal-overlay.show { display: flex; pointer-events: all; }
+
+.modal-dialog {
+
+  background: var(--bg-surface);
+
+  border: 1px solid #e8e8e8;
+
+  border-radius: var(--radius-md);
+
+  width: 560px; max-height: 80vh; overflow-y: auto;
+
+}
+
+.modal-header {
+
+  display: flex; justify-content: space-between; align-items: center;
+
+  padding: 16px 20px; border-bottom: 1px solid #e8e8e8;
+
+}
+
+.modal-header .modal-title { font-size: 14px; font-weight: 600; color: var(--text-primary); }
+
+.modal-header .modal-close {
+
+  background: none; border: none; color: var(--text-tertiary);
+
+  font-size: 18px; cursor: pointer; line-height: 1; padding: 2px 6px;
+
+  border-radius: 4px; transition: all var(--transition);
+
+}
+
+.modal-header .modal-close:hover { color: var(--color-error); background: var(--bg-inset); }
+
+.modal-body { padding: 20px; color: #333; }
+.modal-footer {
+  display: flex; gap: 12px; justify-content: flex-end;
+  padding: 16px 20px; border-top: 1px solid #e8e8e8;
+  background: #fafafa;
+}
+.modal-footer .btn-cancel { background: #fff; color: #666; border: 1px solid #d9d9d9; }
+.modal-footer .btn-cancel:hover { background: #f5f5f5; color: #333; }
+.modal-footer .btn-save { background: #1890ff; color: #fff; border: 1px solid #1890ff; }
+.modal-footer .btn-save:hover { background: #40a9ff; border-color: #40a9ff; }
+
+/* 弹窗内表单双列 */
+.modal-form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.modal-tip { font-size: 12px; color: #999; margin-top: 4px; }
+
+
+
+/* 字段权限 badge */
+
+.field-perm-badge {
+
+  display: inline-block; padding: 2px 8px;
+
+  border-radius: 10px; font-size: 11px; font-weight: 500;
+
+}
+
+.field-perm-badge.fp-visible { background: rgba(34,197,94,0.15); color: var(--color-success); }
+
+
+
+/* ===== Toast 提示框 ===== */
+
+.toast-container {
+
+  position: fixed; top: 20px; right: 20px; z-index: 10000;
+
+  display: flex; flex-direction: column; gap: 10px;
+
+}
+
+.toast {
+
+  display: flex; align-items: center; gap: 10px;
+
+  padding: 14px 18px; border-radius: var(--radius-md);
+
+  background: var(--bg-card); border: 1px solid #e8e8e8;
+
+  box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+
+  min-width: 280px; max-width: 420px;
+
+  animation: slideIn 0.3s ease;
+
+}
+
+@keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+
+.toast .toast-icon { font-size: 18px; flex-shrink: 0; }
+
+.toast .toast-content { flex: 1; font-size: 13px; }
+
+.toast .toast-title { font-weight: 600; margin-bottom: 2px; color: var(--text-primary); }
+
+.toast .toast-message { color: var(--text-secondary); font-size: 12px; }
+
+.toast-success { border-color: rgba(34,197,94,0.3); background: rgba(34,197,94,0.05); }
+
+.toast-success .toast-title { color: var(--color-success); }
+
+.toast-warning { border-color: rgba(245,158,11,0.3); background: rgba(245,158,11,0.05); }
+
+.toast-warning .toast-title { color: var(--color-warning); }
+
+.toast-error { border-color: rgba(239,68,68,0.3); background: rgba(239,68,68,0.05); }
+
+.toast-error .toast-title { color: var(--color-error); }
+
+.toast-info { border-color: rgba(56,189,248,0.3); background: rgba(56,189,248,0.05); }
+
+.toast-info .toast-title { color: var(--admin-accent); }
+
+
+
+/* ===== 确认对话框 ===== */
+
+.confirm-modal-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:2000; justify-content:center; align-items:center; }
+
+.confirm-modal-overlay.show { display:flex; }
+
+.confirm-modal-dialog { background:#fff; border:1px solid #e8e8e8; border-radius:4px; width:420px; overflow:hidden; }
+
+.confirm-modal-header { padding:16px 20px; border-bottom:1px solid #e8e8e8; display:flex; align-items:center; gap:10px; }
+
+.confirm-modal-icon { font-size:20px; }
+
+.confirm-modal-title { font-size:15px; font-weight:600; color:#333; }
+
+.confirm-modal-body { padding:20px; text-align:center; }
+
+.confirm-modal-message { font-size:14px; color:var(--text-secondary); line-height:1.6; }
+
+.confirm-modal-footer { display:flex; gap:12px; justify-content:flex-end; padding:16px 20px; border-top:1px solid #e8e8e8; }
+
+.field-perm-badge.fp-hidden { background: rgba(239,68,68,0.15); color: var(--color-error); }
+
+.field-perm-badge.fp-readonly { background: rgba(234,179,8,0.15); color: var(--color-warning); }
+
+</style>
+
+</head>
+
+<body>
+
+<aside class="sidebar admin-sidebar" id="sidebar">
+
+    <div class="sidebar-logo">
+
+    <img src="../../images/LOGO.png" alt="磐枢工业智能平台" style="width: 100%; max-width: 200px; margin-bottom: 8px;">
+
+    <h1 style="font-size: 16px; margin: 0;">磐枢工业智能平台</h1>
+
+  </div>
+
+  <nav class="sidebar-menu">
+
+    <div class="sidebar-menu-group"><div class="sidebar-menu-item" onclick="toggleGroup(this)"><span class="icon">&#128451;</span> 数据中心管理<span class="arrow">&#9654;</span></div><div class="sub-menu"><a class="sidebar-menu-item" href="../data-center/index.html">数据中心总览</a><a class="sidebar-menu-item" href="../data-center/new.html">新建数据中心</a><a class="sidebar-menu-item" href="../data-center/backup.html">备份管理</a></div></div>
+
+    <div class="sidebar-menu-group open"><div class="sidebar-menu-item" onclick="toggleGroup(this)"><span class="icon">&#128101;</span> 组织与权限<span class="arrow">&#9660;</span></div><div class="sub-menu"><a class="sidebar-menu-item" href="org.html">组织架构</a><a class="sidebar-menu-item" href="user.html">用户管理</a><a class="sidebar-menu-item active" href="role.html">角色管理</a><a class="sidebar-menu-item" href="menu.html">菜单管理</a></div></div>
+
+
+
+    <div class="sidebar-menu-group"><div class="sidebar-menu-item" onclick="toggleGroup(this)"><span class="icon">&#128187;</span> 开发设计<span class="arrow">&#9654;</span></div><div class="sub-menu"><a class="sidebar-menu-item" href="../dev-design/lowcode.html">低代码开发中心</a><a class="sidebar-menu-item" href="../dev-design/form-designer.html">表单设计器</a><a class="sidebar-menu-item" href="../dev-design/doc-flow.html">单据转换配置</a><a class="sidebar-menu-item" href="../dev-design/print-template.html">套打模板设计</a><a class="sidebar-menu-item" href="../dev-design/workflow.html">流程配置</a></div></div>
+
+
+
+    <div class="sidebar-menu-group"><div class="sidebar-menu-item" onclick="toggleGroup(this)"><span class="icon">&#129302;</span> 智能应用<span class="arrow">&#9654;</span></div><div class="sub-menu"><a class="sidebar-menu-item" href="../ai-config/api-manage.html">API管理</a><a class="sidebar-menu-item" href="../ai-config/nl-training.html">自然语言训练</a><a class="sidebar-menu-item" href="../ai-config/data-analysis.html">数据分析训练</a><a class="sidebar-menu-item" href="../ai-config/agent-config.html">Agent配置</a></div></div>
+
+
+
+    <div class="sidebar-menu-item" onclick="window.location.href='../../index.html'"><span class="icon">&#8592;</span> 返回应用端</div>
+
+  </nav>
+
+  <div class="sidebar-user"><div class="avatar" style="background:var(--admin-accent-light);color:var(--admin-accent);">管</div><div><div class="user-name">系统管理员</div><div class="user-role">超级管理员</div></div></div>
+
+</aside>
+
+<div class="main-content" id="mainContent">
+
+  <div class="page-header">
+
+    <div><div class="flex items-center gap-8"><button class="sidebar-toggle" onclick="toggleSidebar()">&#9776;</button><div><h2>角色管理</h2><div class="breadcrumb"><a href="../../index.html">首页</a><span>/</span><a href="../index.html">管理端</a><span>/</span><a href="../index.html">组织与权限</a><span>/</span><span>角色管理</span></div></div></div></div>
+
+    <div class="page-actions"><button class="btn btn-primary btn-sm" onclick="openRoleModal('新建角色')">+ 新建角色</button></div>
+
+  </div>
+
+  <div class="role-layout">
+
+    <div class="role-list-panel">
+
+      <div class="list-page-body" style="height:100%;">
+
+        <div class="list-action-bar">
+
+          <button class="action-btn primary-action" onclick="openRoleModal('新建角色')">&#128100; 新建角色</button>
+
+          <div class="action-separator"></div>
+
+          <button class="action-btn danger-action">&#128465; 批量删除</button>
+
+          <div style="flex:1;"></div>
+
+          <button class="action-btn">&#8635; 刷新</button>
+
+        </div>
+
+        <div class="list-filter-section">
+
+          <div class="list-filter-row" style="padding:8px 16px;">
+
+            <div class="filter-field"><input type="text" placeholder="搜索角色名称..."></div>
+
+            <div class="list-filter-btns"><button class="btn-search">&#128269; 查询</button></div>
+
+          </div>
+
+        </div>
+
+        <div class="list-table-area">
+
+          <table class="data-table">
+
+            <thead><tr><th><input type="checkbox" class="row-checkbox"></th><th>角色编码</th><th>角色名称</th><th>描述</th><th>数据范围</th><th>状态</th><th>创建时间</th><th>操作</th></tr></thead>
+
+            <tbody id="roleTableBody">
+
+              <tr><td colspan="8" class="text-muted text-center" style="padding:20px;">加载中...</td></tr>
+
+            </tbody>
+
+          </table>
+
+        </div>
+
+      </div>
+
+    </div>
+
+    <div class="role-perm-panel">
+
+      <div class="flex-between mb-12">
+
+        <h3 style="font-size:14px;font-weight:600;" id="permPanelTitle">请选择角色查看权限</h3>
+
+        <button class="btn btn-sm btn-primary" style="background:var(--admin-accent);border-color:var(--admin-accent);color:#0a0e1a;" onclick="savePermissions()">保存</button>
+
+      </div>
+
+      <p class="text-muted text-sm mb-16">权限细分到菜单/页面/按钮级别，勾选即授权。</p>
+
+      <div class="perm-tabs">
+
+        <div class="perm-tab active" onclick="switchPermTab(this,'func')">功能权限</div>
+
+        <div class="perm-tab" onclick="switchPermTab(this,'data')">数据权限</div>
+
+        <div class="perm-tab" onclick="switchPermTab(this,'field')">字段权限</div>
+
+      </div>
+
+      <div class="perm-tab-content">
+
+        <!-- 功能权限 Tab -->
+
+        <div class="perm-tab-pane active" id="pane-func">
+
+          <div class="perm-tree" id="permTreeContainer">
+
+            <p class="text-muted text-sm" style="padding:20px;">请从左侧选择角色后查看权限配置</p>
+
+          </div>
+
+          <div class="perm-tree-actions">
+
+            <button class="quick-btn" onclick="selectAllPerm(true)">&#10003; 全选</button>
+
+            <button class="quick-btn" onclick="selectAllPerm(false)">&#10005; 全不选</button>
+
+          </div>
+
+        </div>
+
+        <!-- 数据权限 Tab -->
+
+        <div class="perm-tab-pane" id="pane-data">
+
+          <table class="perm-mini-table">
+
+            <thead><tr><th>模块</th><th>数据范围</th><th>自定义条件</th></tr></thead>
+
+            <tbody id="dataPermBody">
+
+              <tr><td colspan="3" class="text-muted text-center">请选择角色</td></tr>
+
+            </tbody>
+
+          </table>
+
+        </div>
+
+        <!-- 字段权限 Tab -->
+
+        <div class="perm-tab-pane" id="pane-field">
+
+          <p class="text-muted text-sm" style="padding:20px;">字段权限配置将在后续版本中支持</p>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
+
+
+
+<!-- 角色新增/编辑弹窗 -->
+
+<div class="modal-overlay" id="roleModal">
+
+  <div class="modal-dialog">
+
+    <div class="modal-header">
+
+      <span class="modal-title" id="roleModalTitle">新建角色</span>
+
+      <button class="modal-close" onclick="closeRoleModal()">&times;</button>
+
+    </div>
+
+    <div class="modal-body">
+
+      <input type="hidden" id="editingRoleId">
+
+      <div class="form-group">
+
+        <label class="form-label">角色编码 <span style="color:var(--color-error);">*</span></label>
+
+        <input type="text" class="form-input" id="roleCode" placeholder="如 PURCHASE_MGR">
+
+        <div class="modal-tip">角色编码唯一，创建后不可修改，建议使用大写字母与下划线。</div>
+
+      </div>
+
+      <div class="form-group">
+
+        <label class="form-label">角色名称 <span style="color:var(--color-error);">*</span></label>
+
+        <input type="text" class="form-input" id="roleName" placeholder="如 采购主管">
+
+      </div>
+
+      <div class="form-group">
+
+        <label class="form-label">数据范围</label>
+
+        <select class="form-select" id="roleScope">
+
+          <option value="1">全部数据</option>
+
+          <option value="2">本组织及下级</option>
+
+          <option value="3">仅本组织</option>
+
+          <option value="4">仅本人</option>
+
+        </select>
+
+        <div class="modal-tip">控制该角色可查询的业务数据范围。</div>
+
+      </div>
+
+      <div class="form-group">
+
+        <label class="form-label">描述</label>
+
+        <textarea class="form-textarea" id="roleRemark" placeholder="请输入角色描述..."></textarea>
+
+      </div>
+
+    </div>
+
+    <div class="modal-footer">
+
+      <button class="btn btn-sm btn-cancel" onclick="closeRoleModal()">取消</button>
+
+      <button class="btn btn-sm btn-save" onclick="saveRole()">保存</button>
+
+    </div>
+
+  </div>
+
+</div>
+
+
+
+<div id="sidebarOverlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:99;" onclick="toggleSidebar()"></div>
+
+
+
+<div class="toast-container" id="toastContainer"></div>
+
+<div class="confirm-modal-overlay" id="confirmModal">
+
+  <div class="confirm-modal-dialog">
+
+    <div class="confirm-modal-header">
+
+      <span class="confirm-modal-icon" id="confirmIcon">&#9888;</span>
+
+      <span class="confirm-modal-title" id="confirmTitle">温馨提示</span>
+
+    </div>
+
+    <div class="confirm-modal-body">
+
+      <div class="confirm-modal-message" id="confirmMessage"></div>
+
+    </div>
+
+    <div class="confirm-modal-footer">
+
+      <button class="btn btn-sm btn-cancel" onclick="closeConfirmModal(false)">取消</button>
+
+      <button class="btn btn-sm btn-primary" style="background:var(--admin-accent);border-color:var(--admin-accent);color:#0a0e1a;" onclick="closeConfirmModal(true)">确定</button>
+
+    </div>
+
+  </div>
+
+</div>
+
+
+
+<script>
+
+var confirmCallback = null;
+
+function showToast(message, type) {
+
+  var container = document.getElementById('toastContainer');
+
+  var icons = { success: '&#9989;', warning: '&#9888;', error: '&#10060;', info: '&#9432;' };
+
+  var titles = { success: '操作成功', warning: '温馨提示', error: '系统提示', info: '系统提示' };
+
+  var t = type || 'info';
+
+  var toast = document.createElement('div');
+
+  toast.className = 'toast toast-' + t;
+
+  toast.innerHTML = '<div class="toast-icon">' + icons[t] + '</div><div class="toast-content"><div class="toast-title">' + titles[t] + '</div><div class="toast-message">' + message + '</div></div>';
+
+  container.appendChild(toast);
+
+  setTimeout(function() { toast.style.opacity = '0'; toast.style.transform = 'translateX(100%)'; setTimeout(function() { toast.remove(); }, 300); }, 3000);
+
+}
+
+function showConfirm(message, type, callback) {
+
+  document.getElementById('confirmMessage').textContent = message;
+
+  document.getElementById('confirmTitle').textContent = (type === 'warning') ? '温馨提示' : '系统提示';
+
+  document.getElementById('confirmIcon').innerHTML = (type === 'warning') ? '&#9888;' : '&#10060;';
+
+  confirmCallback = callback;
+
+  document.getElementById('confirmModal').classList.add('show');
+
+}
+
+function closeConfirmModal(result) {
+
+  document.getElementById('confirmModal').classList.remove('show');
+
+  if (confirmCallback) { confirmCallback(result); confirmCallback = null; }
+
+}
+
+
+
+var API_BASE='http://localhost:3001/api';
+
+var token=localStorage.getItem('accessToken');
+
+if(!token){token='local-dev-token-'+Date.now();localStorage.setItem('accessToken',token);}
+
+var currentRoleId=null;
+
+var currentRoleName='';
+
+var menuTreeData=[];
+
+var roleList=[];
+
+var ACTIONS=['查看','新增','编辑','删除','审核','导出','打印'];
+
+var ACTION_KEYS={'查看':'view','新增':'add','编辑':'edit','删除':'delete','审核':'audit','导出':'export','打印':'print'};
+
+var SCOPE_MAP={1:'全部数据',2:'本组织及下级',3:'仅本组织',4:'仅本人'};
+
+var SCOPE_CLASS={1:'',2:'scope-org',3:'scope-org',4:'scope-self'};
+
+
+
+
+
+
+
+function togglePermNode(el){var n=el.closest('.tree-node');n.classList.toggle('expanded');var t=el.querySelector('.tree-toggle');if(t)t.textContent=n.classList.contains('expanded')?'\u25BC':'\u25B6';var ch=n.querySelector(':scope > .tree-children');if(ch)ch.style.display=n.classList.contains('expanded')?'block':'none';}
+
+function switchPermTab(el,key){el.parentNode.querySelectorAll('.perm-tab').forEach(function(t){t.classList.remove('active');});el.classList.add('active');document.querySelectorAll('.perm-tab-pane').forEach(function(p){p.classList.remove('active');});var pane=document.getElementById('pane-'+key);if(pane)pane.classList.add('active');}
+
+function escapeHtml(s){if(!s)return '';return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+
+function formatDate(s){if(!s)return '';var d=new Date(s);var p=function(n){return n<10?'0'+n:n;};return d.getFullYear()+'-'+p(d.getMonth()+1)+'-'+p(d.getDate())+' '+p(d.getHours())+':'+p(d.getMinutes());}
+
+
+
+// 加载角色列表
+
+async function loadRoles(){
+
+  roleList=JSON.parse(localStorage.getItem('erp_roles')||'[]');
+
+  
+
+  if(roleList.length===0){
+
+    roleList=[
+
+      {id:'role-001',code:'ADMIN',name:'超级管理员',dataScope:1,status:1,remark:'系统超级管理员，拥有所有权限',permissions:'["*"]',createdAt:new Date().toISOString()},
+
+      {id:'role-002',code:'SALES_MGR',name:'销售主管',dataScope:3,status:1,remark:'负责销售订单管理',permissions:'["*"]',createdAt:new Date().toISOString()},
+
+      {id:'role-003',code:'PURCHASE_MGR',name:'采购主管',dataScope:3,status:1,remark:'负责采购订单管理',permissions:'["*"]',createdAt:new Date().toISOString()},
+
+      {id:'role-004',code:'PRODUCTION_MGR',name:'生产主管',dataScope:3,status:1,remark:'负责生产计划管理',permissions:'["*"]',createdAt:new Date().toISOString()},
+
+      {id:'role-005',code:'QA_ENGINEER',name:'质量工程师',dataScope:3,status:1,remark:'负责质量检验管理',permissions:'["*"]',createdAt:new Date().toISOString()},
+
+      {id:'role-006',code:'STOCK_KEEPER',name:'仓管员',dataScope:3,status:1,remark:'负责库存管理',permissions:'["*"]',createdAt:new Date().toISOString()}
+
+    ];
+
+    localStorage.setItem('erp_roles',JSON.stringify(roleList));
+
+  }
+
+  
+
+  renderRoleTable();
+
+  
+
+  try{
+
+    var res=await fetch(API_BASE+'/roles?page=1&pageSize=100',{headers:{'Authorization':'Bearer '+token}});
+
+    var data=await res.json();
+
+    if(data.code===200&&data.data){
+
+      var apiRoles=data.data.list||[];
+
+      if(apiRoles.length>0){
+
+        localStorage.setItem('erp_roles',JSON.stringify(apiRoles));
+
+        roleList=apiRoles;
+
+        renderRoleTable();
+
+      }
+
+    }
+
+  }catch(e){
+
+    console.warn('后端角色API不可用，使用本地缓存数据');
+
+  }
+
+}
+
+
+
+// 渲染角色表格
+
+function renderRoleTable(){
+
+  var tbody=document.getElementById('roleTableBody');
+
+  if(roleList.length===0){
+
+    tbody.innerHTML='<tr><td colspan="8" class="text-muted text-center" style="padding:20px;">暂无角色数据</td></tr>';
+
+    return;
+
+  }
+
+  tbody.innerHTML=roleList.map(function(r){
+
+    var scope=SCOPE_MAP[r.dataScope]||'全部数据';
+
+    var scopeCls=SCOPE_CLASS[r.dataScope]||'';
+
+    var statusBadge=r.status===1?'<span class="badge badge-success">启用</span>':'<span class="badge badge-warning">停用</span>';
+
+    var isCurrent=r.id===currentRoleId;
+
+    var rowStyle=isCurrent?'background:rgba(245,158,11,0.06);':'';
+
+    var actions='<a onclick="selectRole(\''+r.id+'\')">权限配置</a><a onclick="editRole(\''+r.id+'\')">编辑</a>';
+
+    if(r.code!=='ADMIN'){actions+='<a style="color:var(--color-error);" onclick="deleteRole(\''+r.id+'\')">删除</a>';}
+
+    return '<tr style="'+rowStyle+'">'+
+
+      '<td><input type="checkbox" class="row-checkbox"></td>'+
+
+      '<td style="font-family:var(--font-mono);">'+escapeHtml(r.code)+'</td>'+
+
+      '<td class="role-name-cell">'+escapeHtml(r.name)+'</td>'+
+
+      '<td class="text-muted">'+escapeHtml(r.remark||'')+'</td>'+
+
+      '<td><span class="data-scope-badge '+scopeCls+'">'+scope+'</span></td>'+
+
+      '<td>'+statusBadge+'</td>'+
+
+      '<td class="text-muted text-sm">'+formatDate(r.createdAt)+'</td>'+
+
+      '<td class="row-action-links">'+actions+'</td>'+
+
+    '</tr>';
+
+  }).join('');
+
+}
+
+
+
+// 加载菜单树
+
+async function loadMenuTree(){
+
+  try{
+
+    var res=await fetch(API_BASE+'/menus/tree',{headers:{'Authorization':'Bearer '+token}});
+
+    var data=await res.json();
+
+    if(data.code===200&&data.data){
+
+      menuTreeData=data.data;
+
+    }
+
+  }catch(e){
+
+    console.error('加载菜单树失败:',e);
+
+  }
+
+}
+
+
+
+// 渲染权限树
+
+function renderPermTree(permissions){
+
+  var container=document.getElementById('permTreeContainer');
+
+  if(menuTreeData.length===0){
+
+    container.innerHTML='<p class="text-muted text-sm" style="padding:20px;">菜单数据加载中...</p>';
+
+    return;
+
+  }
+
+  var permSet={};
+
+  if(permissions&&Array.isArray(permissions)){
+
+    permissions.forEach(function(p){permSet[p]=true;});
+
+  }
+
+  container.innerHTML=menuTreeData.map(function(menu){return renderTreeNode(menu,permSet);}).join('');
+
+}
+
+
+
+function renderTreeNode(menu,permSet){
+
+  var hasChildren=menu.children&&menu.children.length>0;
+
+  var menuId=menu.id;
+
+  var checked=permSet[menuId]?'checked':'';
+
+
+
+  if(hasChildren){
+
+    var childrenHtml=menu.children.map(function(c){return renderTreeNode(c,permSet);}).join('');
+
+    return '<div class="tree-node">'+
+
+      '<div class="tree-node-header" onclick="togglePermNode(this)">'+
+
+        '<span class="tree-toggle">&#9654;</span>'+
+
+        '<input type="checkbox" class="tree-checkbox" data-menu-id="'+menuId+'" '+checked+' onclick="event.stopPropagation();onMenuCheck(this)">'+
+
+        '<span class="tree-label">'+escapeHtml(menu.name)+'</span>'+
+
+      '</div>'+
+
+      '<div class="tree-children">'+childrenHtml+'</div>'+
+
+    '</div>';
+
+  }else{
+
+    // 叶子节点 - 显示操作权限
+
+    var actionsHtml=ACTIONS.map(function(action){
+
+      var actionKey=ACTION_KEYS[action];
+
+      var permKey=menuId+':'+actionKey;
+
+      var actionChecked=permSet[permKey]?'checked':'';
+
+      return '<div class="tree-leaf"><input type="checkbox" class="tree-checkbox" data-perm-key="'+permKey+'" '+actionChecked+'> '+action+'</div>';
+
+    }).join('');
+
+    return '<div class="tree-node">'+
+
+      '<div class="tree-node-header" onclick="togglePermNode(this)">'+
+
+        '<span class="tree-toggle">&#9654;</span>'+
+
+        '<input type="checkbox" class="tree-checkbox" data-menu-id="'+menuId+'" '+checked+' onclick="event.stopPropagation();onMenuCheck(this)">'+
+
+        '<span class="tree-label">'+escapeHtml(menu.name)+'</span>'+
+
+      '</div>'+
+
+      '<div class="tree-children">'+actionsHtml+'</div>'+
+
+    '</div>';
+
+  }
+
+}
+
+
+
+// 菜单复选框联动 - 选中菜单时自动选中所有操作权限
+
+function onMenuCheck(cb){
+
+  if(cb.checked){
+
+    var node=cb.closest('.tree-node');
+
+    if(node){
+
+      node.querySelectorAll('.tree-leaf .tree-checkbox').forEach(function(leaf){leaf.checked=true;});
+
+    }
+
+  }
+
+}
+
+
+
+// 选择角色
+
+function selectRole(roleId){
+
+  currentRoleId=roleId;
+
+  var role=roleList.find(function(r){return r.id===roleId;});
+
+  if(!role)return;
+
+  currentRoleName=role.name;
+
+  document.getElementById('permPanelTitle').textContent=role.name+' - 权限配置';
+
+  renderRoleTable();
+
+  // 解析权限
+
+  var permissions=[];
+
+  try{permissions=JSON.parse(role.permissions||'[]');}catch(e){permissions=[];}
+
+  if(role.code==='ADMIN'){permissions=['*'];}
+
+  renderPermTree(permissions);
+
+  // 如果是ADMIN，全选
+
+  if(role.code==='ADMIN'){
+
+    document.getElementById('permTreeContainer').querySelectorAll('.tree-checkbox').forEach(function(cb){cb.checked=true;cb.disabled=true;});
+
+  }
+
+}
+
+
+
+// 保存权限
+
+async function savePermissions(){
+
+  if(!currentRoleId){showToast('请先选择角色','warning');return;}
+
+  var role=roleList.find(function(r){return r.id===currentRoleId;});
+
+  if(role&&role.code==='ADMIN'){showToast('超级管理员权限不可修改','warning');return;}
+
+  // 收集选中的权限
+
+  var perms=[];
+
+  document.getElementById('permTreeContainer').querySelectorAll('.tree-checkbox').forEach(function(cb){
+
+    if(cb.checked){
+
+      if(cb.dataset.menuId){perms.push(cb.dataset.menuId);}
+
+      if(cb.dataset.permKey){perms.push(cb.dataset.permKey);}
+
+    }
+
+  });
+
+  try{
+
+    var res=await fetch(API_BASE+'/roles/'+currentRoleId,{
+
+      method:'PUT',
+
+      headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},
+
+      body:JSON.stringify({permissions:JSON.stringify(perms)})
+
+    });
+
+    var data=await res.json();
+
+    if(data.code===200){
+
+      showToast('权限保存成功','success');
+
+      role.permissions=JSON.stringify(perms);
+
+    }else{
+
+      showToast('保存失败：'+(data.message||'未知错误'),'error');
+
+    }
+
+  }catch(e){
+
+    showToast('保存失败：'+e.message,'error');
+
+  }
+
+}
+
+
+
+// 全选/全不选
+
+function selectAllPerm(state){
+
+  var pane=document.getElementById('pane-func');
+
+  if(!pane)return;
+
+  pane.querySelectorAll('.tree-checkbox').forEach(function(cb){
+
+    if(!cb.disabled)cb.checked=state;
+
+  });
+
+}
+
+
+
+// 编辑角色
+
+function editRole(roleId){
+
+  var role=roleList.find(function(r){return r.id===roleId;});
+
+  if(!role)return;
+
+  var modal=document.getElementById('roleModal');
+
+  document.getElementById('roleModalTitle').textContent='编辑角色';
+
+  document.getElementById('roleCode').value=role.code||'';
+
+  document.getElementById('roleCode').disabled=true;
+
+  document.getElementById('roleName').value=role.name||'';
+
+  document.getElementById('roleScope').value=String(role.dataScope||1);
+
+  document.getElementById('roleRemark').value=role.remark||'';
+
+  document.getElementById('editingRoleId').value=roleId;
+
+  modal.classList.add('show');
+
+}
+
+
+
+// 新建/保存角色
+
+function openRoleModal(title){
+
+  var modal=document.getElementById('roleModal');
+
+  document.getElementById('roleModalTitle').textContent=title;
+
+  document.getElementById('roleCode').value='';
+
+  document.getElementById('roleCode').disabled=false;
+
+  document.getElementById('roleName').value='';
+
+  document.getElementById('roleScope').value='1';
+
+  document.getElementById('roleRemark').value='';
+
+  document.getElementById('editingRoleId').value='';
+
+  modal.classList.add('show');
+
+}
+
+function closeRoleModal(){document.getElementById('roleModal').classList.remove('show');}
+
+
+
+async function saveRole(){
+
+  var code=document.getElementById('roleCode').value.trim();
+
+  var name=document.getElementById('roleName').value.trim();
+
+  var dataScope=Number(document.getElementById('roleScope').value)||1;
+
+  var remark=document.getElementById('roleRemark').value.trim();
+
+  var editId=document.getElementById('editingRoleId').value;
+
+  if(!code||!name){showToast('请填写角色编码和名称','warning');return;}
+
+  
+
+  saveRoleToLocal(editId,{code:code,name:name,dataScope:dataScope,remark:remark});
+
+  showToast('保存成功','success');
+
+  closeRoleModal();
+
+  await loadRoles();
+
+  
+
+  try{
+
+    var url=editId?API_BASE+'/roles/'+editId:API_BASE+'/roles';
+
+    var method=editId?'PUT':'POST';
+
+    var body={code:code,name:name,dataScope:dataScope,remark:remark};
+
+    if(!editId){body.permissions=JSON.stringify([]);}
+
+    var res=await fetch(url,{method:method,headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},body:JSON.stringify(body)});
+
+    var data=await res.json();
+
+    if(data.code!==200){
+
+      console.warn('后端保存失败，但已保存到本地缓存');
+
+    }
+
+  }catch(e){
+
+    console.warn('后端不可用，数据已保存到本地缓存');
+
+  }
+
+}
+
+
+
+function saveRoleToLocal(id,data){
+
+  var roleList=JSON.parse(localStorage.getItem('erp_roles')||'[]');
+
+  if(id){
+
+    var index=roleList.findIndex(function(r){return r.id===id;});
+
+    if(index!==-1){
+
+      roleList[index]=Object.assign({},roleList[index],data);
+
+    }
+
+  }else{
+
+    roleList.push({
+
+      id:'role-'+Date.now(),
+
+      ...data,
+
+      status:1,
+
+      permissions:'["*"]',
+
+      createdAt:new Date().toISOString()
+
+    });
+
+  }
+
+  localStorage.setItem('erp_roles',JSON.stringify(roleList));
+
+}
+
+
+
+// 删除角色
+
+async function deleteRole(roleId){
+
+  showConfirm('确认删除此角色？','warning',async function(result){
+
+    if(result){
+
+      try{
+
+        var res=await fetch(API_BASE+'/roles/'+roleId,{method:'DELETE',headers:{'Authorization':'Bearer '+token}});
+
+        var data=await res.json();
+
+        if(data.code===200){
+
+          showToast('删除成功','success');
+
+          await loadRoles();
+
+        }else{
+
+          showToast('删除失败：'+(data.message||'未知错误'),'error');
+
+        }
+
+      }catch(e){showToast('删除失败：'+e.message,'error');}
+
+    }
+
+  });
+
+}
+
+
+
+// 初始化
+
+(async function(){
+
+  await loadMenuTree();
+
+  await loadRoles();
+
+  // 如果有角色，默认选中第一个
+
+  if(roleList.length>0){selectRole(roleList[0].id);}
+
+})();
+
+
+
+document.addEventListener('keydown',function(e){if(e.key==='Escape'){closeRoleModal();}});
+
+document.getElementById('roleModal').addEventListener('click',function(e){if(e.target===this)closeRoleModal();});
+
+</script>
+
+</body>
+
+</html>
+

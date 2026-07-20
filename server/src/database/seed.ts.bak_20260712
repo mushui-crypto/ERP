@@ -1,0 +1,181 @@
+﻿import 'reflect-metadata';
+import { DataSource } from 'typeorm';
+import * as bcrypt from 'bcryptjs';
+import { User } from './entities/user.entity';
+import { Role } from './entities/role.entity';
+import { Org } from './entities/org.entity';
+import { Menu } from './entities/menu.entity';
+import { SysUserRole } from './entities/sys-user-role.entity';
+
+const dataSource = new DataSource({
+  type: 'mssql',
+  host: 'localhost',
+  port: 1433,
+  username: 'sa',
+  password: '191413',
+  database: 'panshu_erp',
+  entities: [User, Role, Org, Menu, SysUserRole],
+  synchronize: true,
+  options: {
+    encrypt: false,
+    trustServerCertificate: true,
+  },
+} as any);
+
+async function seed() {
+  await dataSource.initialize();
+  console.log('数据库连接成功，开始初始化系统数据...');
+
+  const userRepo = dataSource.getRepository(User);
+  const roleRepo = dataSource.getRepository(Role);
+  const orgRepo = dataSource.getRepository(Org);
+  const menuRepo = dataSource.getRepository(Menu);
+  const userRoleRepo = dataSource.getRepository(SysUserRole);
+
+  let orgId: string;
+
+  const orgExists = await orgRepo.findOne({ where: { code: 'PANSHU' } });
+  if (!orgExists) {
+    const org = await orgRepo.save({
+      name: '磐枢集团',
+      code: 'PANSHU',
+      orgType: 1,
+      fullName: '磐枢工业智能集团有限公司',
+      shortName: '磐枢集团',
+      contact: '系统管理员',
+      phone: '',
+      address: '',
+      status: 1,
+      sortOrder: 1,
+      isDeleted: 0,
+    });
+    orgId = org.id;
+    console.log('系统组织创建成功');
+  } else {
+    orgId = orgExists.id;
+    console.log('系统组织已存在');
+  }
+
+  let roleId: string;
+  const roleExists = await roleRepo.findOne({ where: { code: 'ADMIN' } });
+  if (!roleExists) {
+    const role = await roleRepo.save({
+      name: '系统管理员',
+      code: 'ADMIN',
+      dataScope: 1,
+      permissions: JSON.stringify(['*']),
+      status: 1,
+      remark: '系统超级管理员，拥有所有权限',
+      isDeleted: 0,
+    });
+    roleId = role.id;
+    console.log('系统角色创建成功: 系统管理员');
+  } else {
+    roleId = roleExists.id;
+    console.log('系统角色已存在');
+  }
+
+  let adminUserId: string;
+  const adminExists = await userRepo.findOne({ where: { username: 'admin' } });
+  if (!adminExists) {
+    const hashedPassword = await bcrypt.hash('123456', 10);
+    const admin = await userRepo.save({
+      username: 'admin',
+      password: hashedPassword,
+      realName: '系统管理员',
+      email: '',
+      phone: '',
+      orgId: orgId,
+      avatar: '',
+      status: 1,
+      isDeleted: 0,
+    });
+    adminUserId = admin.id;
+    console.log('管理员账号创建成功: admin / 123456');
+  } else {
+    adminUserId = adminExists.id;
+    console.log('管理员账号已存在');
+  }
+
+  const adminRoleExists = await userRoleRepo.findOne({ where: { userId: adminUserId, roleId } });
+  if (!adminRoleExists) {
+    await userRoleRepo.save({
+      userId: adminUserId,
+      roleId,
+    });
+    console.log('管理员角色分配成功');
+  } else {
+    console.log('管理员角色已分配');
+  }
+
+  const menuExists = await menuRepo.findOne({ where: { name: '工作台' } });
+  if (!menuExists) {
+    const menus = [
+      { name: '工作台', icon: 'home', menuType: 2, path: '/index', component: 'index', sortOrder: 1, isVisible: 1, isCache: 1, status: 1, isDeleted: 0 },
+      { name: '基础数据', icon: 'database', menuType: 1, path: '/base-data', sortOrder: 2, isVisible: 1, isCache: 0, status: 1, isDeleted: 0 },
+      { name: '供应链管理', icon: 'shopping-cart', menuType: 1, path: '/supply-chain', sortOrder: 3, isVisible: 1, isCache: 0, status: 1, isDeleted: 0 },
+      { name: '生产制造', icon: 'tool', menuType: 1, path: '/production', sortOrder: 4, isVisible: 1, isCache: 0, status: 1, isDeleted: 0 },
+      { name: '质量管理', icon: 'safety-certificate', menuType: 1, path: '/quality', sortOrder: 5, isVisible: 1, isCache: 0, status: 1, isDeleted: 0 },
+      { name: '财务会计', icon: 'money-collect', menuType: 1, path: '/finance', sortOrder: 6, isVisible: 1, isCache: 0, status: 1, isDeleted: 0 },
+      { name: '人力资源', icon: 'team', menuType: 1, path: '/hr', sortOrder: 7, isVisible: 1, isCache: 0, status: 1, isDeleted: 0 },
+      { name: '设备管理', icon: 'control', menuType: 1, path: '/equipment', sortOrder: 8, isVisible: 1, isCache: 0, status: 1, isDeleted: 0 },
+      { name: '智能体应用', icon: 'robot', menuType: 1, path: '/ai', sortOrder: 9, isVisible: 1, isCache: 0, status: 1, isDeleted: 0 },
+      { name: '决策分析', icon: 'bar-chart', menuType: 1, path: '/decision', sortOrder: 10, isVisible: 1, isCache: 0, status: 1, isDeleted: 0 },
+      { name: '售后与条码', icon: 'scan', menuType: 1, path: '/service-barcode', sortOrder: 11, isVisible: 1, isCache: 0, status: 1, isDeleted: 0 },
+      { name: '系统设置', icon: 'setting', menuType: 1, path: '/settings', sortOrder: 12, isVisible: 1, isCache: 0, status: 1, isDeleted: 0 },
+    ];
+
+    const savedMenus = await menuRepo.save(menus);
+    console.log(`系统菜单创建成功: ${savedMenus.length} 个一级菜单`);
+
+    const baseDataMenu = savedMenus.find(m => m.name === '基础数据');
+    if (baseDataMenu) {
+      await menuRepo.save([
+        { parentId: baseDataMenu.id, name: '物料管理', menuType: 2, path: '/base-data/material', component: 'master-material', sortOrder: 1, isVisible: 1, isCache: 1, status: 1, isDeleted: 0 },
+        { parentId: baseDataMenu.id, name: '客户管理', menuType: 2, path: '/base-data/customer', component: 'master-customer', sortOrder: 2, isVisible: 1, isCache: 1, status: 1, isDeleted: 0 },
+        { parentId: baseDataMenu.id, name: '供应商管理', menuType: 2, path: '/base-data/supplier', component: 'master-supplier', sortOrder: 3, isVisible: 1, isCache: 1, status: 1, isDeleted: 0 },
+        { parentId: baseDataMenu.id, name: '部门管理', menuType: 2, path: '/base-data/department', component: 'base-department', sortOrder: 4, isVisible: 1, isCache: 1, status: 1, isDeleted: 0 },
+        { parentId: baseDataMenu.id, name: '员工管理', menuType: 2, path: '/base-data/employee', component: 'base-employee', sortOrder: 5, isVisible: 1, isCache: 1, status: 1, isDeleted: 0 },
+        { parentId: baseDataMenu.id, name: '计量单位', menuType: 2, path: '/base-data/unit', component: 'base-unit', sortOrder: 6, isVisible: 1, isCache: 1, status: 1, isDeleted: 0 },
+      ]);
+    }
+
+    const supplyChainMenu = savedMenus.find(m => m.name === '供应链管理');
+    if (supplyChainMenu) {
+      await menuRepo.save([
+        { parentId: supplyChainMenu.id, name: '采购申请', menuType: 2, path: '/purchase/request', component: 'purchase-request', sortOrder: 1, isVisible: 1, isCache: 1, status: 1, isDeleted: 0 },
+        { parentId: supplyChainMenu.id, name: '采购订单', menuType: 2, path: '/purchase/order', component: 'purchase-order', sortOrder: 2, isVisible: 1, isCache: 1, status: 1, isDeleted: 0 },
+        { parentId: supplyChainMenu.id, name: '采购入库', menuType: 2, path: '/purchase/inbound', component: 'purchase-inbound', sortOrder: 3, isVisible: 1, isCache: 1, status: 1, isDeleted: 0 },
+        { parentId: supplyChainMenu.id, name: '销售报价', menuType: 2, path: '/sales/quotation', component: 'sales-quotation', sortOrder: 4, isVisible: 1, isCache: 1, status: 1, isDeleted: 0 },
+        { parentId: supplyChainMenu.id, name: '销售订单', menuType: 2, path: '/sales/order', component: 'sales-order', sortOrder: 5, isVisible: 1, isCache: 1, status: 1, isDeleted: 0 },
+        { parentId: supplyChainMenu.id, name: '销售出库', menuType: 2, path: '/sales/outbound', component: 'sales-outbound', sortOrder: 6, isVisible: 1, isCache: 1, status: 1, isDeleted: 0 },
+        { parentId: supplyChainMenu.id, name: '库存查询', menuType: 2, path: '/inventory/stock', component: 'inventory-stock', sortOrder: 7, isVisible: 1, isCache: 1, status: 1, isDeleted: 0 },
+        { parentId: supplyChainMenu.id, name: '入库管理', menuType: 2, path: '/inventory/in', component: 'inventory-in', sortOrder: 8, isVisible: 1, isCache: 1, status: 1, isDeleted: 0 },
+        { parentId: supplyChainMenu.id, name: '出库管理', menuType: 2, path: '/inventory/out', component: 'inventory-out', sortOrder: 9, isVisible: 1, isCache: 1, status: 1, isDeleted: 0 },
+      ]);
+    }
+
+    const productionMenu = savedMenus.find(m => m.name === '生产制造');
+    if (productionMenu) {
+      await menuRepo.save([
+        { parentId: productionMenu.id, name: 'BOM管理', menuType: 2, path: '/production/bom', component: 'bom', sortOrder: 1, isVisible: 1, isCache: 1, status: 1, isDeleted: 0 },
+        { parentId: productionMenu.id, name: '工艺路线', menuType: 2, path: '/production/routing', component: 'production-routing', sortOrder: 2, isVisible: 1, isCache: 1, status: 1, isDeleted: 0 },
+        { parentId: productionMenu.id, name: '生产订单', menuType: 2, path: '/production/order', component: 'production-order', sortOrder: 3, isVisible: 1, isCache: 1, status: 1, isDeleted: 0 },
+        { parentId: productionMenu.id, name: '生产领料', menuType: 2, path: '/production/material', component: 'production-material', sortOrder: 4, isVisible: 1, isCache: 1, status: 1, isDeleted: 0 },
+        { parentId: productionMenu.id, name: '生产入库', menuType: 2, path: '/production/inbound', component: 'production-inbound', sortOrder: 5, isVisible: 1, isCache: 1, status: 1, isDeleted: 0 },
+        { parentId: productionMenu.id, name: 'MES派工', menuType: 2, path: '/mes/dispatch', component: 'mes-dispatch', sortOrder: 6, isVisible: 1, isCache: 1, status: 1, isDeleted: 0 },
+        { parentId: productionMenu.id, name: 'MES报工', menuType: 2, path: '/mes/report', component: 'mes-report', sortOrder: 7, isVisible: 1, isCache: 1, status: 1, isDeleted: 0 },
+      ]);
+    }
+
+    console.log('系统菜单初始化完成');
+  }
+
+  console.log('系统初始化完成！');
+  await dataSource.destroy();
+}
+
+seed().catch((err) => {
+  console.error('初始化失败:', err);
+  process.exit(1);
+});

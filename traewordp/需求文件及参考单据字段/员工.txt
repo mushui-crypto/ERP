@@ -1,0 +1,78 @@
+员工
+
+字段说明：
+单据头：FBillHead 
+	 实体主键：FID 
+	 数据状态：FDocumentStatus 
+	 禁用状态：FForbidStatus 
+	 员工姓名：FName  (必填项)
+	 编码：FNumber 
+	 描述：FDescription 
+	 创建组织：FCreateOrgId  (必填项)
+	 使用组织：FUseOrgId  (必填项)
+	 创建人：FCreatorId 
+	 修改人：FModifierId 
+	 创建日期：FCreateDate 
+	 修改日期：FModifyDate 
+	 禁用日期：FForbidDate 
+	 禁用人：FForbidderId 
+	 员工编号：FStaffNumber  (必填项)
+	 照片：FPhoto 
+	 审核人：FAuditorID 
+	 审核日期：FAuditDate 
+	 HR员工：FIsHR 
+	 联系地址：FAddress 
+	 移动电话：FMobile 
+	 电子邮箱：FEmail 
+	 固定电话：FTel 
+	 主任职职员信息：FStaffId 
+	 人员：FPersonID 
+	 员工姓名：FBaseProperty8 
+	 主证件内码：FFirstCardID 
+	 主任岗岗位：FBaseProperty 
+	 主任岗开始日期：FBaseProperty1 
+	 任岗状态：FBaseProperty9 
+	 来源于HR：FIsSHR 
+	 用户角色：FUserRole 
+	 收银员权限组：FCashierGrp 
+	 创建销售员：FCreateSaler 
+	 用户ID：FUserId 
+	 收银员ID：FCashierId 
+	 销售员ID：FSalerId 
+	 所属岗位：FPostId 
+	 统一账号：FUniportalNo 
+岗位信息单据体：FPostEntity 
+	 实体主键：FENTRYID 
+	 就任岗位：FPost  (必填项)
+	 任岗开始日期：FStaffStartDate 
+	 所属部门：FPostDept  (必填项)
+	  数据状态：FStaffDocumentStatus 
+	  禁用状态：FStaffForbidStatus 
+	 部门全称：FBaseProperty3 
+	 员工任岗ID：FStaffDetails 
+	 是否主任岗：FIsFirstPost 
+	 工作组织：FWorkOrgId  (必填项)
+	 业务员类型：FOperatorType 
+SHR映射实体：FSHRMapEntity 
+	 实体主键：FMAPID 
+	 编码：FSHRNumber 
+	 HR内码：FShrId 
+	 名称：FSHRName 
+	 状态：FSHRStatus 
+财务信息：FBankInfo 
+	 实体主键：FBankId 
+	 国家：FBankCountry 
+	 开户银行：FOpenBankName 
+	 银行账号：FBankCode 
+	 账户名称：FBankHolder 
+	 币别：FBankCurrencyId 
+	 默认：FBankIsDefault 
+	 描述：FBankDesc 
+	 开户行地址：FOpenAddressRec 
+	 联行号：FCNAPS 
+	 收款银行：FBankTypeRec 
+	 网点名称：FTextBankDetail 
+	 银行网点：FBankDetail 
+	 收款人证件类型：FCertType 
+	 收款人证件号码：FCertNum 
+	 来源于HR：FIsFromSHR 

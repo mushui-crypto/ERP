@@ -1,0 +1,445 @@
+﻿<!DOCTYPE html>
+
+<html lang="zh-CN">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>大模型API管理 — 磐枢工业智能平台(管理端)</title>
+
+<link rel="stylesheet" href="../common-admin.css">
+
+<script src="../../common.js"></script>
+
+<style>
+
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+
+.stats-row {
+
+  display: grid;
+
+  grid-template-columns: repeat(4, 1fr);
+
+  gap: 16px;
+
+  margin-bottom: 20px;
+
+}
+
+.stat-card {
+
+  background: #fff;
+
+  border: 1px solid #e8e8e8;
+
+  border-radius: var(--radius-md);
+
+  padding: 16px;
+
+}
+
+.stat-card .stat-value {
+
+  font-family: var(--font-mono);
+
+  font-size: 24px;
+
+  font-weight: 700;
+
+  color: #333;
+
+}
+
+.stat-card .stat-label {
+
+  font-size: 12px;
+
+  color: #999;
+
+  margin-top: 4px;
+
+}
+
+
+
+/* ===== Toast 提示框 ===== */
+
+.toast-container { position: fixed; top: 20px; right: 20px; z-index: 10000; display: flex; flex-direction: column; gap: 10px; }
+
+.toast { display: flex; align-items: center; gap: 10px; padding: 14px 18px; border-radius: var(--radius-md); background: #fff; border: 1px solid #e8e8e8; box-shadow: 0 4px 16px rgba(0,0,0,0.15); min-width: 280px; max-width: 420px; animation: slideIn 0.3s ease; }
+
+@keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+
+.toast .toast-icon { font-size: 18px; flex-shrink: 0; }
+
+.toast .toast-content { flex: 1; font-size: 13px; }
+
+.toast .toast-title { font-weight: 600; margin-bottom: 2px; color: #333; }
+
+.toast .toast-message { color: #666; font-size: 12px; }
+
+.toast-success { border-color: rgba(34,197,94,0.3); background: rgba(34,197,94,0.05); }
+
+.toast-success .toast-title { color: #52c41a; }
+
+.toast-warning { border-color: rgba(245,158,11,0.3); background: rgba(245,158,11,0.05); }
+
+.toast-warning .toast-title { color: #faad14; }
+
+.toast-error { border-color: rgba(239,68,68,0.3); background: rgba(239,68,68,0.05); }
+
+.toast-error .toast-title { color: #f5222d; }
+
+.toast-info { border-color: rgba(56,189,248,0.3); background: rgba(56,189,248,0.05); }
+
+.toast-info .toast-title { color: #1890ff; }
+
+
+
+/* ===== 确认对话框 ===== */
+
+.confirm-modal-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:2000; justify-content:center; align-items:center; }
+
+.confirm-modal-overlay.show { display:flex; }
+
+.confirm-modal-dialog { background:#fff; border:1px solid #e8e8e8; border-radius:4px; width:420px; overflow:hidden; }
+
+.confirm-modal-header { padding:16px 20px; border-bottom:1px solid #e8e8e8; display:flex; align-items:center; gap:10px; }
+
+.confirm-modal-icon { font-size:20px; }
+
+.confirm-modal-title { font-size:15px; font-weight:600; color:#333; }
+
+.confirm-modal-body { padding:20px; text-align:center; }
+
+.confirm-modal-message { font-size:14px; color: #666; line-height:1.6; }
+
+.confirm-modal-footer { display:flex; gap:12px; justify-content:flex-end; padding:16px 20px; border-top:1px solid #e8e8e8; }
+
+</style>
+
+</head>
+
+<body>
+
+<aside class="sidebar admin-sidebar" id="sidebar">
+
+    <div class="sidebar-logo">
+
+    <img src="../../images/LOGO.png" alt="磐枢工业智能平台" style="width: 100%; max-width: 200px; margin-bottom: 8px;">
+
+    <h1 style="font-size: 16px; margin: 0;">磐枢工业智能平台</h1>
+
+  </div>
+
+  <nav class="sidebar-menu">
+
+    <div class="sidebar-menu-group"><div class="sidebar-menu-item" onclick="toggleGroup(this)"><span class="icon">&#128451;</span> 数据中心管理<span class="arrow">&#9654;</span></div><div class="sub-menu"><a class="sidebar-menu-item" href="../data-center/index.html">数据中心总览</a><a class="sidebar-menu-item" href="../data-center/new.html">新建数据中心</a><a class="sidebar-menu-item" href="../data-center/backup.html">备份管理</a></div></div>
+
+    <div class="sidebar-menu-group"><div class="sidebar-menu-item" onclick="toggleGroup(this)"><span class="icon">&#128101;</span> 组织与权限<span class="arrow">&#9654;</span></div><div class="sub-menu"><a class="sidebar-menu-item" href="../org-perm/org.html">组织架构</a><a class="sidebar-menu-item" href="../org-perm/user.html">用户管理</a><a class="sidebar-menu-item" href="../org-perm/role.html">角色管理</a><a class="sidebar-menu-item" href="../org-perm/menu.html">菜单管理</a></div></div>
+
+
+
+    <div class="sidebar-menu-group"><div class="sidebar-menu-item" onclick="toggleGroup(this)"><span class="icon">&#128187;</span> 开发设计<span class="arrow">&#9654;</span></div><div class="sub-menu"><a class="sidebar-menu-item" href="../dev-design/lowcode.html">低代码开发中心</a><a class="sidebar-menu-item" href="../dev-design/form-designer.html">表单设计器</a><a class="sidebar-menu-item" href="../dev-design/doc-flow.html">单据转换配置</a><a class="sidebar-menu-item" href="../dev-design/print-template.html">套打模板设计</a><a class="sidebar-menu-item" href="../dev-design/workflow.html">流程配置</a></div></div>
+
+
+
+    <div class="sidebar-menu-group"><div class="sidebar-menu-item" onclick="toggleGroup(this)"><span class="icon">&#129302;</span> 智能应用<span class="arrow">&#9660;</span></div><div class="sub-menu"><a class="sidebar-menu-item active" href="api-manage.html">API管理</a><a class="sidebar-menu-item" href="nl-training.html">自然语言训练</a><a class="sidebar-menu-item" href="data-analysis.html">数据分析训练</a><a class="sidebar-menu-item" href="agent-config.html">Agent配置</a></div></div>
+
+
+
+    <div class="sidebar-menu-item" onclick="window.location.href='../../index.html'"><span class="icon">&#8592;</span> 返回应用端</div>
+
+  </nav>
+
+  <div class="sidebar-user"><div class="avatar" style="background: #e6f7ff;color: #1890ff;">管</div><div><div class="user-name">系统管理员</div><div class="user-role">超级管理员</div></div></div>
+
+</aside>
+
+<div class="main-content" id="mainContent">
+
+  <div class="page-header">
+
+    <div><div class="flex items-center gap-8"><button class="sidebar-toggle" onclick="toggleSidebar()">&#9776;</button><div><h2>大模型API管理</h2><div class="breadcrumb"><a href="../../index.html">首页</a><span>/</span><a href="../index.html">管理端</a><span>/</span><span>智能应用 / API管理</span></div></div></div></div>
+
+    <div class="page-actions"><button class="btn btn-primary btn-sm" onclick="showApiConfigModal()">+ 新增API配置</button></div>
+
+  </div>
+
+  <div class="page-body">
+
+    <div class="stats-row">
+
+      <div class="stat-card">
+
+        <div class="stat-value text-success">2,840</div>
+
+        <div class="stat-label">今日调用次数</div>
+
+      </div>
+
+      <div class="stat-card">
+
+        <div class="stat-value text-accent">12,840</div>
+
+        <div class="stat-label">本月调用次数</div>
+
+      </div>
+
+      <div class="stat-card">
+
+        <div class="stat-value text-mono">3.2<span style="font-size:14px;">s</span></div>
+
+        <div class="stat-label">平均响应时间</div>
+
+      </div>
+
+      <div class="stat-card">
+
+        <div class="stat-value text-success">99.6<span style="font-size:14px;">%</span></div>
+
+        <div class="stat-label">成功率</div>
+
+      </div>
+
+    </div>
+
+    <div class="list-page-body" style="height:auto;border:1px solid #e8e8e8;border-radius:4px;overflow:hidden;">
+
+      <div class="list-action-bar">
+
+        <button class="action-btn primary-action" onclick="showApiConfigModal()">&#128200; 新增API配置</button>
+
+        <div class="action-separator"></div>
+
+        <button class="action-btn danger-action">&#128465; 批量删除</button>
+
+        <div style="flex:1;"></div>
+
+        <button class="action-btn">&#8635; 刷新</button>
+
+      </div>
+
+      <div class="list-filter-section">
+
+        <div class="list-filter-tabs">
+
+          <span class="filter-tab active">全部 (8)</span>
+
+          <span class="filter-tab">正常运行 (6)</span>
+
+          <span class="filter-tab">连接失败 (1)</span>
+
+          <span class="filter-tab">待配置 (1)</span>
+
+        </div>
+
+        <div class="list-filter-row">
+
+          <div class="filter-field">
+
+            <select><option>全部供应商</option><option>OpenAI</option><option>阿里云</option><option>百度文心</option><option>腾讯混元</option><option>字节豆包</option></select>
+
+            <input type="text" placeholder="搜索模型名称...">
+
+          </div>
+
+          <div class="list-filter-btns">
+
+            <button class="btn-search">&#128269; 查询</button>
+
+            <button class="btn-reset">&#8634; 重置</button>
+
+          </div>
+
+        </div>
+
+      </div>
+
+      <div class="list-table-area">
+
+        <table class="data-table">
+
+          <thead><tr><th><input type="checkbox" class="row-checkbox"></th><th>供应商名称</th><th>模型类型</th><th>API Key</th><th>连接状态</th><th>调用次数</th><th>操作</th></tr></thead>
+
+          <tbody><tr><td colspan="100%" style="text-align:center;color:#999;padding:20px;">暂无数据</td></tr></tbody>
+
+        </table>
+
+      </div>
+
+      <div class="list-pagination">
+
+        <span class="page-info">共 8 条记录，第 1/1 页</span>
+
+        <div class="page-btns"><button>&#9664;</button><button class="active">1</button><button>&#9654;</button></div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
+
+
+
+<div class="modal-overlay" id="apiConfigModal">
+
+  <div class="modal">
+
+    <div class="modal-header">
+
+      <span>API配置</span>
+
+      <button class="btn btn-ghost btn-sm" onclick="hideApiConfigModal()">✕</button>
+
+    </div>
+
+    <div class="modal-body">
+
+      <div class="form-row">
+
+        <div class="form-group"><label class="form-label">供应商名称</label><select class="form-select"><option>OpenAI</option><option>阿里云</option><option>百度文心一言</option><option>腾讯混元</option><option>字节豆包</option><option>智谱GLM</option><option>DeepSeek</option><option>Ollama (本地)</option></select></div>
+
+        <div class="form-group"><label class="form-label">模型类型</label><select class="form-select"><option>GPT-4o / gpt-4o-mini</option><option>Qwen-max / Qwen-plus</option><option>ERNIE-4.0 / ERNIE-3.5</option><option>HunYuan-Lite / HunYuan-Pro</option></select></div>
+
+      </div>
+
+      <div class="form-row">
+
+        <div class="form-group"><label class="form-label">API Key</label><input type="text" class="form-input" placeholder="请输入API Key"></div>
+
+        <div class="form-group"><label class="form-label">Secret Key</label><input type="text" class="form-input" placeholder="请输入Secret Key（如适用）"></div>
+
+      </div>
+
+      <div class="form-group"><label class="form-label">Endpoint</label><input type="text" class="form-input" placeholder="请输入API端点地址"></div>
+
+      <div class="form-group"><label class="form-label">状态</label><select class="form-select"><option>启用</option><option>禁用</option></select></div>
+
+    </div>
+
+    <div class="modal-footer">
+
+      <button class="btn btn-ghost btn-sm" onclick="hideApiConfigModal()">取消</button>
+
+      <button class="btn btn-primary btn-sm" onclick="saveApiConfig()">保存配置</button>
+
+    </div>
+
+  </div>
+
+</div>
+
+
+
+<div id="sidebarOverlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:99;" onclick="toggleSidebar()"></div>
+
+<script>
+
+var confirmCallback = null;
+
+function showToast(message, type) {
+
+  var container = document.getElementById('toastContainer');
+
+  var icons = { success: '&#9989;', warning: '&#9888;', error: '&#10060;', info: '&#9432;' };
+
+  var titles = { success: '操作成功', warning: '温馨提示', error: '系统提示', info: '系统提示' };
+
+  var t = type || 'info';
+
+  var toast = document.createElement('div');
+
+  toast.className = 'toast toast-' + t;
+
+  toast.innerHTML = '<div class="toast-icon">' + icons[t] + '</div><div class="toast-content"><div class="toast-title">' + titles[t] + '</div><div class="toast-message">' + message + '</div></div>';
+
+  container.appendChild(toast);
+
+  setTimeout(function() { toast.style.opacity = '0'; toast.style.transform = 'translateX(100%)'; setTimeout(function() { toast.remove(); }, 300); }, 3000);
+
+}
+
+
+
+function showConfirm(message, type, callback) {
+
+  document.getElementById('confirmMessage').textContent = message;
+
+  document.getElementById('confirmTitle').textContent = (type === 'warning') ? '温馨提示' : '系统提示';
+
+  document.getElementById('confirmIcon').innerHTML = (type === 'warning') ? '&#9888;' : '&#10060;';
+
+  confirmCallback = callback;
+
+  document.getElementById('confirmModal').classList.add('show');
+
+}
+
+
+
+function closeConfirmModal(result) {
+
+  document.getElementById('confirmModal').classList.remove('show');
+
+  if (confirmCallback) { confirmCallback(result); confirmCallback = null; }
+
+}
+
+
+
+function showApiConfigModal(){document.getElementById('apiConfigModal').classList.add('active');}
+
+function hideApiConfigModal(){document.getElementById('apiConfigModal').classList.remove('active');}
+
+function saveApiConfig(){showToast('API配置已保存', 'success');hideApiConfigModal();}
+
+function testApiConn(index){showToast('正在测试API连接...', 'info');}
+
+
+
+}</script>
+
+
+
+<div class="toast-container" id="toastContainer"></div>
+
+<div class="confirm-modal-overlay" id="confirmModal">
+
+  <div class="confirm-modal-dialog">
+
+    <div class="confirm-modal-header">
+
+      <span class="confirm-modal-icon" id="confirmIcon">&#9888;</span>
+
+      <span class="confirm-modal-title" id="confirmTitle">温馨提示</span>
+
+    </div>
+
+    <div class="confirm-modal-body">
+
+      <div class="confirm-modal-message" id="confirmMessage"></div>
+
+    </div>
+
+    <div class="confirm-modal-footer">
+
+      <button class="btn btn-sm btn-cancel" onclick="closeConfirmModal(false)">取消</button>
+
+      <button class="btn btn-sm btn-primary" style="background: #1890ff;border-color: #1890ff;color:#0a0e1a;" onclick="closeConfirmModal(true)">确定</button>
+
+    </div>
+
+  </div>
+
+</div>
+
+</body>
+
+</html>

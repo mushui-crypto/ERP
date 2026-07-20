@@ -1,0 +1,1743 @@
+<!DOCTYPE html>
+
+
+
+<html lang="zh-CN">
+
+
+
+<head>
+
+
+
+<meta charset="UTF-8">
+
+
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+
+
+<title>售后报表 — 磐枢工业智能平台</title>
+
+
+
+<link rel="stylesheet" href="../common.css">
+
+
+
+<script src="../common.js"></script>
+<script>
+</script>
+
+
+
+<style>
+
+
+
+.page-body { padding: 20px 24px; }
+
+
+
+.stat-cards { display: grid; grid-template-columns: repeat(6, 1fr); gap: 16px; margin-bottom: 20px; }
+
+
+
+.stat-card { background: var(--bg-surface); border: 1px solid var(--border-normal); border-radius: var(--radius-md); padding: 16px; }
+
+
+
+.stat-card .stat-value { font-family: var(--font-mono); font-size: 24px; font-weight: 700; color: var(--text-accent); line-height: 1.2; }
+
+
+
+.stat-card .stat-label { font-size: 12px; color: var(--text-tertiary); margin-top: 6px; }
+
+
+
+.report-tabs { display: flex; border-bottom: 1px solid var(--border-normal); background: var(--bg-surface); padding: 0 16px; margin-bottom: 16px; }
+
+
+
+.report-tab { padding: 10px 20px; cursor: pointer; color: var(--text-tertiary); font-size: 13px; border-bottom: 2px solid transparent; transition: all var(--transition); }
+
+
+
+.report-tab:hover { color: var(--text-primary); }
+
+
+
+.report-tab.active { color: var(--text-accent); border-bottom-color: var(--text-accent); font-weight: 500; }
+
+
+
+.report-tab-content { background: var(--bg-surface); border: 1px solid var(--border-normal); border-radius: var(--radius-md); padding: 20px; }
+
+
+
+.report-section { display: none; }
+
+
+
+.report-section.active { display: block; }
+
+
+
+.chart-container { margin-top: 20px; }
+
+
+
+.bar-chart { display: flex; flex-direction: column; gap: 12px; }
+
+
+
+.bar-item { display: flex; align-items: center; gap: 12px; }
+
+
+
+.bar-label { width: 80px; font-size: 13px; color: var(--text-secondary); flex-shrink: 0; }
+
+
+
+.bar-track { flex: 1; height: 24px; background: var(--bg-inset); border-radius: var(--radius-sm); overflow: hidden; }
+
+
+
+.bar-fill { height: 100%; border-radius: var(--radius-sm); transition: width 500ms ease; }
+
+
+
+.bar-fill-success { background: var(--color-success); }
+
+
+
+.bar-fill-warning { background: var(--color-warning); }
+
+
+
+.bar-fill-info { background: var(--color-info); }
+
+
+
+.bar-fill-error { background: var(--color-error); }
+
+
+
+.bar-value { width: 60px; text-align: right; font-family: var(--font-mono); font-size: 13px; color: var(--text-primary); flex-shrink: 0; }
+
+
+
+.pie-chart-container { display: flex; align-items: center; gap: 40px; }
+
+
+
+.pie-chart { width: 200px; height: 200px; border-radius: 50%; position: relative; background: conic-gradient(var(--color-success) 0% 35%, var(--color-warning) 35% 55%, var(--color-info) 55% 75%, var(--color-error) 75% 100%); }
+
+
+
+.pie-chart::before { content: ''; position: absolute; top: 20%; left: 20%; width: 60%; height: 60%; background: var(--bg-surface); border-radius: 50%; }
+
+
+
+.pie-legend { display: flex; flex-direction: column; gap: 12px; }
+
+
+
+.pie-legend-item { display: flex; align-items: center; gap: 8px; }
+
+
+
+.pie-legend-color { width: 16px; height: 16px; border-radius: var(--radius-sm); }
+
+
+
+.pie-legend-label { font-size: 13px; color: var(--text-secondary); }
+
+
+
+.pie-legend-value { font-family: var(--font-mono); font-size: 13px; color: var(--text-primary); margin-left: auto; }
+
+
+
+.radar-chart-container { display: flex; justify-content: center; }
+
+
+
+.radar-chart { width: 280px; height: 280px; position: relative; }
+
+
+
+.radar-grid { position: absolute; inset: 0; }
+
+
+
+.radar-grid circle { fill: none; stroke: var(--border-normal); stroke-width: 1; }
+
+
+
+.radar-grid line { stroke: var(--border-normal); stroke-width: 1; }
+
+
+
+.radar-polygon { fill: rgba(56,189,248,0.2); stroke: var(--text-accent); stroke-width: 2; }
+
+
+
+.radar-labels { position: absolute; inset: 0; }
+
+
+
+.radar-label { position: absolute; font-size: 11px; color: var(--text-tertiary); }
+
+
+
+.radar-label:nth-child(1) { top: 0; left: 50%; transform: translateX(-50%); }
+
+
+
+.radar-label:nth-child(2) { top: 18%; right: 8%; }
+
+
+
+.radar-label:nth-child(3) { bottom: 18%; right: 8%; }
+
+
+
+.radar-label:nth-child(4) { bottom: 0; left: 50%; transform: translateX(-50%); }
+
+
+
+.radar-label:nth-child(5) { bottom: 18%; left: 8%; }
+
+
+
+.radar-label:nth-child(6) { top: 18%; left: 8%; }
+
+
+
+.summary-row { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; }
+
+
+
+.star-rating { display: flex; gap: 2px; color: var(--color-warning); font-size: 14px; }
+
+
+
+.star-rating .star.filled { color: var(--color-warning); }
+
+
+
+.star-rating .star.empty { color: var(--bg-raised); }
+
+
+
+
+.lookup-modal { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:2000; justify-content:center; align-items:center; }
+.lookup-modal.show { display:flex; }
+.lookup-dialog { background:#fff; border:1px solid #e8e8e8; border-radius:4px; width:720px; max-height:70vh; overflow:hidden; }
+.lookup-header { padding:14px 20px; border-bottom:1px solid #e8e8e8; display:flex; align-items:center; justify-content:space-between; }
+.lookup-title { font-size:15px; font-weight:600; color:#333; }
+.lookup-close { font-size:20px; color:#666; cursor:pointer; background:none; border:none; }
+.lookup-close:hover { color:#333; }
+.lookup-body { padding:16px; }
+.lookup-search { display:flex; gap:8px; margin-bottom:12px; }
+.lookup-search input { flex:1; padding:6px 10px; border:1px solid #e8e8e8; border-radius:4px; font-size:13px; }
+.lookup-search button { padding:6px 16px; background:#1890ff; color:#fff; border:none; border-radius:4px; cursor:pointer; }
+.lookup-table { width:100%; border-collapse:collapse; font-size:13px; }
+.lookup-table th, .lookup-table td { padding:10px 12px; text-align:left; border-bottom:1px solid #e8e8e8; }
+.lookup-table th { background:#fafafa; font-weight:600; color:#333; }
+.lookup-table tr:hover { background:#f5f5f5; }
+.lookup-table .checkbox-cell { width:40px; }
+.lookup-footer { padding:12px 20px; border-top:1px solid #e8e8e8; display:flex; justify-content:flex-end; gap:8px; }
+.lookup-field { display:flex; align-items:center; }
+.lookup-field input { flex:1; padding:6px 10px; border:1px solid #e8e8e8; border-radius:4px 0 0 4px; font-size:13px; }
+.lookup-field button { width:28px; height:28px; border:1px solid #e8e8e8; border-left:none; border-radius:0 4px 4px 0; background:#fff; cursor:pointer; display:flex; align-items:center; justify-content:center; }
+.lookup-field button:hover { background:#f5f5f5; }
+
+</style>
+
+
+
+</head>
+
+
+
+<body>
+
+
+
+
+
+
+
+<aside class="sidebar" id="sidebar">
+
+
+
+<div class="sidebar-logo">
+
+
+
+    <img src="../images/logo.png" alt="磐枢工业智能平台" style="width: 100%; max-width: 200px; margin-bottom: 8px;">
+
+
+
+    <h1 style="font-size: 16px; margin: 0;">磐枢工业智能平台</h1>
+
+
+
+  </div>
+
+
+
+  <nav class="sidebar-menu"></nav>
+
+
+
+<div class="sidebar-user"><div class="avatar">管</div>
+
+
+
+</aside>
+
+
+
+
+
+
+
+<div class="main-content" id="mainContent">
+
+
+
+  <div class="page-header" style="position:sticky;top:0;z-index:100;">
+
+
+
+    <div>
+
+
+
+      <div class="flex items-center gap-8">
+
+
+
+        <button class="sidebar-toggle" onclick="toggleSidebar()">&#9776;</button>
+
+
+
+        <div>
+
+
+
+          <h2>售后报表</h2>
+
+
+
+          <div class="breadcrumb"><a href="../index.html">首页</a><span>></span><span>售后管理</span><span>></span><span>售后报表</span></div></div>
+
+
+
+        </div>
+
+
+
+      </div>
+
+
+
+    </div>
+
+
+
+  </div>
+
+  <div class="doc-header" style="background:#fff;border-bottom:1px solid #e8e8e8;padding:12px 20px;display:flex;justify-content:space-between;align-items:center;">
+    <div style="font-size:14px;color:#666;">快捷操作</div>
+    <div class="doc-toolbar" style="display:flex;gap:8px;flex-wrap:wrap;">
+      <button class="toolbar-btn" style="padding:6px 12px;border-radius:4px;font-size:13px;cursor:pointer;border:1px solid #d9d9d9;background:#fff;color:#666;display:flex;align-items:center;gap:6px;transition:all 0.3s;" onclick="showToast('刷新功能开发中...', 'info')"><span>🔄</span> 刷新</button>
+      <button class="toolbar-btn" style="padding:6px 12px;border-radius:4px;font-size:13px;cursor:pointer;border:1px solid #d9d9d9;background:#fff;color:#666;display:flex;align-items:center;gap:6px;transition:all 0.3s;" onclick="showToast('列设置功能开发中...', 'info')"><span>⚙️</span> 显示/隐藏列</button>
+      <button class="toolbar-btn" style="padding:6px 12px;border-radius:4px;font-size:13px;cursor:pointer;border:1px solid #d9d9d9;background:#fff;color:#666;display:flex;align-items:center;gap:6px;transition:all 0.3s;" onclick="showToast('导出功能开发中...', 'info')"><span>📤</span> 导出</button>
+      <button class="toolbar-btn danger" style="padding:6px 12px;border-radius:4px;font-size:13px;cursor:pointer;border:1px solid #f5222d;background:#f5222d;color:#fff;display:flex;align-items:center;gap:6px;transition:all 0.3s;" onclick="showConfirm('确认退出？', function() {location.href='../index.html';});)"><span>✖️</span> 退出</button>
+    </div>
+  </div>
+
+  <div class="page-body">
+
+
+
+    <div class="stat-cards">
+
+
+
+      <div class="stat-card"><div class="stat-value">156</div><div class="stat-label">服务总量</div></div>
+
+
+
+      <div class="stat-card"><div class="stat-value">128</div><div class="stat-label">已解决</div></div>
+
+
+
+      <div class="stat-card"><div class="stat-value">28</div><div class="stat-label">未解决</div></div>
+
+
+
+      <div class="stat-card"><div class="stat-value">94.5%</div><div class="stat-label">客户满意度</div></div>
+
+
+
+      <div class="stat-card"><div class="stat-value">2.3小时</div><div class="stat-label">平均响应时间</div></div>
+
+
+
+      <div class="stat-card"><div class="stat-value">4.8小时</div><div class="stat-label">平均服务时长</div></div>
+
+
+
+    </div>
+
+
+
+
+
+
+
+    <div class="report-tabs">
+
+
+
+      <div class="report-tab active" onclick="showReportTab('service-volume')">服务量统计</div>
+
+
+
+      <div class="report-tab" onclick="showReportTab('response-efficiency')">需求响应效率</div>
+
+
+
+      <div class="report-tab" onclick="showReportTab('work-order-efficiency')">工单执行效率</div>
+
+
+
+      <div class="report-tab" onclick="showReportTab('defect-analysis')">退换货缺陷分析</div>
+
+
+
+      <div class="report-tab" onclick="showReportTab('customer-satisfaction')">客户满意度</div>
+
+
+
+      <div class="report-tab" onclick="showReportTab('cost-analysis')">售后成本分析</div>
+
+
+
+      <div class="report-tab" onclick="showReportTab('engineer-performance')">服务工程师绩效</div>
+
+
+
+    </div>
+
+
+
+
+
+
+
+    <div class="report-tab-content">
+
+
+
+      <div id="service-volume" class="report-section active">
+
+
+
+        <h3 style="font-size:15px; font-weight:600; color:var(--text-primary); margin-bottom:16px;">服务量统计</h3>
+
+
+
+        <table class="data-table">
+
+
+
+          <thead><tr>
+
+
+
+            <th>服务类型</th>
+
+
+
+            <th style="text-align:right">数量</th>
+
+
+
+            <th style="text-align:right">占比</th>
+
+
+
+            <th style="text-align:right">解决率</th>
+
+
+
+            <th style="text-align:right">平均服务时长</th>
+
+
+
+          </tr></thead>
+
+
+
+          <tbody>
+
+
+
+            <tr><td>维修</td><td style="text-align:right; font-family:var(--font-mono)">68.00</td><td style="text-align:right; font-family:var(--font-mono)">43.59%</td><td style="text-align:right; font-family:var(--font-mono)">92.65%</td><td style="text-align:right; font-family:var(--font-mono)">5.20小时</td></tr>
+
+
+
+            <tr><td>退换</td><td style="text-align:right; font-family:var(--font-mono)">45.00</td><td style="text-align:right; font-family:var(--font-mono)">28.90%</td><td style="text-align:right; font-family:var(--font-mono)">97.78%</td><td style="text-align:right; font-family:var(--font-mono)">3.80小时</td></tr>
+
+
+
+            <tr><td>上门</td><td style="text-align:right; font-family:var(--font-mono)">28.00</td><td style="text-align:right; font-family:var(--font-mono)">17.95%</td><td style="text-align:right; font-family:var(--font-mono)">89.29%</td><td style="text-align:right; font-family:var(--font-mono)">6.50小时</td></tr>
+
+
+
+            <tr><td>咨询</td><td style="text-align:right; font-family:var(--font-mono)">15.00</td><td style="text-align:right; font-family:var(--font-mono)">9.62%</td><td style="text-align:right; font-family:var(--font-mono)">100.00%</td><td style="text-align:right; font-family:var(--font-mono)">1.20小时</td></tr>
+
+
+
+          </tbody>
+
+
+
+        </table>
+
+
+
+        <div class="chart-container">
+
+
+
+          <h4 style="font-size:13px; font-weight:600; color:var(--text-primary); margin-bottom:12px;">服务类型分布</h4>
+
+
+
+          <div class="bar-chart">
+
+
+
+            <div class="bar-item"><div class="bar-label">维修</div><div class="bar-track"><div class="bar-fill bar-fill-success" style="width:43.59%"></div></div><div class="bar-value">68</div></div>
+
+
+
+            <div class="bar-item"><div class="bar-label">退换</div><div class="bar-track"><div class="bar-fill bar-fill-warning" style="width:28.90%"></div></div><div class="bar-value">45</div></div>
+
+
+
+            <div class="bar-item"><div class="bar-label">上门</div><div class="bar-track"><div class="bar-fill bar-fill-info" style="width:17.95%"></div></div><div class="bar-value">28</div></div>
+
+
+
+            <div class="bar-item"><div class="bar-label">咨询</div><div class="bar-track"><div class="bar-fill bar-fill-error" style="width:9.62%"></div></div><div class="bar-value">15</div></div>
+
+
+
+          </div>
+
+
+
+        </div>
+
+
+
+      </div>
+
+
+
+
+
+
+
+      <div id="response-efficiency" class="report-section">
+
+
+
+        <h3 style="font-size:15px; font-weight:600; color:var(--text-primary); margin-bottom:16px;">需求响应效率分析</h3>
+
+
+
+        <table class="data-table">
+
+
+
+          <thead><tr>
+
+
+
+            <th>月份</th>
+
+
+
+            <th style="text-align:right">服务总量</th>
+
+
+
+            <th style="text-align:right">平均响应时间</th>
+
+
+
+            <th style="text-align:right">1小时内响应率</th>
+
+
+
+            <th style="text-align:right">4小时内响应率</th>
+
+
+
+            <th style="text-align:right">超时率</th>
+
+
+
+          </tr></thead>
+
+
+
+          <tbody>
+
+
+
+            <tr><td>2026-01</td><td style="text-align:right; font-family:var(--font-mono)">125.00</td><td style="text-align:right; font-family:var(--font-mono)">2.80小时</td><td style="text-align:right; font-family:var(--font-mono)">62.40%</td><td style="text-align:right; font-family:var(--font-mono)">88.80%</td><td style="text-align:right; font-family:var(--font-mono)">5.60%</td></tr>
+
+
+
+            <tr><td>2026-02</td><td style="text-align:right; font-family:var(--font-mono)">98.00</td><td style="text-align:right; font-family:var(--font-mono)">3.20小时</td><td style="text-align:right; font-family:var(--font-mono)">55.10%</td><td style="text-align:right; font-family:var(--font-mono)">85.71%</td><td style="text-align:right; font-family:var(--font-mono)">7.14%</td></tr>
+
+
+
+            <tr><td>2026-03</td><td style="text-align:right; font-family:var(--font-mono)">142.00</td><td style="text-align:right; font-family:var(--font-mono)">2.50小时</td><td style="text-align:right; font-family:var(--font-mono)">68.31%</td><td style="text-align:right; font-family:var(--font-mono)">92.25%</td><td style="text-align:right; font-family:var(--font-mono)">3.52%</td></tr>
+
+
+
+            <tr><td>2026-04</td><td style="text-align:right; font-family:var(--font-mono)">138.00</td><td style="text-align:right; font-family:var(--font-mono)">2.40小时</td><td style="text-align:right; font-family:var(--font-mono)">70.29%</td><td style="text-align:right; font-family:var(--font-mono)">93.48%</td><td style="text-align:right; font-family:var(--font-mono)">2.90%</td></tr>
+
+
+
+            <tr><td>2026-05</td><td style="text-align:right; font-family:var(--font-mono)">165.00</td><td style="text-align:right; font-family:var(--font-mono)">2.60小时</td><td style="text-align:right; font-family:var(--font-mono)">66.67%</td><td style="text-align:right; font-family:var(--font-mono)">91.52%</td><td style="text-align:right; font-family:var(--font-mono)">4.24%</td></tr>
+
+
+
+            <tr><td>2026-06</td><td style="text-align:right; font-family:var(--font-mono)">156.00</td><td style="text-align:right; font-family:var(--font-mono)">2.30小时</td><td style="text-align:right; font-family:var(--font-mono)">73.08%</td><td style="text-align:right; font-family:var(--font-mono)">94.87%</td><td style="text-align:right; font-family:var(--font-mono)">2.56%</td></tr>
+
+
+
+          </tbody>
+
+
+
+        </table>
+
+
+
+        <div class="chart-container">
+
+
+
+          <h4 style="font-size:13px; font-weight:600; color:var(--text-primary); margin-bottom:12px;">各渠道响应时效对比</h4>
+
+
+
+          <div class="bar-chart">
+
+
+
+            <div class="bar-item"><div class="bar-label">电话</div><div class="bar-track"><div class="bar-fill bar-fill-success" style="width:85%"></div></div><div class="bar-value">0.8小时</div></div>
+
+
+
+            <div class="bar-item"><div class="bar-label">在线</div><div class="bar-track"><div class="bar-fill bar-fill-warning" style="width:65%"></div></div><div class="bar-value">1.5小时</div></div>
+
+
+
+            <div class="bar-item"><div class="bar-label">邮件</div><div class="bar-track"><div class="bar-fill bar-fill-info" style="width:45%"></div></div><div class="bar-value">3.2小时</div></div>
+
+
+
+          </div>
+
+
+
+        </div>
+
+
+
+      </div>
+
+
+
+
+
+
+
+      <div id="work-order-efficiency" class="report-section">
+
+
+
+        <h3 style="font-size:15px; font-weight:600; color:var(--text-primary); margin-bottom:16px;">工单执行效率分析</h3>
+
+
+
+        <table class="data-table">
+
+
+
+          <thead><tr>
+
+
+
+            <th>工单类型</th>
+
+
+
+            <th style="text-align:right">工单数</th>
+
+
+
+            <th style="text-align:right">平均执行时长</th>
+
+
+
+            <th style="text-align:right">按时完成率</th>
+
+
+
+            <th style="text-align:right">一次解决率</th>
+
+
+
+            <th style="text-align:right">返工率</th>
+
+
+
+          </tr></thead>
+
+
+
+          <tbody>
+
+
+
+            <tr><td>维修工单</td><td style="text-align:right; font-family:var(--font-mono)">68.00</td><td style="text-align:right; font-family:var(--font-mono)">5.20小时</td><td style="text-align:right; font-family:var(--font-mono)">88.24%</td><td style="text-align:right; font-family:var(--font-mono)">91.18%</td><td style="text-align:right; font-family:var(--font-mono)">8.82%</td></tr>
+
+
+
+            <tr><td>退换工单</td><td style="text-align:right; font-family:var(--font-mono)">45.00</td><td style="text-align:right; font-family:var(--font-mono)">3.80小时</td><td style="text-align:right; font-family:var(--font-mono)">95.56%</td><td style="text-align:right; font-family:var(--font-mono)">97.78%</td><td style="text-align:right; font-family:var(--font-mono)">2.22%</td></tr>
+
+
+
+            <tr><td>上门工单</td><td style="text-align:right; font-family:var(--font-mono)">28.00</td><td style="text-align:right; font-family:var(--font-mono)">6.50小时</td><td style="text-align:right; font-family:var(--font-mono)">82.14%</td><td style="text-align:right; font-family:var(--font-mono)">85.71%</td><td style="text-align:right; font-family:var(--font-mono)">14.29%</td></tr>
+
+
+
+            <tr><td>咨询工单</td><td style="text-align:right; font-family:var(--font-mono)">15.00</td><td style="text-align:right; font-family:var(--font-mono)">1.20小时</td><td style="text-align:right; font-family:var(--font-mono)">100.00%</td><td style="text-align:right; font-family:var(--font-mono)">100.00%</td><td style="text-align:right; font-family:var(--font-mono)">0.00%</td></tr>
+
+
+
+          </tbody>
+
+
+
+        </table>
+
+
+
+        <div class="chart-container">
+
+
+
+          <h4 style="font-size:13px; font-weight:600; color:var(--text-primary); margin-bottom:12px;">执行效率月度趋势</h4>
+
+
+
+          <div style="height:200px;display:flex;align-items:flex-end;gap:12px;padding-top:20px;">
+
+
+
+            <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;">
+
+
+
+              <div style="width:100%;background:var(--color-success);border-radius:var(--radius-md) 4px 0 0;" style="height:60%;"></div>
+
+
+
+              <span style="font-size:11px;color:var(--text-tertiary);">1月</span>
+
+
+
+            </div>
+
+
+
+            <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;">
+
+
+
+              <div style="width:100%;background:var(--color-success);border-radius:var(--radius-md) 4px 0 0;" style="height:55%;"></div>
+
+
+
+              <span style="font-size:11px;color:var(--text-tertiary);">2月</span>
+
+
+
+            </div>
+
+
+
+            <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;">
+
+
+
+              <div style="width:100%;background:var(--color-success);border-radius:var(--radius-md) 4px 0 0;" style="height:70%;"></div>
+
+
+
+              <span style="font-size:11px;color:var(--text-tertiary);">3月</span>
+
+
+
+            </div>
+
+
+
+            <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;">
+
+
+
+              <div style="width:100%;background:var(--color-success);border-radius:var(--radius-md) 4px 0 0;" style="height:75%;"></div>
+
+
+
+              <span style="font-size:11px;color:var(--text-tertiary);">4月</span>
+
+
+
+            </div>
+
+
+
+            <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;">
+
+
+
+              <div style="width:100%;background:var(--color-success);border-radius:var(--radius-md) 4px 0 0;" style="height:72%;"></div>
+
+
+
+              <span style="font-size:11px;color:var(--text-tertiary);">5月</span>
+
+
+
+            </div>
+
+
+
+            <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;">
+
+
+
+              <div style="width:100%;background:var(--color-success);border-radius:var(--radius-md) 4px 0 0;" style="height:80%;"></div>
+
+
+
+              <span style="font-size:11px;color:var(--text-tertiary);">6月</span>
+
+
+
+            </div>
+
+
+
+          </div>
+
+
+
+        </div>
+
+
+
+      </div>
+
+
+
+
+
+
+
+      <div id="defect-analysis" class="report-section">
+
+
+
+        <h3 style="font-size:15px; font-weight:600; color:var(--text-primary); margin-bottom:16px;">退换货工艺缺陷分析</h3>
+
+
+
+        <table class="data-table">
+
+
+
+          <thead><tr>
+
+
+
+            <th>缺陷类型</th>
+
+
+
+            <th style="text-align:right">退换货数量</th>
+
+
+
+            <th style="text-align:right">占比</th>
+
+
+
+            <th style="text-align:right">涉及产品数</th>
+
+
+
+            <th style="text-align:right">损失金额(元)</th>
+
+
+
+            <th>改进措施</th>
+
+
+
+          </tr></thead>
+
+
+
+          <tbody>
+
+
+
+            <tr><td>加工精度偏差</td><td style="text-align:right; font-family:var(--font-mono)">42.00</td><td style="text-align:right; font-family:var(--font-mono)">35.00%</td><td style="text-align:right; font-family:var(--font-mono)">12.00</td><td style="text-align:right; font-family:var(--font-mono)">45,200.00</td><td>优化加工参数，增加质检频次</td></tr>
+
+
+
+            <tr><td>焊接缺陷</td><td style="text-align:right; font-family:var(--font-mono)">30.00</td><td style="text-align:right; font-family:var(--font-mono)">25.00%</td><td style="text-align:right; font-family:var(--font-mono)">8.00</td><td style="text-align:right; font-family:var(--font-mono)">32,800.00</td><td>更换焊接设备，培训焊工</td></tr>
+
+
+
+            <tr><td>表面处理不良</td><td style="text-align:right; font-family:var(--font-mono)">24.00</td><td style="text-align:right; font-family:var(--font-mono)">20.00%</td><td style="text-align:right; font-family:var(--font-mono)">6.00</td><td style="text-align:right; font-family:var(--font-mono)">25,600.00</td><td>改进喷涂工艺，增加表面检测</td></tr>
+
+
+
+            <tr><td>装配问题</td><td style="text-align:right; font-family:var(--font-mono)">24.00</td><td style="text-align:right; font-family:var(--font-mono)">20.00%</td><td style="text-align:right; font-family:var(--font-mono)">10.00</td><td style="text-align:right; font-family:var(--font-mono)">24,960.00</td><td>优化装配流程，增加防错装置</td></tr>
+
+
+
+            <tr><td style="font-weight:600;">合计</td><td style="text-align:right; font-family:var(--font-mono); font-weight:600;">120.00</td><td style="text-align:right; font-family:var(--font-mono); font-weight:600;">100.00%</td><td style="text-align:right; font-family:var(--font-mono); font-weight:600;">36.00</td><td style="text-align:right; font-family:var(--font-mono); font-weight:600;">128,560.00</td><td></td></tr>
+
+
+
+          </tbody>
+
+
+
+        </table>
+
+
+
+        <div class="chart-container">
+
+
+
+          <h4 style="font-size:13px; font-weight:600; color:var(--text-primary); margin-bottom:12px;">缺陷类型分布</h4>
+
+
+
+          <div class="pie-chart-container">
+
+
+
+            <div class="pie-chart" style="background:conic-gradient(var(--color-error) 0% 35%, var(--color-warning) 35% 60%, var(--color-info) 60% 80%, var(--color-success) 80% 100%);"></div>
+
+
+
+            <div class="pie-legend">
+
+
+
+              <div class="pie-legend-item"><div class="pie-legend-color" style="background:var(--color-error)"></div><span class="pie-legend-label">加工精度偏差</span><span class="pie-legend-value">42 (35%)</span></div>
+
+
+
+              <div class="pie-legend-item"><div class="pie-legend-color" style="background:var(--color-warning)"></div><span class="pie-legend-label">焊接缺陷</span><span class="pie-legend-value">30 (25%)</span></div>
+
+
+
+              <div class="pie-legend-item"><div class="pie-legend-color" style="background:var(--color-info)"></div><span class="pie-legend-label">表面处理不良</span><span class="pie-legend-value">24 (20%)</span></div>
+
+
+
+              <div class="pie-legend-item"><div class="pie-legend-color" style="background:var(--color-success)"></div><span class="pie-legend-label">装配问题</span><span class="pie-legend-value">24 (20%)</span></div>
+
+
+
+            </div>
+
+
+
+          </div>
+
+
+
+        </div>
+
+
+
+      </div>
+
+
+
+
+
+
+
+      <div id="customer-satisfaction" class="report-section">
+
+
+
+        <h3 style="font-size:15px; font-weight:600; color:var(--text-primary); margin-bottom:16px;">客户满意度排名</h3>
+
+
+
+        <table class="data-table">
+
+
+
+          <thead><tr>
+
+
+
+            <th>排名</th>
+
+
+
+            <th>客户名称</th>
+
+
+
+            <th style="text-align:right">服务次数</th>
+
+
+
+            <th>满意度</th>
+
+
+
+            <th style="text-align:right">投诉次数</th>
+
+
+
+          </tr></thead>
+
+
+
+          <tbody>
+
+
+
+            <tr><td>1</td><td>深圳测试公司</td><td style="text-align:right; font-family:var(--font-mono)">28.00</td><td><div class="star-rating"><span class="star filled">&#9733;</span><span class="star filled">&#9733;</span><span class="star filled">&#9733;</span><span class="star filled">&#9733;</span><span class="star filled">&#9733;</span></div></td><td style="text-align:right; font-family:var(--font-mono)">0.00</td></tr>
+
+
+
+            <tr><td>2</td><td>浙江阿里巴巴网络有限公司</td><td style="text-align:right; font-family:var(--font-mono)">18.00</td><td><div class="star-rating"><span class="star filled">&#9733;</span><span class="star filled">&#9733;</span><span class="star filled">&#9733;</span><span class="star filled">&#9733;</span><span class="star filled">&#9733;</span></div></td><td style="text-align:right; font-family:var(--font-mono)">0.00</td></tr>
+
+
+
+            <tr><td>3</td><td>广州美的集团有限公司</td><td style="text-align:right; font-family:var(--font-mono)">22.00</td><td><div class="star-rating"><span class="star filled">&#9733;</span><span class="star filled">&#9733;</span><span class="star filled">&#9733;</span><span class="star filled">&#9733;</span><span class="star empty">&#9733;</span></div></td><td style="text-align:right; font-family:var(--font-mono)">1.00</td></tr>
+
+
+
+            <tr><td>4</td><td>上海汽车集团股份有限公司</td><td style="text-align:right; font-family:var(--font-mono)">25.00</td><td><div class="star-rating"><span class="star filled">&#9733;</span><span class="star filled">&#9733;</span><span class="star filled">&#9733;</span><span class="star filled">&#9733;</span><span class="star empty">&#9733;</span></div></td><td style="text-align:right; font-family:var(--font-mono)">2.00</td></tr>
+
+
+
+            <tr><td>5</td><td>重庆长安汽车股份有限公司</td><td style="text-align:right; font-family:var(--font-mono)">15.00</td><td><div class="star-rating"><span class="star filled">&#9733;</span><span class="star filled">&#9733;</span><span class="star filled">&#9733;</span><span class="star empty">&#9733;</span><span class="star empty">&#9733;</span></div></td><td style="text-align:right; font-family:var(--font-mono)">3.00</td></tr>
+
+
+
+            <tr><td>6</td><td>测试公司</td><td style="text-align:right; font-family:var(--font-mono)">12.00</td><td><div class="star-rating"><span class="star filled">&#9733;</span><span class="star filled">&#9733;</span><span class="star filled">&#9733;</span><span class="star filled">&#9733;</span><span class="star empty">&#9733;</span></div></td><td style="text-align:right; font-family:var(--font-mono)">1.00</td></tr>
+
+
+
+            <tr><td>7</td><td>成都腾讯科技有限公司</td><td style="text-align:right; font-family:var(--font-mono)">10.00</td><td><div class="star-rating"><span class="star filled">&#9733;</span><span class="star filled">&#9733;</span><span class="star filled">&#9733;</span><span class="star filled">&#9733;</span><span class="star filled">&#9733;</span></div></td><td style="text-align:right; font-family:var(--font-mono)">0.00</td></tr>
+
+
+
+            <tr><td>8</td><td>测试公司</td><td style="text-align:right; font-family:var(--font-mono)">6.00</td><td><div class="star-rating"><span class="star filled">&#9733;</span><span class="star filled">&#9733;</span><span class="star filled">&#9733;</span><span class="star empty">&#9733;</span><span class="star empty">&#9733;</span></div></td><td style="text-align:right; font-family:var(--font-mono)">2.00</td></tr>
+
+
+
+          </tbody>
+
+
+
+        </table>
+
+
+
+        <div class="chart-container">
+
+
+
+          <h4 style="font-size:13px; font-weight:600; color:var(--text-primary); margin-bottom:12px;">满意度维度分析</h4>
+
+
+
+          <div class="radar-chart-container">
+
+
+
+            <div class="radar-chart">
+
+
+
+              <svg viewBox="0 0 200 200" class="radar-grid">
+
+
+
+                <circle cx="100" cy="100" r="80" />
+
+
+
+                <circle cx="100" cy="100" r="60" />
+
+
+
+                <circle cx="100" cy="100" r="40" />
+
+
+
+                <circle cx="100" cy="100" r="20" />
+
+
+
+                <line x1="100" y1="20" x2="100" y2="180" />
+
+
+
+                <line x1="20" y1="100" x2="180" y2="100" />
+
+
+
+                <line x1="46" y1="46" x2="154" y2="154" />
+
+
+
+                <line x1="46" y1="154" x2="154" y2="46" />
+
+
+
+              </svg>
+
+
+
+              <svg viewBox="0 0 200 200" class="radar-polygon">
+
+
+
+                <polygon points="100,30 162,68 162,132 100,170 38,132 38,68" />
+
+
+
+              </svg>
+
+
+
+              <div class="radar-labels">
+
+
+
+                <div class="radar-label">响应速度</div>
+
+
+
+                <div class="radar-label">服务态度</div>
+
+
+
+                <div class="radar-label">专业能力</div>
+
+
+
+                <div class="radar-label">解决效果</div>
+
+
+
+                <div class="radar-label">沟通能力</div>
+
+
+
+                <div class="radar-label">售后跟进</div>
+
+
+
+              </div>
+
+
+
+            </div>
+
+
+
+          </div>
+
+
+
+        </div>
+
+
+
+      </div>
+
+
+
+
+
+
+
+      <div id="cost-analysis" class="report-section">
+
+
+
+        <h3 style="font-size:15px; font-weight:600; color:var(--text-primary); margin-bottom:16px;">售后成本分析</h3>
+
+
+
+        <table class="data-table">
+
+
+
+          <thead><tr>
+
+
+
+            <th>成本类型</th>
+
+
+
+            <th style="text-align:right">金额(元)</th>
+
+
+
+            <th style="text-align:right">占比</th>
+
+
+
+            <th>说明</th>
+
+
+
+          </tr></thead>
+
+
+
+          <tbody>
+
+
+
+            <tr><td>配件成本</td><td style="text-align:right; font-family:var(--font-mono)">128,500.00</td><td style="text-align:right; font-family:var(--font-mono)">35.00%</td><td>更换零部件、维修材料等</td></tr>
+
+
+
+            <tr><td>人工成本</td><td style="text-align:right; font-family:var(--font-mono)">95,200.00</td><td style="text-align:right; font-family:var(--font-mono)">25.80%</td><td>工程师工时费用</td></tr>
+
+
+
+            <tr><td>差旅费</td><td style="text-align:right; font-family:var(--font-mono)">72,800.00</td><td style="text-align:right; font-family:var(--font-mono)">19.80%</td><td>交通、住宿、餐饮费用</td></tr>
+
+
+
+            <tr><td>其他费用</td><td style="text-align:right; font-family:var(--font-mono)">71,180.00</td><td style="text-align:right; font-family:var(--font-mono)">19.40%</td><td>物流、质检、管理费用</td></tr>
+
+
+
+            <tr><td style="font-weight:600;">合计</td><td style="text-align:right; font-family:var(--font-mono); font-weight:600;">367,680.00</td><td style="text-align:right; font-family:var(--font-mono); font-weight:600;">100.00%</td><td></td></tr>
+
+
+
+          </tbody>
+
+
+
+        </table>
+
+
+
+        <div class="chart-container">
+
+
+
+          <h4 style="font-size:13px; font-weight:600; color:var(--text-primary); margin-bottom:12px;">成本构成</h4>
+
+
+
+          <div class="pie-chart-container">
+
+
+
+            <div class="pie-chart"></div>
+
+
+
+            <div class="pie-legend">
+
+
+
+              <div class="pie-legend-item"><div class="pie-legend-color" style="background:var(--color-success)"></div><span class="pie-legend-label">配件成本</span><span class="pie-legend-value">128,500.00 (35%)</span></div>
+
+
+
+              <div class="pie-legend-item"><div class="pie-legend-color" style="background:var(--color-warning)"></div><span class="pie-legend-label">人工成本</span><span class="pie-legend-value">95,200.00 (25.8%)</span></div>
+
+
+
+              <div class="pie-legend-item"><div class="pie-legend-color" style="background:var(--color-info)"></div><span class="pie-legend-label">差旅费</span><span class="pie-legend-value">72,800.00 (19.8%)</span></div>
+
+
+
+              <div class="pie-legend-item"><div class="pie-legend-color" style="background:var(--color-error)"></div><span class="pie-legend-label">其他费用</span><span class="pie-legend-value">71,180.00 (19.4%)</span></div>
+
+
+
+            </div>
+
+
+
+          </div>
+
+
+
+        </div>
+
+
+
+      </div>
+
+
+
+
+
+
+
+      <div id="engineer-performance" class="report-section">
+
+
+
+        <h3 style="font-size:15px; font-weight:600; color:var(--text-primary); margin-bottom:16px;">服务工程师绩效排名</h3>
+
+
+
+        <table class="data-table">
+
+
+
+          <thead><tr>
+
+
+
+            <th>排名</th>
+
+
+
+            <th>姓名</th>
+
+
+
+            <th style="text-align:right">服务次数</th>
+
+
+
+            <th style="text-align:right">解决率</th>
+
+
+
+            <th style="text-align:right">平均时长(小时)</th>
+
+
+
+            <th>客户评价</th>
+
+
+
+          </tr></thead>
+
+
+
+          <tbody>
+
+
+
+            <tr><td>1</td><td>张伟</td><td style="text-align:right; font-family:var(--font-mono)">42.00</td><td style="text-align:right; font-family:var(--font-mono)">95.24%</td><td style="text-align:right; font-family:var(--font-mono)">4.20</td><td><div class="star-rating"><span class="star filled">&#9733;</span><span class="star filled">&#9733;</span><span class="star filled">&#9733;</span><span class="star filled">&#9733;</span><span class="star filled">&#9733;</span></div></td></tr>
+
+
+
+            <tr><td>2</td><td>王芳</td><td style="text-align:right; font-family:var(--font-mono)">38.00</td><td style="text-align:right; font-family:var(--font-mono)">92.11%</td><td style="text-align:right; font-family:var(--font-mono)">4.50</td><td><div class="star-rating"><span class="star filled">&#9733;</span><span class="star filled">&#9733;</span><span class="star filled">&#9733;</span><span class="star filled">&#9733;</span><span class="star empty">&#9733;</span></div></td></tr>
+
+
+
+            <tr><td>3</td><td>李明辉</td><td style="text-align:right; font-family:var(--font-mono)">45.00</td><td style="text-align:right; font-family:var(--font-mono)">88.89%</td><td style="text-align:right; font-family:var(--font-mono)">5.10</td><td><div class="star-rating"><span class="star filled">&#9733;</span><span class="star filled">&#9733;</span><span class="star filled">&#9733;</span><span class="star filled">&#9733;</span><span class="star empty">&#9733;</span></div></td></tr>
+
+
+
+            <tr><td>4</td><td>陈静</td><td style="text-align:right; font-family:var(--font-mono)">31.00</td><td style="text-align:right; font-family:var(--font-mono)">93.55%</td><td style="text-align:right; font-family:var(--font-mono)">5.50</td><td><div class="star-rating"><span class="star filled">&#9733;</span><span class="star filled">&#9733;</span><span class="star filled">&#9733;</span><span class="star filled">&#9733;</span><span class="star filled">&#9733;</span></div></td></tr>
+
+
+
+          </tbody>
+
+
+
+        </table>
+
+
+
+        <div class="chart-container">
+
+
+
+          <h4 style="font-size:13px; font-weight:600; color:var(--text-primary); margin-bottom:12px;">工程师服务量对比</h4>
+
+
+
+          <div class="bar-chart">
+
+
+
+            <div class="bar-item"><div class="bar-label">李明辉</div><div class="bar-track"><div class="bar-fill bar-fill-success" style="width:100%"></div></div><div class="bar-value">45</div></div>
+
+
+
+            <div class="bar-item"><div class="bar-label">张伟</div><div class="bar-track"><div class="bar-fill bar-fill-warning" style="width:93.33%"></div></div><div class="bar-value">42</div></div>
+
+
+
+            <div class="bar-item"><div class="bar-label">王芳</div><div class="bar-track"><div class="bar-fill bar-fill-info" style="width:84.44%"></div></div><div class="bar-value">38</div></div>
+
+
+
+            <div class="bar-item"><div class="bar-label">陈静</div><div class="bar-track"><div class="bar-fill bar-fill-error" style="width:68.89%"></div></div><div class="bar-value">31</div></div>
+
+
+
+          </div>
+
+
+
+        </div>
+
+
+
+      </div>
+
+
+
+    </div>
+
+
+
+  </div>
+
+
+
+</div>
+
+
+
+
+
+
+
+<script>
+
+
+
+function showReportTab(tabId) {
+
+
+
+  document.querySelectorAll('.report-tab').forEach(function(t){t.classList.remove('active');});
+
+
+
+  document.querySelectorAll('.report-section').forEach(function(s){s.classList.remove('active');});
+
+
+
+  event.target.classList.add('active');
+
+
+
+  document.getElementById(tabId).classList.add('active');
+
+
+
+}
+
+
+
+
+var currentLookupField = null;
+var currentLookupType = null;
+var lookupData = [];
+var lookupColumns = [];
+
+function openLookup(fieldId, type) {
+  currentLookupField = fieldId;
+  currentLookupType = type;
+  
+  if (type === 'org') {
+    lookupColumns = ['编码', '名称', '形态', '上级组织'];
+    lookupData = JSON.parse(localStorage.getItem('erp_orgs') || '[]');
+    document.getElementById('lookupTitle').textContent = '选择组织';
+  } else if (type === 'department') {
+    lookupColumns = ['编码', '名称'];
+    lookupData = JSON.parse(localStorage.getItem('erp_departments_cache') || '[]');
+    document.getElementById('lookupTitle').textContent = '选择部门';
+  } else if (type === 'employee') {
+    lookupColumns = ['编号', '姓名', '所属部门'];
+    lookupData = JSON.parse(localStorage.getItem('erp_employees_cache') || '[]');
+    document.getElementById('lookupTitle').textContent = '选择员工';
+  } else if (type === 'supplier') {
+    lookupColumns = ['编码', '名称'];
+    lookupData = JSON.parse(localStorage.getItem('erp_suppliers_cache') || '[]');
+    document.getElementById('lookupTitle').textContent = '选择供应商';
+  } else if (type === 'customer') {
+    lookupColumns = ['编码', '名称'];
+    lookupData = JSON.parse(localStorage.getItem('erp_customers_cache') || '[]');
+    document.getElementById('lookupTitle').textContent = '选择客户';
+  } else if (type === 'material') {
+    lookupColumns = ['物料编码', '物料名称', '规格型号', '基本单位'];
+    lookupData = JSON.parse(localStorage.getItem('erp_materials_cache') || '[]');
+    document.getElementById('lookupTitle').textContent = '选择物料';
+  } else if (type === 'warehouse') {
+    lookupColumns = ['编码', '名称'];
+    lookupData = JSON.parse(localStorage.getItem('erp_warehouses_cache') || '[]');
+    document.getElementById('lookupTitle').textContent = '选择仓库';
+  }
+  
+  renderLookupTable(lookupData);
+  document.getElementById('lookupModal').classList.add('show');
+}
+
+function closeLookup() {
+  document.getElementById('lookupModal').classList.remove('show');
+}
+
+function filterLookup() {
+  var keyword = document.getElementById('lookupKeyword').value.trim().toLowerCase();
+  var filtered = lookupData.filter(function(item) {
+    var code = item.code || '';
+    var name = item.name || '';
+    return code.toLowerCase().includes(keyword) || name.toLowerCase().includes(keyword);
+  });
+  renderLookupTable(filtered);
+}
+
+function renderLookupTable(data) {
+  var head = document.getElementById('lookupTableHead');
+  var body = document.getElementById('lookupTableBody');
+  
+  head.innerHTML = '<tr><th class="checkbox-cell"><input type="checkbox" onclick="selectAllLookup()"></th>' + lookupColumns.map(function(col) { return '<th>' + col + '</th>'; }).join('') + '</tr>';
+  
+  body.innerHTML = '';
+  data.forEach(function(item) {
+    var row = document.createElement('tr');
+    row.onclick = function() { selectLookupRow(this); };
+    var cells = ['<td class="checkbox-cell"><input type="checkbox" class="lookup-checkbox" value="' + item.id + '"></td>'];
+    if (currentLookupType === 'org') {
+      cells.push('<td>' + item.code + '</td><td>' + item.name + '</td><td>' + (item.form || '') + '</td><td>' + (item.parentName || '') + '</td>');
+    } else if (currentLookupType === 'department') {
+      cells.push('<td>' + item.code + '</td><td>' + item.name + '</td>');
+    } else if (currentLookupType === 'employee') {
+      cells.push('<td>' + item.code + '</td><td>' + item.name + '</td><td>' + (item.department || '') + '</td>');
+    } else if (currentLookupType === 'supplier' || currentLookupType === 'customer') {
+      cells.push('<td>' + item.code + '</td><td>' + item.name + '</td>');
+    } else if (currentLookupType === 'material') {
+      cells.push('<td>' + item.code + '</td><td>' + item.name + '</td><td>' + (item.specification || '') + '</td><td>' + (item.unit || '') + '</td>');
+    } else if (currentLookupType === 'warehouse') {
+      cells.push('<td>' + item.code + '</td><td>' + item.name + '</td>');
+    }
+    row.innerHTML = cells.join('');
+    body.appendChild(row);
+  });
+  
+  if (data.length === 0) {
+    body.innerHTML = '<tr><td colspan="' + (lookupColumns.length + 1) + '" style="text-align:center;padding:40px;color:#999;">暂无数据</td></tr>';
+  }
+}
+
+function selectAllLookup() {
+  var master = document.querySelector('.lookup-table th input');
+  var checkboxes = document.querySelectorAll('.lookup-checkbox');
+  checkboxes.forEach(function(cb) { cb.checked = master.checked; });
+}
+
+function selectLookupRow(row) {
+  var checkbox = row.querySelector('.lookup-checkbox');
+  checkbox.checked = !checkbox.checked;
+}
+
+function confirmLookup() {
+  var checkboxes = document.querySelectorAll('.lookup-checkbox:checked');
+  if (checkboxes.length === 0) {
+    showToast('请选择一条记录', 'warning');
+    return;
+  }
+  
+  var item = lookupData.find(function(d) { return d.id === checkboxes[0].value; });
+  if (item) {
+    var field = document.getElementById(currentLookupField);
+    if (field) {
+      field.value = item.name;
+      field.setAttribute('data-id', item.id);
+      field.setAttribute('data-code', item.code);
+      
+      if (currentLookupType === 'material') {
+        var row = field.closest('tr');
+        if (row) {
+          row.querySelector('.material-name').value = item.name;
+          row.querySelector('.material-spec').value = item.specification || '';
+          row.querySelector('.material-unit').value = item.unit || '';
+        }
+      }
+    }
+  }
+  
+  closeLookup();
+}
+
+function openMaterialLookup(btn) {
+  var field = btn.previousElementSibling;
+  field.id = 'lookupField_' + Date.now();
+  currentLookupField = field.id;
+  openLookup(field.id, 'material');
+}
+
+function openOrgLookup(btn) {
+  var field = btn.previousElementSibling;
+  field.id = 'lookupField_' + Date.now();
+  currentLookupField = field.id;
+  openLookup(field.id, 'org');
+}
+
+function openSupplierLookup(btn) {
+  var field = btn.previousElementSibling;
+  field.id = 'lookupField_' + Date.now();
+  currentLookupField = field.id;
+  openLookup(field.id, 'supplier');
+}
+
+function openWarehouseLookup(btn) {
+  var field = btn.previousElementSibling;
+  field.id = 'lookupField_' + Date.now();
+  currentLookupField = field.id;
+  openLookup(field.id, 'warehouse');
+}
+
+function initLookupData() {
+  if (!localStorage.getItem('erp_orgs')) {
+    localStorage.setItem('erp_orgs', JSON.stringify([
+      { id: 'org-001', code: 'ORG-HQ', name: '磐枢工业集团', form: '集团', parentName: '' },
+      { id: 'org-002', code: 'ORG-SM', name: '磐枢智能制造有限公司', form: '公司', parentName: '磐枢工业集团' },
+      { id: 'org-003', code: 'ORG-SM-PD', name: '生产制造部', form: '部门', parentName: '磐枢智能制造有限公司' },
+      { id: 'org-004', code: 'ORG-SM-FA', name: '财务部', form: '部门', parentName: '磐枢智能制造有限公司' },
+      { id: 'org-005', code: 'ORG-SM-SD', name: '销售部', form: '部门', parentName: '磐枢智能制造有限公司' }
+    ]));
+  }
+  if (!localStorage.getItem('erp_departments_cache')) {
+    localStorage.setItem('erp_departments_cache', JSON.stringify([
+      { id: 'dept-001', code: 'DEPT-PD', name: '生产制造部', status: 1 },
+      { id: 'dept-002', code: 'DEPT-FA', name: '财务部', status: 1 },
+      { id: 'dept-003', code: 'DEPT-SD', name: '销售部', status: 1 },
+      { id: 'dept-004', code: 'DEPT-AS', name: '装配车间', status: 1 },
+      { id: 'dept-005', code: 'DEPT-QC', name: '质检车间', status: 1 }
+    ]));
+  }
+  if (!localStorage.getItem('erp_employees_cache')) {
+    localStorage.setItem('erp_employees_cache', JSON.stringify([
+      { id: 'emp-001', code: 'EMP-001', name: '张三', department: '生产制造部', status: 1 },
+      { id: 'emp-002', code: 'EMP-002', name: '李四', department: '生产制造部', status: 1 },
+      { id: 'emp-003', code: 'EMP-003', name: '王五', department: '财务部', status: 1 },
+      { id: 'emp-004', code: 'EMP-004', name: '赵六', department: '销售部', status: 1 },
+      { id: 'emp-005', code: 'EMP-005', name: '钱七', department: '质检车间', status: 1 }
+    ]));
+  }
+  if (!localStorage.getItem('erp_suppliers_cache')) {
+    localStorage.setItem('erp_suppliers_cache', JSON.stringify([
+      { id: 'sup-001', code: 'S-001', name: '深圳电子元器件有限公司', status: 1 },
+      { id: 'sup-002', code: 'S-002', name: '杭州精密机械加工厂', status: 1 },
+      { id: 'sup-003', code: 'S-003', name: '上海材料科技有限公司', status: 1 },
+      { id: 'sup-004', code: 'S-004', name: '东莞五金制品厂', status: 1 }
+    ]));
+  }
+  if (!localStorage.getItem('erp_materials_cache')) {
+    localStorage.setItem('erp_materials_cache', JSON.stringify([
+      { id: 'mat-001', code: 'P-001', name: '高频传感器模块', specification: 'HT-2026', unit: '个', status: 1 },
+      { id: 'mat-002', code: 'P-002', name: '控制电路板', specification: 'CB-2026', unit: '块', status: 1 },
+      { id: 'mat-003', code: 'P-003', name: '智能控制器', specification: 'IC-V3', unit: '台', status: 1 },
+      { id: 'mat-004', code: 'P-004', name: '电源模块', specification: 'PM-500W', unit: '个', status: 1 },
+      { id: 'mat-005', code: 'M-001', name: 'PCB电路板', specification: 'FR-4双层', unit: '块', status: 1 },
+      { id: 'mat-006', code: 'M-002', name: '贴片电阻', specification: '10KΩ 0603', unit: '个', status: 1 },
+      { id: 'mat-007', code: 'M-003', name: '贴片电容', specification: '100μF 0805', unit: '个', status: 1 },
+      { id: 'mat-008', code: 'M-004', name: '螺丝', specification: 'M4x10', unit: '包', status: 1 }
+    ]));
+  }
+  if (!localStorage.getItem('erp_warehouses_cache')) {
+    localStorage.setItem('erp_warehouses_cache', JSON.stringify([
+      { id: 'wh-001', code: 'WH-001', name: '成品仓', status: 1 },
+      { id: 'wh-002', code: 'WH-002', name: '原料仓', status: 1 },
+      { id: 'wh-003', code: 'WH-003', name: '半成品仓', status: 1 },
+      { id: 'wh-004', code: 'WH-004', name: '辅料仓', status: 1 }
+    ]));
+  }
+}
+
+</script>
+
+
+
+
+<div class="lookup-modal" id="lookupModal">
+  <div class="lookup-dialog">
+    <div class="lookup-header">
+      <div class="lookup-title" id="lookupTitle">选择</div>
+      <button class="lookup-close" onclick="closeLookup()">×</button>
+    </div>
+    <div class="lookup-body">
+      <div class="lookup-search">
+        <input type="text" id="lookupKeyword" placeholder="请输入编码或名称搜索" onkeydown="if(event.key==='Enter')filterLookup()">
+        <button onclick="filterLookup()">搜索</button>
+      </div>
+      <table class="lookup-table">
+        <thead id="lookupTableHead"></thead>
+        <tbody id="lookupTableBody"></tbody>
+      </table>
+    </div>
+    <div class="lookup-footer">
+      <button class="btn btn-cancel" onclick="closeLookup()">取消</button>
+      <button class="btn btn-primary" onclick="confirmLookup()">确定</button>
+    </div>
+  </div>
+</div>
+
+</body>
+
+
+
+</html>

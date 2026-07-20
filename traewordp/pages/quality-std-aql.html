@@ -1,0 +1,898 @@
+<!DOCTYPE html>
+
+
+
+<html lang="zh-CN">
+
+
+
+<head>
+
+
+
+<meta charset="UTF-8">
+
+
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+
+
+<title>AQL标准 — 磐枢工业智能平台</title>
+
+
+
+<link rel="stylesheet" href="../common.css">
+
+
+
+<script src="../common.js"></script>
+<script>
+</script>
+
+
+
+<script src="../common.js"></script>
+<script>
+var currentLookupField = null;
+var currentLookupType = null;
+var lookupData = [];
+var lookupColumns = [];
+
+function openLookup(fieldId, type) {
+  currentLookupField = fieldId;
+  currentLookupType = type;
+  
+  if (type === 'org') {
+    lookupColumns = ['编码', '名称', '形态', '上级组织'];
+    lookupData = JSON.parse(localStorage.getItem('erp_orgs') || '[]');
+    document.getElementById('lookupTitle').textContent = '选择组织';
+  } else if (type === 'department') {
+    lookupColumns = ['编码', '名称'];
+    lookupData = JSON.parse(localStorage.getItem('erp_departments_cache') || '[]');
+    document.getElementById('lookupTitle').textContent = '选择部门';
+  } else if (type === 'employee') {
+    lookupColumns = ['编号', '姓名', '所属部门'];
+    lookupData = JSON.parse(localStorage.getItem('erp_employees_cache') || '[]');
+    document.getElementById('lookupTitle').textContent = '选择员工';
+  } else if (type === 'supplier') {
+    lookupColumns = ['编码', '名称'];
+    lookupData = JSON.parse(localStorage.getItem('erp_suppliers_cache') || '[]');
+    document.getElementById('lookupTitle').textContent = '选择供应商';
+  } else if (type === 'customer') {
+    lookupColumns = ['编码', '名称'];
+    lookupData = JSON.parse(localStorage.getItem('erp_customers_cache') || '[]');
+    document.getElementById('lookupTitle').textContent = '选择客户';
+  } else if (type === 'material') {
+    lookupColumns = ['物料编码', '物料名称', '规格型号', '基本单位'];
+    lookupData = JSON.parse(localStorage.getItem('erp_materials_cache') || '[]');
+    document.getElementById('lookupTitle').textContent = '选择物料';
+  } else if (type === 'warehouse') {
+    lookupColumns = ['编码', '名称'];
+    lookupData = JSON.parse(localStorage.getItem('erp_warehouses_cache') || '[]');
+    document.getElementById('lookupTitle').textContent = '选择仓库';
+  }
+  
+  renderLookupTable(lookupData);
+  document.getElementById('lookupModal').classList.add('show');
+}
+
+function closeLookup() {
+  document.getElementById('lookupModal').classList.remove('show');
+}
+
+function filterLookup() {
+  var keyword = document.getElementById('lookupKeyword').value.trim().toLowerCase();
+  var filtered = lookupData.filter(function(item) {
+    var code = item.code || '';
+    var name = item.name || '';
+    return code.toLowerCase().includes(keyword) || name.toLowerCase().includes(keyword);
+  });
+  renderLookupTable(filtered);
+}
+
+function renderLookupTable(data) {
+  var head = document.getElementById('lookupTableHead');
+  var body = document.getElementById('lookupTableBody');
+  
+  head.innerHTML = '<tr><th class="checkbox-cell"><input type="checkbox" onclick="selectAllLookup()"></th>' + lookupColumns.map(function(col) { return '<th>' + col + '</th>'; }).join('') + '</tr>';
+  
+  body.innerHTML = '';
+  data.forEach(function(item) {
+    var row = document.createElement('tr');
+    row.onclick = function() { selectLookupRow(this); };
+    var cells = ['<td class="checkbox-cell"><input type="checkbox" class="lookup-checkbox" value="' + item.id + '"></td>'];
+    if (currentLookupType === 'org') {
+      cells.push('<td>' + item.code + '</td><td>' + item.name + '</td><td>' + (item.form || '') + '</td><td>' + (item.parentName || '') + '</td>');
+    } else if (currentLookupType === 'department') {
+      cells.push('<td>' + item.code + '</td><td>' + item.name + '</td>');
+    } else if (currentLookupType === 'employee') {
+      cells.push('<td>' + item.code + '</td><td>' + item.name + '</td><td>' + (item.department || '') + '</td>');
+    } else if (currentLookupType === 'supplier' || currentLookupType === 'customer') {
+      cells.push('<td>' + item.code + '</td><td>' + item.name + '</td>');
+    } else if (currentLookupType === 'material') {
+      cells.push('<td>' + item.code + '</td><td>' + item.name + '</td><td>' + (item.specification || '') + '</td><td>' + (item.unit || '') + '</td>');
+    } else if (currentLookupType === 'warehouse') {
+      cells.push('<td>' + item.code + '</td><td>' + item.name + '</td>');
+    }
+    row.innerHTML = cells.join('');
+    body.appendChild(row);
+  });
+  
+  if (data.length === 0) {
+    body.innerHTML = '<tr><td colspan="' + (lookupColumns.length + 1) + '" style="text-align:center;padding:40px;color:#999;">暂无数据</td></tr>';
+  }
+}
+
+function selectAllLookup() {
+  var master = document.querySelector('.lookup-table th input');
+  var checkboxes = document.querySelectorAll('.lookup-checkbox');
+  checkboxes.forEach(function(cb) { cb.checked = master.checked; });
+}
+
+function selectLookupRow(row) {
+  var checkbox = row.querySelector('.lookup-checkbox');
+  checkbox.checked = !checkbox.checked;
+}
+
+function confirmLookup() {
+  var checkboxes = document.querySelectorAll('.lookup-checkbox:checked');
+  if (checkboxes.length === 0) {
+    showToast('请选择一条记录', 'warning');
+    return;
+  }
+  
+  var item = lookupData.find(function(d) { return d.id === checkboxes[0].value; });
+  if (item) {
+    var field = document.getElementById(currentLookupField);
+    if (field) {
+      field.value = item.name;
+      field.setAttribute('data-id', item.id);
+      field.setAttribute('data-code', item.code);
+      
+      if (currentLookupType === 'material') {
+        var row = field.closest('tr');
+        if (row) {
+          row.querySelector('.material-name').value = item.name;
+          row.querySelector('.material-spec').value = item.specification || '';
+          row.querySelector('.material-unit').value = item.unit || '';
+        }
+      }
+    }
+  }
+  
+  closeLookup();
+}
+
+function openMaterialLookup(btn) {
+  var field = btn.previousElementSibling;
+  field.id = 'lookupField_' + Date.now();
+  currentLookupField = field.id;
+  openLookup(field.id, 'material');
+}
+
+function openOrgLookup(btn) {
+  var field = btn.previousElementSibling;
+  field.id = 'lookupField_' + Date.now();
+  currentLookupField = field.id;
+  openLookup(field.id, 'org');
+}
+
+function openSupplierLookup(btn) {
+  var field = btn.previousElementSibling;
+  field.id = 'lookupField_' + Date.now();
+  currentLookupField = field.id;
+  openLookup(field.id, 'supplier');
+}
+
+function openWarehouseLookup(btn) {
+  var field = btn.previousElementSibling;
+  field.id = 'lookupField_' + Date.now();
+  currentLookupField = field.id;
+  openLookup(field.id, 'warehouse');
+}
+
+function initLookupData() {
+  if (!localStorage.getItem('erp_orgs')) {
+    localStorage.setItem('erp_orgs', JSON.stringify([
+      { id: 'org-001', code: 'ORG-HQ', name: '磐枢工业集团', form: '集团', parentName: '' },
+      { id: 'org-002', code: 'ORG-SM', name: '磐枢智能制造有限公司', form: '公司', parentName: '磐枢工业集团' },
+      { id: 'org-003', code: 'ORG-SM-PD', name: '生产制造部', form: '部门', parentName: '磐枢智能制造有限公司' },
+      { id: 'org-004', code: 'ORG-SM-FA', name: '财务部', form: '部门', parentName: '磐枢智能制造有限公司' },
+      { id: 'org-005', code: 'ORG-SM-SD', name: '销售部', form: '部门', parentName: '磐枢智能制造有限公司' }
+    ]));
+  }
+  if (!localStorage.getItem('erp_departments_cache')) {
+    localStorage.setItem('erp_departments_cache', JSON.stringify([
+      { id: 'dept-001', code: 'DEPT-PD', name: '生产制造部', status: 1 },
+      { id: 'dept-002', code: 'DEPT-FA', name: '财务部', status: 1 },
+      { id: 'dept-003', code: 'DEPT-SD', name: '销售部', status: 1 },
+      { id: 'dept-004', code: 'DEPT-AS', name: '装配车间', status: 1 },
+      { id: 'dept-005', code: 'DEPT-QC', name: '质检车间', status: 1 }
+    ]));
+  }
+  if (!localStorage.getItem('erp_employees_cache')) {
+    localStorage.setItem('erp_employees_cache', JSON.stringify([
+      { id: 'emp-001', code: 'EMP-001', name: '张三', department: '生产制造部', status: 1 },
+      { id: 'emp-002', code: 'EMP-002', name: '李四', department: '生产制造部', status: 1 },
+      { id: 'emp-003', code: 'EMP-003', name: '王五', department: '财务部', status: 1 },
+      { id: 'emp-004', code: 'EMP-004', name: '赵六', department: '销售部', status: 1 },
+      { id: 'emp-005', code: 'EMP-005', name: '钱七', department: '质检车间', status: 1 }
+    ]));
+  }
+  if (!localStorage.getItem('erp_suppliers_cache')) {
+    localStorage.setItem('erp_suppliers_cache', JSON.stringify([
+      { id: 'sup-001', code: 'S-001', name: '深圳电子元器件有限公司', status: 1 },
+      { id: 'sup-002', code: 'S-002', name: '杭州精密机械加工厂', status: 1 },
+      { id: 'sup-003', code: 'S-003', name: '上海材料科技有限公司', status: 1 },
+      { id: 'sup-004', code: 'S-004', name: '东莞五金制品厂', status: 1 }
+    ]));
+  }
+  if (!localStorage.getItem('erp_materials_cache')) {
+    localStorage.setItem('erp_materials_cache', JSON.stringify([
+      { id: 'mat-001', code: 'P-001', name: '高频传感器模块', specification: 'HT-2026', unit: '个', status: 1 },
+      { id: 'mat-002', code: 'P-002', name: '控制电路板', specification: 'CB-2026', unit: '块', status: 1 },
+      { id: 'mat-003', code: 'P-003', name: '智能控制器', specification: 'IC-V3', unit: '台', status: 1 },
+      { id: 'mat-004', code: 'P-004', name: '电源模块', specification: 'PM-500W', unit: '个', status: 1 },
+      { id: 'mat-005', code: 'M-001', name: 'PCB电路板', specification: 'FR-4双层', unit: '块', status: 1 },
+      { id: 'mat-006', code: 'M-002', name: '贴片电阻', specification: '10KΩ 0603', unit: '个', status: 1 },
+      { id: 'mat-007', code: 'M-003', name: '贴片电容', specification: '100μF 0805', unit: '个', status: 1 },
+      { id: 'mat-008', code: 'M-004', name: '螺丝', specification: 'M4x10', unit: '包', status: 1 }
+    ]));
+  }
+  if (!localStorage.getItem('erp_warehouses_cache')) {
+    localStorage.setItem('erp_warehouses_cache', JSON.stringify([
+      { id: 'wh-001', code: 'WH-001', name: '成品仓', status: 1 },
+      { id: 'wh-002', code: 'WH-002', name: '原料仓', status: 1 },
+      { id: 'wh-003', code: 'WH-003', name: '半成品仓', status: 1 },
+      { id: 'wh-004', code: 'WH-004', name: '辅料仓', status: 1 }
+    ]));
+  }
+}
+
+</script>
+
+
+
+</head>
+
+
+
+<body>
+
+
+
+<aside class="sidebar" id="sidebar">
+
+
+
+<div class="sidebar-logo">
+
+
+
+    <img src="../images/logo.png" alt="磐枢工业智能平台" style="width: 100%; max-width: 200px; margin-bottom: 8px;">
+
+
+
+    <h1 style="font-size: 16px; margin: 0;">磐枢工业智能平台</h1>
+
+
+
+  </div>
+
+
+
+  <nav class="sidebar-menu"></nav>
+
+
+
+<div class="sidebar-user"><div class="avatar">管</div>
+
+
+
+</aside>
+
+
+
+
+
+
+
+<div class="main-content" id="mainContent">
+
+
+
+  <div class="page-header" style="position:sticky;top:0;z-index:100;">
+
+
+
+    <div>
+
+
+
+      <div class="flex items-center gap-8">
+
+
+
+        <button class="sidebar-toggle" onclick="toggleSidebar()">&#9776;</button>
+
+
+
+        <div>
+
+
+
+          <h2>AQL标准</h2>
+
+
+
+          <div class="breadcrumb"><a href="../index.html">首页</a><span>&gt;</span><span>质量管理 > 国标资料 > AQL</span></div></div>
+
+
+
+        </div>
+
+
+
+      </div>
+
+
+
+    </div>
+
+
+
+  </div>
+
+
+
+
+
+
+
+  <div class="list-page-body">
+
+
+
+    <div class="list-action-bar">
+
+
+
+      <button class="action-btn" data-action="filter">过滤</button>
+
+
+
+      <button class="action-btn" data-action="refresh">刷新</button>
+
+
+
+      <span class="action-separator"></span>
+
+
+
+      <button class="action-btn" data-action="export">导出</button>
+
+
+
+      <span class="action-separator"></span>
+
+
+
+      <button class="action-btn">综合查询</button>
+
+
+
+      <button class="action-btn">选项</button>
+
+
+
+      <button class="action-btn" data-action="close">退出</button>
+
+
+
+    </div>
+
+
+
+
+
+
+
+    <div class="list-filter-section">
+
+
+
+      <div class="list-filter-row">
+
+
+
+        <div class="filter-field"><select><option>批量范围</option><option>1-8</option><option>9-15</option><option>16-25</option><option>26-50</option><option>51-90</option><option>91-150</option><option>151-280</option><option>281-500</option><option>501-1200</option><option>1201-3200</option><option>3201-10000</option><option>10001-35000</option><option>35001-150000</option><option>150001-500000</option><option>≥500001</option></select></div>
+
+
+
+        <div class="filter-field"><select><option>检验水平</option><option>I</option><option>II</option><option>III</option></select></div>
+
+
+
+        <div class="filter-field"><select><option>AQL级别</option><option>0.010</option><option>0.015</option><option>0.025</option><option>0.040</option><option>0.065</option><option>0.10</option><option>0.15</option><option>0.25</option><option>0.40</option><option>0.65</option><option>1.0</option><option>1.5</option><option>2.5</option><option>4.0</option><option>6.5</option></select></div>
+
+
+
+        <div class="list-filter-btns">
+
+
+
+          <button class="btn-search">查询</button>
+
+
+
+          <button class="btn-reset">重置</button>
+
+
+
+        </div>
+
+
+
+      </div>
+
+
+
+    </div>
+
+
+
+
+
+
+
+    <div style="background: var(--bg-surface); border: 1px solid var(--border-normal); border-radius: 8px; padding: 24px; margin-bottom: 24px;">
+
+
+
+      <div style="font-size: 16px; font-weight: 600; color: var(--text-primary); margin-bottom: 16px;">AQL标准说明</div>
+
+
+
+      <div style="color: var(--text-secondary); font-size: 14px; line-height: 1.8;">
+
+
+
+        <p><strong>什么是AQL？</strong></p>
+
+
+
+        <p>AQL（Acceptance Quality Limit，接收质量限）是GB/T 2828.1-2012《计数抽样检验程序 第1部分：按接收质量限(AQL)检索的逐批检验抽样计划》中的核心概念。它表示当一个连续系列批被提交验收抽样时，可允许的最差过程平均质量水平。</p>
+
+
+
+        <p><strong>AQL的应用原则：</strong></p>
+
+
+
+        <ul style="margin-left: 20px;">
+
+
+
+          <li><strong>0.010-0.15：</strong>极严至严，适用于安全件、关键功能件等重要产品</li>
+
+
+
+          <li><strong>0.25-1.0：</strong>较严至一般，适用于一般零件、次要功能件</li>
+
+
+
+          <li><strong>1.5-4.0：</strong>较宽至宽，适用于次要零件、辅料、包装材料</li>
+
+
+
+          <li><strong>6.5：</strong>很宽，适用于低值易耗品、非关键项目</li>
+
+
+
+        </ul>
+
+
+
+        <p><strong>检验水平：</strong></p>
+
+
+
+        <ul style="margin-left: 20px;">
+
+
+
+          <li><strong>检验水平I：</strong>样本量较小，适用于检验费用较高或破坏性检验</li>
+
+
+
+          <li><strong>检验水平II：</strong>常规检验水平，适用于一般检验</li>
+
+
+
+          <li><strong>检验水平III：</strong>样本量较大，适用于检验费用较低或要求较高</li>
+
+
+
+        </ul>
+
+
+
+      </div>
+
+
+
+    </div>
+
+
+
+
+
+
+
+    <div style="background: var(--bg-surface); border: 1px solid var(--border-normal); border-radius: 8px; padding: 24px; margin-bottom: 24px;">
+
+
+
+      <div style="font-size: 16px; font-weight: 600; color: var(--text-primary); margin-bottom: 20px;">样本量字码表</div>
+
+
+
+      <table class="data-table" style="font-size: 13px;">
+
+
+
+        <thead><tr>
+
+
+
+          <th rowspan="2">批量范围</th>
+
+
+
+          <th colspan="3">特殊检验水平</th>
+
+
+
+          <th colspan="3">一般检验水平</th>
+
+
+
+        </tr><tr>
+
+
+
+          <th>S-1</th>
+
+
+
+          <th>S-2</th>
+
+
+
+          <th>S-3</th>
+
+
+
+          <th>I</th>
+
+
+
+          <th>II</th>
+
+
+
+          <th>III</th>
+
+
+
+        </tr></thead>
+
+
+
+        <tbody>
+
+
+
+          <tr><td>1-8</td><td>A</td><td>A</td><td>A</td><td>A</td><td>A</td><td>B</td></tr>
+
+
+
+          <tr><td>9-15</td><td>A</td><td>A</td><td>A</td><td>A</td><td>B</td><td>C</td></tr>
+
+
+
+          <tr><td>16-25</td><td>A</td><td>B</td><td>B</td><td>B</td><td>C</td><td>D</td></tr>
+
+
+
+          <tr><td>26-50</td><td>B</td><td>B</td><td>C</td><td>C</td><td>D</td><td>E</td></tr>
+
+
+
+          <tr><td>51-90</td><td>B</td><td>C</td><td>C</td><td>C</td><td>E</td><td>F</td></tr>
+
+
+
+          <tr><td>91-150</td><td>B</td><td>C</td><td>D</td><td>D</td><td>F</td><td>G</td></tr>
+
+
+
+          <tr><td>151-280</td><td>C</td><td>D</td><td>E</td><td>E</td><td>G</td><td>H</td></tr>
+
+
+
+          <tr><td>281-500</td><td>C</td><td>D</td><td>E</td><td>F</td><td>H</td><td>J</td></tr>
+
+
+
+          <tr><td>501-1200</td><td>C</td><td>E</td><td>F</td><td>G</td><td>J</td><td>K</td></tr>
+
+
+
+          <tr><td>1201-3200</td><td>D</td><td>E</td><td>G</td><td>H</td><td>K</td><td>L</td></tr>
+
+
+
+          <tr><td>3201-10000</td><td>D</td><td>F</td><td>G</td><td>J</td><td>L</td><td>M</td></tr>
+
+
+
+          <tr><td>10001-35000</td><td>D</td><td>F</td><td>H</td><td>K</td><td>M</td><td>N</td></tr>
+
+
+
+          <tr><td>35001-150000</td><td>E</td><td>G</td><td>J</td><td>L</td><td>N</td><td>P</td></tr>
+
+
+
+          <tr><td>150001-500000</td><td>E</td><td>G</td><td>J</td><td>M</td><td>P</td><td>Q</td></tr>
+
+
+
+          <tr><td>≥500001</td><td>E</td><td>H</td><td>K</td><td>N</td><td>Q</td><td>R</td></tr>
+
+
+
+        </tbody>
+
+
+
+      </table>
+
+
+
+    </div>
+
+
+
+
+
+
+
+    <div style="background: var(--bg-surface); border: 1px solid var(--border-normal); border-radius: 8px; padding: 24px;">
+
+
+
+      <div style="font-size: 16px; font-weight: 600; color: var(--text-primary); margin-bottom: 20px;">AQL检索表（正常检验一次抽样方案）</div>
+
+
+
+      <table class="data-table" style="font-size: 12px;">
+
+
+
+        <thead><tr>
+
+
+
+          <th rowspan="2">字码</th>
+
+
+
+          <th rowspan="2">样本量</th>
+
+
+
+          <th colspan="11">AQL（接收质量限）/%</th>
+
+
+
+        </tr><tr>
+
+
+
+          <th>0.10</th>
+
+
+
+          <th>0.15</th>
+
+
+
+          <th>0.25</th>
+
+
+
+          <th>0.40</th>
+
+
+
+          <th>0.65</th>
+
+
+
+          <th>1.0</th>
+
+
+
+          <th>1.5</th>
+
+
+
+          <th>2.5</th>
+
+
+
+          <th>4.0</th>
+
+
+
+          <th>6.5</th>
+
+
+
+          <th>10</th>
+
+
+
+        </tr></thead>
+
+
+
+        <tbody>
+
+
+
+          <tr><td>A</td><td>2</td><td>↓</td><td>↓</td><td>↓</td><td>↓</td><td>↓</td><td>↓</td><td>↓</td><td>0/1</td><td>0/1</td><td>0/1</td><td>1/2</td></tr>
+
+
+
+          <tr><td>B</td><td>3</td><td>↓</td><td>↓</td><td>↓</td><td>↓</td><td>↓</td><td>↓</td><td>0/1</td><td>0/1</td><td>0/1</td><td>1/2</td><td>2/3</td></tr>
+
+
+
+          <tr><td>C</td><td>5</td><td>↓</td><td>↓</td><td>↓</td><td>↓</td><td>↓</td><td>0/1</td><td>0/1</td><td>0/1</td><td>1/2</td><td>2/3</td><td>3/4</td></tr>
+
+
+
+          <tr><td>D</td><td>8</td><td>↓</td><td>↓</td><td>↓</td><td>↓</td><td>0/1</td><td>0/1</td><td>0/1</td><td>1/2</td><td>2/3</td><td>3/4</td><td>5/6</td></tr>
+
+
+
+          <tr><td>E</td><td>13</td><td>↓</td><td>↓</td><td>↓</td><td>0/1</td><td>0/1</td><td>0/1</td><td>1/2</td><td>2/3</td><td>3/4</td><td>5/6</td><td>7/8</td></tr>
+
+
+
+          <tr><td>F</td><td>20</td><td>↓</td><td>↓</td><td>0/1</td><td>0/1</td><td>0/1</td><td>1/2</td><td>2/3</td><td>3/4</td><td>5/6</td><td>7/8</td><td>10/11</td></tr>
+
+
+
+          <tr><td>G</td><td>32</td><td>↓</td><td>↓</td><td>0/1</td><td>0/1</td><td>1/2</td><td>2/3</td><td>3/4</td><td>5/6</td><td>7/8</td><td>10/11</td><td>14/15</td></tr>
+
+
+
+          <tr><td>H</td><td>50</td><td>↓</td><td>0/1</td><td>0/1</td><td>1/2</td><td>2/3</td><td>3/4</td><td>5/6</td><td>7/8</td><td>10/11</td><td>14/15</td><td>21/22</td></tr>
+
+
+
+          <tr><td>J</td><td>80</td><td>0/1</td><td>0/1</td><td>1/2</td><td>2/3</td><td>3/4</td><td>5/6</td><td>7/8</td><td>10/11</td><td>14/15</td><td>21/22</td><td>21/22</td></tr>
+
+
+
+          <tr><td>K</td><td>125</td><td>0/1</td><td>1/2</td><td>2/3</td><td>3/4</td><td>5/6</td><td>7/8</td><td>10/11</td><td>14/15</td><td>21/22</td><td>21/22</td><td>30/31</td></tr>
+
+
+
+          <tr><td>L</td><td>200</td><td>1/2</td><td>2/3</td><td>3/4</td><td>5/6</td><td>7/8</td><td>10/11</td><td>14/15</td><td>21/22</td><td>21/22</td><td>30/31</td><td>50/51</td></tr>
+
+
+
+          <tr><td>M</td><td>315</td><td>2/3</td><td>3/4</td><td>5/6</td><td>7/8</td><td>10/11</td><td>14/15</td><td>21/22</td><td>21/22</td><td>30/31</td><td>50/51</td><td>50/51</td></tr>
+
+
+
+          <tr><td>N</td><td>500</td><td>3/4</td><td>5/6</td><td>7/8</td><td>10/11</td><td>14/15</td><td>21/22</td><td>21/22</td><td>30/31</td><td>50/51</td><td>50/51</td><td>80/81</td></tr>
+
+
+
+          <tr><td>P</td><td>800</td><td>5/6</td><td>7/8</td><td>10/11</td><td>14/15</td><td>21/22</td><td>21/22</td><td>30/31</td><td>50/51</td><td>50/51</td><td>80/81</td><td>80/81</td></tr>
+
+
+
+          <tr><td>Q</td><td>1250</td><td>7/8</td><td>10/11</td><td>14/15</td><td>21/22</td><td>21/22</td><td>30/31</td><td>50/51</td><td>50/51</td><td>80/81</td><td>80/81</td><td>125/126</td></tr>
+
+
+
+          <tr><td>R</td><td>2000</td><td>10/11</td><td>14/15</td><td>21/22</td><td>21/22</td><td>30/31</td><td>50/51</td><td>50/51</td><td>80/81</td><td>80/81</td><td>125/126</td><td>125/126</td></tr>
+
+
+
+        </tbody>
+
+
+
+      </table>
+
+
+
+      <div style="margin-top: 16px; font-size: 12px; color: var(--text-tertiary);">
+
+
+
+        注：表中"↓"表示使用箭头下面的第一个抽样方案；"Ac/Re"表示接收数/拒收数；空白表示无适用抽样方案
+
+
+
+      </div>
+
+
+
+    </div>
+
+
+
+  </div>
+
+
+
+</div>
+
+
+
+
+
+
+
+<script>
+
+
+
+document.querySelectorAll('.filter-tab').forEach(function(tab){tab.addEventListener('click',function(){this.parentElement.querySelectorAll('.filter-tab').forEach(function(t){t.classList.remove('active');});this.classList.add('active');});});
+
+
+
+
+</script>
+
+
+
+
+<div class="lookup-modal" id="lookupModal">
+  <div class="lookup-dialog">
+    <div class="lookup-header">
+      <div class="lookup-title" id="lookupTitle">选择</div>
+      <button class="lookup-close" onclick="closeLookup()">×</button>
+    </div>
+    <div class="lookup-body">
+      <div class="lookup-search">
+        <input type="text" id="lookupKeyword" placeholder="请输入编码或名称搜索" onkeydown="if(event.key==='Enter')filterLookup()">
+        <button onclick="filterLookup()">搜索</button>
+      </div>
+      <table class="lookup-table">
+        <thead id="lookupTableHead"></thead>
+        <tbody id="lookupTableBody"></tbody>
+      </table>
+    </div>
+    <div class="lookup-footer">
+      <button class="btn btn-cancel" onclick="closeLookup()">取消</button>
+      <button class="btn btn-primary" onclick="confirmLookup()">确定</button>
+    </div>
+  </div>
+</div>
+
+</body>
+
+
+
+</html>

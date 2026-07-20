@@ -1,0 +1,1746 @@
+﻿﻿﻿﻿﻿﻿<!DOCTYPE html>
+
+<html lang="zh-CN">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>管理端 — 磐枢工业智能平台</title>
+
+<link rel="stylesheet" href="common-admin.css">
+
+<script src="../common.js"></script>
+
+<style>
+
+.module-panel { display: none; }
+
+.module-panel.active { display: block; }
+
+.admin-home-grid {
+
+  display: grid;
+
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+
+  gap: 16px;
+
+}
+
+.admin-home-card {
+
+  background: #fff;
+
+  border: 1px solid #e8e8e8;
+
+  border-radius: var(--radius-md);
+
+  padding: 20px;
+
+  text-decoration: none;
+
+  color: #333;
+
+  transition: all var(--transition);
+
+  display: flex;
+
+  align-items: center;
+
+  gap: 14px;
+
+}
+
+.admin-home-card:hover {
+
+  border-color: #91d5ff;
+
+  transform: translateY(-2px);
+
+  box-shadow: 0 4px 16px rgba(0,0,0,0.3);
+
+}
+
+.admin-home-card .ahc-icon {
+
+  width: 44px;
+
+  height: 44px;
+
+  border-radius: var(--radius-md);
+
+  background: #e6f7ff;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  font-size: 20px;
+
+  flex-shrink: 0;
+
+}
+
+.admin-home-card .ahc-text h3 {
+
+  font-size: 14px;
+
+  font-weight: 600;
+
+  margin-bottom: 2px;
+
+}
+
+.admin-home-card .ahc-text p {
+
+  font-size: 11px;
+
+  color: #999;
+
+}
+
+.mini-chart-bars {
+
+  display: flex;
+
+  align-items: flex-end;
+
+  gap: 3px;
+
+  height: 60px;
+
+  padding: 4px 0;
+
+}
+
+.mini-chart-bars .bar-col {
+
+  flex: 1;
+
+  background: #e6f7ff;
+
+  border-radius: 2px 2px 0 0;
+
+  min-height: 4px;
+
+  transition: opacity var(--transition);
+
+}
+
+.mini-chart-bars .bar-col.active {
+
+  background: #1890ff;
+
+  opacity: 0.8;
+
+}
+
+.mt-24 { margin-top: 24px; }
+
+
+
+/* ===== Toast 提示框 ===== */
+
+.toast-container { position: fixed; top: 20px; right: 20px; z-index: 10000; display: flex; flex-direction: column; gap: 10px; }
+
+.toast { display: flex; align-items: center; gap: 10px; padding: 14px 18px; border-radius: var(--radius-md); background: #fff; border: 1px solid #e8e8e8; box-shadow: 0 4px 16px rgba(0,0,0,0.15); min-width: 280px; max-width: 420px; animation: slideIn 0.3s ease; }
+
+@keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+
+.toast .toast-icon { font-size: 18px; flex-shrink: 0; }
+
+.toast .toast-content { flex: 1; font-size: 13px; }
+
+.toast .toast-title { font-weight: 600; margin-bottom: 2px; color: #333; }
+
+.toast .toast-message { color: #666; font-size: 12px; }
+
+.toast-success { border-color: rgba(34,197,94,0.3); background: rgba(34,197,94,0.05); }
+
+.toast-success .toast-title { color: #52c41a; }
+
+.toast-warning { border-color: rgba(245,158,11,0.3); background: rgba(245,158,11,0.05); }
+
+.toast-warning .toast-title { color: #faad14; }
+
+.toast-error { border-color: rgba(239,68,68,0.3); background: rgba(239,68,68,0.05); }
+
+.toast-error .toast-title { color: #f5222d; }
+
+.toast-info { border-color: rgba(56,189,248,0.3); background: rgba(56,189,248,0.05); }
+
+.toast-info .toast-title { color: #1890ff; }
+
+
+
+/* ===== 确认对话框 ===== */
+
+.confirm-modal-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:2000; justify-content:center; align-items:center; }
+
+.confirm-modal-overlay.show { display:flex; }
+
+.confirm-modal-dialog { background:#fff; border:1px solid #e8e8e8; border-radius:4px; width:420px; overflow:hidden; }
+
+.confirm-modal-header { padding:16px 20px; border-bottom:1px solid #e8e8e8; display:flex; align-items:center; gap:10px; }
+
+.confirm-modal-icon { font-size:20px; }
+
+.confirm-modal-title { font-size:15px; font-weight:600; color:#333; }
+
+.confirm-modal-body { padding:20px; text-align:center; }
+
+.confirm-modal-message { font-size:14px; color: #666; line-height:1.6; }
+
+.confirm-modal-footer { display:flex; gap:12px; justify-content:flex-end; padding:16px 20px; border-top:1px solid #e8e8e8; }
+
+</style>
+
+</head>
+
+<body>
+
+
+
+<!-- ===== 管理端 SIDEBAR ===== -->
+
+<aside class="sidebar admin-sidebar" id="sidebar">
+
+    <div class="sidebar-logo">
+
+    <img src="../images/LOGO.png" alt="磐枢工业智能平台" style="width: 100%; max-width: 200px; display: block;">
+
+    <h1 style="font-size: 16px; margin: 4px 0 0;">磐枢工业智能平台</h1>
+
+  </div>
+
+
+
+  <nav class="sidebar-menu">
+
+    <!-- 数据中心管理 -->
+
+    <div class="sidebar-menu-group open">
+
+      <div class="sidebar-menu-item active" onclick="toggleGroup(this)">
+
+        <span class="icon">&#128451;</span> 数据中心管理
+
+        <span class="arrow">&#9660;</span>
+
+      </div>
+
+      <div class="sub-menu">
+
+        <a class="sidebar-menu-item active" href="javascript:void(0)" onclick="showAdminPage('dc-overview')"><span class="icon"></span> 数据中心总览</a>
+
+        <a class="sidebar-menu-item" href="javascript:void(0)" onclick="showAdminPage('dc-new')"><span class="icon"></span> 新建数据中心</a>
+
+        <a class="sidebar-menu-item" href="javascript:void(0)" onclick="showAdminPage('dc-backup')"><span class="icon"></span> 备份管理</a>
+
+      </div>
+
+    </div>
+
+
+
+    <!-- 组织与权限 -->
+
+    <div class="sidebar-menu-group">
+
+      <div class="sidebar-menu-item" onclick="toggleGroup(this)">
+
+        <span class="icon">&#128101;</span> 组织与权限
+
+        <span class="arrow">&#9654;</span>
+
+      </div>
+
+      <div class="sub-menu">
+
+        <a class="sidebar-menu-item" href="javascript:void(0)" onclick="showAdminPage('org')"><span class="icon"></span> 组织架构</a>
+
+        <a class="sidebar-menu-item" href="javascript:void(0)" onclick="showAdminPage('user')"><span class="icon"></span> 用户管理</a>
+
+        <a class="sidebar-menu-item" href="javascript:void(0)" onclick="showAdminPage('role')"><span class="icon"></span> 角色管理</a>
+
+        <a class="sidebar-menu-item" href="javascript:void(0)" onclick="showAdminPage('menu')"><span class="icon"></span> 菜单管理</a>
+
+      </div>
+
+    </div>
+
+
+
+    <!-- 开发设计 -->
+
+    <div class="sidebar-menu-group">
+
+      <div class="sidebar-menu-item" onclick="toggleGroup(this)">
+
+        <span class="icon">&#128187;</span> 开发设计
+
+        <span class="arrow">&#9654;</span>
+
+      </div>
+
+      <div class="sub-menu">
+
+        <a class="sidebar-menu-item" href="javascript:void(0)" onclick="showAdminPage('lowcode')"><span class="icon"></span> 低代码开发中心</a>
+
+        <a class="sidebar-menu-item" href="javascript:void(0)" onclick="showAdminPage('form-designer')"><span class="icon"></span> 表单设计器</a>
+
+        <a class="sidebar-menu-item" href="javascript:void(0)" onclick="showAdminPage('doc-flow')"><span class="icon"></span> 单据转换配置</a>
+
+        <a class="sidebar-menu-item" href="javascript:void(0)" onclick="showAdminPage('print-template')"><span class="icon"></span> 套打模板设计</a>
+
+        <a class="sidebar-menu-item" href="javascript:void(0)" onclick="showAdminPage('workflow')"><span class="icon"></span> 流程配置</a>
+
+      </div>
+
+    </div>
+
+
+
+    <!-- 智能应用 -->
+
+    <div class="sidebar-menu-group">
+
+      <div class="sidebar-menu-item" onclick="toggleGroup(this)">
+
+        <span class="icon">&#129302;</span> 智能应用
+
+        <span class="arrow">&#9654;</span>
+
+      </div>
+
+      <div class="sub-menu">
+
+        <a class="sidebar-menu-item" href="javascript:void(0)" onclick="showAdminPage('api-manage')"><span class="icon"></span> API管理</a>
+
+        <a class="sidebar-menu-item" href="javascript:void(0)" onclick="showAdminPage('nl-training')"><span class="icon"></span> 自然语言训练</a>
+
+        <a class="sidebar-menu-item" href="javascript:void(0)" onclick="showAdminPage('data-analysis')"><span class="icon"></span> 数据分析训练</a>
+
+        <a class="sidebar-menu-item" href="javascript:void(0)" onclick="showAdminPage('agent-config')"><span class="icon"></span> Agent配置</a>
+
+      </div>
+
+    </div>
+
+
+
+    <!-- 返回应用端 -->
+
+    <div class="sidebar-menu-item" onclick="window.location.href='../index.html'">
+
+      <span class="icon">&#8592;</span> 返回应用端
+
+    </div>
+
+  </nav>
+
+
+
+  <div class="sidebar-user" id="sidebarUser">
+
+    <div class="avatar" style="background: #e6f7ff;color: #1890ff;" id="userAvatar">管</div>
+
+    <div>
+
+      <div class="user-name" id="userName">系统管理员</div>
+
+      <div class="user-role" id="userRole">超级管理员</div>
+
+    </div>
+
+  </div>
+
+</aside>
+
+
+
+<!-- ===== MAIN CONTENT ===== -->
+
+<div class="main-content" id="mainContent">
+
+  <!-- Page Header -->
+
+  <div class="page-header">
+
+    <div>
+
+      <div class="flex items-center gap-8">
+
+        <button class="sidebar-toggle" id="sidebarToggle" onclick="toggleSidebar()">&#9776;</button>
+
+        <div>
+
+          <h2 id="pageTitle">管理端控制台</h2>
+
+          <div class="breadcrumb" id="pageBreadcrumb">
+
+            <a href="../index.html">首页</a><span>/</span><span>管理端</span>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+    <div class="page-actions">
+
+      <button class="btn btn-ghost btn-sm">&#128276; 消息</button>
+
+      <button class="btn btn-ghost btn-sm" onclick="logout()">&#9211; 退出</button>
+
+    </div>
+
+  </div>
+
+
+
+  <!-- ========================================== -->
+
+  <!-- MODULE: 数据中心总览 -->
+
+  <!-- ========================================== -->
+
+  <div class="module-panel active" id="mod-dc-overview">
+
+    <div class="page-body">
+
+      <div class="flex-between mb-16">
+
+        <div>
+
+          <h3 style="font-size:16px;font-weight:600;">数据中心总览</h3>
+
+          <p class="text-muted text-sm mt-8">管理所有数据中心连接，监控运行状态</p>
+
+        </div>
+
+        <div class="flex gap-8">
+
+          <a class="btn btn-primary btn-sm" href="data-center/new.html">+ 新建数据中心</a>
+
+          <a class="btn btn-ghost btn-sm" href="data-center/backup.html">&#128190; 备份管理</a>
+
+        </div>
+
+      </div>
+
+
+
+      <!-- Stats Row -->
+
+      <div class="grid-4 mb-24">
+
+        <div class="stat-card">
+
+          <div class="stat-value" id="dcTotal">--</div>
+
+          <div class="stat-label">数据中心总数</div>
+
+        </div>
+
+        <div class="stat-card">
+
+          <div class="stat-value text-success" id="dcOnline">--</div>
+
+          <div class="stat-label">正常运行</div>
+
+        </div>
+
+        <div class="stat-card">
+
+          <div class="stat-value text-warning" id="dcWarning">--</div>
+
+          <div class="stat-label">需要关注</div>
+
+        </div>
+
+        <div class="stat-card">
+
+          <div class="stat-value text-mono" id="dcSize">--</div>
+
+          <div class="stat-label">数据总量</div>
+
+        </div>
+
+      </div>
+
+
+
+      <!-- DC Cards -->
+
+      <div class="grid-2" style="gap:20px;" id="dcCardContainer">
+
+        <div style="grid-column:1/-1;text-align:center;padding:40px;color: #999;">
+
+          <div style="font-size:32px;margin-bottom:12px;">&#128451;</div>
+
+          <div>加载数据中心列表中...</div>
+
+        </div>
+
+      </div>
+
+
+
+      <!-- ===== 组织概览 ===== -->
+
+      <div class="flex-between mb-16 mt-24">
+
+        <h3 style="font-size:16px;font-weight:600;">组织与用户概览</h3>
+
+      </div>
+
+      <div class="grid-4 mb-24" id="orgStatsContainer">
+
+        <div class="stat-card">
+
+          <div class="stat-value text-mono" id="orgTotal">--</div>
+
+          <div class="stat-label">组织总数</div>
+
+        </div>
+
+        <div class="stat-card">
+
+          <div class="stat-value text-mono" id="userTotal">--</div>
+
+          <div class="stat-label">用户总数</div>
+
+        </div>
+
+        <div class="stat-card">
+
+          <div class="stat-value text-mono" id="roleTotal">--</div>
+
+          <div class="stat-label">角色总数</div>
+
+        </div>
+
+        <div class="stat-card">
+
+          <div class="stat-value text-success text-mono" id="onlineTotal">--</div>
+
+          <div class="stat-label">在线用户数</div>
+
+        </div>
+
+      </div>
+
+
+
+      <!-- ===== 快捷入口 ===== -->
+
+      <div class="card">
+
+        <div class="card-header">快捷入口</div>
+
+        <div class="card-body">
+
+          <div class="admin-home-grid" style="grid-template-columns:repeat(auto-fill,minmax(160px,1fr));">
+
+            <a class="admin-home-card" href="data-center/index.html">
+
+              <div class="ahc-icon">&#128451;</div>
+
+              <div class="ahc-text"><h3>数据中心</h3><p>数据库实例管理</p></div>
+
+            </a>
+
+            <a class="admin-home-card" href="org-perm/org.html">
+
+              <div class="ahc-icon">&#127970;</div>
+
+              <div class="ahc-text"><h3>组织架构</h3><p>组织层级管理</p></div>
+
+            </a>
+
+            <a class="admin-home-card" href="org-perm/user.html">
+
+              <div class="ahc-icon">&#128100;</div>
+
+              <div class="ahc-text"><h3>用户管理</h3><p>用户账号管理</p></div>
+
+            </a>
+
+            <a class="admin-home-card" href="org-perm/role.html">
+
+              <div class="ahc-icon">&#128101;</div>
+
+              <div class="ahc-text"><h3>角色管理</h3><p>权限角色配置</p></div>
+
+            </a>
+
+            <a class="admin-home-card" href="org-perm/menu.html">
+
+              <div class="ahc-icon">&#128194;</div>
+
+              <div class="ahc-text"><h3>菜单管理</h3><p>菜单权限配置</p></div>
+
+            </a>
+
+            <a class="admin-home-card" href="dev-design/lowcode.html">
+
+              <div class="ahc-icon">&#128187;</div>
+
+              <div class="ahc-text"><h3>低代码</h3><p>元数据引擎</p></div>
+
+            </a>
+
+            <a class="admin-home-card" href="dev-design/form-designer.html">
+
+              <div class="ahc-icon">&#128221;</div>
+
+              <div class="ahc-text"><h3>表单设计</h3><p>可视化设计器</p></div>
+
+            </a>
+
+            <a class="admin-home-card" href="dev-design/workflow.html">
+
+              <div class="ahc-icon">&#128260;</div>
+
+              <div class="ahc-text"><h3>流程配置</h3><p>审批流设计</p></div>
+
+            </a>
+
+            <a class="admin-home-card" href="ai-config/api-manage.html">
+
+              <div class="ahc-icon">&#129302;</div>
+
+              <div class="ahc-text"><h3>AI配置</h3><p>智能应用管理</p></div>
+
+            </a>
+
+            <a class="admin-home-card" href="dev-design/doc-flow.html">
+
+              <div class="ahc-icon">&#128260;</div>
+
+              <div class="ahc-text"><h3>单据转换</h3><p>流转规则配置</p></div>
+
+            </a>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+
+
+  <!-- ========================================== -->
+
+  <!-- MODULE: 新建数据中心 (跳转提示) -->
+
+  <!-- ========================================== -->
+
+  <div class="module-panel" id="mod-dc-new">
+
+    <div class="page-body">
+
+      <div class="flex-between mb-16">
+
+        <h3 style="font-size:16px;font-weight:600;">新建数据中心</h3>
+
+      </div>
+
+      <p class="text-muted mb-16">此模块已独立为子页面，请访问完整的新建数据中心页面。</p>
+
+      <a class="btn btn-primary" href="data-center/new.html">前往新建数据中心页面</a>
+
+    </div>
+
+  </div>
+
+
+
+  <!-- ========================================== -->
+
+  <!-- MODULE: 备份管理 (跳转提示) -->
+
+  <!-- ========================================== -->
+
+  <div class="module-panel" id="mod-dc-backup">
+
+    <div class="page-body">
+
+      <div class="flex-between mb-16">
+
+        <h3 style="font-size:16px;font-weight:600;">备份管理</h3>
+
+      </div>
+
+      <p class="text-muted mb-16">此模块已独立为子页面，请访问完整的备份管理页面。</p>
+
+      <a class="btn btn-primary" href="data-center/backup.html">前往备份管理页面</a>
+
+    </div>
+
+  </div>
+
+
+
+  <!-- ========================================== -->
+
+  <!-- MODULE: 组织架构 (跳转提示) -->
+
+  <!-- ========================================== -->
+
+  <div class="module-panel" id="mod-org">
+
+    <div class="page-body">
+
+      <h3 style="font-size:16px;font-weight:600;" class="mb-16">组织架构管理</h3>
+
+      <p class="text-muted mb-16">请访问完整的组织架构管理页面。</p>
+
+      <a class="btn btn-primary" href="org-perm/org.html">前往组织架构页面</a>
+
+    </div>
+
+  </div>
+
+
+
+  <!-- ========================================== -->
+
+  <!-- MODULE: 用户管理 (跳转提示) -->
+
+  <!-- ========================================== -->
+
+  <div class="module-panel" id="mod-user">
+
+    <div class="page-body">
+
+      <h3 style="font-size:16px;font-weight:600;" class="mb-16">用户管理</h3>
+
+      <p class="text-muted mb-16">请访问完整的用户管理页面。</p>
+
+      <a class="btn btn-primary" href="org-perm/user.html">前往用户管理页面</a>
+
+    </div>
+
+  </div>
+
+
+
+  <!-- ========================================== -->
+
+  <!-- MODULE: 角色管理 (跳转提示) -->
+
+  <!-- ========================================== -->
+
+  <div class="module-panel" id="mod-role">
+
+    <div class="page-body">
+
+      <h3 style="font-size:16px;font-weight:600;" class="mb-16">角色管理</h3>
+
+      <p class="text-muted mb-16">请访问完整的角色管理页面。</p>
+
+      <a class="btn btn-primary" href="org-perm/role.html">前往角色管理页面</a>
+
+    </div>
+
+  </div>
+
+
+
+  <!-- ========================================== -->
+
+  <!-- MODULE: 菜单管理 (跳转提示) -->
+
+  <!-- ========================================== -->
+
+  <div class="module-panel" id="mod-menu">
+
+    <div class="page-body">
+
+      <h3 style="font-size:16px;font-weight:600;" class="mb-16">菜单管理</h3>
+
+      <p class="text-muted mb-16">请访问完整的菜单管理页面。</p>
+
+      <a class="btn btn-primary" href="org-perm/menu.html">前往菜单管理页面</a>
+
+    </div>
+
+  </div>
+
+
+
+  <!-- ========================================== -->
+
+  <!-- MODULE: 低代码开发中心 -->
+
+  <!-- ========================================== -->
+
+  <div class="module-panel" id="mod-lowcode">
+
+    <div class="page-body">
+
+      <h3 style="font-size:16px;font-weight:600;" class="mb-16">低代码开发中心</h3>
+
+      <p class="text-muted mb-16">请访问完整的低代码开发中心页面。</p>
+
+      <a class="btn btn-primary" href="dev-design/lowcode.html">前往低代码开发中心</a>
+
+    </div>
+
+  </div>
+
+
+
+  <!-- ========================================== -->
+
+  <!-- MODULE: 表单设计器 (跳转) -->
+
+  <!-- ========================================== -->
+
+  <div class="module-panel" id="mod-form-designer">
+
+    <div class="page-body">
+
+      <h3 style="font-size:16px;font-weight:600;" class="mb-16">表单设计器</h3>
+
+      <p class="text-muted mb-16">请访问完整的表单设计器页面。</p>
+
+      <a class="btn btn-primary" href="dev-design/form-designer.html">前往表单设计器</a>
+
+    </div>
+
+  </div>
+
+
+
+  <!-- ========================================== -->
+
+  <!-- MODULE: 单据转换配置 (跳转) -->
+
+  <!-- ========================================== -->
+
+  <div class="module-panel" id="mod-doc-flow">
+
+    <div class="page-body">
+
+      <h3 style="font-size:16px;font-weight:600;" class="mb-16">单据转换配置</h3>
+
+      <p class="text-muted mb-16">请访问完整的单据转换配置页面。</p>
+
+      <a class="btn btn-primary" href="dev-design/doc-flow.html">前往单据转换配置</a>
+
+    </div>
+
+  </div>
+
+
+
+  <!-- ========================================== -->
+
+  <!-- MODULE: 套打模板设计 (跳转) -->
+
+  <!-- ========================================== -->
+
+  <div class="module-panel" id="mod-print-template">
+
+    <div class="page-body">
+
+      <h3 style="font-size:16px;font-weight:600;" class="mb-16">套打模板设计</h3>
+
+      <p class="text-muted mb-16">请访问完整的套打模板设计页面。</p>
+
+      <a class="btn btn-primary" href="dev-design/print-template.html">前往套打模板设计</a>
+
+    </div>
+
+  </div>
+
+
+
+  <!-- ========================================== -->
+
+  <!-- MODULE: 流程配置 (跳转) -->
+
+  <!-- ========================================== -->
+
+  <div class="module-panel" id="mod-workflow">
+
+    <div class="page-body">
+
+      <h3 style="font-size:16px;font-weight:600;" class="mb-16">流程配置</h3>
+
+      <p class="text-muted mb-16">请访问完整的流程配置页面。</p>
+
+      <a class="btn btn-primary" href="dev-design/workflow.html">前往流程配置</a>
+
+    </div>
+
+  </div>
+
+
+
+  <!-- ========================================== -->
+
+  <!-- MODULE: API管理 (跳转) -->
+
+  <!-- ========================================== -->
+
+  <div class="module-panel" id="mod-api-manage">
+
+    <div class="page-body">
+
+      <h3 style="font-size:16px;font-weight:600;" class="mb-16">大模型API管理</h3>
+
+      <p class="text-muted mb-16">请访问完整的API管理页面。</p>
+
+      <a class="btn btn-primary" href="ai-config/api-manage.html">前往API管理页面</a>
+
+    </div>
+
+  </div>
+
+
+
+  <!-- ========================================== -->
+
+  <!-- MODULE: 自然语言训练 (跳转) -->
+
+  <!-- ========================================== -->
+
+  <div class="module-panel" id="mod-nl-training">
+
+    <div class="page-body">
+
+      <h3 style="font-size:16px;font-weight:600;" class="mb-16">自然语言训练</h3>
+
+      <p class="text-muted mb-16">请访问完整的自然语言训练页面。</p>
+
+      <a class="btn btn-primary" href="ai-config/nl-training.html">前往自然语言训练</a>
+
+    </div>
+
+  </div>
+
+
+
+  <!-- ========================================== -->
+
+  <!-- MODULE: 数据分析训练 (跳转) -->
+
+  <!-- ========================================== -->
+
+  <div class="module-panel" id="mod-data-analysis">
+
+    <div class="page-body">
+
+      <h3 style="font-size:16px;font-weight:600;" class="mb-16">数据分析训练</h3>
+
+      <p class="text-muted mb-16">请访问完整的数据分析训练页面。</p>
+
+      <a class="btn btn-primary" href="ai-config/data-analysis.html">前往数据分析训练</a>
+
+    </div>
+
+  </div>
+
+
+
+  <!-- ========================================== -->
+
+  <!-- MODULE: Agent配置 (跳转) -->
+
+  <!-- ========================================== -->
+
+  <div class="module-panel" id="mod-agent-config">
+
+    <div class="page-body">
+
+      <h3 style="font-size:16px;font-weight:600;" class="mb-16">AI Agent配置</h3>
+
+      <p class="text-muted mb-16">请访问完整的Agent配置页面。</p>
+
+      <a class="btn btn-primary" href="ai-config/agent-config.html">前往Agent配置</a>
+
+    </div>
+
+  </div>
+
+
+
+</div>
+
+
+
+<!-- Mobile sidebar overlay -->
+
+<div id="sidebarOverlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:99;" onclick="toggleSidebar()"></div>
+
+
+
+<script>
+
+var confirmCallback = null;
+
+function showToast(message, type) {
+
+  var container = document.getElementById('toastContainer');
+
+  var icons = { success: '&#9989;', warning: '&#9888;', error: '&#10060;', info: '&#9432;' };
+
+  var titles = { success: '操作成功', warning: '温馨提示', error: '系统提示', info: '系统提示' };
+
+  var t = type || 'info';
+
+  var toast = document.createElement('div');
+
+  toast.className = 'toast toast-' + t;
+
+  toast.innerHTML = '<div class="toast-icon">' + icons[t] + '</div><div class="toast-content"><div class="toast-title">' + titles[t] + '</div><div class="toast-message">' + message + '</div></div>';
+
+  container.appendChild(toast);
+
+  setTimeout(function() { toast.style.opacity = '0'; toast.style.transform = 'translateX(100%)'; setTimeout(function() { toast.remove(); }, 300); }, 3000);
+
+}
+
+function showConfirm(message, type, callback) {
+
+  document.getElementById('confirmMessage').textContent = message;
+
+  document.getElementById('confirmTitle').textContent = (type === 'warning') ? '温馨提示' : '系统提示';
+
+  document.getElementById('confirmIcon').innerHTML = (type === 'warning') ? '&#9888;' : '&#10060;';
+
+  confirmCallback = callback;
+
+  document.getElementById('confirmModal').classList.add('show');
+
+}
+
+function closeConfirmModal(result) {
+
+  document.getElementById('confirmModal').classList.remove('show');
+
+  if (confirmCallback) { confirmCallback(result); confirmCallback = null; }
+
+}
+
+
+
+var adminModuleInfo = {
+
+  'dc-overview':   { title: '数据中心总览', bc: '数据中心管理 / 总览' },
+
+  'dc-new':        { title: '新建数据中心', bc: '数据中心管理 / 新建' },
+
+  'dc-backup':     { title: '备份管理', bc: '数据中心管理 / 备份管理' },
+
+  'org':           { title: '组织架构管理', bc: '组织与权限 / 组织架构' },
+
+  'user':          { title: '用户管理', bc: '组织与权限 / 用户管理' },
+
+  'role':          { title: '角色管理', bc: '组织与权限 / 角色管理' },
+
+  'menu':          { title: '菜单管理', bc: '组织与权限 / 菜单管理' },
+
+  'lowcode':       { title: '低代码开发中心', bc: '开发设计 / 低代码' },
+
+  'form-designer':  { title: '表单设计器', bc: '开发设计 / 表单设计器' },
+
+  'doc-flow':      { title: '单据转换配置', bc: '开发设计 / 单据转换' },
+
+  'print-template':{ title: '套打模板设计', bc: '开发设计 / 套打模板' },
+
+  'workflow':      { title: '流程配置', bc: '开发设计 / 流程配置' },
+
+  'api-manage':    { title: '大模型API管理', bc: '智能应用 / API管理' },
+
+  'nl-training':   { title: '自然语言训练', bc: '智能应用 / 自然语言训练' },
+
+  'data-analysis': { title: '数据分析训练', bc: '智能应用 / 数据分析' },
+
+  'agent-config':  { title: 'AI Agent配置', bc: '智能应用 / Agent配置' }
+
+};
+
+
+
+function showAdminPage(moduleId) {
+
+  document.querySelectorAll('.module-panel').forEach(function(p) { p.classList.remove('active'); });
+
+  var target = document.getElementById('mod-' + moduleId);
+
+  if (target) target.classList.add('active');
+
+
+
+  var info = adminModuleInfo[moduleId];
+
+  if (info) {
+
+    document.getElementById('pageTitle').textContent = info.title;
+
+    document.getElementById('pageBreadcrumb').innerHTML = '<a href="../index.html">首页</a><span>/</span><a href="index.html">管理端</a><span>/</span>' + info.bc.replace(' / ', '</span><span>/</span><span>') + '</span>';
+
+  }
+
+
+
+  document.querySelectorAll('.admin-sidebar .sidebar-menu-item').forEach(function(item) { item.classList.remove('active'); });
+
+  document.querySelectorAll('.admin-sidebar .sidebar-menu-group').forEach(function(group) { group.classList.remove('open'); });
+
+
+
+  var links = document.querySelectorAll('.admin-sidebar .sub-menu .sidebar-menu-item');
+
+  links.forEach(function(link) {
+
+    if (link.getAttribute('onclick') && link.getAttribute('onclick').indexOf("'" + moduleId + "'") !== -1) {
+
+      link.classList.add('active');
+
+      var group = link.closest('.sidebar-menu-group');
+
+      if (group) {
+
+        group.classList.add('open');
+
+        var header = group.querySelector('.sidebar-menu-item:not(.sub-menu .sidebar-menu-item)');
+
+        if (header) header.classList.add('active');
+
+      }
+
+    }
+
+  });
+
+
+
+  if (moduleId === 'dc-overview') {
+
+    loadDataCenters();
+
+    loadOrgStats();
+
+  }
+
+}
+
+
+
+window.addEventListener('resize', function() {
+
+  var sidebar = document.getElementById('sidebar');
+
+  var overlay = document.getElementById('sidebarOverlay');
+
+  if (window.innerWidth > 768) {
+
+    sidebar.classList.remove('mobile-open');
+
+    overlay.style.display = 'none';
+
+  }
+
+});
+
+
+
+var API_BASE = 'http://localhost:3001/api';
+
+
+
+function getAccessToken() {
+
+  return localStorage.getItem('accessToken');
+
+}
+
+
+
+function checkLogin() {
+
+  var token = getAccessToken();
+
+  if (!token) {
+
+    window.location.href = '../login.html';
+
+    return false;
+
+  }
+
+  return true;
+
+}
+
+
+
+async function loadUserProfile() {
+
+  if (!checkLogin()) return;
+
+
+
+  // 先从localStorage恢复用户信息（离线模式）
+
+  var storedUser = null;
+
+  try { storedUser = JSON.parse(localStorage.getItem('user') || '{}'); } catch(e) {}
+
+  if (storedUser && storedUser.name) {
+
+    document.getElementById('userName').textContent = storedUser.name || storedUser.username || '系统管理员';
+
+    document.getElementById('userAvatar').textContent = (storedUser.name || storedUser.username || '管').charAt(0);
+
+    document.getElementById('userRole').textContent = storedUser.roleName || '超级管理员';
+
+  }
+
+
+
+  try {
+
+    var response = await fetch(API_BASE + '/auth/profile', {
+
+      headers: { 'Authorization': 'Bearer ' + getAccessToken() }
+
+    });
+
+
+
+    if (response.status === 401) {
+
+      localStorage.removeItem('accessToken');
+
+      localStorage.removeItem('user');
+
+      window.location.href = '../login.html';
+
+      return;
+
+    }
+
+
+
+    var data = await response.json();
+
+    if (data.code === 200 && data.data) {
+
+      var user = data.data;
+
+      document.getElementById('userName').textContent = user.realName || user.username;
+
+      document.getElementById('userAvatar').textContent = (user.realName || user.username).charAt(0);
+
+
+
+      if (user.roleIds && user.roleIds.length > 0) {
+
+        document.getElementById('userRole').textContent = '管理员';
+
+      }
+
+    }
+
+  } catch (error) {
+
+    console.warn('后端不可用，使用本地用户信息');
+
+  }
+
+}
+
+
+
+function logout() {
+
+  localStorage.removeItem('accessToken');
+
+  localStorage.removeItem('user');
+
+  localStorage.removeItem('loginType');
+
+  window.location.href = '../login.html';
+
+}
+
+
+
+async function loadDataCenters() {
+
+  if (!checkLogin()) return;
+
+
+
+  try {
+
+    var response = await fetch(API_BASE + '/data-centers', {
+
+      headers: { 'Authorization': 'Bearer ' + getAccessToken() }
+
+    });
+
+
+
+    if (response.status === 401) {
+
+      logout();
+
+      return;
+
+    }
+
+
+
+    var data = await response.json();
+
+    if (data.code === 200 && data.data) {
+
+      var dcList = data.data.list || [];
+
+      if (dcList.length === 0) {
+
+        dcList = JSON.parse(localStorage.getItem('erp_data_centers') || '[]');
+
+      }
+
+
+
+      document.getElementById('dcTotal').textContent = dcList.length;
+
+      document.getElementById('dcOnline').textContent = dcList.filter(d => d.status === 1).length;
+
+      document.getElementById('dcWarning').textContent = dcList.filter(d => d.status !== 1).length;
+
+      document.getElementById('dcSize').textContent = '--';
+
+      
+
+      var container = document.getElementById('dcCardContainer');
+
+      if (dcList.length === 0) {
+
+        container.innerHTML = `
+
+          <div style="grid-column:1/-1;text-align:center;padding:40px;color: #999;">
+
+            <div style="font-size:32px;margin-bottom:12px;">&#128451;</div>
+
+            <div>暂无数据中心</div>
+
+            <div style="font-size:12px;margin-top:8px;">点击右上角「新建数据中心」创建</div>
+
+          </div>
+
+        `;
+
+      } else {
+
+        var cardsHtml = dcList.map(function(dc) {
+
+          var typeName = dc.dbType === 'mysql' ? 'MySQL' : 
+
+                         dc.dbType === 'postgres' ? 'PostgreSQL' : 
+
+                         dc.dbType === 'mssql' ? 'SQL Server' : dc.dbType;
+
+          return `
+
+            <div class="dc-card">
+
+              <div class="flex-between">
+
+                <div class="dc-status"><span class="status-dot ${dc.status === 1 ? 'online' : 'offline'}"></span> ${dc.status === 1 ? '运行中' : '已停用'}</div>
+
+                <span class="badge badge-${dc.status === 1 ? 'success' : 'warning'}">${dc.status === 1 ? '正常' : '已停用'}</span>
+
+              </div>
+
+              <div class="dc-name">${dc.name || dc.code}</div>
+
+              <div class="dc-type">${typeName}</div>
+
+              <div class="dc-info">
+
+                <div><span class="label">主机:</span> ${dc.dbHost}</div>
+
+                <div><span class="label">端口:</span> ${dc.dbPort}</div>
+
+                <div><span class="label">数据库:</span> ${dc.dbName}</div>
+
+                <div><span class="label">编码:</span> ${dc.code}</div>
+
+              </div>
+
+              <div class="dc-actions">
+
+                <button class="btn btn-sm btn-ghost">&#128190; 备份</button>
+
+                <button class="btn btn-sm btn-ghost">&#128260; 恢复</button>
+
+                <button class="btn btn-sm btn-ghost" onclick="testDcConnection('${dc.id}')">&#9888; 测试连接</button>
+
+                <button class="btn btn-sm btn-ghost" style="margin-left:auto;color: #f5222d;" onclick="deleteDc('${dc.id}')">&#128465; 删除</button>
+
+              </div>
+
+            </div>
+
+          `;
+
+        }).join('');
+
+        container.innerHTML = cardsHtml;
+
+      }
+
+    } else {
+
+      loadMockDcData();
+
+    }
+
+  } catch (error) {
+
+    console.warn('后端数据中心API不可用，使用本地数据');
+
+    loadMockDcData();
+
+  }
+
+}
+
+
+
+function loadMockDcData() {
+
+  var dcList = JSON.parse(localStorage.getItem('erp_data_centers') || '[]');
+
+  if (dcList.length === 0) {
+
+    dcList = [
+
+      { id: 'dc-001', name: '测试数据中心', code: 'DC001', dbType: 'mysql', dbHost: 'localhost', dbPort: '3306', dbName: 'test_db', status: 1, maxConnections: 100 },
+
+      { id: 'dc-002', name: '备用数据中心', code: 'DC002', dbType: 'mssql', dbHost: '127.0.0.1', dbPort: '1433', dbName: 'backup_db', status: 1, maxConnections: 50 },
+
+    ];
+
+  }
+
+  
+
+  document.getElementById('dcTotal').textContent = dcList.length;
+
+  document.getElementById('dcOnline').textContent = dcList.filter(d => d.status === 1).length;
+
+  document.getElementById('dcWarning').textContent = dcList.filter(d => d.status !== 1).length;
+
+  document.getElementById('dcSize').textContent = '--';
+
+  
+
+  var container = document.getElementById('dcCardContainer');
+
+  var cardsHtml = dcList.map(function(dc) {
+
+    var typeName = dc.dbType === 'mysql' ? 'MySQL' : 
+
+                   dc.dbType === 'postgres' ? 'PostgreSQL' : 
+
+                   dc.dbType === 'mssql' ? 'SQL Server' : dc.dbType;
+
+    return `
+
+      <div class="dc-card">
+
+        <div class="flex-between">
+
+          <div class="dc-status"><span class="status-dot ${dc.status === 1 ? 'online' : 'offline'}"></span> ${dc.status === 1 ? '运行中' : '已停用'}</div>
+
+          <span class="badge badge-${dc.status === 1 ? 'success' : 'warning'}">${dc.status === 1 ? '正常' : '已停用'}</span>
+
+        </div>
+
+        <div class="dc-name">${dc.name || dc.code}</div>
+
+        <div class="dc-type">${typeName}</div>
+
+        <div class="dc-info">
+
+          <div><span class="label">主机:</span> ${dc.dbHost}</div>
+
+          <div><span class="label">端口:</span> ${dc.dbPort}</div>
+
+          <div><span class="label">数据库:</span> ${dc.dbName}</div>
+
+          <div><span class="label">编码:</span> ${dc.code}</div>
+
+        </div>
+
+        <div class="dc-actions">
+
+          <button class="btn btn-sm btn-ghost">&#128190; 备份</button>
+
+          <button class="btn btn-sm btn-ghost">&#128260; 恢复</button>
+
+          <button class="btn btn-sm btn-ghost" onclick="testDcConnection('${dc.id}')">&#9888; 测试连接</button>
+
+          <button class="btn btn-sm btn-ghost" style="margin-left:auto;color: #f5222d;" onclick="deleteDc('${dc.id}')">&#128465; 删除</button>
+
+        </div>
+
+      </div>
+
+    `;
+
+  }).join('');
+
+  container.innerHTML = cardsHtml;
+
+}
+
+
+
+function deleteDc(dcId) {
+
+  if (confirm('确定要删除这个数据中心吗？')) {
+
+    var dcList = JSON.parse(localStorage.getItem('erp_data_centers') || '[]');
+
+    dcList = dcList.filter(function(dc) { return dc.id !== dcId; });
+
+    localStorage.setItem('erp_data_centers', JSON.stringify(dcList));
+
+    loadDataCenters();
+
+  }
+
+}
+
+
+
+async function loadOrgStats() {
+
+  if (!checkLogin()) return;
+
+
+
+  var orgCount = 5, userCount = 3, roleCount = 3;
+
+
+
+  try {
+
+    var orgResponse = await fetch(API_BASE + '/orgs', {
+
+      headers: { 'Authorization': 'Bearer ' + getAccessToken() }
+
+    });
+
+    var orgData = await orgResponse.json();
+
+    if (orgData.code === 200 && orgData.data) {
+
+      orgCount = (orgData.data.list || orgData.data).length;
+
+    }
+
+
+
+    var userResponse = await fetch(API_BASE + '/users', {
+
+      headers: { 'Authorization': 'Bearer ' + getAccessToken() }
+
+    });
+
+    var userData = await userResponse.json();
+
+    if (userData.code === 200 && userData.data) {
+
+      userCount = (userData.data.list || userData.data).length;
+
+    }
+
+
+
+    var roleResponse = await fetch(API_BASE + '/roles', {
+
+      headers: { 'Authorization': 'Bearer ' + getAccessToken() }
+
+    });
+
+    var roleData = await roleResponse.json();
+
+    if (roleData.code === 200 && roleData.data) {
+
+      roleCount = (roleData.data.list || roleData.data).length;
+
+    }
+
+  } catch (error) {
+
+    console.warn('后端不可用，使用本地统计数据');
+
+  }
+
+
+
+  document.getElementById('orgTotal').textContent = orgCount;
+
+  document.getElementById('userTotal').textContent = userCount;
+
+  document.getElementById('roleTotal').textContent = roleCount;
+
+  document.getElementById('onlineTotal').textContent = '1';
+
+}
+
+
+
+async function testDcConnection(dcId) {
+
+  try {
+
+    var response = await fetch(API_BASE + '/data-centers/' + dcId + '/test-connection', {
+
+      method: 'POST',
+
+      headers: { 'Authorization': 'Bearer ' + getAccessToken() }
+
+    });
+
+    var data = await response.json();
+
+    if (data.success) {
+
+      showToast('连接测试成功！', 'success');
+
+    } else {
+
+      showToast('连接测试失败: ' + data.message, 'error');
+
+    }
+
+  } catch (error) {
+
+    showToast('连接测试失败: ' + error.message, 'error');
+
+  }
+
+}
+
+
+
+async function deleteDc(dcId) {
+
+  showConfirm('确定要删除这个数据中心吗？', 'warning', async function(result) {
+
+    if (!result) return;
+
+    try {
+
+      var response = await fetch(API_BASE + '/data-centers/' + dcId, {
+
+        method: 'DELETE',
+
+        headers: { 'Authorization': 'Bearer ' + getAccessToken() }
+
+      });
+
+      var data = await response.json();
+
+      if (data.code === 200) {
+
+        showToast('删除成功', 'success');
+
+        loadDataCenters();
+
+      } else {
+
+        showToast('删除失败: ' + data.message, 'error');
+
+      }
+
+    } catch (error) {
+
+      showToast('删除失败: ' + error.message, 'error');
+
+    }
+
+  });
+
+}
+
+
+
+window.addEventListener('DOMContentLoaded', function() {
+
+  checkLogin();
+
+  loadUserProfile();
+
+  loadDataCenters();
+
+  loadOrgStats();
+
+});
+
+</script>
+
+
+
+<div class="toast-container" id="toastContainer"></div>
+
+<div class="confirm-modal-overlay" id="confirmModal">
+
+  <div class="confirm-modal-dialog">
+
+    <div class="confirm-modal-header">
+
+      <span class="confirm-modal-icon" id="confirmIcon">&#9888;</span>
+
+      <span class="confirm-modal-title" id="confirmTitle">温馨提示</span>
+
+    </div>
+
+    <div class="confirm-modal-body">
+
+      <div class="confirm-modal-message" id="confirmMessage"></div>
+
+    </div>
+
+    <div class="confirm-modal-footer">
+
+      <button class="btn btn-sm btn-cancel" onclick="closeConfirmModal(false)">取消</button>
+
+      <button class="btn btn-sm btn-primary" style="background: #1890ff;border-color: #1890ff;color:#0a0e1a;" onclick="closeConfirmModal(true)">确定</button>
+
+    </div>
+
+  </div>
+
+</div>
+
+</body>
+
+</html>
+

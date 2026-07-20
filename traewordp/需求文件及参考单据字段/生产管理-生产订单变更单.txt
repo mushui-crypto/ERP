@@ -1,0 +1,84 @@
+生产管理-生产订单变更单
+
+字段说明：
+单据头：FBillHead 
+	 实体主键：FID 
+	 单据编号：FBillNo 
+	 单据状态：FDocumentStatus 
+	 审核人：FApproverId 
+	 审核日期：FApproveDate 
+	 修改日期：FModifyDate 
+	 创建日期：FCreateDate 
+	 修改人：FModifierId 
+	 创建人：FCreatorId 
+	 备注：FDescription 
+	 生产组织：FPrdOrgId  (必填项)
+	 单据类型：FBillType  (必填项)
+	 生产车间：FWorkShopID 
+	 变更原因：FChangeReason 
+	 单据日期：FDate  (必填项)
+明细：FEntity 
+	 实体主键：FEntryID 
+	 变更类型：FChangeType  (必填项)
+	 物料编码：FMaterialId  (必填项)
+	 物料名称：FMaterialName 
+	 规格型号：FSpecification 
+	 源单类型：FSrcBillType 
+	 源单编号：FSrcBillNo 
+	 源单内码：FSrcBillId 
+	 源单分录内码：FSrcBillEntryId 
+	 源单行号：FSrcBillEntrySeq 
+	 生产订单编号：FMoNo  (必填项)
+	 生产订单内码：FMoId 
+	 生产订单分录内码：FMoEntryId 
+	 生产订单行号：FMoEntrySeq 
+	 单位：FUnitId  (必填项)
+	 基本单位：FBaseUnitId 
+	 数量：FQty 
+	 基本单位数量：FBaseQty 
+	 入库上限：FStockInLimitH 
+	 基本单位入库上限：FBaseStockInLimitH 
+	 入库上限比例：FStockInUlRatio 
+	 入库下限：FStockInLimitL 
+	 基本单位入库下限：FBaseStockInLimitL 
+	 入库下限比例：FStockInLlRatio 
+	 计划开工时间：FPlanStartDate  (必填项)
+	 计划完工时间：FPlanFinishDate  (必填项)
+	 BOM版本：FBomId 
+	 需求组织：FRequestOrgId 
+	 产品类型：FProductType  (必填项)
+	 工艺路线：FRoutingId 
+	 批号：FLot 
+	 计划跟踪号：FMTONO 
+	 项目编号：FProjectNo 
+	 辅助属性：FAuxPropId 
+	 入库组织：FStockInOrgId  (必填项)
+	 仓库：FStockId 
+	 仓位：FStockLocId 
+	 货位：FF100001
+	 产出工序：FOperId 
+	 产出作业编码：FProcessId 
+	 成本权重：FCostRate 
+	 备注：FMemoItem 
+	 业务状态：FStatus  (必填项)
+	 组别：FGroup 
+	 业务流程：FBFLowId 
+	 需求类型：FReqType  (必填项)
+	 需求优先级：FPriority 
+	 生产车间：FWorkShopId1 
+	 入库货主类型：FInStockOwnerTypeId 
+	 入库货主：FInStockOwnerId 
+	 成品率%：FYieldRate 
+	 基本单位成品数量：FBaseYieldQty 
+	 成品数量：FYieldQty 
+关联关系表：FEntity_Link 
+	 实体主键：FLinkId 
+	 业务流程图：FEntity_Link_FFlowId 
+	 推进路线：FEntity_Link_FFlowLineId 
+	 转换规则：FEntity_Link_FRuleId 
+	 源单表内码：FEntity_Link_FSTableId 
+	 源单表：FEntity_Link_FSTableName 
+	 源单内码：FEntity_Link_FSBillId 
+	 源单分录内码：FEntity_Link_FSId 
+	 原始携带量：FEntity_Link_FBaseQtyOld 
+	 修改携带量：FEntity_Link_FBaseQty 

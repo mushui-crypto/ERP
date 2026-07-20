@@ -1,0 +1,30 @@
+税率
+
+字段说明：
+单据头：FBillHead 
+	 实体主键：FID 
+	 数据状态：FDocumentStatus 
+	 禁用状态：FForbidStatus 
+	 名称：FName  (必填项)
+	 编码：FNumber 
+	 修改人：FModifierId 
+	 创建人：FCreatorId 
+	 创建日期：FCreateDate 
+	 修改日期：FModifyDate 
+	 描述：FDescription 
+	 税收制度：FTaxatiionSystem  (必填项)
+	 税种：FTaxType  (必填项)
+	 生效日期：FEffectiveDate  (必填项)
+	 失效日期：FExpiryDate  (必填项)
+	 增值税：FIsVat 
+	 卖方代扣代缴：FSellerWithHold 
+	 买方代扣代缴：FBuyerWithHold 
+	 开增值税发票：FMakeVatInvoice  (必填项)
+	 计入成本比例%：FInCostPercent 
+	 审核人：FApproverId 
+	 审核日期：FApproveDate 
+	 禁用人：FForbiderId 
+	 禁用日期：FForbidDate 
+	 系统预设：FIsSyspReset 
+	 默认费用项目：FDefaultCost 
+	 税率%：FTaxRate 

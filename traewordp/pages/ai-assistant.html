@@ -1,0 +1,3407 @@
+<!DOCTYPE html>
+
+
+
+<html lang="zh-CN">
+
+
+
+<head>
+
+
+
+<meta charset="UTF-8">
+
+
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+
+
+<title>AI问答中心 — 磐枢工业智能平台</title>
+
+
+
+<link rel="stylesheet" href="../common.css">
+
+
+
+<script src="../common.js"></script>
+<script></script>
+<script>
+var currentLookupField = null;
+var currentLookupType = null;
+var lookupData = [];
+var lookupColumns = [];
+
+function openLookup(fieldId, type) {
+  currentLookupField = fieldId;
+  currentLookupType = type;
+  
+  if (type === 'org') {
+    lookupColumns = ['编码', '名称', '形态', '上级组织'];
+    lookupData = JSON.parse(localStorage.getItem('erp_orgs') || '[]');
+    document.getElementById('lookupTitle').textContent = '选择组织';
+  } else if (type === 'department') {
+    lookupColumns = ['编码', '名称'];
+    lookupData = JSON.parse(localStorage.getItem('erp_departments_cache') || '[]');
+    document.getElementById('lookupTitle').textContent = '选择部门';
+  } else if (type === 'employee') {
+    lookupColumns = ['编号', '姓名', '所属部门'];
+    lookupData = JSON.parse(localStorage.getItem('erp_employees_cache') || '[]');
+    document.getElementById('lookupTitle').textContent = '选择员工';
+  } else if (type === 'supplier') {
+    lookupColumns = ['编码', '名称'];
+    lookupData = JSON.parse(localStorage.getItem('erp_suppliers_cache') || '[]');
+    document.getElementById('lookupTitle').textContent = '选择供应商';
+  } else if (type === 'customer') {
+    lookupColumns = ['编码', '名称'];
+    lookupData = JSON.parse(localStorage.getItem('erp_customers_cache') || '[]');
+    document.getElementById('lookupTitle').textContent = '选择客户';
+  } else if (type === 'material') {
+    lookupColumns = ['物料编码', '物料名称', '规格型号', '基本单位'];
+    lookupData = JSON.parse(localStorage.getItem('erp_materials_cache') || '[]');
+    document.getElementById('lookupTitle').textContent = '选择物料';
+  } else if (type === 'warehouse') {
+    lookupColumns = ['编码', '名称'];
+    lookupData = JSON.parse(localStorage.getItem('erp_warehouses_cache') || '[]');
+    document.getElementById('lookupTitle').textContent = '选择仓库';
+  }
+  
+  renderLookupTable(lookupData);
+  document.getElementById('lookupModal').classList.add('show');
+}
+
+function closeLookup() {
+  document.getElementById('lookupModal').classList.remove('show');
+}
+
+function filterLookup() {
+  var keyword = document.getElementById('lookupKeyword').value.trim().toLowerCase();
+  var filtered = lookupData.filter(function(item) {
+    var code = item.code || '';
+    var name = item.name || '';
+    return code.toLowerCase().includes(keyword) || name.toLowerCase().includes(keyword);
+  });
+  renderLookupTable(filtered);
+}
+
+function renderLookupTable(data) {
+  var head = document.getElementById('lookupTableHead');
+  var body = document.getElementById('lookupTableBody');
+  
+  head.innerHTML = '<tr><th class="checkbox-cell"><input type="checkbox" onclick="selectAllLookup()"></th>' + lookupColumns.map(function(col) { return '<th>' + col + '</th>'; }).join('') + '</tr>';
+  
+  body.innerHTML = '';
+  data.forEach(function(item) {
+    var row = document.createElement('tr');
+    row.onclick = function() { selectLookupRow(this); };
+    var cells = ['<td class="checkbox-cell"><input type="checkbox" class="lookup-checkbox" value="' + item.id + '"></td>'];
+    if (currentLookupType === 'org') {
+      cells.push('<td>' + item.code + '</td><td>' + item.name + '</td><td>' + (item.form || '') + '</td><td>' + (item.parentName || '') + '</td>');
+    } else if (currentLookupType === 'department') {
+      cells.push('<td>' + item.code + '</td><td>' + item.name + '</td>');
+    } else if (currentLookupType === 'employee') {
+      cells.push('<td>' + item.code + '</td><td>' + item.name + '</td><td>' + (item.department || '') + '</td>');
+    } else if (currentLookupType === 'supplier' || currentLookupType === 'customer') {
+      cells.push('<td>' + item.code + '</td><td>' + item.name + '</td>');
+    } else if (currentLookupType === 'material') {
+      cells.push('<td>' + item.code + '</td><td>' + item.name + '</td><td>' + (item.specification || '') + '</td><td>' + (item.unit || '') + '</td>');
+    } else if (currentLookupType === 'warehouse') {
+      cells.push('<td>' + item.code + '</td><td>' + item.name + '</td>');
+    }
+    row.innerHTML = cells.join('');
+    body.appendChild(row);
+  });
+  
+  if (data.length === 0) {
+    body.innerHTML = '<tr><td colspan="' + (lookupColumns.length + 1) + '" style="text-align:center;padding:40px;color:#999;">暂无数据</td></tr>';
+  }
+}
+
+function selectAllLookup() {
+  var master = document.querySelector('.lookup-table th input');
+  var checkboxes = document.querySelectorAll('.lookup-checkbox');
+  checkboxes.forEach(function(cb) { cb.checked = master.checked; });
+}
+
+function selectLookupRow(row) {
+  var checkbox = row.querySelector('.lookup-checkbox');
+  checkbox.checked = !checkbox.checked;
+}
+
+function confirmLookup() {
+  var checkboxes = document.querySelectorAll('.lookup-checkbox:checked');
+  if (checkboxes.length === 0) {
+    showToast('请选择一条记录', 'warning');
+    return;
+  }
+  
+  var item = lookupData.find(function(d) { return d.id === checkboxes[0].value; });
+  if (item) {
+    var field = document.getElementById(currentLookupField);
+    if (field) {
+      field.value = item.name;
+      field.setAttribute('data-id', item.id);
+      field.setAttribute('data-code', item.code);
+      
+      if (currentLookupType === 'material') {
+        var row = field.closest('tr');
+        if (row) {
+          row.querySelector('.material-name').value = item.name;
+          row.querySelector('.material-spec').value = item.specification || '';
+          row.querySelector('.material-unit').value = item.unit || '';
+        }
+      }
+    }
+  }
+  
+  closeLookup();
+}
+
+function openMaterialLookup(btn) {
+  var field = btn.previousElementSibling;
+  field.id = 'lookupField_' + Date.now();
+  currentLookupField = field.id;
+  openLookup(field.id, 'material');
+}
+
+function openOrgLookup(btn) {
+  var field = btn.previousElementSibling;
+  field.id = 'lookupField_' + Date.now();
+  currentLookupField = field.id;
+  openLookup(field.id, 'org');
+}
+
+function openSupplierLookup(btn) {
+  var field = btn.previousElementSibling;
+  field.id = 'lookupField_' + Date.now();
+  currentLookupField = field.id;
+  openLookup(field.id, 'supplier');
+}
+
+function openWarehouseLookup(btn) {
+  var field = btn.previousElementSibling;
+  field.id = 'lookupField_' + Date.now();
+  currentLookupField = field.id;
+  openLookup(field.id, 'warehouse');
+}
+
+function initLookupData() {
+  if (!localStorage.getItem('erp_orgs')) {
+    localStorage.setItem('erp_orgs', JSON.stringify([
+      { id: 'org-001', code: 'ORG-HQ', name: '磐枢工业集团', form: '集团', parentName: '' },
+      { id: 'org-002', code: 'ORG-SM', name: '磐枢智能制造有限公司', form: '公司', parentName: '磐枢工业集团' },
+      { id: 'org-003', code: 'ORG-SM-PD', name: '生产制造部', form: '部门', parentName: '磐枢智能制造有限公司' },
+      { id: 'org-004', code: 'ORG-SM-FA', name: '财务部', form: '部门', parentName: '磐枢智能制造有限公司' },
+      { id: 'org-005', code: 'ORG-SM-SD', name: '销售部', form: '部门', parentName: '磐枢智能制造有限公司' }
+    ]));
+  }
+  if (!localStorage.getItem('erp_departments_cache')) {
+    localStorage.setItem('erp_departments_cache', JSON.stringify([
+      { id: 'dept-001', code: 'DEPT-PD', name: '生产制造部', status: 1 },
+      { id: 'dept-002', code: 'DEPT-FA', name: '财务部', status: 1 },
+      { id: 'dept-003', code: 'DEPT-SD', name: '销售部', status: 1 },
+      { id: 'dept-004', code: 'DEPT-AS', name: '装配车间', status: 1 },
+      { id: 'dept-005', code: 'DEPT-QC', name: '质检车间', status: 1 }
+    ]));
+  }
+  if (!localStorage.getItem('erp_employees_cache')) {
+    localStorage.setItem('erp_employees_cache', JSON.stringify([
+      { id: 'emp-001', code: 'EMP-001', name: '张三', department: '生产制造部', status: 1 },
+      { id: 'emp-002', code: 'EMP-002', name: '李四', department: '生产制造部', status: 1 },
+      { id: 'emp-003', code: 'EMP-003', name: '王五', department: '财务部', status: 1 },
+      { id: 'emp-004', code: 'EMP-004', name: '赵六', department: '销售部', status: 1 },
+      { id: 'emp-005', code: 'EMP-005', name: '钱七', department: '质检车间', status: 1 }
+    ]));
+  }
+  if (!localStorage.getItem('erp_suppliers_cache')) {
+    localStorage.setItem('erp_suppliers_cache', JSON.stringify([
+      { id: 'sup-001', code: 'S-001', name: '深圳电子元器件有限公司', status: 1 },
+      { id: 'sup-002', code: 'S-002', name: '杭州精密机械加工厂', status: 1 },
+      { id: 'sup-003', code: 'S-003', name: '上海材料科技有限公司', status: 1 },
+      { id: 'sup-004', code: 'S-004', name: '东莞五金制品厂', status: 1 }
+    ]));
+  }
+  if (!localStorage.getItem('erp_materials_cache')) {
+    localStorage.setItem('erp_materials_cache', JSON.stringify([
+      { id: 'mat-001', code: 'P-001', name: '高频传感器模块', specification: 'HT-2026', unit: '个', status: 1 },
+      { id: 'mat-002', code: 'P-002', name: '控制电路板', specification: 'CB-2026', unit: '块', status: 1 },
+      { id: 'mat-003', code: 'P-003', name: '智能控制器', specification: 'IC-V3', unit: '台', status: 1 },
+      { id: 'mat-004', code: 'P-004', name: '电源模块', specification: 'PM-500W', unit: '个', status: 1 },
+      { id: 'mat-005', code: 'M-001', name: 'PCB电路板', specification: 'FR-4双层', unit: '块', status: 1 },
+      { id: 'mat-006', code: 'M-002', name: '贴片电阻', specification: '10KΩ 0603', unit: '个', status: 1 },
+      { id: 'mat-007', code: 'M-003', name: '贴片电容', specification: '100μF 0805', unit: '个', status: 1 },
+      { id: 'mat-008', code: 'M-004', name: '螺丝', specification: 'M4x10', unit: '包', status: 1 }
+    ]));
+  }
+  if (!localStorage.getItem('erp_warehouses_cache')) {
+    localStorage.setItem('erp_warehouses_cache', JSON.stringify([
+      { id: 'wh-001', code: 'WH-001', name: '成品仓', status: 1 },
+      { id: 'wh-002', code: 'WH-002', name: '原料仓', status: 1 },
+      { id: 'wh-003', code: 'WH-003', name: '半成品仓', status: 1 },
+      { id: 'wh-004', code: 'WH-004', name: '辅料仓', status: 1 }
+    ]));
+  }
+}
+
+</script>
+
+
+
+<style>
+
+
+
+
+
+
+
+.toast-container {
+
+
+
+  position: fixed;
+
+
+
+  top: 60px;
+
+
+
+  right: 20px;
+
+
+
+  z-index: 1000;
+
+
+
+  display: flex;
+
+
+
+  flex-direction: column;
+
+
+
+  gap: 8px;
+
+
+
+}
+
+
+
+.toast {
+
+
+
+  padding: 12px 16px;
+
+
+
+  border-radius: var(--radius-md);
+
+
+
+  font-size: 13px;
+
+
+
+  color: var(--text-primary);
+
+
+
+  min-width: 280px;
+
+
+
+  max-width: 400px;
+
+
+
+  display: flex;
+
+
+
+  align-items: center;
+
+
+
+  gap: 8px;
+
+
+
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+
+
+
+  animation: toastIn 0.3s ease;
+
+
+
+}
+
+
+
+@keyframes toastIn {
+
+
+
+  from { opacity: 0; transform: translateX(100%); }
+
+
+
+  to { opacity: 1; transform: translateX(0); }
+
+
+
+}
+
+
+
+.toast-success { background: rgba(34,197,94,0.9); }
+
+
+
+.toast-error { background: rgba(239,68,68,0.9); }
+
+
+
+.toast-warning { background: rgba(234,179,8,0.9); }
+
+
+
+.toast-info { background: rgba(6,182,212,0.9); }
+
+
+
+.toast-icon { font-size: 16px; }
+</style>
+
+<style>
+.confirm-modal-overlay {
+
+
+
+  position: fixed;
+
+
+
+  inset: 0;
+
+
+
+  background: rgba(0,0,0,0.6);
+
+
+
+  display: none;
+
+
+
+  align-items: center;
+
+
+
+  justify-content: center;
+
+
+
+  z-index: 2000;
+
+
+
+}
+
+
+
+.confirm-modal-overlay.show { display: flex; }
+
+
+
+.confirm-modal {
+
+
+
+  background: var(--bg-surface);
+
+
+
+  border: 1px solid var(--border-normal);
+
+
+
+  border-radius: var(--radius-lg);
+
+
+
+  padding: 24px;
+
+
+
+  min-width: 360px;
+
+
+
+  max-width: 480px;
+
+
+
+  box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+
+
+
+}
+
+
+
+.confirm-modal-header {
+
+
+
+  font-size: 14px;
+
+
+
+  font-weight: 600;
+
+
+
+  color: var(--text-primary);
+
+
+
+  margin-bottom: 12px;
+
+
+
+}
+
+
+
+.confirm-modal-body {
+
+
+
+  font-size: 13px;
+
+
+
+  color: var(--text-secondary);
+
+
+
+  line-height: 1.6;
+
+
+
+  margin-bottom: 20px;
+
+
+
+}
+
+
+
+.confirm-modal-footer {
+
+
+
+  display: flex;
+
+
+
+  justify-content: flex-end;
+
+
+
+  gap: 8px;
+
+
+
+}
+
+.ai-assistant-container {
+
+
+
+  display: grid;
+
+
+
+  grid-template-columns: 30% 70%;
+
+
+
+  height: calc(100vh - 56px);
+
+
+
+}
+
+
+
+
+
+
+
+.conversation-sidebar {
+
+
+
+  background: var(--bg-surface);
+
+
+
+  border-right: 1px solid var(--border-normal);
+
+
+
+  display: flex;
+
+
+
+  flex-direction: column;
+
+
+
+}
+
+
+
+
+
+
+
+.conv-sidebar-header {
+
+
+
+  padding: 16px;
+
+
+
+  border-bottom: 1px solid var(--border-normal);
+
+
+
+}
+
+
+
+
+
+
+
+.conv-sidebar-header h3 {
+
+
+
+  font-size: 14px;
+
+
+
+  font-weight: 600;
+
+
+
+  color: var(--text-primary);
+
+
+
+  margin-bottom: 8px;
+
+
+
+}
+
+
+
+
+
+
+
+.conv-search {
+
+
+
+  position: relative;
+
+
+
+}
+
+
+
+
+
+
+
+.conv-search input {
+
+
+
+  width: 100%;
+
+
+
+  padding: 7px 30px 7px 12px;
+
+
+
+  background: var(--bg-inset);
+
+
+
+  border: 1px solid var(--border-normal);
+
+
+
+  border-radius: var(--radius-sm);
+
+
+
+  color: var(--text-primary);
+
+
+
+  font-size: 12px;
+
+
+
+}
+
+
+
+
+
+
+
+.conv-search::before {
+
+
+
+  content: '⌕';
+
+
+
+  position: absolute;
+
+
+
+  right: 10px;
+
+
+
+  top: 50%;
+
+
+
+  transform: translateY(-50%);
+
+
+
+  color: var(--text-tertiary);
+
+
+
+  font-size: 14px;
+
+
+
+}
+
+
+
+
+
+
+
+.conv-list {
+
+
+
+  flex: 1;
+
+
+
+  overflow-y: auto;
+
+
+
+  padding: 8px 0;
+
+
+
+}
+
+
+
+
+
+
+
+.conv-item {
+
+
+
+  padding: 12px 16px;
+
+
+
+  cursor: pointer;
+
+
+
+  border-left: 3px solid transparent;
+
+
+
+  transition: all var(--transition);
+
+
+
+}
+
+
+
+
+
+
+
+.conv-item:hover {
+
+
+
+  background: rgba(56,189,248,0.04);
+
+
+
+}
+
+
+
+
+
+
+
+.conv-item.active {
+
+
+
+  background: rgba(56,189,248,0.08);
+
+
+
+  border-left-color: var(--text-accent);
+
+
+
+}
+
+
+
+
+
+
+
+.conv-item-title {
+
+
+
+  font-size: 13px;
+
+
+
+  color: var(--text-primary);
+
+
+
+  font-weight: 500;
+
+
+
+  margin-bottom: 4px;
+
+
+
+  overflow: hidden;
+
+
+
+  text-overflow: ellipsis;
+
+
+
+  white-space: nowrap;
+
+
+
+}
+
+
+
+
+
+
+
+.conv-item-meta {
+
+
+
+  font-size: 11px;
+
+
+
+  color: var(--text-tertiary);
+
+
+
+  display: flex;
+
+
+
+  align-items: center;
+
+
+
+  gap: 8px;
+
+
+
+}
+
+
+
+
+
+
+
+.conv-item-badge {
+
+
+
+  font-size: 10px;
+
+
+
+  padding: 1px 5px;
+
+
+
+  border-radius: 8px;
+
+
+
+}
+
+
+
+
+
+
+
+.conv-sidebar-footer {
+
+
+
+  padding: 12px 16px;
+
+
+
+  border-top: 1px solid var(--border-normal);
+
+
+
+}
+
+
+
+
+
+
+
+.conv-sidebar-footer button {
+
+
+
+  width: 100%;
+
+
+
+  padding: 8px;
+
+
+
+  background: transparent;
+
+
+
+  border: 1px solid var(--border-normal);
+
+
+
+  border-radius: var(--radius-sm);
+
+
+
+  color: var(--text-secondary);
+
+
+
+  font-size: 13px;
+
+
+
+  cursor: pointer;
+
+
+
+  transition: all var(--transition);
+
+
+
+}
+
+
+
+
+
+
+
+.conv-sidebar-footer button:hover {
+
+
+
+  background: rgba(56,189,248,0.08);
+
+
+
+  border-color: var(--text-accent);
+
+
+
+  color: var(--text-accent);
+
+
+
+}
+
+
+
+
+
+
+
+.conversation-main {
+
+
+
+  display: flex;
+
+
+
+  flex-direction: column;
+
+
+
+}
+
+
+
+
+
+
+
+.conv-main-header {
+
+
+
+  padding: 16px 24px;
+
+
+
+  border-bottom: 1px solid var(--border-normal);
+
+
+
+  background: var(--bg-surface);
+
+
+
+  display: flex;
+
+
+
+  align-items: center;
+
+
+
+  justify-content: space-between;
+
+
+
+}
+
+
+
+
+
+
+
+.conv-main-header h3 {
+
+
+
+  font-size: 15px;
+
+
+
+  font-weight: 600;
+
+
+
+  color: var(--text-primary);
+
+
+
+}
+
+
+
+
+
+
+
+.conv-main-header .conv-actions {
+
+
+
+  display: flex;
+
+
+
+  gap: 8px;
+
+
+
+}
+
+
+
+
+
+
+
+.conv-actions button {
+
+
+
+  padding: 6px 12px;
+
+
+
+  background: transparent;
+
+
+
+  border: 1px solid var(--border-normal);
+
+
+
+  border-radius: var(--radius-sm);
+
+
+
+  color: var(--text-secondary);
+
+
+
+  font-size: 12px;
+
+
+
+  cursor: pointer;
+
+
+
+  transition: all var(--transition);
+
+
+
+}
+
+
+
+
+
+
+
+.conv-actions button:hover {
+
+
+
+  background: var(--bg-raised);
+
+
+
+  color: var(--text-primary);
+
+
+
+}
+
+
+
+
+
+
+
+.conv-messages-area {
+
+
+
+  flex: 1;
+
+
+
+  overflow-y: auto;
+
+
+
+  padding: 24px;
+
+
+
+  display: flex;
+
+
+
+  flex-direction: column;
+
+
+
+  gap: 20px;
+
+
+
+}
+
+
+
+
+
+
+
+.message-block {
+
+
+
+  display: flex;
+
+
+
+  gap: 12px;
+
+
+
+}
+
+
+
+
+
+
+
+.message-block.user-block {
+
+
+
+  align-self: flex-end;
+
+
+
+}
+
+
+
+
+
+
+
+.message-block.ai-block {
+
+
+
+  align-self: flex-start;
+
+
+
+}
+
+
+
+
+
+
+
+.message-avatar-lg {
+
+
+
+  width: 40px;
+
+
+
+  height: 40px;
+
+
+
+  border-radius: 50%;
+
+
+
+  background: var(--bg-raised);
+
+
+
+  display: flex;
+
+
+
+  align-items: center;
+
+
+
+  justify-content: center;
+
+
+
+  font-size: 18px;
+
+
+
+  flex-shrink: 0;
+
+
+
+}
+
+
+
+
+
+
+
+.message-content-lg {
+
+
+
+  max-width: 75%;
+
+
+
+  padding: 14px 18px;
+
+
+
+  border-radius: 14px;
+
+
+
+  font-size: 14px;
+
+
+
+  line-height: 1.7;
+
+
+
+  overflow: visible;
+
+
+
+}
+
+
+
+
+
+
+
+.message-block.user-block .message-content-lg {
+
+
+
+  background: linear-gradient(135deg, #38bdf8, #0ea5e9);
+
+
+
+  color: var(--bg-surface);
+
+
+
+  border-radius: 14px 14px 0 14px;
+
+
+
+}
+
+
+
+
+
+
+
+.message-block.ai-block .message-content-lg {
+
+
+
+  background: var(--bg-raised);
+
+
+
+  color: var(--text-secondary);
+
+
+
+  border-radius: 14px 14px 14px 0;
+
+
+
+}
+
+
+
+
+
+
+
+.message-content-lg strong {
+
+
+
+  color: var(--text-accent);
+
+
+
+  font-weight: 600;
+
+
+
+}
+
+
+
+
+
+
+
+.message-block.user-block .message-content-lg strong {
+
+
+
+  color: var(--bg-surface);
+
+
+
+}
+
+
+
+
+
+
+
+.ai-table-lg {
+
+
+
+  width: 100%;
+
+
+
+  border-collapse: collapse;
+
+
+
+  margin: 12px 0;
+
+
+
+  font-size: 13px;
+
+
+
+}
+
+
+
+
+
+
+
+.ai-table-lg th {
+
+
+
+  padding: 8px 12px;
+
+
+
+  background: rgba(56,189,248,0.1);
+
+
+
+  color: var(--text-tertiary);
+
+
+
+  font-weight: 600;
+
+
+
+  text-align: left;
+
+
+
+  border-radius:var(--radius-sm);
+
+
+
+  font-size: 12px;
+
+
+
+}
+
+
+
+
+
+
+
+.ai-table-lg td {
+
+
+
+  padding: 8px 12px;
+
+
+
+  border-bottom: 1px solid var(--border-normal);
+
+
+
+}
+
+
+
+
+
+
+
+.ai-table-lg tr:hover td {
+
+
+
+  background: rgba(56,189,248,0.04);
+
+
+
+}
+
+
+
+
+
+
+
+.analysis-chart {
+
+
+
+  background: var(--bg-inset);
+
+
+
+  border-radius: 8px;
+
+
+
+  padding: 20px;
+
+
+
+  margin: 16px 0;
+
+
+
+  min-width: 100%;
+
+
+
+  box-sizing: border-box;
+
+
+
+}
+
+
+
+.analysis-chart-title {
+
+
+
+  font-size: 13px;
+
+
+
+  color: var(--text-tertiary);
+
+
+
+  margin-bottom: 20px;
+
+
+
+  text-align: center;
+
+
+
+  font-weight: 500;
+
+
+
+}
+
+
+
+
+
+
+
+.chart-bar-container {
+
+
+
+  display: flex;
+
+
+
+  align-items: flex-end;
+
+
+
+  gap: 16px;
+
+
+
+  height: 140px;
+
+
+
+  padding-top: 8px;
+
+
+
+}
+
+
+
+
+
+
+
+.chart-bar-item {
+
+
+
+  flex: 1;
+
+
+
+  display: flex;
+
+
+
+  flex-direction: column;
+
+
+
+  align-items: center;
+
+
+
+  gap: 6px;
+
+
+
+}
+
+
+
+
+
+
+
+.chart-bar-fill {
+
+
+
+  width: 100%;
+
+
+
+  max-width: 40px;
+
+
+
+  min-height: 4px;
+
+
+
+  border-radius:var(--radius-sm) 4px 0 0;
+
+
+
+  transition: height 500ms ease;
+
+
+
+}
+
+
+
+
+
+
+
+.chart-bar-label {
+
+
+
+  font-size: 11px;
+
+
+
+  color: var(--text-tertiary);
+
+
+
+  white-space: nowrap;
+
+
+
+  text-align: center;
+
+
+
+  max-width: 70px;
+
+
+
+  overflow: hidden;
+
+
+
+  text-overflow: ellipsis;
+
+
+
+}
+
+
+
+
+
+
+
+.chart-bar-value {
+
+
+
+  font-size: 12px;
+
+
+
+  font-family: var(--font-mono);
+
+
+
+  color: var(--text-secondary);
+
+
+
+  font-weight: 600;
+
+
+
+  white-space: nowrap;
+
+
+
+}
+
+
+
+.message-content-lg .chart-line-container {
+
+
+
+  position: relative !important;
+
+
+
+  height: 160px !important;
+
+
+
+  padding-top: 20px !important;
+
+
+
+  padding-bottom: 10px !important;
+
+
+
+  border-bottom: 1px solid #ccc !important;
+
+
+
+}
+
+
+
+.message-content-lg .chart-line-container svg {
+
+
+
+  width: 100% !important;
+
+
+
+  height: 100% !important;
+
+
+
+}
+
+
+
+.message-content-lg .chart-line-path {
+
+
+
+  fill: none !important;
+
+
+
+  stroke-width: 2.5 !important;
+
+
+
+  stroke-linecap: round !important;
+
+
+
+  stroke-linejoin: round !important;
+
+
+
+}
+
+
+
+.message-content-lg .chart-line-area {
+
+
+
+  opacity: 0.15 !important;
+
+
+
+}
+
+
+
+.message-content-lg .chart-line-dot {
+
+
+
+  stroke-width: 2 !important;
+
+
+
+}
+
+
+
+.message-content-lg .chart-double-bar-container {
+
+
+
+  display: flex !important;
+
+
+
+  align-items: flex-end !important;
+
+
+
+  justify-content: space-between !important;
+
+
+
+  height: 160px !important;
+
+
+
+  padding-top: 30px !important;
+
+
+
+  padding-bottom: 8px !important;
+
+
+
+  border-bottom: 1px solid #ccc !important;
+
+
+
+  position: relative !important;
+
+
+
+}
+
+
+
+.message-content-lg .chart-double-bar-item {
+
+
+
+  flex: 1 !important;
+
+
+
+  max-width: 80px !important;
+
+
+
+  display: flex !important;
+
+
+
+  flex-direction: column !important;
+
+
+
+  align-items: center !important;
+
+
+
+  gap: 8px !important;
+
+
+
+}
+
+
+
+.message-content-lg .chart-double-bar-bg {
+
+
+
+  width: 100% !important;
+
+
+
+  height: 100px !important;
+
+
+
+  background: #f5f5f5 !important;
+
+
+
+  border: 1px solid #e0e0e0 !important;
+
+
+
+  border-radius: 4px 4px 0 0 !important;
+
+
+
+  position: relative !important;
+
+
+
+  overflow: hidden !important;
+
+
+
+}
+
+
+
+.message-content-lg .chart-double-bar-fill {
+
+
+
+  width: 100% !important;
+
+
+
+  min-height: 4px !important;
+
+
+
+  border-radius: 4px 4px 0 0 !important;
+
+
+
+  position: absolute !important;
+
+
+
+  bottom: 0 !important;
+
+
+
+  left: 0 !important;
+
+
+
+}
+
+
+
+
+
+
+
+.conv-input-area {
+
+
+
+  padding: 16px 24px;
+
+
+
+  border-top: 1px solid var(--border-normal);
+
+
+
+  background: var(--bg-surface);
+
+
+
+}
+
+
+
+
+
+
+
+.conv-quick-btns {
+
+
+
+  display: flex;
+
+
+
+  flex-wrap: wrap;
+
+
+
+  gap: 6px;
+
+
+
+  margin-bottom: 12px;
+
+
+
+}
+
+
+
+
+
+
+
+.conv-quick-btn {
+
+
+
+  padding: 6px 14px;
+
+
+
+  background: transparent;
+
+
+
+  border: 1px solid var(--border-normal);
+
+
+
+  border-radius: 18px;
+
+
+
+  color: var(--text-secondary);
+
+
+
+  font-size: 12px;
+
+
+
+  cursor: pointer;
+
+
+
+  transition: all var(--transition);
+
+
+
+}
+
+
+
+
+
+
+
+.conv-quick-btn:hover {
+
+
+
+  background: rgba(56,189,248,0.08);
+
+
+
+  border-color: var(--text-accent);
+
+
+
+  color: var(--text-accent);
+
+
+
+}
+
+
+
+
+
+
+
+.conv-input-row {
+
+
+
+  display: flex;
+
+
+
+  gap: 10px;
+
+
+
+}
+
+
+
+
+
+
+
+.conv-input-row input {
+
+
+
+  flex: 1;
+
+
+
+  padding: 12px 16px;
+
+
+
+  background: var(--bg-inset);
+
+
+
+  border: 1px solid var(--border-normal);
+
+
+
+  border-radius: 24px;
+
+
+
+  color: var(--text-primary);
+
+
+
+  font-size: 14px;
+
+
+
+  outline: none;
+
+
+
+  transition: all var(--transition);
+
+
+
+}
+
+
+
+
+
+
+
+.conv-input-row input:focus {
+
+
+
+  border-color: var(--text-accent);
+
+
+
+}
+
+
+
+
+
+
+
+.conv-input-row input::placeholder {
+
+
+
+  color: #475569;
+
+
+
+}
+
+
+
+
+
+
+
+.conv-input-row button {
+
+
+
+  padding: 12px 20px;
+
+
+
+  background: linear-gradient(135deg, #38bdf8, #0ea5e9);
+
+
+
+  border: none;
+
+
+
+  border-radius: 24px;
+
+
+
+  color: var(--bg-surface);
+
+
+
+  font-size: 14px;
+
+
+
+  font-weight: 500;
+
+
+
+  cursor: pointer;
+
+
+
+  transition: all var(--transition);
+
+
+
+}
+
+
+
+
+
+
+
+.conv-input-row button:hover {
+
+
+
+  transform: translateY(-1px);
+
+
+
+  box-shadow: 0 4px 12px rgba(56,189,248,0.3);
+
+
+
+}
+
+
+
+
+
+
+
+@media (max-width: 992px) {
+
+
+
+  .ai-assistant-container {
+
+
+
+    grid-template-columns: 1fr;
+
+
+
+  }
+
+
+
+  .conversation-sidebar {
+
+
+
+    display: none;
+
+
+
+  }
+
+
+
+}
+
+
+
+
+.lookup-modal { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:2000; justify-content:center; align-items:center; }
+.lookup-modal.show { display:flex; }
+.lookup-dialog { background:#fff; border:1px solid #e8e8e8; border-radius:4px; width:720px; max-height:70vh; overflow:hidden; }
+.lookup-header { padding:14px 20px; border-bottom:1px solid #e8e8e8; display:flex; align-items:center; justify-content:space-between; }
+.lookup-title { font-size:15px; font-weight:600; color:#333; }
+.lookup-close { font-size:20px; color:#666; cursor:pointer; background:none; border:none; }
+.lookup-close:hover { color:#333; }
+.lookup-body { padding:16px; }
+.lookup-search { display:flex; gap:8px; margin-bottom:12px; }
+.lookup-search input { flex:1; padding:6px 10px; border:1px solid #e8e8e8; border-radius:4px; font-size:13px; }
+.lookup-search button { padding:6px 16px; background:#1890ff; color:#fff; border:none; border-radius:4px; cursor:pointer; }
+.lookup-table { width:100%; border-collapse:collapse; font-size:13px; }
+.lookup-table th, .lookup-table td { padding:10px 12px; text-align:left; border-bottom:1px solid #e8e8e8; }
+.lookup-table th { background:#fafafa; font-weight:600; color:#333; }
+.lookup-table tr:hover { background:#f5f5f5; }
+.lookup-table .checkbox-cell { width:40px; }
+.lookup-footer { padding:12px 20px; border-top:1px solid #e8e8e8; display:flex; justify-content:flex-end; gap:8px; }
+.lookup-field { display:flex; align-items:center; }
+.lookup-field input { flex:1; padding:6px 10px; border:1px solid #e8e8e8; border-radius:4px 0 0 4px; font-size:13px; }
+.lookup-field button { width:28px; height:28px; border:1px solid #e8e8e8; border-left:none; border-radius:0 4px 4px 0; background:#fff; cursor:pointer; display:flex; align-items:center; justify-content:center; }
+.lookup-field button:hover { background:#f5f5f5; }
+
+</style>
+
+
+
+</head>
+
+
+
+<body>
+
+
+
+
+
+
+
+<aside class="sidebar" id="sidebar">
+
+
+
+<div class="sidebar-logo">
+
+
+
+    <img src="../images/logo.png" alt="磐枢工业智能平台" style="width: 100%; max-width: 200px; margin-bottom: 8px;">
+
+
+
+    <h1 style="font-size: 16px; margin: 0;">磐枢工业智能平台</h1>
+
+
+
+  </div>
+
+
+
+  <nav class="sidebar-menu"></nav>
+
+
+
+<div class="sidebar-user"><div class="avatar">管</div>
+
+
+
+</aside>
+
+
+
+
+
+
+
+<div class="main-content" id="mainContent">
+
+
+
+  <div class="page-header" style="position:sticky;top:0;z-index:100;">
+
+
+
+    <div>
+
+
+
+      <div class="flex items-center gap-8">
+
+
+
+        <button class="sidebar-toggle" onclick="toggleSidebar()">☰</button>
+
+
+
+        <div>
+
+
+
+          <h2>AI问答中心</h2>
+
+
+
+          <div class="breadcrumb"><a href="../index.html">首页</a><span>></span><span>AI智能体</span><span>></span><span>AI问答中心</span></div></div>
+
+
+
+        </div>
+
+
+
+      </div>
+
+
+
+    </div>
+
+
+
+    <div class="page-actions">
+
+
+
+      <button class="btn btn-ghost btn-sm">🔔 消息</button>
+
+      </div>
+
+
+
+  </div>
+
+
+
+
+
+
+
+  <div class="ai-assistant-container">
+
+
+
+    <div class="conversation-sidebar">
+
+
+
+      <div class="conv-sidebar-header">
+
+
+
+        <h3>对话历史</h3>
+
+
+
+        <div class="conv-search">
+
+
+
+          <input type="text" placeholder="搜索对话...">
+
+
+
+        </div>
+
+
+
+      </div>
+
+
+
+      <div class="conv-list" id="convList">
+
+
+
+        <div class="conv-item active" onclick="loadConversation(0)">
+
+
+
+          <div class="conv-item-title">本月销售数据分析</div>
+
+
+
+          <div class="conv-item-meta">
+
+
+
+            <span>07-10 10:30</span>
+
+
+
+            <span class="badge badge-success conv-item-badge">已完成</span>
+
+
+
+          </div>
+
+
+
+        </div>
+
+
+
+        <div class="conv-item" onclick="loadConversation(1)">
+
+
+
+          <div class="conv-item-title">库存预警查询</div>
+
+
+
+          <div class="conv-item-meta">
+
+
+
+            <span>07-09 14:20</span>
+
+
+
+            <span class="badge badge-warning conv-item-badge">需关注</span>
+
+
+
+          </div>
+
+
+
+        </div>
+
+
+
+        <div class="conv-item" onclick="loadConversation(2)">
+
+
+
+          <div class="conv-item-title">生产订单进度分析</div>
+
+
+
+          <div class="conv-item-meta">
+
+
+
+            <span>07-09 09:15</span>
+
+
+
+            <span class="badge badge-info conv-item-badge">进行中</span>
+
+
+
+          </div>
+
+
+
+        </div>
+
+
+
+        <div class="conv-item" onclick="loadConversation(3)">
+
+
+
+          <div class="conv-item-title">供应商绩效评估</div>
+
+
+
+          <div class="conv-item-meta">
+
+
+
+            <span>07-08 16:45</span>
+
+
+
+            <span class="badge badge-success conv-item-badge">已完成</span>
+
+
+
+          </div>
+
+
+
+        </div>
+
+
+
+        <div class="conv-item" onclick="loadConversation(4)">
+
+
+
+          <div class="conv-item-title">质量异常原因分析</div>
+
+
+
+          <div class="conv-item-meta">
+
+
+
+            <span>07-08 11:30</span>
+
+
+
+            <span class="badge badge-error conv-item-badge">紧急</span>
+
+
+
+          </div>
+
+
+
+        </div>
+
+
+
+        <div class="conv-item" onclick="loadConversation(5)">
+
+
+
+          <div class="conv-item-title">应收账款账龄分析</div>
+
+
+
+          <div class="conv-item-meta">
+
+
+
+            <span>07-07 15:00</span>
+
+
+
+            <span class="badge badge-warning conv-item-badge">需关注</span>
+
+
+
+          </div>
+
+
+
+        </div>
+
+
+
+        <div class="conv-item" onclick="loadConversation(6)">
+
+
+
+          <div class="conv-item-title">设备稼动率统计</div>
+
+
+
+          <div class="conv-item-meta">
+
+
+
+            <span>07-07 10:20</span>
+
+
+
+            <span class="badge badge-success conv-item-badge">已完成</span>
+
+
+
+          </div>
+
+
+
+        </div>
+
+
+
+        <div class="conv-item" onclick="loadConversation(7)">
+
+
+
+          <div class="conv-item-title">采购成本对比分析</div>
+
+
+
+          <div class="conv-item-meta">
+
+
+
+            <span>07-06 14:30</span>
+
+
+
+            <span class="badge badge-info conv-item-badge">进行中</span>
+
+
+
+          </div>
+
+
+
+        </div>
+
+
+
+        <div class="conv-item" onclick="loadConversation(8)">
+
+
+
+          <div class="conv-item-title">人力出勤统计分析</div>
+
+
+
+          <div class="conv-item-meta">
+
+
+
+            <span>07-05 09:00</span>
+
+
+
+            <span class="badge badge-success conv-item-badge">已完成</span>
+
+
+
+          </div>
+
+
+
+        </div>
+
+
+
+        <div class="conv-item" onclick="loadConversation(9)">
+
+
+
+          <div class="conv-item-title">BOM成本估算</div>
+
+
+
+          <div class="conv-item-meta">
+
+
+
+            <span>07-04 16:00</span>
+
+
+
+            <span class="badge badge-success conv-item-badge">已完成</span>
+
+
+
+          </div>
+
+
+
+        </div>
+
+
+
+      </div>
+
+
+
+      <div class="conv-sidebar-footer">
+
+
+
+        <button onclick="newConversation()">+ 新建对话</button>
+
+
+
+      </div>
+
+
+
+    </div>
+
+
+
+
+
+
+
+    <div class="conversation-main">
+
+
+
+      <div class="conv-main-header">
+
+
+
+        <h3 id="convTitle">本月销售数据分析</h3>
+
+
+
+        <div class="conv-actions">
+
+
+
+          <button onclick="exportConversation()">导出</button>
+
+
+
+          <button onclick="clearConversation()">清空对话</button>
+
+
+
+        </div>
+
+
+
+      </div>
+
+
+
+
+
+
+
+      <div class="conv-messages-area" id="messagesArea">
+
+
+
+      </div>
+
+
+
+
+
+
+
+      <div class="conv-input-area">
+
+
+
+        <div class="conv-quick-btns">
+
+
+
+          <button class="conv-quick-btn" onclick="sendQuickQuestion('本月销售额')">📊 本月销售额</button>
+
+
+
+          <button class="conv-quick-btn" onclick="sendQuickQuestion('库存预警')">⚠️ 库存预警</button>
+
+
+
+          <button class="conv-quick-btn" onclick="sendQuickQuestion('生产进度')">🏭 生产进度</button>
+
+
+
+          <button class="conv-quick-btn" onclick="sendQuickQuestion('采购分析')">📦 采购分析</button>
+
+
+
+          <button class="conv-quick-btn" onclick="sendQuickQuestion('质量异常')">🔍 质量异常</button>
+
+
+
+          <button class="conv-quick-btn" onclick="sendQuickQuestion('应收款情况')">💰 应收款情况</button>
+
+
+
+        </div>
+
+
+
+        <div class="conv-input-row">
+
+
+
+          <input type="text" id="messageInput" placeholder="输入您的问题..." onkeydown="handleKeyDown(event)">
+
+
+
+          <button onclick="sendMessage()">发送</button>
+
+
+
+        </div>
+
+
+
+      </div>
+
+
+
+    </div>
+
+
+
+  </div>
+
+
+
+</div>
+
+
+
+
+
+
+
+<script>
+
+
+
+var conversations = [
+
+
+
+  {
+
+
+
+    title: '本月销售数据分析',
+
+
+
+    messages: [
+
+
+
+      { type: 'user', content: '请分析本月销售数据情况' },
+
+
+
+      { type: 'ai', content: '📊 <strong>本月销售数据分析报告</strong><br><br><strong>一、核心指标概览</strong><br><table class="ai-table-lg"><tr><th>指标</th><th>数值</th><th>同比</th><th>环比</th></tr><tr><td>本月销售额</td><td class="text-accent">2,340.00万元</td><td class="text-success">+8.5%</td><td class="text-success">+6.2%</td></tr><tr><td>订单数量</td><td>1,286单</td><td class="text-success">+12.3%</td><td class="text-success">+4.8%</td></tr><tr><td>平均单价</td><td>1.82万元</td><td class="text-success">+2.1%</td><td class="text-error">-1.5%</td></tr><tr><td>目标达成率</td><td class="text-success">103.2%</td><td>-</td><td class="text-success">+2.8%</td></tr></table><br><strong>二、销售趋势分析</strong><br><div class="analysis-chart"><div class="analysis-chart-title">近6个月销售额趋势（单位：万元）</div><div class="chart-line-container"><svg viewBox="0 0 400 120" preserveAspectRatio="none"><defs><linearGradient id="lineGrad1" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" style="stop-color:#0ea5e9;stop-opacity:0.2"/><stop offset="100%" style="stop-color:#0ea5e9;stop-opacity:0"/></linearGradient></defs><path class="chart-line-area" d="M 20 120 L 20 42 Q 80 53 140 31 T 260 28 T 380 20 L 380 120 Z" fill="url(#lineGrad1)"/><polyline class="chart-line-path" points="20,42 80,53 140,31 200,36 260,28 380,20" style="stroke:#0ea5e9;"/><circle class="chart-line-dot" cx="20" cy="42" r="4" fill="#0ea5e9" stroke="white"/><circle class="chart-line-dot" cx="80" cy="53" r="4" fill="#0ea5e9" stroke="white"/><circle class="chart-line-dot" cx="140" cy="31" r="4" fill="#0ea5e9" stroke="white"/><circle class="chart-line-dot" cx="200" cy="36" r="4" fill="#0ea5e9" stroke="white"/><circle class="chart-line-dot" cx="260" cy="28" r="4" fill="#0ea5e9" stroke="white"/><circle class="chart-line-dot" cx="380" cy="20" r="5" fill="#38bdf8" stroke="white" stroke-width="2"/><text x="20" y="115" text-anchor="middle" font-size="11" fill="var(--text-tertiary)">1月</text><text x="80" y="115" text-anchor="middle" font-size="11" fill="var(--text-tertiary)">2月</text><text x="140" y="115" text-anchor="middle" font-size="11" fill="var(--text-tertiary)">3月</text><text x="200" y="115" text-anchor="middle" font-size="11" fill="var(--text-tertiary)">4月</text><text x="260" y="115" text-anchor="middle" font-size="11" fill="var(--text-tertiary)">5月</text><text x="380" y="115" text-anchor="middle" font-size="11" fill="var(--text-accent)" font-weight="600">6月</text><text x="20" y="32" text-anchor="middle" font-size="10" fill="var(--text-secondary)" font-family="var(--font-mono)">1,820</text><text x="80" y="43" text-anchor="middle" font-size="10" fill="var(--text-secondary)" font-family="var(--font-mono)">1,560</text><text x="140" y="21" text-anchor="middle" font-size="10" fill="var(--text-secondary)" font-family="var(--font-mono)">2,080</text><text x="200" y="26" text-anchor="middle" font-size="10" fill="var(--text-secondary)" font-family="var(--font-mono)">1,960</text><text x="260" y="18" text-anchor="middle" font-size="10" fill="var(--text-secondary)" font-family="var(--font-mono)">2,158</text><text x="380" y="10" text-anchor="middle" font-size="10" fill="var(--text-accent)" font-family="var(--font-mono)" font-weight="600">2,340</text></svg></div></div><br><strong>三、区域销售排名</strong><br><table class="ai-table-lg"><tr><th>排名</th><th>区域</th><th>销售额</th><th>占比</th><th>同比增长</th></tr><tr><td>1</td><td>华东区域</td><td>680.00万元</td><td>29.1%</td><td class="text-success">+15.3%</td></tr><tr><td>2</td><td>华南区域</td><td>520.00万元</td><td>22.2%</td><td class="text-success">+8.7%</td></tr><tr><td>3</td><td>华中区域</td><td>450.00万元</td><td>19.2%</td><td class="text-success">+5.2%</td></tr><tr><td>4</td><td>华北区域</td><td>380.00万元</td><td>16.2%</td><td class="text-error">-2.1%</td></tr><tr><td>5</td><td>西南区域</td><td>310.00万元</td><td>13.3%</td><td class="text-success">+12.8%</td></tr></table><br><strong>AI洞察：</strong><br>1. 本月销售额超出目标3.2%，整体表现优秀。<br>2. 华东区域增长最为显著（+15.3%），建议加大市场投入。<br>3. 华北区域出现下滑（-2.1%），需分析原因并制定改进措施。<br>4. 平均单价环比下降1.5%，可能存在低价促销策略影响。' }
+
+
+
+    ]
+
+
+
+  },
+
+
+
+  {
+
+
+
+    title: '库存预警查询',
+
+
+
+    messages: [
+
+
+
+      { type: 'user', content: '查询当前库存预警情况' },
+
+
+
+      { type: 'ai', content: '⚠️ <strong>库存预警清单</strong><br><br><table class="ai-table-lg"><tr><th>物料编码</th><th>物料名称</th><th>当前库存</th><th>安全库存</th><th>库存/安全库存</th><th>预警等级</th></tr><tr><td>MAT-001</td><td>ABS树脂 PC-770</td><td>160 KG</td><td>500 KG</td><td class="text-error">32%</td><td><span class="badge badge-error">紧急</span></td></tr><tr><td>MAT-002</td><td>PMMA亚克力 MH-655</td><td>90 KG</td><td>200 KG</td><td class="text-warning">45%</td><td><span class="badge badge-warning">预警</span></td></tr><tr><td>MAT-003</td><td>TPU弹性体 1185A</td><td>130 KG</td><td>250 KG</td><td class="text-warning">52%</td><td><span class="badge badge-warning">预警</span></td></tr><tr><td>MAT-004</td><td>PA66尼龙66 A3HG6</td><td>340 KG</td><td>500 KG</td><td class="text-info">68%</td><td><span class="badge badge-info">关注</span></td></tr><tr><td>MAT-005</td><td>玻纤增强PP GF20-PP</td><td>360 KG</td><td>500 KG</td><td class="text-info">72%</td><td><span class="badge badge-info">关注</span></td></tr></table><br><strong>预警详情分析</strong><br><div class="analysis-chart"><div class="analysis-chart-title">预警物料库存占比</div><div class="chart-double-bar-container"><div class="chart-double-bar-item"><div class="chart-double-bar-bg"><div class="chart-double-bar-fill" style="height:32%;background:#f5222d;"></div></div><span class="chart-bar-value">32%</span><span class="chart-bar-label">ABS树脂</span></div><div class="chart-double-bar-item"><div class="chart-double-bar-bg"><div class="chart-double-bar-fill" style="height:45%;background:#faad14;"></div></div><span class="chart-bar-value">45%</span><span class="chart-bar-label">PMMA亚克力</span></div><div class="chart-double-bar-item"><div class="chart-double-bar-bg"><div class="chart-double-bar-fill" style="height:52%;background:#faad14;"></div></div><span class="chart-bar-value">52%</span><span class="chart-bar-label">TPU弹性体</span></div><div class="chart-double-bar-item"><div class="chart-double-bar-bg"><div class="chart-double-bar-fill" style="height:68%;background:#1890ff;"></div></div><span class="chart-bar-value">68%</span><span class="chart-bar-label">PA66尼龙</span></div><div class="chart-double-bar-item"><div class="chart-double-bar-bg"><div class="chart-double-bar-fill" style="height:72%;background:#1890ff;"></div></div><span class="chart-bar-value">72%</span><span class="chart-bar-label">玻纤PP</span></div></div></div><br><strong>AI建议：</strong><br>1. <span class="text-error">紧急物料</span>（ABS树脂）需在48小时内完成采购下单，避免影响生产进度。<br>2. <span class="text-warning">预警物料</span>（PMMA、TPU）建议3天内完成补货。<br>3. 当前共5项预警，较上周增加2项，需关注库存管理策略。' }
+
+
+
+    ]
+
+
+
+  },
+
+
+
+  {
+
+
+
+    title: '生产订单进度分析',
+
+
+
+    messages: [
+
+
+
+      { type: 'user', content: '分析当前生产订单进度' },
+
+
+
+      { type: 'ai', content: '🏭 <strong>生产订单进度分析</strong><br><br><table class="ai-table-lg"><tr><th>订单号</th><th>产品名称</th><th>计划数量</th><th>已完成</th><th>完成率</th><th>状态</th><th>预计完工</th></tr><tr><td>MO-2026-0345</td><td>仪表盘外壳</td><td>2,000 SET</td><td>1,840 SET</td><td class="text-success">92%</td><td><span class="badge badge-success">即将完工</span></td><td>07/12</td></tr><tr><td>MO-2026-0346</td><td>门板内饰件</td><td>3,000 SET</td><td>2,340 SET</td><td class="text-success">78%</td><td><span class="badge badge-info">生产中</span></td><td>07/15</td></tr><tr><td>MO-2026-0347</td><td>保险杠支架</td><td>1,500 SET</td><td>825 SET</td><td class="text-info">55%</td><td><span class="badge badge-info">生产中</span></td><td>07/20</td></tr><tr><td>MO-2026-0348</td><td>仪表盘面板组件</td><td>5,000 PCS</td><td>1,600 PCS</td><td class="text-warning">32%</td><td><span class="badge badge-warning">进度偏慢</span></td><td>07/25</td></tr><tr><td>MO-2026-0349</td><td>门板骨架组件</td><td>4,000 PCS</td><td>720 PCS</td><td class="text-warning">18%</td><td><span class="badge badge-warning">刚开工</span></td><td>07/28</td></tr></table><br><strong>进度分析图表</strong><br><div class="analysis-chart"><div class="analysis-chart-title">生产订单完成率</div><div class="chart-double-bar-container"><div class="chart-double-bar-item"><div class="chart-double-bar-bg"><div class="chart-double-bar-fill" style="height:92%;background:#52c41a;"></div></div><span class="chart-bar-value">92%</span><span class="chart-bar-label">MO-0345</span></div><div class="chart-double-bar-item"><div class="chart-double-bar-bg"><div class="chart-double-bar-fill" style="height:78%;background:#52c41a;"></div></div><span class="chart-bar-value">78%</span><span class="chart-bar-label">MO-0346</span></div><div class="chart-double-bar-item"><div class="chart-double-bar-bg"><div class="chart-double-bar-fill" style="height:55%;background:#1890ff;"></div></div><span class="chart-bar-value">55%</span><span class="chart-bar-label">MO-0347</span></div><div class="chart-double-bar-item"><div class="chart-double-bar-bg"><div class="chart-double-bar-fill" style="height:32%;background:#faad14;"></div></div><span class="chart-bar-value">32%</span><span class="chart-bar-label">MO-0348</span></div><div class="chart-double-bar-item"><div class="chart-double-bar-bg"><div class="chart-double-bar-fill" style="height:18%;background:#faad14;"></div></div><span class="chart-bar-value">18%</span><span class="chart-bar-label">MO-0349</span></div></div></div><br><strong>AI洞察：</strong><br>1. MO-2026-0348进度偏慢（32%），建议检查设备稼动情况或增加人力投入。<br>2. 整体订单完成率为55%，处于正常水平。<br>3. 两个即将完工订单完成后，产能可向进度落后订单倾斜。' }
+
+
+
+    ]
+
+
+
+  },
+
+
+
+  {
+
+
+
+    title: '供应商绩效评估',
+
+
+
+    messages: [
+
+
+
+      { type: 'user', content: '评估供应商绩效' },
+
+
+
+      { type: 'ai', content: '📦 <strong>供应商绩效评估报告</strong><br><br><table class="ai-table-lg"><tr><th>供应商名称</th><th>采购金额</th><th>准时交货率</th><th>质量合格率</th><th>服务评分</th><th>综合评分</th><th>评级</th></tr><tr><td>深圳材料科技</td><td>850.00万元</td><td class="text-success">98.5%</td><td class="text-success">99.2%</td><td class="text-success">95</td><td class="text-success">97.6</td><td><span class="badge badge-success">A</span></td></tr><tr><td>东莞塑胶有限公司</td><td>620.00万元</td><td class="text-success">96.8%</td><td class="text-success">98.8%</td><td class="text-success">92</td><td class="text-success">95.8</td><td><span class="badge badge-success">A</span></td></tr><tr><td>广州化工集团</td><td>480.00万元</td><td class="text-info">94.2%</td><td class="text-info">97.5%</td><td class="text-info">88</td><td class="text-info">93.2</td><td><span class="badge badge-info">B</span></td></tr><tr><td>佛山新材料</td><td>320.00万元</td><td class="text-warning">89.6%</td><td class="text-success">98.2%</td><td class="text-info">85</td><td class="text-warning">90.9</td><td><span class="badge badge-warning">B</span></td></tr><tr><td>中山橡塑制品</td><td>280.00万元</td><td class="text-error">85.3%</td><td class="text-warning">95.6%</td><td class="text-warning">78</td><td class="text-error">86.3</td><td><span class="badge badge-error">C</span></td></tr></table><br><strong>供应商评级分布</strong><br><div class="analysis-chart"><div class="analysis-chart-title">供应商评级占比</div><div class="chart-bar-container"><div class="chart-bar-item"><div class="chart-bar-fill" style="height:40%;background:var(--color-success);"></div><span class="chart-bar-value">40%</span><span class="chart-bar-label">A级</span></div><div class="chart-bar-item"><div class="chart-bar-fill" style="height:40%;background:var(--color-info);"></div><span class="chart-bar-value">40%</span><span class="chart-bar-label">B级</span></div><div class="chart-bar-item"><div class="chart-bar-fill" style="height:20%;background:var(--color-error);"></div><span class="chart-bar-value">20%</span><span class="chart-bar-label">C级</span></div></div></div><br><strong>AI建议：</strong><br>1. 深圳材料科技和东莞塑胶为最优供应商，可考虑增加采购份额。<br>2. 佛山新材料交货准时率较低（89.6%），建议与供应商沟通改进。<br>3. 中山橡塑制品评级为C级，建议启动备选供应商评估流程。' }
+
+
+
+    ]
+
+
+
+  },
+
+
+
+  {
+
+
+
+    title: '质量异常原因分析',
+
+
+
+    messages: [
+
+
+
+      { type: 'user', content: '分析本月质量异常原因' },
+
+
+
+      { type: 'ai', content: '🔍 <strong>本月质量异常原因分析</strong><br><br><table class="ai-table-lg"><tr><th>不良类型</th><th>数量</th><th>占比</th><th>主要原因</th><th>责任部门</th><th>改进状态</th></tr><tr><td>缩水凹陷</td><td>28件</td><td>37.8%</td><td>注塑压力不足</td><td>注塑车间</td><td><span class="badge badge-warning">整改中</span></td></tr><tr><td>熔接痕</td><td>19件</td><td>25.7%</td><td>模具浇口设计</td><td>模具车间</td><td><span class="badge badge-info">分析中</span></td></tr><tr><td>翘曲变形</td><td>14件</td><td>18.9%</td><td>冷却时间不足</td><td>注塑车间</td><td><span class="badge badge-success">已改进</span></td></tr><tr><td>表面流纹</td><td>8件</td><td>10.8%</td><td>注塑速度过快</td><td>注塑车间</td><td><span class="badge badge-success">已改进</span></td></tr><tr><td>尺寸超差</td><td>5件</td><td>6.8%</td><td>模具磨损</td><td>模具车间</td><td><span class="badge badge-warning">整改中</span></td></tr></table><br><strong>不良类型帕累托分析</strong><br><div class="analysis-chart"><div class="analysis-chart-title">质量不良分布</div><div class="chart-bar-container"><div class="chart-bar-item"><div class="chart-bar-fill" style="height:100%;background:var(--color-error);"></div><span class="chart-bar-value">28</span><span class="chart-bar-label">缩水凹陷</span></div><div class="chart-bar-item"><div class="chart-bar-fill" style="height:68%;background:var(--color-warning);"></div><span class="chart-bar-value">19</span><span class="chart-bar-label">熔接痕</span></div><div class="chart-bar-item"><div class="chart-bar-fill" style="height:50%;background:var(--color-warning);"></div><span class="chart-bar-value">14</span><span class="chart-bar-label">翘曲变形</span></div><div class="chart-bar-item"><div class="chart-bar-fill" style="height:29%;background:var(--color-info);"></div><span class="chart-bar-value">8</span><span class="chart-bar-label">表面流纹</span></div><div class="chart-bar-item"><div class="chart-bar-fill" style="height:18%;background:var(--color-info);"></div><span class="chart-bar-value">5</span><span class="chart-bar-label">尺寸超差</span></div></div></div><br><strong>AI洞察：</strong><br>1. 前两项不良（缩水凹陷+熔接痕）占比达63.5%，为重点改进方向。<br>2. 翘曲变形和表面流纹已完成改进，预计下月不良率将下降。<br>3. 总不良数74件，不良率1.4%，需关注目标达成情况。<br><strong>改进建议：</strong><br>优先解决缩水凹陷问题，建议调整注塑工艺参数，增加保压时间。' }
+
+
+
+    ]
+
+
+
+  }
+
+
+
+];
+
+
+
+
+
+
+
+var currentConvIndex = 0;
+
+
+
+
+
+
+
+function loadConversation(index) {
+
+
+
+  currentConvIndex = index;
+
+
+
+  document.querySelectorAll('.conv-item').forEach(function(item, i) {
+
+
+
+    item.classList.toggle('active', i === index);
+
+
+
+  });
+
+
+
+  
+
+
+
+  var conv = conversations[index];
+
+
+
+  document.getElementById('convTitle').textContent = conv.title;
+
+
+
+  
+
+
+
+  var messagesArea = document.getElementById('messagesArea');
+
+
+
+  messagesArea.innerHTML = '';
+
+
+
+  
+
+
+
+  conv.messages.forEach(function(msg) {
+
+
+
+    addMessage(msg.type, msg.content);
+
+
+
+  });
+
+
+
+  
+
+
+
+  messagesArea.scrollTop = messagesArea.scrollHeight;
+
+
+
+
+
+
+
+function addMessage(type, content) {
+
+
+
+  var messagesArea = document.getElementById('messagesArea');
+
+
+
+  var div = document.createElement('div');
+
+
+
+  div.className = 'message-block ' + (type === 'user' ? 'user-block' : 'ai-block');
+
+
+
+  
+
+
+
+  var avatar = type === 'user' ? '👤' : '🤖';
+
+
+
+  
+
+
+
+  div.innerHTML = `
+
+
+
+    <div class="message-avatar-lg">${avatar}</div>
+
+
+
+    <div class="message-content-lg">${content}</div>
+
+
+
+  `;
+
+
+
+  
+
+
+
+  messagesArea.appendChild(div);
+
+
+
+
+
+
+
+function sendMessage() {
+
+
+
+  var input = document.getElementById('messageInput');
+
+
+
+  var text = input.value.trim();
+
+
+
+  if (!text) return;
+
+
+
+  
+
+
+
+  addMessage('user', text);
+
+
+
+  input.value = '';
+
+
+
+  
+
+
+
+  setTimeout(function() {
+
+
+
+    var responses = {
+
+
+
+      '本月销售额': '📊 <strong>本月销售概况</strong><br><br><table class="ai-table-lg"><tr><th>指标</th><th>数值</th></tr><tr><td>本月销售额</td><td class="text-accent">2,340.00万元</td></tr><tr><td>同比增长</td><td class="text-success">+8.5%</td></tr><tr><td>目标达成率</td><td class="text-success">103.2%</td></tr><tr><td>订单数量</td><td>1,286单</td></tr></table>',
+
+
+
+      '库存预警': '⚠️ <strong>库存预警清单</strong><br><br><table class="ai-table-lg"><tr><th>物料名称</th><th>当前库存</th><th>安全库存</th><th>状态</th></tr><tr><td>ABS树脂 PC-770</td><td>160 KG</td><td>500 KG</td><td><span class="badge badge-error">紧急</span></td></tr><tr><td>PMMA亚克力 MH-655</td><td>90 KG</td><td>200 KG</td><td><span class="badge badge-warning">预警</span></td></tr></table>',
+
+
+
+      '生产进度': '🏭 <strong>生产订单进度</strong><br><br><table class="ai-table-lg"><tr><th>订单号</th><th>产品名称</th><th>完成率</th></tr><tr><td>MO-2026-0345</td><td>仪表盘外壳</td><td class="text-success">92%</td></tr><tr><td>MO-2026-0346</td><td>门板内饰件</td><td class="text-success">78%</td></tr></table>',
+
+
+
+      '采购分析': '📦 <strong>采购分析报告</strong><br><br><table class="ai-table-lg"><tr><th>供应商</th><th>采购金额</th><th>准时交货率</th></tr><tr><td>深圳材料科技</td><td>850.00万元</td><td class="text-success">98.5%</td></tr><tr><td>东莞塑胶有限公司</td><td>620.00万元</td><td class="text-success">96.8%</td></tr></table>',
+
+
+
+      '质量异常': '🔍 <strong>本月质量异常分析</strong><br><br><table class="ai-table-lg"><tr><th>不良类型</th><th>数量</th><th>占比</th></tr><tr><td>缩水凹陷</td><td>28件</td><td>37.8%</td></tr><tr><td>熔接痕</td><td>19件</td><td>25.7%</td></tr></table>',
+
+
+
+      '应收款情况': '💰 <strong>应收账款分析</strong><br><br><table class="ai-table-lg"><tr><th>客户名称</th><th>应收金额</th><th>账龄</th></tr><tr><td>华东科技有限公司</td><td>380.00万元</td><td>30天以内</td></tr><tr><td>华北重工机械</td><td>180.00万元</td><td><span class="badge badge-error">90天以上</span></td></tr></table>'
+
+
+
+    };
+
+
+
+    
+
+
+
+    var response = responses[text] || '感谢您的提问！我正在分析您的问题，请稍候...';
+
+
+
+    addMessage('ai', response);
+
+
+
+    
+
+
+
+    document.getElementById('messagesArea').scrollTop = document.getElementById('messagesArea').scrollHeight;
+
+
+
+  }, 800);
+
+
+
+
+
+
+
+function sendQuickQuestion(question) {
+
+
+
+  document.getElementById('messageInput').value = question;
+
+
+
+  sendMessage();
+
+
+
+
+
+
+
+function handleKeyDown(event) {
+
+
+
+  if (event.key === 'Enter') {
+
+
+
+    sendMessage();
+
+
+
+  }
+
+
+
+
+
+
+
+function newConversation() {
+
+
+
+  document.getElementById('messagesArea').innerHTML = '';
+
+
+
+  document.getElementById('convTitle').textContent = '新对话';
+
+
+
+  document.getElementById('messageInput').value = '';
+
+
+
+  document.querySelectorAll('.conv-item').forEach(function(item) {
+
+
+
+    item.classList.remove('active');
+
+
+
+  });
+
+
+
+
+
+
+
+function clearConversation() {
+
+
+
+  document.getElementById('messagesArea').innerHTML = '';
+
+
+
+
+
+
+
+function exportConversation() {
+  showToast("对话导出功能即将上线", "info");
+}
+
+loadConversation(0);</script>
+
+
+
+
+<div class="lookup-modal" id="lookupModal">
+  <div class="lookup-dialog">
+    <div class="lookup-header">
+      <div class="lookup-title" id="lookupTitle">选择</div>
+      <button class="lookup-close" onclick="closeLookup()">×</button>
+    </div>
+    <div class="lookup-body">
+      <div class="lookup-search">
+        <input type="text" id="lookupKeyword" placeholder="请输入编码或名称搜索" onkeydown="if(event.key==='Enter')filterLookup()">
+        <button onclick="filterLookup()">搜索</button>
+      </div>
+      <table class="lookup-table">
+        <thead id="lookupTableHead"></thead>
+        <tbody id="lookupTableBody"></tbody>
+      </table>
+    </div>
+    <div class="lookup-footer">
+      <button class="btn btn-cancel" onclick="closeLookup()">取消</button>
+      <button class="btn btn-primary" onclick="confirmLookup()">确定</button>
+    </div>
+  </div>
+</div>
+
+</body>
+
+
+
+</html>

@@ -1,0 +1,2843 @@
+<!DOCTYPE html>
+
+
+
+<html lang="zh-CN">
+
+
+
+<head>
+
+
+
+<meta charset="UTF-8">
+
+
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+
+
+<title>自定义看板 — 磐枢工业智能平台</title>
+
+
+
+<link rel="stylesheet" href="../common.css">
+
+
+
+<script src="../common.js"></script>
+<script>
+</script>
+
+
+
+<style>
+
+
+
+.toast-container {
+
+
+
+  position: fixed;
+
+
+
+  top: 60px;
+
+
+
+  right: 20px;
+
+
+
+  z-index: 1000;
+
+
+
+  display: flex;
+
+
+
+  flex-direction: column;
+
+
+
+  gap: 8px;
+
+
+
+}
+
+
+
+.toast {
+
+
+
+  padding: 12px 16px;
+
+
+
+  border-radius: var(--radius-md);
+
+
+
+  font-size: 13px;
+
+
+
+  color: var(--text-primary);
+
+
+
+  min-width: 280px;
+
+
+
+  max-width: 400px;
+
+
+
+  display: flex;
+
+
+
+  align-items: center;
+
+
+
+  gap: 8px;
+
+
+
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+
+
+
+  animation: toastIn 0.3s ease;
+
+
+
+}
+
+
+
+@keyframes toastIn {
+
+
+
+  from { opacity: 0; transform: translateX(100%); }
+
+
+
+  to { opacity: 1; transform: translateX(0); }
+
+
+
+}
+
+
+
+.toast-success { background: rgba(34,197,94,0.9); }
+
+
+
+.toast-error { background: rgba(239,68,68,0.9); }
+
+
+
+.toast-warning { background: rgba(234,179,8,0.9); }
+
+
+
+.toast-info { background: rgba(6,182,212,0.9); }
+
+
+
+.toast-icon { font-size: 16px; }
+
+
+
+
+
+
+
+.confirm-modal-overlay {
+
+
+
+  position: fixed;
+
+
+
+  inset: 0;
+
+
+
+  background: rgba(0,0,0,0.6);
+
+
+
+  display: none;
+
+
+
+  align-items: center;
+
+
+
+  justify-content: center;
+
+
+
+  z-index: 2000;
+
+
+
+}
+
+
+
+.confirm-modal-overlay.show { display: flex; }
+
+
+
+.confirm-modal {
+
+
+
+  background: var(--bg-surface);
+
+
+
+  border: 1px solid var(--border-normal);
+
+
+
+  border-radius: var(--radius-lg);
+
+
+
+  padding: 24px;
+
+
+
+  min-width: 360px;
+
+
+
+  max-width: 480px;
+
+
+
+  box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+
+
+
+}
+
+
+
+.confirm-modal-header {
+
+
+
+  font-size: 14px;
+
+
+
+  font-weight: 600;
+
+
+
+  color: var(--text-primary);
+
+
+
+  margin-bottom: 12px;
+
+
+
+}
+
+
+
+.confirm-modal-body {
+
+
+
+  font-size: 13px;
+
+
+
+  color: var(--text-secondary);
+
+
+
+  line-height: 1.6;
+
+
+
+  margin-bottom: 20px;
+
+
+
+}
+
+
+
+.confirm-modal-footer {
+
+
+
+  display: flex;
+
+
+
+  justify-content: flex-end;
+
+
+
+  gap: 8px;
+
+
+
+}
+
+
+
+.dashboard-layout { display: flex; height: calc(100vh - 56px); }
+
+
+
+.panel-left { width: 200px; background: var(--bg-surface); border-right: 1px solid var(--border-normal); display: flex; flex-direction: column; flex-shrink: 0; }
+
+
+
+.panel-center { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+
+
+
+.panel-right { width: 320px; background: var(--bg-surface); border-left: 1px solid var(--border-normal); display: flex; flex-direction: column; flex-shrink: 0; overflow-y: auto; }
+
+
+
+.panel-header { padding: 12px 14px; border-bottom: 1px solid var(--border-normal); font-size: 13px; font-weight: 600; color: var(--text-primary); }
+
+
+
+.panel-body { flex: 1; overflow-y: auto; padding: 8px; }
+
+
+
+.component-library { font-size: 12px; }
+
+
+
+.component-item { padding: 10px 12px; cursor: grab; border-radius: var(--radius-sm); display: flex; align-items: center; gap: 10px; color: var(--text-secondary); border: 1px solid var(--border-normal); margin-bottom: 8px; transition: all var(--transition); }
+
+
+
+.component-item:hover { background: rgba(56,189,248,0.06); border-color: var(--border-strong); }
+
+
+
+.component-item .comp-icon { width: 32px; height: 32px; border-radius: var(--radius-sm); background: var(--bg-inset); display: flex; align-items: center; justify-content: center; font-size: 16px; }
+
+
+
+.canvas-toolbar { padding: 8px 12px; background: var(--bg-inset); border-bottom: 1px solid var(--border-normal); display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
+
+
+
+.canvas-toolbar .tool-btn { padding: 6px 12px; font-size: 12px; border: 1px solid var(--border-normal); border-radius: var(--radius-sm); background: transparent; color: var(--text-secondary); cursor: pointer; display: flex; align-items: center; gap: 4px; transition: all var(--transition); }
+
+
+
+.canvas-toolbar .tool-btn:hover { background: var(--bg-raised); border-color: var(--border-strong); }
+
+
+
+.canvas-area { flex: 1; background: var(--bg-base); overflow: auto; padding: 20px; }
+
+
+
+.dashboard-canvas { min-height: 600px; background: var(--bg-surface); border: 1px dashed var(--border-normal); border-radius: var(--radius-md); padding: 16px; position: relative; }
+
+
+
+.grid-layout { display: grid; grid-template-columns: repeat(12, 1fr); gap: 16px; }
+
+
+
+.dashboard-widget { background: var(--bg-inset); border: 1px solid var(--border-normal); border-radius: var(--radius-md); padding: 16px; transition: all var(--transition); position: relative; }
+
+
+
+.dashboard-widget:hover { border-color: var(--border-strong); }
+
+
+
+.dashboard-widget.selected { border-color: var(--text-accent); box-shadow: 0 0 0 2px rgba(56,189,248,0.2); }
+
+
+
+.widget-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+
+
+
+.widget-title { font-size: 13px; font-weight: 600; color: var(--text-primary); }
+
+
+
+.widget-close { font-size: 16px; color: var(--text-tertiary); cursor: pointer; }
+
+
+
+.widget-close:hover { color: var(--text-error); }
+
+
+
+.stat-value { font-size: 28px; font-weight: 700; color: var(--text-accent); font-family: var(--font-mono); }
+
+
+
+.stat-label { font-size: 12px; color: var(--text-tertiary); margin-top: 4px; }
+
+
+
+.stat-change { font-size: 11px; margin-top: 4px; }
+
+
+
+.stat-change.up { color: var(--color-success); }
+
+
+
+.stat-change.down { color: var(--color-error); }
+
+
+
+.chart-placeholder { height: 160px; background: var(--bg-base); border-radius: var(--radius-sm); display: flex; align-items: center; justify-content: center; color: var(--text-tertiary); font-size: 12px; }
+
+
+
+.grid-2 { grid-column: span 2; }
+
+
+
+.grid-3 { grid-column: span 3; }
+
+
+
+.grid-4 { grid-column: span 4; }
+
+
+
+.grid-6 { grid-column: span 6; }
+
+
+
+.grid-8 { grid-column: span 8; }
+
+
+
+.grid-12 { grid-column: span 12; }
+
+
+
+.preview-mode { position: fixed; inset: 0; background: var(--bg-base); z-index: 200; display: none; flex-direction: column; }
+
+
+
+.preview-mode.show { display: flex; }
+
+
+
+.preview-header { padding: 16px 24px; background: var(--bg-surface); border-bottom: 1px solid var(--border-normal); display: flex; align-items: center; justify-content: space-between; }
+
+
+
+.preview-header h2 { font-size: 18px; color: var(--text-primary); }
+
+
+
+.preview-close { padding: 6px 12px; border: 1px solid var(--border-normal); border-radius: var(--radius-sm); background: transparent; color: var(--text-secondary); cursor: pointer; }
+
+
+
+.preview-close:hover { background: var(--bg-raised); }
+
+
+
+.preview-content { flex: 1; overflow: auto; padding: 24px; }
+
+
+
+.prop-section { margin-bottom: 16px; }
+
+
+
+.prop-section-title { font-size: 12px; font-weight: 600; color: var(--text-tertiary); margin-bottom: 8px; padding-bottom: 4px; border-bottom: 1px solid var(--border-normal); }
+
+
+
+.prop-item { margin-bottom: 10px; }
+
+
+
+.prop-item label { font-size: 11px; color: var(--text-tertiary); display: block; margin-bottom: 4px; }
+
+
+
+.prop-item input, .prop-item select, .prop-item textarea { width: 100%; padding: 6px 8px; font-size: 12px; background: var(--bg-inset); border: 1px solid var(--border-normal); border-radius: var(--radius-sm); color: var(--text-primary); outline: none; }
+
+
+
+.prop-item input:focus, .prop-item select:focus, .prop-item textarea:focus { border-color: var(--text-accent); }
+
+
+
+.prop-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+
+
+
+.list-section { background: var(--bg-surface); border: 1px solid var(--border-normal); border-radius: var(--radius-md); overflow: hidden; }
+
+
+
+.list-section-header { padding: 12px 16px; border-bottom: 1px solid var(--border-normal); font-size: 14px; font-weight: 600; color: var(--text-primary); display: flex; align-items: center; justify-content: space-between; }
+
+
+
+
+.lookup-modal { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:2000; justify-content:center; align-items:center; }
+.lookup-modal.show { display:flex; }
+.lookup-dialog { background:#fff; border:1px solid #e8e8e8; border-radius:4px; width:720px; max-height:70vh; overflow:hidden; }
+.lookup-header { padding:14px 20px; border-bottom:1px solid #e8e8e8; display:flex; align-items:center; justify-content:space-between; }
+.lookup-title { font-size:15px; font-weight:600; color:#333; }
+.lookup-close { font-size:20px; color:#666; cursor:pointer; background:none; border:none; }
+.lookup-close:hover { color:#333; }
+.lookup-body { padding:16px; }
+.lookup-search { display:flex; gap:8px; margin-bottom:12px; }
+.lookup-search input { flex:1; padding:6px 10px; border:1px solid #e8e8e8; border-radius:4px; font-size:13px; }
+.lookup-search button { padding:6px 16px; background:#1890ff; color:#fff; border:none; border-radius:4px; cursor:pointer; }
+.lookup-table { width:100%; border-collapse:collapse; font-size:13px; }
+.lookup-table th, .lookup-table td { padding:10px 12px; text-align:left; border-bottom:1px solid #e8e8e8; }
+.lookup-table th { background:#fafafa; font-weight:600; color:#333; }
+.lookup-table tr:hover { background:#f5f5f5; }
+.lookup-table .checkbox-cell { width:40px; }
+.lookup-footer { padding:12px 20px; border-top:1px solid #e8e8e8; display:flex; justify-content:flex-end; gap:8px; }
+.lookup-field { display:flex; align-items:center; }
+.lookup-field input { flex:1; padding:6px 10px; border:1px solid #e8e8e8; border-radius:4px 0 0 4px; font-size:13px; }
+.lookup-field button { width:28px; height:28px; border:1px solid #e8e8e8; border-left:none; border-radius:0 4px 4px 0; background:#fff; cursor:pointer; display:flex; align-items:center; justify-content:center; }
+.lookup-field button:hover { background:#f5f5f5; }
+
+</style>
+
+
+
+</head>
+
+
+
+<body>
+
+
+
+
+
+
+
+<aside class="sidebar" id="sidebar">
+
+
+
+<div class="sidebar-logo">
+
+
+
+    <img src="../images/logo.png" alt="磐枢工业智能平台" style="width: 100%; max-width: 200px; margin-bottom: 8px;">
+
+
+
+    <h1 style="font-size: 16px; margin: 0;">磐枢工业智能平台</h1>
+
+
+
+  </div>
+
+
+
+  <nav class="sidebar-menu"></nav>
+
+
+
+<div class="sidebar-user"><div class="avatar">管</div>
+
+
+
+</aside>
+
+
+
+
+
+
+
+<div class="main-content" id="mainContent">
+
+
+
+  <div class="page-header" style="position:sticky;top:0;z-index:100;">
+
+
+
+    <div>
+
+
+
+      <div class="flex items-center gap-8">
+
+
+
+        <button class="sidebar-toggle" onclick="toggleSidebar()">&#9776;</button>
+
+
+
+        <div>
+
+
+
+          <h2>自定义看板</h2>
+
+
+
+          <div class="breadcrumb"><a href="../index.html">首页</a><span>></span><span>BI智能分析</span><span>></span><span>自定义报表</span><span>></span><span>自定义看板</span></div></div>
+
+
+
+        </div>
+
+
+
+      </div>
+
+
+
+    </div>
+
+
+
+    <div class="page-actions">
+
+
+
+      <button class="btn btn-primary" onclick="openModal('newDashboardModal')">+ 新建看板</button>
+
+
+
+      <button class="btn btn-ghost btn-sm">退出</button>
+
+
+
+    </div>
+
+
+
+  </div>
+
+
+
+
+
+
+
+  <div class="dashboard-layout">
+
+
+
+    <div class="panel-left">
+
+
+
+      <div class="panel-header">组件库</div>
+
+
+
+      <div class="panel-body">
+
+
+
+        <div class="component-library">
+
+
+
+          <div class="component-item" draggable="true" ondragstart="dragStart(event)">
+
+
+
+            <div class="comp-icon">📊</div><span>统计卡片</span>
+
+
+
+          </div>
+
+
+
+          <div class="component-item" draggable="true" ondragstart="dragStart(event)">
+
+
+
+            <div class="comp-icon">📈</div><span>柱状图</span>
+
+
+
+          </div>
+
+
+
+          <div class="component-item" draggable="true" ondragstart="dragStart(event)">
+
+
+
+            <div class="comp-icon">📉</div><span>折线图</span>
+
+
+
+          </div>
+
+
+
+          <div class="component-item" draggable="true" ondragstart="dragStart(event)">
+
+
+
+            <div class="comp-icon">🥧</div><span>饼图</span>
+
+
+
+          </div>
+
+
+
+          <div class="component-item" draggable="true" ondragstart="dragStart(event)">
+
+
+
+            <div class="comp-icon">▦</div><span>表格</span>
+
+
+
+          </div>
+
+
+
+          <div class="component-item" draggable="true" ondragstart="dragStart(event)">
+
+
+
+            <div class="comp-icon">🎛️</div><span>仪表盘</span>
+
+
+
+          </div>
+
+
+
+          <div class="component-item" draggable="true" ondragstart="dragStart(event)">
+
+
+
+            <div class="comp-icon">🗺️</div><span>地图</span>
+
+
+
+          </div>
+
+
+
+          <div class="component-item" draggable="true" ondragstart="dragStart(event)">
+
+
+
+            <div class="comp-icon">📋</div><span>文本</span>
+
+
+
+          </div>
+
+
+
+          <div class="component-item" draggable="true" ondragstart="dragStart(event)">
+
+
+
+            <div class="comp-icon">📁</div><span>筛选器</span>
+
+
+
+          </div>
+
+
+
+          <div class="component-item" draggable="true" ondragstart="dragStart(event)">
+
+
+
+            <div class="comp-icon">🎯</div><span>目标达成</span>
+
+
+
+          </div>
+
+
+
+        </div>
+
+
+
+      </div>
+
+
+
+    </div>
+
+
+
+
+
+
+
+    <div class="panel-center">
+
+
+
+      <div class="canvas-toolbar">
+
+
+
+        <button class="tool-btn" onclick="clearCanvas()"><span>🗑️</span>清空画布</button>
+
+
+
+        <button class="tool-btn" onclick="saveDashboard()"><span>💾</span>保存</button>
+
+
+
+        <button class="tool-btn" onclick="previewDashboard()"><span>👁️</span>预览</button>
+
+
+
+        <span style="width:1px;height:20px;background:var(--border-normal);margin:0 4px;"></span>
+
+
+
+        <button class="tool-btn" onclick="setGrid(2)"><span>2列</span></button>
+
+
+
+        <button class="tool-btn" onclick="setGrid(3)"><span>3列</span></button>
+
+
+
+        <button class="tool-btn" onclick="setGrid(4)"><span>4列</span></button>
+
+
+
+        <span style="width:1px;height:20px;background:var(--border-normal);margin:0 4px;"></span>
+
+
+
+        <button class="tool-btn" onclick="exportDashboard()"><span>📥</span>导出</button>
+
+
+
+      </div>
+
+
+
+      <div class="canvas-area">
+
+
+
+        <div class="dashboard-canvas" id="dashboardCanvas" ondragover="dragOver(event)" ondrop="drop(event)">
+
+
+
+          <div class="grid-layout">
+
+
+
+            <div class="dashboard-widget grid-3" onclick="selectWidget(this)">
+
+
+
+              <div class="widget-header"><span class="widget-title">今日销售额</span><span class="widget-close" onclick="removeWidget(this)">×</span></div>
+
+
+
+              <div class="stat-value">1,258,600.00</div>
+
+
+
+              <div class="stat-label">元</div>
+
+
+
+              <div class="stat-change up">↑ 12.50% 较昨日</div>
+
+
+
+            </div>
+
+
+
+            <div class="dashboard-widget grid-3" onclick="selectWidget(this)">
+
+
+
+              <div class="widget-header"><span class="widget-title">订单数量</span><span class="widget-close" onclick="removeWidget(this)">×</span></div>
+
+
+
+              <div class="stat-value">256.00</div>
+
+
+
+              <div class="stat-label">单</div>
+
+
+
+              <div class="stat-change up">↑ 8.30% 较昨日</div>
+
+
+
+            </div>
+
+
+
+            <div class="dashboard-widget grid-3" onclick="selectWidget(this)">
+
+
+
+              <div class="widget-header"><span class="widget-title">库存周转率</span><span class="widget-close" onclick="removeWidget(this)">×</span></div>
+
+
+
+              <div class="stat-value">4.50</div>
+
+
+
+              <div class="stat-label">次/月</div>
+
+
+
+              <div class="stat-change down">↓ 2.10% 较上月</div>
+
+
+
+            </div>
+
+
+
+            <div class="dashboard-widget grid-3" onclick="selectWidget(this)">
+
+
+
+              <div class="widget-header"><span class="widget-title">生产完成率</span><span class="widget-close" onclick="removeWidget(this)">×</span></div>
+
+
+
+              <div class="stat-value">96.80%</div>
+
+
+
+              <div class="stat-label">达成率</div>
+
+
+
+              <div class="stat-change up">↑ 1.20% 较上月</div>
+
+
+
+            </div>
+
+
+
+            <div class="dashboard-widget grid-6" onclick="selectWidget(this)">
+
+
+
+              <div class="widget-header"><span class="widget-title">销售趋势分析</span><span class="widget-close" onclick="removeWidget(this)">×</span></div>
+
+
+
+              <div class="chart-placeholder">[折线图预览区域]</div>
+
+
+
+            </div>
+
+
+
+            <div class="dashboard-widget grid-6" onclick="selectWidget(this)">
+
+
+
+              <div class="widget-header"><span class="widget-title">产品销售占比</span><span class="widget-close" onclick="removeWidget(this)">×</span></div>
+
+
+
+              <div class="chart-placeholder">[饼图预览区域]</div>
+
+
+
+            </div>
+
+
+
+            <div class="dashboard-widget grid-4" onclick="selectWidget(this)">
+
+
+
+              <div class="widget-header"><span class="widget-title">客户分布</span><span class="widget-close" onclick="removeWidget(this)">×</span></div>
+
+
+
+              <div class="chart-placeholder">[柱状图预览区域]</div>
+
+
+
+            </div>
+
+
+
+            <div class="dashboard-widget grid-4" onclick="selectWidget(this)">
+
+
+
+              <div class="widget-header"><span class="widget-title">供应商采购金额</span><span class="widget-close" onclick="removeWidget(this)">×</span></div>
+
+
+
+              <div class="chart-placeholder">[柱状图预览区域]</div>
+
+
+
+            </div>
+
+
+
+            <div class="dashboard-widget grid-4" onclick="selectWidget(this)">
+
+
+
+              <div class="widget-header"><span class="widget-title">库存预警</span><span class="widget-close" onclick="removeWidget(this)">×</span></div>
+
+
+
+              <div style="font-size:12px;color:var(--text-secondary);">
+
+
+
+                <div style="padding:6px 0;border-bottom:1px solid var(--border-normal);">物料A - 库存不足</div>
+
+
+
+                <div style="padding:6px 0;border-bottom:1px solid var(--border-normal);">物料B - 库存不足</div>
+
+
+
+                <div style="padding:6px 0;">物料C - 库存充足</div>
+
+
+
+              </div>
+
+
+
+            </div>
+
+
+
+            <div class="dashboard-widget grid-12" onclick="selectWidget(this)">
+
+
+
+              <div class="widget-header"><span class="widget-title">销售订单明细</span><span class="widget-close" onclick="removeWidget(this)">×</span></div>
+
+
+
+              <table class="data-table" style="font-size:11px;">
+
+
+
+                <thead><tr><th>订单号</th><th>客户</th><th style="text-align:right">金额</th><th>状态</th></tr></thead>
+
+
+
+                <tbody>
+
+
+
+                  <tr><td>SO-2026-0001</td><td>华为技术</td><td style="text-align:right;font-family:var(--font-mono)">328,500.00</td><td><span class="badge badge-success">已审</span></td></tr>
+
+
+
+                  <tr><td>SO-2026-0002</td><td>上汽集团</td><td style="text-align:right;font-family:var(--font-mono)">156,800.00</td><td><span class="badge badge-warning">待审</span></td></tr>
+
+
+
+                  <tr><td>SO-2026-0003</td><td>字节跳动</td><td style="text-align:right;font-family:var(--font-mono)">512,000.00</td><td><span class="badge badge-success">已审</span></td></tr>
+
+
+
+                  <tr><td>SO-2026-0004</td><td>美的集团</td><td style="text-align:right;font-family:var(--font-mono)">89,600.00</td><td><span class="badge badge-info">已出库</span></td></tr>
+
+
+
+                </tbody>
+
+
+
+              </table>
+
+
+
+            </div>
+
+
+
+          </div>
+
+
+
+        </div>
+
+
+
+      </div>
+
+
+
+    </div>
+
+
+
+
+
+
+
+    <div class="panel-right">
+
+
+
+      <div class="panel-header">
+
+
+
+        <span>组件属性</span>
+
+
+
+        <span style="font-size:11px;color:var(--text-tertiary)">统计卡片</span>
+
+
+
+      </div>
+
+
+
+      <div class="panel-body">
+
+
+
+        <div class="prop-section">
+
+
+
+          <div class="prop-section-title">基本信息</div>
+
+
+
+          <div class="prop-item">
+
+
+
+            <label>组件名称</label>
+
+
+
+            <input type="text" value="今日销售额">
+
+
+
+          </div>
+
+
+
+          <div class="prop-item">
+
+
+
+            <label>组件类型</label>
+
+
+
+            <select>
+
+
+
+              <option>统计卡片</option>
+
+
+
+              <option>柱状图</option>
+
+
+
+              <option>折线图</option>
+
+
+
+              <option>饼图</option>
+
+
+
+              <option>表格</option>
+
+
+
+            </select>
+
+
+
+          </div>
+
+
+
+        </div>
+
+
+
+        <div class="prop-section">
+
+
+
+          <div class="prop-section-title">数据配置</div>
+
+
+
+          <div class="prop-item">
+
+
+
+            <label>数据源</label>
+
+
+
+            <select>
+
+
+
+              <option>销售订单</option>
+
+
+
+              <option>采购订单</option>
+
+
+
+              <option>库存</option>
+
+
+
+              <option>生产工单</option>
+
+
+
+            </select>
+
+
+
+          </div>
+
+
+
+          <div class="prop-item">
+
+
+
+            <label>数值字段</label>
+
+
+
+            <select>
+
+
+
+              <option>订单金额</option>
+
+
+
+              <option>数量</option>
+
+
+
+              <option>利润</option>
+
+
+
+            </select>
+
+
+
+          </div>
+
+
+
+          <div class="prop-item">
+
+
+
+            <label>汇总方式</label>
+
+
+
+            <select>
+
+
+
+              <option>求和</option>
+
+
+
+              <option>平均值</option>
+
+
+
+              <option>最大值</option>
+
+
+
+              <option>最小值</option>
+
+
+
+            </select>
+
+
+
+          </div>
+
+
+
+        </div>
+
+
+
+        <div class="prop-section">
+
+
+
+          <div class="prop-section-title">样式设置</div>
+
+
+
+          <div class="prop-item">
+
+
+
+            <label>显示标签</label>
+
+
+
+            <input type="text" value="元">
+
+
+
+          </div>
+
+
+
+          <div class="prop-item">
+
+
+
+            <label>字体大小</label>
+
+
+
+            <select>
+
+
+
+              <option>24px</option>
+
+
+
+              <option>28px</option>
+
+
+
+              <option>32px</option>
+
+
+
+              <option>36px</option>
+
+
+
+            </select>
+
+
+
+          </div>
+
+
+
+          <div class="prop-item">
+
+
+
+            <label>颜色主题</label>
+
+
+
+            <div style="display:flex;gap:6px;">
+
+
+
+              <div style="width:24px;height:24px;border-radius:50%;background:var(--text-accent);cursor:pointer;border:2px solid var(--text-accent);"></div>
+
+
+
+              <div style="width:24px;height:24px;border-radius:50%;background:var(--color-success);cursor:pointer;border:2px solid transparent;"></div>
+
+
+
+              <div style="width:24px;height:24px;border-radius:50%;background:var(--color-warning);cursor:pointer;border:2px solid transparent;"></div>
+
+
+
+              <div style="width:24px;height:24px;border-radius:50%;background:var(--color-error);cursor:pointer;border:2px solid transparent;"></div>
+
+
+
+              <div style="width:24px;height:24px;border-radius:50%;background:var(--color-info);cursor:pointer;border:2px solid transparent;"></div>
+
+
+
+            </div>
+
+
+
+          </div>
+
+
+
+        </div>
+
+
+
+        <div class="prop-section">
+
+
+
+          <div class="prop-section-title">数据对比</div>
+
+
+
+          <div class="prop-item">
+
+
+
+            <label>对比方式</label>
+
+
+
+            <select>
+
+
+
+              <option>与昨日对比</option>
+
+
+
+              <option>与上周对比</option>
+
+
+
+              <option>与上月对比</option>
+
+
+
+              <option>与去年同期对比</option>
+
+
+
+            </select>
+
+
+
+          </div>
+
+
+
+          <div class="prop-item">
+
+
+
+            <label>显示变化百分比</label>
+
+
+
+            <select>
+
+
+
+              <option>显示</option>
+
+
+
+              <option>不显示</option>
+
+
+
+            </select>
+
+
+
+          </div>
+
+
+
+        </div>
+
+
+
+        <div class="prop-section">
+
+
+
+          <div class="prop-section-title">尺寸调整</div>
+
+
+
+          <div class="prop-row">
+
+
+
+            <div class="prop-item">
+
+
+
+              <label>宽度</label>
+
+
+
+              <select>
+
+
+
+                <option>1列</option>
+
+
+
+                <option>2列</option>
+
+
+
+                <option>3列</option>
+
+
+
+                <option>4列</option>
+
+
+
+              </select>
+
+
+
+            </div>
+
+
+
+            <div class="prop-item">
+
+
+
+              <label>高度</label>
+
+
+
+              <select>
+
+
+
+                <option>1行</option>
+
+
+
+                <option>2行</option>
+
+
+
+                <option>3行</option>
+
+
+
+              </select>
+
+
+
+            </div>
+
+
+
+          </div>
+
+
+
+        </div>
+
+
+
+      </div>
+
+
+
+    </div>
+
+
+
+  </div>
+
+
+
+
+
+
+
+  <div style="padding:20px 24px;">
+
+
+
+    <div class="list-section">
+
+
+
+      <div class="list-section-header">
+
+
+
+        <span>看板列表</span>
+
+
+
+        <button class="btn btn-primary btn-sm" onclick="openModal('newDashboardModal')">+ 新建看板</button>
+
+
+
+      </div>
+
+
+
+      <div class="list-table-area" style="height:300px;">
+
+
+
+        <table class="data-table">
+
+
+
+          <thead><tr>
+
+
+
+            <th>看板名称</th>
+
+
+
+            <th>描述</th>
+
+
+
+            <th>图表数量</th>
+
+
+
+            <th>创建时间</th>
+
+
+
+            <th>操作</th>
+
+
+
+          </tr></thead>
+
+
+
+          <tbody>
+
+
+
+            <tr><td><a href="#">销售数据分析看板</a></td><td>销售业绩综合分析</td><td>8</td><td>2026-07-01 10:30</td><td class="row-action-links"><a href="#">编辑</a><a href="#">预览</a><a href="#">复制</a><a href="#">删除</a></td></tr>
+
+
+
+            <tr><td><a href="#">生产运营看板</a></td><td>生产进度与效率监控</td><td>6</td><td>2026-07-02 14:15</td><td class="row-action-links"><a href="#">编辑</a><a href="#">预览</a><a href="#">复制</a><a href="#">删除</a></td></tr>
+
+
+
+            <tr><td><a href="#">库存管理看板</a></td><td>库存状态与预警</td><td>5</td><td>2026-07-03 09:20</td><td class="row-action-links"><a href="#">编辑</a><a href="#">预览</a><a href="#">复制</a><a href="#">删除</a></td></tr>
+
+
+
+            <tr><td><a href="#">财务分析看板</a></td><td>财务数据汇总分析</td><td>7</td><td>2026-07-04 16:45</td><td class="row-action-links"><a href="#">编辑</a><a href="#">预览</a><a href="#">复制</a><a href="#">删除</a></td></tr>
+
+
+
+            <tr><td><a href="#">采购看板</a></td><td>供应商与采购订单</td><td>4</td><td>2026-07-05 11:00</td><td class="row-action-links"><a href="#">编辑</a><a href="#">预览</a><a href="#">复制</a><a href="#">删除</a></td></tr>
+
+
+
+            <tr><td><a href="#">客户分析看板</a></td><td>客户价值与分布</td><td>6</td><td>2026-07-06 13:30</td><td class="row-action-links"><a href="#">编辑</a><a href="#">预览</a><a href="#">复制</a><a href="#">删除</a></td></tr>
+
+
+
+            <tr><td><a href="#">质量管理看板</a></td><td>质量检验与合格率</td><td>5</td><td>2026-07-07 15:20</td><td class="row-action-links"><a href="#">编辑</a><a href="#">预览</a><a href="#">复制</a><a href="#">删除</a></td></tr>
+
+
+
+            <tr><td><a href="#">设备监控看板</a></td><td>设备状态与维护</td><td>4</td><td>2026-07-08 10:10</td><td class="row-action-links"><a href="#">编辑</a><a href="#">预览</a><a href="#">复制</a><a href="#">删除</a></td></tr>
+
+
+
+            <tr><td><a href="#">人力资源看板</a></td><td>人员编制与考勤</td><td>5</td><td>2026-07-09 14:00</td><td class="row-action-links"><a href="#">编辑</a><a href="#">预览</a><a href="#">复制</a><a href="#">删除</a></td></tr>
+
+
+
+            <tr><td><a href="#">综合管理驾驶舱</a></td><td>企业整体运营状况</td><td>12</td><td>2026-07-10 09:30</td><td class="row-action-links"><a href="#">编辑</a><a href="#">预览</a><a href="#">复制</a><a href="#">删除</a></td></tr>
+
+
+
+          </tbody>
+
+
+
+        </table>
+
+
+
+      </div>
+
+
+
+      <div class="list-pagination">
+
+
+
+        <span class="page-info">共 18 条记录，第 1/2 页</span>
+
+
+
+        <div class="page-btns">
+
+
+
+          <button>&lt; 上一页</button>
+
+
+
+          <button class="active">1</button>
+
+
+
+          <button>2</button>
+
+
+
+          <button>下一页 &gt;</button>
+
+
+
+        </div>
+
+
+
+      </div>
+
+
+
+    </div>
+
+
+
+  </div>
+
+
+
+
+
+
+
+  <div class="preview-mode" id="previewMode">
+
+
+
+    <div class="preview-header">
+
+
+
+      <h2>销售数据分析看板</h2>
+
+
+
+      <button class="preview-close" onclick="closePreview()">关闭预览</button>
+
+
+
+    </div>
+
+
+
+    <div class="preview-content">
+
+
+
+      <div class="grid-layout">
+
+
+
+        <div class="dashboard-widget grid-3">
+
+
+
+          <div class="widget-header"><span class="widget-title">今日销售额</span></div>
+
+
+
+          <div class="stat-value">1,258,600.00</div>
+
+
+
+          <div class="stat-label">元</div>
+
+
+
+          <div class="stat-change up">↑ 12.50% 较昨日</div>
+
+
+
+        </div>
+
+
+
+        <div class="dashboard-widget grid-3">
+
+
+
+          <div class="widget-header"><span class="widget-title">订单数量</span></div>
+
+
+
+          <div class="stat-value">256.00</div>
+
+
+
+          <div class="stat-label">单</div>
+
+
+
+          <div class="stat-change up">↑ 8.30% 较昨日</div>
+
+
+
+        </div>
+
+
+
+        <div class="dashboard-widget grid-3">
+
+
+
+          <div class="widget-header"><span class="widget-title">库存周转率</span></div>
+
+
+
+          <div class="stat-value">4.50</div>
+
+
+
+          <div class="stat-label">次/月</div>
+
+
+
+          <div class="stat-change down">↓ 2.10% 较上月</div>
+
+
+
+        </div>
+
+
+
+        <div class="dashboard-widget grid-3">
+
+
+
+          <div class="widget-header"><span class="widget-title">生产完成率</span></div>
+
+
+
+          <div class="stat-value">96.80%</div>
+
+
+
+          <div class="stat-label">达成率</div>
+
+
+
+          <div class="stat-change up">↑ 1.20% 较上月</div>
+
+
+
+        </div>
+
+
+
+        <div class="dashboard-widget grid-6">
+
+
+
+          <div class="widget-header"><span class="widget-title">销售趋势分析</span></div>
+
+
+
+          <div class="chart-placeholder">[折线图预览区域]</div>
+
+
+
+        </div>
+
+
+
+        <div class="dashboard-widget grid-6">
+
+
+
+          <div class="widget-header"><span class="widget-title">产品销售占比</span></div>
+
+
+
+          <div class="chart-placeholder">[饼图预览区域]</div>
+
+
+
+        </div>
+
+
+
+        <div class="dashboard-widget grid-4">
+
+
+
+          <div class="widget-header"><span class="widget-title">客户分布</span></div>
+
+
+
+          <div class="chart-placeholder">[柱状图预览区域]</div>
+
+
+
+        </div>
+
+
+
+        <div class="dashboard-widget grid-4">
+
+
+
+          <div class="widget-header"><span class="widget-title">供应商采购金额</span></div>
+
+
+
+          <div class="chart-placeholder">[柱状图预览区域]</div>
+
+
+
+        </div>
+
+
+
+        <div class="dashboard-widget grid-4">
+
+
+
+          <div class="widget-header"><span class="widget-title">库存预警</span></div>
+
+
+
+          <div style="font-size:12px;color:var(--text-secondary);">
+
+
+
+            <div style="padding:6px 0;border-bottom:1px solid var(--border-normal);">物料A - 库存不足</div>
+
+
+
+            <div style="padding:6px 0;border-bottom:1px solid var(--border-normal);">物料B - 库存不足</div>
+
+
+
+            <div style="padding:6px 0;">物料C - 库存充足</div>
+
+
+
+          </div>
+
+
+
+        </div>
+
+
+
+      </div>
+
+
+
+    </div>
+
+
+
+  </div>
+
+
+
+
+
+
+
+  <div id="toastContainer" class="toast-container"></div>
+
+
+
+
+
+
+
+<div class="confirm-modal-overlay" id="confirmModal">
+
+
+
+  <div class="confirm-modal">
+
+
+
+    <div class="confirm-modal-header">温馨提示</div>
+
+
+
+    <div class="confirm-modal-body" id="confirmMessage"></div>
+
+
+
+    <div class="confirm-modal-footer">
+
+
+
+      <button class="btn btn-ghost" onclick="closeConfirmModal()">取消</button>
+
+
+
+      <button class="btn btn-primary" onclick="confirmOk()">确定</button>
+
+
+
+    </div>
+
+
+
+  </div>
+
+
+
+</div>
+
+
+
+
+
+
+
+<div class="modal-overlay" id="newDashboardModal">
+
+
+
+    <div class="modal-dialog">
+
+
+
+      <div class="modal-header">
+
+
+
+        <h3>新建看板</h3>
+
+
+
+        <button class="modal-close" onclick="closeModal('newDashboardModal')">&times;</button>
+
+
+
+      </div>
+
+
+
+      <div class="modal-body">
+
+
+
+        <div class="prop-section">
+
+
+
+          <div class="prop-section-title">基本信息</div>
+
+
+
+          <div class="prop-item">
+
+
+
+            <label>看板名称</label>
+
+
+
+            <input type="text" placeholder="请输入看板名称">
+
+
+
+          </div>
+
+
+
+          <div class="prop-item">
+
+
+
+            <label>看板描述</label>
+
+
+
+            <textarea placeholder="请输入看板描述"></textarea>
+
+
+
+          </div>
+
+
+
+        </div>
+
+
+
+        <div class="prop-section">
+
+
+
+          <div class="prop-section-title">布局设置</div>
+
+
+
+          <div class="prop-item">
+
+
+
+            <label>网格列数</label>
+
+
+
+            <select>
+
+
+
+              <option>2列</option>
+
+
+
+              <option>3列</option>
+
+
+
+              <option>4列</option>
+
+
+
+              <option>6列</option>
+
+
+
+            </select>
+
+
+
+          </div>
+
+
+
+          <div class="prop-item">
+
+
+
+            <label>背景颜色</label>
+
+
+
+            <select>
+
+
+
+              <option>深色背景</option>
+
+
+
+              <option>浅色背景</option>
+
+
+
+            </select>
+
+
+
+          </div>
+
+
+
+        </div>
+
+
+
+        <div class="prop-section">
+
+
+
+          <div class="prop-section-title">权限设置</div>
+
+
+
+          <div class="prop-item">
+
+
+
+            <label>可见范围</label>
+
+
+
+            <select>
+
+
+
+              <option>全部用户</option>
+
+
+
+              <option>仅自己可见</option>
+
+
+
+              <option>指定角色</option>
+
+
+
+            </select>
+
+
+
+          </div>
+
+
+
+        </div>
+
+
+
+      </div>
+
+
+
+      <div class="modal-footer">
+
+
+
+        <button class="btn btn-ghost" onclick="closeModal('newDashboardModal')">取消</button>
+
+
+
+        <button class="btn btn-primary" onclick="closeModal('newDashboardModal')">确定</button>
+
+
+
+      </div>
+
+
+
+    </div>
+
+
+
+  </div>
+
+
+
+</div>
+
+
+
+
+
+
+
+<script>
+
+
+
+function openModal(id){document.getElementById(id).classList.add('show');}
+
+
+
+function closeModal(id){document.getElementById(id).classList.remove('show');}
+
+
+
+document.querySelectorAll('.modal-overlay').forEach(function(ov){ov.addEventListener('click',function(e){if(e.target===ov)ov.classList.remove('show');});});
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+;
+
+
+
+  toast.className = 'toast toast-' + (type || 'info');
+
+
+
+  toast.innerHTML = '<span class="toast-icon">' + (icons[type] || icons.info) + '</span><span>' + message + '</span>';
+
+
+
+container.appendChild(toast);
+
+
+
+}
+
+
+
+  setTimeout(function() { toast.remove(); }, 3000);
+function closeConfirmModal() {
+
+
+
+  document.getElementById('confirmModal').classList.remove('show');
+
+
+
+  confirmCallback = null;
+
+
+
+
+
+
+
+}
+
+
+
+function confirmOk() {
+
+
+
+  if (confirmCallback) {
+
+
+
+    confirmCallback();
+
+
+
+  }
+
+
+
+  closeConfirmModal();
+
+
+
+}
+
+
+
+
+
+
+
+var draggedItem = null;
+
+
+
+function dragStart(e) {
+
+
+
+  draggedItem = e.target;
+
+
+
+  e.dataTransfer.effectAllowed = 'copy';
+
+
+
+}
+
+
+
+function dragOver(e) {
+
+
+
+  e.preventDefault();
+
+
+
+  e.dataTransfer.dropEffect = 'copy';
+
+
+
+}
+
+
+
+function drop(e) {
+
+
+
+  e.preventDefault();
+
+
+
+  if (draggedItem) {
+
+
+
+    showToast('组件已添加到画布', 'success');
+
+
+
+    draggedItem = null;
+
+
+
+  }
+
+
+
+
+
+
+
+}
+
+
+
+function selectWidget(el) {
+
+
+
+}
+
+
+
+  document.querySelectorAll('.dashboard-widget').forEach(function(w) { w.classList.remove('selected'); });
+
+
+
+  el.classList.add('selected');
+
+
+
+
+
+
+
+function removeWidget(el) {
+
+
+
+  el.closest('.dashboard-widget').remove();
+
+
+
+
+
+
+
+}
+
+
+
+function clearCanvas() {
+
+
+
+}
+
+
+
+  showConfirm('确定要清空画布吗？', 'warning', function() {
+
+
+
+    document.getElementById('dashboardCanvas').innerHTML = '<div class="grid-layout"></div>';
+
+
+
+  });
+
+
+
+
+
+
+
+function saveDashboard() { showToast('看板已保存', 'success');
+
+
+
+}
+
+
+
+function previewDashboard() {
+
+
+
+  document.getElementById('previewMode').classList.add('show');
+
+
+
+
+
+
+
+}
+
+
+
+function closePreview() {
+
+
+
+  document.getElementById('previewMode').classList.remove('show');
+
+
+
+
+
+
+
+}
+
+
+
+function setGrid(cols) {
+
+
+
+  var layout = document.querySelector('.grid-layout');
+
+
+
+  layout.style.gridTemplateColumns = 'repeat(' + cols + ', 1fr)';
+
+
+
+
+
+
+
+}
+
+
+
+function exportDashboard() { showToast('导出功能开发中', 'info'); }
+
+
+
+
+var currentLookupField = null;
+var currentLookupType = null;
+var lookupData = [];
+var lookupColumns = [];
+
+function openLookup(fieldId, type) {
+  currentLookupField = fieldId;
+  currentLookupType = type;
+  
+  if (type === 'org') {
+    lookupColumns = ['编码', '名称', '形态', '上级组织'];
+    lookupData = JSON.parse(localStorage.getItem('erp_orgs') || '[]');
+    document.getElementById('lookupTitle').textContent = '选择组织';
+  } else if (type === 'department') {
+    lookupColumns = ['编码', '名称'];
+    lookupData = JSON.parse(localStorage.getItem('erp_departments_cache') || '[]');
+    document.getElementById('lookupTitle').textContent = '选择部门';
+  } else if (type === 'employee') {
+    lookupColumns = ['编号', '姓名', '所属部门'];
+    lookupData = JSON.parse(localStorage.getItem('erp_employees_cache') || '[]');
+    document.getElementById('lookupTitle').textContent = '选择员工';
+  } else if (type === 'supplier') {
+    lookupColumns = ['编码', '名称'];
+    lookupData = JSON.parse(localStorage.getItem('erp_suppliers_cache') || '[]');
+    document.getElementById('lookupTitle').textContent = '选择供应商';
+  } else if (type === 'customer') {
+    lookupColumns = ['编码', '名称'];
+    lookupData = JSON.parse(localStorage.getItem('erp_customers_cache') || '[]');
+    document.getElementById('lookupTitle').textContent = '选择客户';
+  } else if (type === 'material') {
+    lookupColumns = ['物料编码', '物料名称', '规格型号', '基本单位'];
+    lookupData = JSON.parse(localStorage.getItem('erp_materials_cache') || '[]');
+    document.getElementById('lookupTitle').textContent = '选择物料';
+  } else if (type === 'warehouse') {
+    lookupColumns = ['编码', '名称'];
+    lookupData = JSON.parse(localStorage.getItem('erp_warehouses_cache') || '[]');
+    document.getElementById('lookupTitle').textContent = '选择仓库';
+  }
+  
+  renderLookupTable(lookupData);
+  document.getElementById('lookupModal').classList.add('show');
+}
+
+function closeLookup() {
+  document.getElementById('lookupModal').classList.remove('show');
+}
+
+function filterLookup() {
+  var keyword = document.getElementById('lookupKeyword').value.trim().toLowerCase();
+  var filtered = lookupData.filter(function(item) {
+    var code = item.code || '';
+    var name = item.name || '';
+    return code.toLowerCase().includes(keyword) || name.toLowerCase().includes(keyword);
+  });
+  renderLookupTable(filtered);
+}
+
+function renderLookupTable(data) {
+  var head = document.getElementById('lookupTableHead');
+  var body = document.getElementById('lookupTableBody');
+  
+  head.innerHTML = '<tr><th class="checkbox-cell"><input type="checkbox" onclick="selectAllLookup()"></th>' + lookupColumns.map(function(col) { return '<th>' + col + '</th>'; }).join('') + '</tr>';
+  
+  body.innerHTML = '';
+  data.forEach(function(item) {
+    var row = document.createElement('tr');
+    row.onclick = function() { selectLookupRow(this); };
+    var cells = ['<td class="checkbox-cell"><input type="checkbox" class="lookup-checkbox" value="' + item.id + '"></td>'];
+    if (currentLookupType === 'org') {
+      cells.push('<td>' + item.code + '</td><td>' + item.name + '</td><td>' + (item.form || '') + '</td><td>' + (item.parentName || '') + '</td>');
+    } else if (currentLookupType === 'department') {
+      cells.push('<td>' + item.code + '</td><td>' + item.name + '</td>');
+    } else if (currentLookupType === 'employee') {
+      cells.push('<td>' + item.code + '</td><td>' + item.name + '</td><td>' + (item.department || '') + '</td>');
+    } else if (currentLookupType === 'supplier' || currentLookupType === 'customer') {
+      cells.push('<td>' + item.code + '</td><td>' + item.name + '</td>');
+    } else if (currentLookupType === 'material') {
+      cells.push('<td>' + item.code + '</td><td>' + item.name + '</td><td>' + (item.specification || '') + '</td><td>' + (item.unit || '') + '</td>');
+    } else if (currentLookupType === 'warehouse') {
+      cells.push('<td>' + item.code + '</td><td>' + item.name + '</td>');
+    }
+    row.innerHTML = cells.join('');
+    body.appendChild(row);
+  });
+  
+  if (data.length === 0) {
+    body.innerHTML = '<tr><td colspan="' + (lookupColumns.length + 1) + '" style="text-align:center;padding:40px;color:#999;">暂无数据</td></tr>';
+  }
+}
+
+function selectAllLookup() {
+  var master = document.querySelector('.lookup-table th input');
+  var checkboxes = document.querySelectorAll('.lookup-checkbox');
+  checkboxes.forEach(function(cb) { cb.checked = master.checked; });
+}
+
+function selectLookupRow(row) {
+  var checkbox = row.querySelector('.lookup-checkbox');
+  checkbox.checked = !checkbox.checked;
+}
+
+function confirmLookup() {
+  var checkboxes = document.querySelectorAll('.lookup-checkbox:checked');
+  if (checkboxes.length === 0) {
+    showToast('请选择一条记录', 'warning');
+    return;
+  }
+  
+  var item = lookupData.find(function(d) { return d.id === checkboxes[0].value; });
+  if (item) {
+    var field = document.getElementById(currentLookupField);
+    if (field) {
+      field.value = item.name;
+      field.setAttribute('data-id', item.id);
+      field.setAttribute('data-code', item.code);
+      
+      if (currentLookupType === 'material') {
+        var row = field.closest('tr');
+        if (row) {
+          row.querySelector('.material-name').value = item.name;
+          row.querySelector('.material-spec').value = item.specification || '';
+          row.querySelector('.material-unit').value = item.unit || '';
+        }
+      }
+    }
+  }
+  
+  closeLookup();
+}
+
+function openMaterialLookup(btn) {
+  var field = btn.previousElementSibling;
+  field.id = 'lookupField_' + Date.now();
+  currentLookupField = field.id;
+  openLookup(field.id, 'material');
+}
+
+function openOrgLookup(btn) {
+  var field = btn.previousElementSibling;
+  field.id = 'lookupField_' + Date.now();
+  currentLookupField = field.id;
+  openLookup(field.id, 'org');
+}
+
+function openSupplierLookup(btn) {
+  var field = btn.previousElementSibling;
+  field.id = 'lookupField_' + Date.now();
+  currentLookupField = field.id;
+  openLookup(field.id, 'supplier');
+}
+
+function openWarehouseLookup(btn) {
+  var field = btn.previousElementSibling;
+  field.id = 'lookupField_' + Date.now();
+  currentLookupField = field.id;
+  openLookup(field.id, 'warehouse');
+}
+
+function initLookupData() {
+  if (!localStorage.getItem('erp_orgs')) {
+    localStorage.setItem('erp_orgs', JSON.stringify([
+      { id: 'org-001', code: 'ORG-HQ', name: '磐枢工业集团', form: '集团', parentName: '' },
+      { id: 'org-002', code: 'ORG-SM', name: '磐枢智能制造有限公司', form: '公司', parentName: '磐枢工业集团' },
+      { id: 'org-003', code: 'ORG-SM-PD', name: '生产制造部', form: '部门', parentName: '磐枢智能制造有限公司' },
+      { id: 'org-004', code: 'ORG-SM-FA', name: '财务部', form: '部门', parentName: '磐枢智能制造有限公司' },
+      { id: 'org-005', code: 'ORG-SM-SD', name: '销售部', form: '部门', parentName: '磐枢智能制造有限公司' }
+    ]));
+  }
+  if (!localStorage.getItem('erp_departments_cache')) {
+    localStorage.setItem('erp_departments_cache', JSON.stringify([
+      { id: 'dept-001', code: 'DEPT-PD', name: '生产制造部', status: 1 },
+      { id: 'dept-002', code: 'DEPT-FA', name: '财务部', status: 1 },
+      { id: 'dept-003', code: 'DEPT-SD', name: '销售部', status: 1 },
+      { id: 'dept-004', code: 'DEPT-AS', name: '装配车间', status: 1 },
+      { id: 'dept-005', code: 'DEPT-QC', name: '质检车间', status: 1 }
+    ]));
+  }
+  if (!localStorage.getItem('erp_employees_cache')) {
+    localStorage.setItem('erp_employees_cache', JSON.stringify([
+      { id: 'emp-001', code: 'EMP-001', name: '张三', department: '生产制造部', status: 1 },
+      { id: 'emp-002', code: 'EMP-002', name: '李四', department: '生产制造部', status: 1 },
+      { id: 'emp-003', code: 'EMP-003', name: '王五', department: '财务部', status: 1 },
+      { id: 'emp-004', code: 'EMP-004', name: '赵六', department: '销售部', status: 1 },
+      { id: 'emp-005', code: 'EMP-005', name: '钱七', department: '质检车间', status: 1 }
+    ]));
+  }
+  if (!localStorage.getItem('erp_suppliers_cache')) {
+    localStorage.setItem('erp_suppliers_cache', JSON.stringify([
+      { id: 'sup-001', code: 'S-001', name: '深圳电子元器件有限公司', status: 1 },
+      { id: 'sup-002', code: 'S-002', name: '杭州精密机械加工厂', status: 1 },
+      { id: 'sup-003', code: 'S-003', name: '上海材料科技有限公司', status: 1 },
+      { id: 'sup-004', code: 'S-004', name: '东莞五金制品厂', status: 1 }
+    ]));
+  }
+  if (!localStorage.getItem('erp_materials_cache')) {
+    localStorage.setItem('erp_materials_cache', JSON.stringify([
+      { id: 'mat-001', code: 'P-001', name: '高频传感器模块', specification: 'HT-2026', unit: '个', status: 1 },
+      { id: 'mat-002', code: 'P-002', name: '控制电路板', specification: 'CB-2026', unit: '块', status: 1 },
+      { id: 'mat-003', code: 'P-003', name: '智能控制器', specification: 'IC-V3', unit: '台', status: 1 },
+      { id: 'mat-004', code: 'P-004', name: '电源模块', specification: 'PM-500W', unit: '个', status: 1 },
+      { id: 'mat-005', code: 'M-001', name: 'PCB电路板', specification: 'FR-4双层', unit: '块', status: 1 },
+      { id: 'mat-006', code: 'M-002', name: '贴片电阻', specification: '10KΩ 0603', unit: '个', status: 1 },
+      { id: 'mat-007', code: 'M-003', name: '贴片电容', specification: '100μF 0805', unit: '个', status: 1 },
+      { id: 'mat-008', code: 'M-004', name: '螺丝', specification: 'M4x10', unit: '包', status: 1 }
+    ]));
+  }
+  if (!localStorage.getItem('erp_warehouses_cache')) {
+    localStorage.setItem('erp_warehouses_cache', JSON.stringify([
+      { id: 'wh-001', code: 'WH-001', name: '成品仓', status: 1 },
+      { id: 'wh-002', code: 'WH-002', name: '原料仓', status: 1 },
+      { id: 'wh-003', code: 'WH-003', name: '半成品仓', status: 1 },
+      { id: 'wh-004', code: 'WH-004', name: '辅料仓', status: 1 }
+    ]));
+  }
+}
+
+</script>
+
+
+
+
+<div class="lookup-modal" id="lookupModal">
+  <div class="lookup-dialog">
+    <div class="lookup-header">
+      <div class="lookup-title" id="lookupTitle">选择</div>
+      <button class="lookup-close" onclick="closeLookup()">×</button>
+    </div>
+    <div class="lookup-body">
+      <div class="lookup-search">
+        <input type="text" id="lookupKeyword" placeholder="请输入编码或名称搜索" onkeydown="if(event.key==='Enter')filterLookup()">
+        <button onclick="filterLookup()">搜索</button>
+      </div>
+      <table class="lookup-table">
+        <thead id="lookupTableHead"></thead>
+        <tbody id="lookupTableBody"></tbody>
+      </table>
+    </div>
+    <div class="lookup-footer">
+      <button class="btn btn-cancel" onclick="closeLookup()">取消</button>
+      <button class="btn btn-primary" onclick="confirmLookup()">确定</button>
+    </div>
+  </div>
+</div>
+
+</body>
+
+
+
+</html>

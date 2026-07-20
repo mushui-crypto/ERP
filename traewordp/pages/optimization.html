@@ -1,0 +1,2651 @@
+<!DOCTYPE html>
+
+
+
+<html lang="zh-CN">
+
+
+
+<head>
+
+
+
+<meta charset="UTF-8">
+
+
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+
+
+<title>优化建议中心 — 磐枢工业智能平台</title>
+
+
+
+<link rel="stylesheet" href="../common.css">
+
+
+
+<script src="../common.js"></script>
+<script>
+</script>
+
+
+
+<script src="../common.js"></script>
+<script>
+var currentLookupField = null;
+var currentLookupType = null;
+var lookupData = [];
+var lookupColumns = [];
+
+function openLookup(fieldId, type) {
+  currentLookupField = fieldId;
+  currentLookupType = type;
+  
+  if (type === 'org') {
+    lookupColumns = ['编码', '名称', '形态', '上级组织'];
+    lookupData = JSON.parse(localStorage.getItem('erp_orgs') || '[]');
+    document.getElementById('lookupTitle').textContent = '选择组织';
+  } else if (type === 'department') {
+    lookupColumns = ['编码', '名称'];
+    lookupData = JSON.parse(localStorage.getItem('erp_departments_cache') || '[]');
+    document.getElementById('lookupTitle').textContent = '选择部门';
+  } else if (type === 'employee') {
+    lookupColumns = ['编号', '姓名', '所属部门'];
+    lookupData = JSON.parse(localStorage.getItem('erp_employees_cache') || '[]');
+    document.getElementById('lookupTitle').textContent = '选择员工';
+  } else if (type === 'supplier') {
+    lookupColumns = ['编码', '名称'];
+    lookupData = JSON.parse(localStorage.getItem('erp_suppliers_cache') || '[]');
+    document.getElementById('lookupTitle').textContent = '选择供应商';
+  } else if (type === 'customer') {
+    lookupColumns = ['编码', '名称'];
+    lookupData = JSON.parse(localStorage.getItem('erp_customers_cache') || '[]');
+    document.getElementById('lookupTitle').textContent = '选择客户';
+  } else if (type === 'material') {
+    lookupColumns = ['物料编码', '物料名称', '规格型号', '基本单位'];
+    lookupData = JSON.parse(localStorage.getItem('erp_materials_cache') || '[]');
+    document.getElementById('lookupTitle').textContent = '选择物料';
+  } else if (type === 'warehouse') {
+    lookupColumns = ['编码', '名称'];
+    lookupData = JSON.parse(localStorage.getItem('erp_warehouses_cache') || '[]');
+    document.getElementById('lookupTitle').textContent = '选择仓库';
+  }
+  
+  renderLookupTable(lookupData);
+  document.getElementById('lookupModal').classList.add('show');
+}
+
+function closeLookup() {
+  document.getElementById('lookupModal').classList.remove('show');
+}
+
+function filterLookup() {
+  var keyword = document.getElementById('lookupKeyword').value.trim().toLowerCase();
+  var filtered = lookupData.filter(function(item) {
+    var code = item.code || '';
+    var name = item.name || '';
+    return code.toLowerCase().includes(keyword) || name.toLowerCase().includes(keyword);
+  });
+  renderLookupTable(filtered);
+}
+
+function renderLookupTable(data) {
+  var head = document.getElementById('lookupTableHead');
+  var body = document.getElementById('lookupTableBody');
+  
+  head.innerHTML = '<tr><th class="checkbox-cell"><input type="checkbox" onclick="selectAllLookup()"></th>' + lookupColumns.map(function(col) { return '<th>' + col + '</th>'; }).join('') + '</tr>';
+  
+  body.innerHTML = '';
+  data.forEach(function(item) {
+    var row = document.createElement('tr');
+    row.onclick = function() { selectLookupRow(this); };
+    var cells = ['<td class="checkbox-cell"><input type="checkbox" class="lookup-checkbox" value="' + item.id + '"></td>'];
+    if (currentLookupType === 'org') {
+      cells.push('<td>' + item.code + '</td><td>' + item.name + '</td><td>' + (item.form || '') + '</td><td>' + (item.parentName || '') + '</td>');
+    } else if (currentLookupType === 'department') {
+      cells.push('<td>' + item.code + '</td><td>' + item.name + '</td>');
+    } else if (currentLookupType === 'employee') {
+      cells.push('<td>' + item.code + '</td><td>' + item.name + '</td><td>' + (item.department || '') + '</td>');
+    } else if (currentLookupType === 'supplier' || currentLookupType === 'customer') {
+      cells.push('<td>' + item.code + '</td><td>' + item.name + '</td>');
+    } else if (currentLookupType === 'material') {
+      cells.push('<td>' + item.code + '</td><td>' + item.name + '</td><td>' + (item.specification || '') + '</td><td>' + (item.unit || '') + '</td>');
+    } else if (currentLookupType === 'warehouse') {
+      cells.push('<td>' + item.code + '</td><td>' + item.name + '</td>');
+    }
+    row.innerHTML = cells.join('');
+    body.appendChild(row);
+  });
+  
+  if (data.length === 0) {
+    body.innerHTML = '<tr><td colspan="' + (lookupColumns.length + 1) + '" style="text-align:center;padding:40px;color:#999;">暂无数据</td></tr>';
+  }
+}
+
+function selectAllLookup() {
+  var master = document.querySelector('.lookup-table th input');
+  var checkboxes = document.querySelectorAll('.lookup-checkbox');
+  checkboxes.forEach(function(cb) { cb.checked = master.checked; });
+}
+
+function selectLookupRow(row) {
+  var checkbox = row.querySelector('.lookup-checkbox');
+  checkbox.checked = !checkbox.checked;
+}
+
+function confirmLookup() {
+  var checkboxes = document.querySelectorAll('.lookup-checkbox:checked');
+  if (checkboxes.length === 0) {
+    showToast('请选择一条记录', 'warning');
+    return;
+  }
+  
+  var item = lookupData.find(function(d) { return d.id === checkboxes[0].value; });
+  if (item) {
+    var field = document.getElementById(currentLookupField);
+    if (field) {
+      field.value = item.name;
+      field.setAttribute('data-id', item.id);
+      field.setAttribute('data-code', item.code);
+      
+      if (currentLookupType === 'material') {
+        var row = field.closest('tr');
+        if (row) {
+          row.querySelector('.material-name').value = item.name;
+          row.querySelector('.material-spec').value = item.specification || '';
+          row.querySelector('.material-unit').value = item.unit || '';
+        }
+      }
+    }
+  }
+  
+  closeLookup();
+}
+
+function openMaterialLookup(btn) {
+  var field = btn.previousElementSibling;
+  field.id = 'lookupField_' + Date.now();
+  currentLookupField = field.id;
+  openLookup(field.id, 'material');
+}
+
+function openOrgLookup(btn) {
+  var field = btn.previousElementSibling;
+  field.id = 'lookupField_' + Date.now();
+  currentLookupField = field.id;
+  openLookup(field.id, 'org');
+}
+
+function openSupplierLookup(btn) {
+  var field = btn.previousElementSibling;
+  field.id = 'lookupField_' + Date.now();
+  currentLookupField = field.id;
+  openLookup(field.id, 'supplier');
+}
+
+function openWarehouseLookup(btn) {
+  var field = btn.previousElementSibling;
+  field.id = 'lookupField_' + Date.now();
+  currentLookupField = field.id;
+  openLookup(field.id, 'warehouse');
+}
+
+function initLookupData() {
+  if (!localStorage.getItem('erp_orgs')) {
+    localStorage.setItem('erp_orgs', JSON.stringify([
+      { id: 'org-001', code: 'ORG-HQ', name: '磐枢工业集团', form: '集团', parentName: '' },
+      { id: 'org-002', code: 'ORG-SM', name: '磐枢智能制造有限公司', form: '公司', parentName: '磐枢工业集团' },
+      { id: 'org-003', code: 'ORG-SM-PD', name: '生产制造部', form: '部门', parentName: '磐枢智能制造有限公司' },
+      { id: 'org-004', code: 'ORG-SM-FA', name: '财务部', form: '部门', parentName: '磐枢智能制造有限公司' },
+      { id: 'org-005', code: 'ORG-SM-SD', name: '销售部', form: '部门', parentName: '磐枢智能制造有限公司' }
+    ]));
+  }
+  if (!localStorage.getItem('erp_departments_cache')) {
+    localStorage.setItem('erp_departments_cache', JSON.stringify([
+      { id: 'dept-001', code: 'DEPT-PD', name: '生产制造部', status: 1 },
+      { id: 'dept-002', code: 'DEPT-FA', name: '财务部', status: 1 },
+      { id: 'dept-003', code: 'DEPT-SD', name: '销售部', status: 1 },
+      { id: 'dept-004', code: 'DEPT-AS', name: '装配车间', status: 1 },
+      { id: 'dept-005', code: 'DEPT-QC', name: '质检车间', status: 1 }
+    ]));
+  }
+  if (!localStorage.getItem('erp_employees_cache')) {
+    localStorage.setItem('erp_employees_cache', JSON.stringify([
+      { id: 'emp-001', code: 'EMP-001', name: '张三', department: '生产制造部', status: 1 },
+      { id: 'emp-002', code: 'EMP-002', name: '李四', department: '生产制造部', status: 1 },
+      { id: 'emp-003', code: 'EMP-003', name: '王五', department: '财务部', status: 1 },
+      { id: 'emp-004', code: 'EMP-004', name: '赵六', department: '销售部', status: 1 },
+      { id: 'emp-005', code: 'EMP-005', name: '钱七', department: '质检车间', status: 1 }
+    ]));
+  }
+  if (!localStorage.getItem('erp_suppliers_cache')) {
+    localStorage.setItem('erp_suppliers_cache', JSON.stringify([
+      { id: 'sup-001', code: 'S-001', name: '深圳电子元器件有限公司', status: 1 },
+      { id: 'sup-002', code: 'S-002', name: '杭州精密机械加工厂', status: 1 },
+      { id: 'sup-003', code: 'S-003', name: '上海材料科技有限公司', status: 1 },
+      { id: 'sup-004', code: 'S-004', name: '东莞五金制品厂', status: 1 }
+    ]));
+  }
+  if (!localStorage.getItem('erp_materials_cache')) {
+    localStorage.setItem('erp_materials_cache', JSON.stringify([
+      { id: 'mat-001', code: 'P-001', name: '高频传感器模块', specification: 'HT-2026', unit: '个', status: 1 },
+      { id: 'mat-002', code: 'P-002', name: '控制电路板', specification: 'CB-2026', unit: '块', status: 1 },
+      { id: 'mat-003', code: 'P-003', name: '智能控制器', specification: 'IC-V3', unit: '台', status: 1 },
+      { id: 'mat-004', code: 'P-004', name: '电源模块', specification: 'PM-500W', unit: '个', status: 1 },
+      { id: 'mat-005', code: 'M-001', name: 'PCB电路板', specification: 'FR-4双层', unit: '块', status: 1 },
+      { id: 'mat-006', code: 'M-002', name: '贴片电阻', specification: '10KΩ 0603', unit: '个', status: 1 },
+      { id: 'mat-007', code: 'M-003', name: '贴片电容', specification: '100μF 0805', unit: '个', status: 1 },
+      { id: 'mat-008', code: 'M-004', name: '螺丝', specification: 'M4x10', unit: '包', status: 1 }
+    ]));
+  }
+  if (!localStorage.getItem('erp_warehouses_cache')) {
+    localStorage.setItem('erp_warehouses_cache', JSON.stringify([
+      { id: 'wh-001', code: 'WH-001', name: '成品仓', status: 1 },
+      { id: 'wh-002', code: 'WH-002', name: '原料仓', status: 1 },
+      { id: 'wh-003', code: 'WH-003', name: '半成品仓', status: 1 },
+      { id: 'wh-004', code: 'WH-004', name: '辅料仓', status: 1 }
+    ]));
+  }
+}
+
+</script>
+
+
+
+<style>
+
+
+
+.toast-container {
+
+
+
+  position: fixed;
+
+
+
+  top: 60px;
+
+
+
+  right: 20px;
+
+
+
+  z-index: 1000;
+
+
+
+  display: flex;
+
+
+
+  flex-direction: column;
+
+
+
+  gap: 8px;
+
+
+
+}
+
+
+
+.toast {
+
+
+
+  padding: 12px 16px;
+
+
+
+  border-radius: var(--radius-md);
+
+
+
+  font-size: 13px;
+
+
+
+  color: var(--text-primary);
+
+
+
+  min-width: 280px;
+
+
+
+  max-width: 400px;
+
+
+
+  display: flex;
+
+
+
+  align-items: center;
+
+
+
+  gap: 8px;
+
+
+
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+
+
+
+  animation: toastIn 0.3s ease;
+
+
+
+}
+
+
+
+@keyframes toastIn {
+
+
+
+  from { opacity: 0; transform: translateX(100%); }
+
+
+
+  to { opacity: 1; transform: translateX(0); }
+
+
+
+}
+
+
+
+.toast-success { background: rgba(34,197,94,0.9); }
+
+
+
+.toast-error { background: rgba(239,68,68,0.9); }
+
+
+
+.toast-warning { background: rgba(234,179,8,0.9); }
+
+
+
+.toast-info { background: rgba(6,182,212,0.9); }
+
+
+
+.toast-icon { font-size: 16px; }
+
+
+
+
+
+
+
+.confirm-modal-overlay {
+
+
+
+  position: fixed;
+
+
+
+  inset: 0;
+
+
+
+  background: rgba(0,0,0,0.6);
+
+
+
+  display: none;
+
+
+
+  align-items: center;
+
+
+
+  justify-content: center;
+
+
+
+  z-index: 2000;
+
+
+
+}
+
+
+
+.confirm-modal-overlay.show { display: flex; }
+
+
+
+.confirm-modal {
+
+
+
+  background: var(--bg-surface);
+
+
+
+  border: 1px solid var(--border-normal);
+
+
+
+  border-radius: var(--radius-lg);
+
+
+
+  padding: 24px;
+
+
+
+  min-width: 360px;
+
+
+
+  max-width: 480px;
+
+
+
+  box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+
+
+
+}
+
+
+
+.confirm-modal-header {
+
+
+
+  font-size: 14px;
+
+
+
+  font-weight: 600;
+
+
+
+  color: var(--text-primary);
+
+
+
+  margin-bottom: 12px;
+
+
+
+}
+
+
+
+.confirm-modal-body {
+
+
+
+  font-size: 13px;
+
+
+
+  color: var(--text-secondary);
+
+
+
+  line-height: 1.6;
+
+
+
+  margin-bottom: 20px;
+
+
+
+}
+
+
+
+.confirm-modal-footer {
+
+
+
+  display: flex;
+
+
+
+  justify-content: flex-end;
+
+
+
+  gap: 8px;
+
+
+
+}
+
+
+
+
+
+
+
+.stat-grid {
+
+
+
+  display: grid;
+
+
+
+  grid-template-columns: repeat(4, 1fr);
+
+
+
+  gap: 16px;
+
+
+
+  margin-bottom: 20px;
+
+
+
+}
+
+
+
+.stat-card .stat-icon { font-size: 18px; margin-bottom: 6px; }
+
+
+
+.stat-card .stat-value { font-size: 24px; }
+
+
+
+.stat-card .stat-label { font-size: 12px; }
+
+
+
+
+
+
+
+.modal-lg { max-width: 760px; }
+
+
+
+
+
+
+
+.tab-summary {
+
+
+
+  display: flex;
+
+
+
+  align-items: center;
+
+
+
+  justify-content: space-between;
+
+
+
+  padding: 8px 16px;
+
+
+
+  border-bottom: 1px solid var(--border-normal);
+
+
+
+  background: var(--bg-inset);
+
+
+
+  font-size: 12px;
+
+
+
+  color: var(--text-tertiary);
+
+
+
+}
+
+
+
+
+
+
+
+.track-progress {
+
+
+
+  width: 100%;
+
+
+
+  height: 8px;
+
+
+
+  background: var(--bg-inset);
+
+
+
+  border-radius:var(--radius-sm);
+
+
+
+  overflow: hidden;
+
+
+
+  margin: 8px 0;
+
+
+
+}
+
+
+
+.track-progress .fill {
+
+
+
+  height: 100%;
+
+
+
+  border-radius:var(--radius-sm);
+
+
+
+  transition: width 500ms ease;
+
+
+
+}
+
+
+
+
+
+
+
+@media (max-width: 1200px) {
+
+
+
+  .stat-grid { grid-template-columns: repeat(2, 1fr); }
+
+
+
+}
+
+
+
+@media (max-width: 768px) {
+
+
+
+  .stat-grid { grid-template-columns: 1fr; }
+
+
+
+}
+
+
+
+
+.lookup-modal { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:2000; justify-content:center; align-items:center; }
+.lookup-modal.show { display:flex; }
+.lookup-dialog { background:#fff; border:1px solid #e8e8e8; border-radius:4px; width:720px; max-height:70vh; overflow:hidden; }
+.lookup-header { padding:14px 20px; border-bottom:1px solid #e8e8e8; display:flex; align-items:center; justify-content:space-between; }
+.lookup-title { font-size:15px; font-weight:600; color:#333; }
+.lookup-close { font-size:20px; color:#666; cursor:pointer; background:none; border:none; }
+.lookup-close:hover { color:#333; }
+.lookup-body { padding:16px; }
+.lookup-search { display:flex; gap:8px; margin-bottom:12px; }
+.lookup-search input { flex:1; padding:6px 10px; border:1px solid #e8e8e8; border-radius:4px; font-size:13px; }
+.lookup-search button { padding:6px 16px; background:#1890ff; color:#fff; border:none; border-radius:4px; cursor:pointer; }
+.lookup-table { width:100%; border-collapse:collapse; font-size:13px; }
+.lookup-table th, .lookup-table td { padding:10px 12px; text-align:left; border-bottom:1px solid #e8e8e8; }
+.lookup-table th { background:#fafafa; font-weight:600; color:#333; }
+.lookup-table tr:hover { background:#f5f5f5; }
+.lookup-table .checkbox-cell { width:40px; }
+.lookup-footer { padding:12px 20px; border-top:1px solid #e8e8e8; display:flex; justify-content:flex-end; gap:8px; }
+.lookup-field { display:flex; align-items:center; }
+.lookup-field input { flex:1; padding:6px 10px; border:1px solid #e8e8e8; border-radius:4px 0 0 4px; font-size:13px; }
+.lookup-field button { width:28px; height:28px; border:1px solid #e8e8e8; border-left:none; border-radius:0 4px 4px 0; background:#fff; cursor:pointer; display:flex; align-items:center; justify-content:center; }
+.lookup-field button:hover { background:#f5f5f5; }
+
+</style>
+
+
+
+</head>
+
+
+
+<body>
+
+
+
+
+
+
+
+<aside class="sidebar" id="sidebar">
+
+
+
+<div class="sidebar-logo">
+
+
+
+    <img src="../images/logo.png" alt="磐枢工业智能平台" style="width: 100%; max-width: 200px; margin-bottom: 8px;">
+
+
+
+    <h1 style="font-size: 16px; margin: 0;">磐枢工业智能平台</h1>
+
+
+
+  </div>
+
+
+
+  <nav class="sidebar-menu"></nav>
+
+
+
+<div class="sidebar-user">
+
+
+
+    <div class="avatar">管</div>
+
+
+
+</aside>
+
+
+
+
+
+
+
+<div class="main-content" id="mainContent">
+
+
+
+  <div class="page-header" style="position:sticky;top:0;z-index:100;">
+
+
+
+    <div>
+
+
+
+      <div class="flex items-center gap-8">
+
+
+
+        <button class="sidebar-toggle" onclick="toggleSidebar()">&#9776;</button>
+
+
+
+        <div>
+
+
+
+          <h2>优化建议中心</h2>
+
+
+
+          <div class="breadcrumb"><a href="../index.html">首页</a><span>/</span><span>智能体应用</span><span>/</span><span>优化建议中心</span></div></div>
+
+
+
+        </div>
+
+
+
+      </div>
+
+
+
+    </div>
+
+
+
+    <div class="page-actions">
+
+
+
+      <button class="btn btn-ghost btn-sm" onclick="refreshData()">&#128260; 刷新</button>
+
+
+
+      <button class="btn btn-primary btn-sm" onclick="exportData()">&#128190; 导出</button>
+
+      </div>
+
+
+
+  </div>
+
+  <div class="doc-header" style="background:#fff;border-bottom:1px solid #e8e8e8;padding:12px 20px;display:flex;justify-content:space-between;align-items:center;">
+    <div style="font-size:14px;color:#666;">快捷操作</div>
+    <div class="doc-toolbar" style="display:flex;gap:8px;flex-wrap:wrap;">
+      <button class="toolbar-btn" style="padding:6px 12px;border-radius:4px;font-size:13px;cursor:pointer;border:1px solid #d9d9d9;background:#fff;color:#666;display:flex;align-items:center;gap:6px;transition:all 0.3s;" onclick="showToast('刷新功能开发中...', 'info')"><span>🔄</span> 刷新</button>
+      <button class="toolbar-btn" style="padding:6px 12px;border-radius:4px;font-size:13px;cursor:pointer;border:1px solid #d9d9d9;background:#fff;color:#666;display:flex;align-items:center;gap:6px;transition:all 0.3s;" onclick="showToast('列设置功能开发中...', 'info')"><span>⚙️</span> 显示/隐藏列</button>
+      <button class="toolbar-btn" style="padding:6px 12px;border-radius:4px;font-size:13px;cursor:pointer;border:1px solid #d9d9d9;background:#fff;color:#666;display:flex;align-items:center;gap:6px;transition:all 0.3s;" onclick="showToast('导出功能开发中...', 'info')"><span>📤</span> 导出</button>
+      <button class="toolbar-btn danger" style="padding:6px 12px;border-radius:4px;font-size:13px;cursor:pointer;border:1px solid #f5222d;background:#f5222d;color:#fff;display:flex;align-items:center;gap:6px;transition:all 0.3s;" onclick="showConfirm('确认退出？', function() {location.href='../index.html';});)"><span>✖️</span> 退出</button>
+    </div>
+  </div>
+
+  <div class="page-body">
+
+
+
+    <div class="stat-grid">
+
+
+
+      <div class="stat-card" style="border-color:rgba(34,197,94,0.3);">
+
+
+
+        <div class="stat-icon" style="color:var(--color-success);">&#10004;</div>
+
+
+
+        <div class="stat-value" style="color:var(--color-success);">23</div>
+
+
+
+        <div class="stat-label">已采纳</div>
+
+
+
+      </div>
+
+
+
+      <div class="stat-card" style="border-color:rgba(56,189,248,0.3);">
+
+
+
+        <div class="stat-icon" style="color:var(--text-accent);">&#128203;</div>
+
+
+
+        <div class="stat-value" style="color:var(--text-accent);">18</div>
+
+
+
+        <div class="stat-label">待评估</div>
+
+
+
+      </div>
+
+
+
+      <div class="stat-card" style="border-color:rgba(234,179,8,0.3);">
+
+
+
+        <div class="stat-icon" style="color:var(--color-warning);">&#10060;</div>
+
+
+
+        <div class="stat-value" style="color:var(--color-warning);">8</div>
+
+
+
+        <div class="stat-label">已驳回</div>
+
+
+
+      </div>
+
+
+
+      <div class="stat-card" style="border-color:rgba(34,197,94,0.3);">
+
+
+
+        <div class="stat-icon" style="color:var(--color-success);">&#128176;</div>
+
+
+
+        <div class="stat-value text-mono" style="color:var(--color-success);">268<span style="font-size:14px;">万</span></div>
+
+
+
+        <div class="stat-label">预计收益</div>
+
+
+
+      </div>
+
+
+
+    </div>
+
+
+
+
+
+
+
+    <div class="card">
+
+
+
+      <div class="tabs">
+
+
+
+        <div class="tab-item active" onclick="switchTab('all')">全部</div>
+
+
+
+        <div class="tab-item" onclick="switchTab('production')">生产排产</div>
+
+
+
+        <div class="tab-item" onclick="switchTab('warehouse')">仓储管理</div>
+
+
+
+        <div class="tab-item" onclick="switchTab('process')">工艺优化</div>
+
+
+
+        <div class="tab-item" onclick="switchTab('human')">人力调配</div>
+
+
+
+        <div class="tab-item" onclick="switchTab('purchase')">采购优化</div>
+
+
+
+        <div class="tab-item" onclick="switchTab('sales')">销售优化</div>
+
+
+
+      </div>
+
+
+
+      <div class="tab-summary">
+
+
+
+        <span>共 <strong style="color:var(--text-primary);font-family:var(--font-mono);">49</strong> 条建议</span>
+
+
+
+        <span>高推荐度 <span class="badge badge-success">12</span> | 中推荐度 <span class="badge badge-warning">23</span> | 低推荐度 <span class="badge badge-info">14</span></span>
+
+
+
+      </div>
+
+
+
+      <div class="list-filter-section">
+
+
+
+        <div class="list-filter-row">
+
+
+
+          <div class="filter-field">
+
+
+
+            <select id="filter-type" onchange="applyFilter()">
+
+
+
+              <option value="">建议类型</option>
+
+
+
+              <option value="效率提升">效率提升</option>
+
+
+
+              <option value="成本降低">成本降低</option>
+
+
+
+              <option value="质量改善">质量改善</option>
+
+
+
+              <option value="流程优化">流程优化</option>
+
+
+
+            </select>
+
+
+
+          </div>
+
+
+
+          <div class="filter-field">
+
+
+
+            <select id="filter-level" onchange="applyFilter()">
+
+
+
+              <option value="">推荐度</option>
+
+
+
+              <option value="高">高</option>
+
+
+
+              <option value="中">中</option>
+
+
+
+              <option value="低">低</option>
+
+
+
+            </select>
+
+
+
+          </div>
+
+
+
+          <div class="filter-field">
+
+
+
+            <select id="filter-status" onchange="applyFilter()">
+
+
+
+              <option value="">状态</option>
+
+
+
+              <option value="待评估">待评估</option>
+
+
+
+              <option value="已采纳">已采纳</option>
+
+
+
+              <option value="已驳回">已驳回</option>
+
+
+
+              <option value="实施中">实施中</option>
+
+
+
+              <option value="已完成">已完成</option>
+
+
+
+            </select>
+
+
+
+          </div>
+
+
+
+          <div class="filter-field">
+
+
+
+            <input type="date" id="filter-start" placeholder="开始日期">
+
+
+
+          </div>
+
+
+
+          <div class="filter-field">
+
+
+
+            <input type="date" id="filter-end" placeholder="结束日期">
+
+
+
+          </div>
+
+
+
+          <div class="filter-btns">
+
+
+
+            <button class="btn-search" onclick="applyFilter()">&#128269; 查询</button>
+
+
+
+            <button class="btn-reset" onclick="resetFilter()">&#128265; 重置</button>
+
+
+
+          </div>
+
+
+
+        </div>
+
+
+
+      </div>
+
+
+
+      <div class="list-table-area">
+
+
+
+        <table class="data-table">
+
+
+
+          <thead>
+
+
+
+            <tr>
+
+
+
+              <th><input type="checkbox" class="row-checkbox"></th>
+
+
+
+              <th>建议编号</th>
+
+
+
+              <th>建议标题</th>
+
+
+
+              <th>优化领域</th>
+
+
+
+              <th>推荐度</th>
+
+
+
+              <th>问题分析</th>
+
+
+
+              <th>优化方案</th>
+
+
+
+              <th>预期收益</th>
+
+
+
+              <th>状态</th>
+
+
+
+              <th>操作</th>
+
+
+
+            </tr>
+
+
+
+          </thead>
+
+
+
+          <tbody><tr><td colspan="100%" style="text-align:center;color:var(--text-tertiary);padding:20px;">暂无数据</td></tr></tbody>
+
+
+
+        </table>
+
+
+
+      </div>
+
+
+
+      <div class="list-pagination">
+
+
+
+        <div class="page-info">共 15 条记录，显示 1-15 条</div>
+
+
+
+        <div class="page-btns">
+
+
+
+          <button onclick="prevPage()">上一页</button>
+
+
+
+          <button class="active">1</button>
+
+
+
+          <button onclick="nextPage()">下一页</button>
+
+
+
+        </div>
+
+
+
+      </div>
+
+
+
+    </div>
+
+
+
+
+
+
+
+    <div class="card mt-24">
+
+
+
+      <div class="card-header"><span>&#128200; 采纳效果追踪</span><span class="badge badge-success">8 项实施中</span></div>
+
+
+
+      <div class="card-body">
+
+
+
+        <table class="data-table">
+
+
+
+          <thead>
+
+
+
+            <tr>
+
+
+
+              <th>建议编号</th>
+
+
+
+              <th>建议标题</th>
+
+
+
+              <th>采纳日期</th>
+
+
+
+              <th>实施状态</th>
+
+
+
+              <th>预期收益</th>
+
+
+
+              <th>已实现收益</th>
+
+
+
+              <th>达成率</th>
+
+
+
+              <th>进度</th>
+
+
+
+            </tr>
+
+
+
+          </thead>
+
+
+
+          <tbody>
+
+
+
+            <tr>
+
+
+
+              <td class="text-mono">OPT-2026-0041</td>
+
+
+
+              <td>供应商优选策略</td>
+
+
+
+              <td>2026-05-15</td>
+
+
+
+              <td><span class="badge badge-success">已完成</span></td>
+
+
+
+              <td class="text-mono">¥ 68.00万/年</td>
+
+
+
+              <td class="text-mono">¥ 72.50万/年</td>
+
+
+
+              <td class="text-mono" style="color:var(--color-success);">106.6%</td>
+
+
+
+              <td><div class="track-progress"><div class="fill" style="width:100%;background:var(--color-success);"></div></div></td>
+
+
+
+            </tr>
+
+
+
+            <tr>
+
+
+
+              <td class="text-mono">OPT-2026-0035</td>
+
+
+
+              <td>采购批量优化</td>
+
+
+
+              <td>2026-05-20</td>
+
+
+
+              <td><span class="badge badge-success">已完成</span></td>
+
+
+
+              <td class="text-mono">¥ 35.00万/年</td>
+
+
+
+              <td class="text-mono">¥ 33.80万/年</td>
+
+
+
+              <td class="text-mono" style="color:var(--color-info);">96.6%</td>
+
+
+
+              <td><div class="track-progress"><div class="fill" style="width:100%;background:var(--color-success);"></div></div></td>
+
+
+
+            </tr>
+
+
+
+            <tr>
+
+
+
+              <td class="text-mono">OPT-2026-0045</td>
+
+
+
+              <td>优化注塑车间生产排程</td>
+
+
+
+              <td>2026-06-01</td>
+
+
+
+              <td><span class="badge badge-success">已采纳</span></td>
+
+
+
+              <td class="text-mono">¥ 45.00万/年</td>
+
+
+
+              <td class="text-mono">¥ 18.50万/年</td>
+
+
+
+              <td class="text-mono" style="color:var(--color-info);">41.1%</td>
+
+
+
+              <td><div class="track-progress"><div class="fill" style="width:65%;background:var(--color-info);"></div></div></td>
+
+
+
+            </tr>
+
+
+
+            <tr>
+
+
+
+              <td class="text-mono">OPT-2026-0044</td>
+
+
+
+              <td>仓库布局优化建议</td>
+
+
+
+              <td>2026-06-10</td>
+
+
+
+              <td><span class="badge badge-warning">实施中</span></td>
+
+
+
+              <td class="text-mono">¥ 32.00万/年</td>
+
+
+
+              <td class="text-mono">¥ 8.20万/年</td>
+
+
+
+              <td class="text-mono" style="color:var(--color-warning);">25.6%</td>
+
+
+
+              <td><div class="track-progress"><div class="fill" style="width:40%;background:var(--color-warning);"></div></div></td>
+
+
+
+            </tr>
+
+
+
+            <tr>
+
+
+
+              <td class="text-mono">OPT-2026-0039</td>
+
+
+
+              <td>生产线平衡优化</td>
+
+
+
+              <td>2026-06-15</td>
+
+
+
+              <td><span class="badge badge-warning">实施中</span></td>
+
+
+
+              <td class="text-mono">¥ 18.50万/年</td>
+
+
+
+              <td class="text-mono">¥ 3.50万/年</td>
+
+
+
+              <td class="text-mono" style="color:var(--color-warning);">18.9%</td>
+
+
+
+              <td><div class="track-progress"><div class="fill" style="width:30%;background:var(--color-warning);"></div></div></td>
+
+
+
+            </tr>
+
+
+
+            <tr>
+
+
+
+              <td class="text-mono">OPT-2026-0036</td>
+
+
+
+              <td>员工技能矩阵优化</td>
+
+
+
+              <td>2026-06-20</td>
+
+
+
+              <td><span class="badge badge-success">已采纳</span></td>
+
+
+
+              <td class="text-mono">¥ 15.00万/年</td>
+
+
+
+              <td class="text-mono">¥ 2.80万/年</td>
+
+
+
+              <td class="text-mono" style="color:var(--color-info);">18.7%</td>
+
+
+
+              <td><div class="track-progress"><div class="fill" style="width:25%;background:var(--color-info);"></div></div></td>
+
+
+
+            </tr>
+
+
+
+            <tr>
+
+
+
+              <td class="text-mono">OPT-2026-0031</td>
+
+
+
+              <td>能耗优化建议</td>
+
+
+
+              <td>2026-06-25</td>
+
+
+
+              <td><span class="badge badge-success">已采纳</span></td>
+
+
+
+              <td class="text-mono">¥ 16.50万/年</td>
+
+
+
+              <td class="text-mono">¥ 1.20万/年</td>
+
+
+
+              <td class="text-mono" style="color:var(--color-info);">7.3%</td>
+
+
+
+              <td><div class="track-progress"><div class="fill" style="width:15%;background:var(--color-info);"></div></div></td>
+
+
+
+            </tr>
+
+
+
+          </tbody>
+
+
+
+        </table>
+
+
+
+      </div>
+
+
+
+    </div>
+
+
+
+  </div>
+
+
+
+</div>
+
+
+
+
+
+
+
+<div id="toastContainer" class="toast-container"></div>
+
+
+
+
+
+
+
+<div class="confirm-modal-overlay" id="confirmModal">
+
+
+
+  <div class="confirm-modal">
+
+
+
+    <div class="confirm-modal-header">温馨提示</div>
+
+
+
+    <div class="confirm-modal-body" id="confirmMessage"></div>
+
+
+
+    <div class="confirm-modal-footer">
+
+
+
+      <button class="btn btn-ghost" onclick="closeConfirmModal()">取消</button>
+
+
+
+      <button class="btn btn-primary" onclick="confirmOk()">确定</button>
+
+
+
+    </div>
+
+
+
+  </div>
+
+
+
+</div>
+
+
+
+
+
+
+
+<div class="modal-overlay" id="detailModal">
+
+
+
+  <div class="modal modal-lg">
+
+
+
+    <div class="modal-header">
+
+
+
+      <span>&#128197; 建议详情</span>
+
+
+
+      <button class="btn btn-ghost btn-sm" onclick="closeModal('detailModal')">&#10006;</button>
+
+
+
+    </div>
+
+
+
+    <div class="modal-body">
+
+
+
+      <div class="form-group">
+
+
+
+        <label class="form-label">建议编号</label>
+
+
+
+        <input type="text" class="form-input" value="OPT-2026-0043" readonly>
+
+
+
+      </div>
+
+
+
+      <div class="grid-2 gap-16">
+
+
+
+        <div class="form-group">
+
+
+
+          <label class="form-label">优化领域</label>
+
+
+
+          <input type="text" class="form-input" value="工艺优化" readonly>
+
+
+
+        </div>
+
+
+
+        <div class="form-group">
+
+
+
+          <label class="form-label">推荐度</label>
+
+
+
+          <input type="text" class="form-input" value="高" readonly>
+
+
+
+        </div>
+
+
+
+      </div>
+
+
+
+      <div class="form-group">
+
+
+
+        <label class="form-label">建议标题</label>
+
+
+
+        <input type="text" class="form-input" value="注塑工艺参数优化" readonly>
+
+
+
+      </div>
+
+
+
+      <div style="border-bottom:1px solid var(--border-normal);margin-bottom:16px;padding-bottom:12px;">
+
+
+
+        <h4 style="font-size:13px;font-weight:600;color:var(--text-primary);margin-bottom:8px;">问题分析</h4>
+
+
+
+        <div class="form-group">
+
+
+
+          <label class="form-label">当前问题描述</label>
+
+
+
+          <textarea class="form-textarea" readonly>当前注塑车间产品合格率为 95.2%，低于行业平均水平 97%。主要问题包括：1) 缩水凹陷问题频发，占不良品的 38%；2) 熔接痕问题占不良品的 26%；3) 翘曲变形问题占不良品的 19%。经数据分析，工艺参数设置不合理是导致这些问题的主要原因。</textarea>
+
+
+
+        </div>
+
+
+
+        <div class="form-group">
+
+
+
+          <label class="form-label">数据支撑</label>
+
+
+
+          <textarea class="form-textarea" readonly>1. 近3个月生产数据显示，平均不良率 4.8%，累计产生不良品 3,240 件，损失金额约 48.60 万元。
+
+
+
+2. 缩水凹陷问题：28 件/批次，占比 38%
+
+
+
+3. 熔接痕问题：19 件/批次，占比 26%
+
+
+
+4. 翘曲变形问题：14 件/批次，占比 19%
+
+
+
+5. 当前工艺参数使用的是经验值，未根据材料特性和环境温度进行调整。</textarea>
+
+
+
+        </div>
+
+
+
+      </div>
+
+
+
+      <div style="border-bottom:1px solid var(--border-normal);margin-bottom:16px;padding-bottom:12px;">
+
+
+
+        <h4 style="font-size:13px;font-weight:600;color:var(--text-primary);margin-bottom:8px;">优化方案</h4>
+
+
+
+        <div class="form-group">
+
+
+
+          <label class="form-label">详细方案描述</label>
+
+
+
+          <textarea class="form-textarea" readonly>基于 AI 分析历史生产数据，建议对注塑工艺参数进行以下优化：
+
+
+
+1. 注射压力：从当前 85 MPa 调整为 92 MPa，提高熔体填充能力
+
+
+
+2. 保压压力：从当前 60 MPa 调整为 68 MPa，增强保压效果
+
+
+
+3. 模具温度：从当前 60°C 调整为 65°C，改善熔体流动性
+
+
+
+4. 冷却时间：从当前 25s 调整为 28s，确保充分冷却
+
+
+
+5. 注射速度：分段控制，前段 80mm/s，后段 40mm/s</textarea>
+
+
+
+        </div>
+
+
+
+        <div class="form-group">
+
+
+
+          <label class="form-label">实施步骤</label>
+
+
+
+          <textarea class="form-textarea" readonly>步骤1：选取代表性产品（仪表盘外壳）进行小批量试验（500件）
+
+
+
+步骤2：收集试验数据，对比优化前后的合格率
+
+
+
+步骤3：根据试验结果微调参数
+
+
+
+步骤4：在全车间推广优化后的工艺参数
+
+
+
+步骤5：持续监控生产数据，建立参数自动调整机制</textarea>
+
+
+
+        </div>
+
+
+
+      </div>
+
+
+
+      <div>
+
+
+
+        <h4 style="font-size:13px;font-weight:600;color:var(--text-primary);margin-bottom:8px;">预期收益</h4>
+
+
+
+        <div class="grid-3 gap-12">
+
+
+
+          <div class="stat-card">
+
+
+
+            <div class="stat-value text-mono" style="font-size:20px;color:var(--color-success);">¥ 58<span style="font-size:12px;">万</span></div>
+
+
+
+            <div class="stat-label">年预期效益</div>
+
+
+
+          </div>
+
+
+
+          <div class="stat-card">
+
+
+
+            <div class="stat-value text-mono" style="font-size:20px;color:var(--text-accent);">3.5</div>
+
+
+
+            <div class="stat-label">投资回报率</div>
+
+
+
+          </div>
+
+
+
+          <div class="stat-card">
+
+
+
+            <div class="stat-value text-mono" style="font-size:20px;color:var(--color-info);">45<span style="font-size:12px;">天</span></div>
+
+
+
+            <div class="stat-label">实施周期</div>
+
+
+
+          </div>
+
+
+
+        </div>
+
+
+
+        <div class="form-group mt-12">
+
+
+
+          <label class="form-label">详细收益分析</label>
+
+
+
+          <textarea class="form-textarea" readonly>1. 合格率提升：预计从 95.2% 提升至 98.5%，降低不良率 3.3 个百分点
+
+
+
+2. 年节约成本：按年产 500,000 件计算，预计减少不良品 16,500 件，节约成本约 58.00 万元/年
+
+
+
+3. 投资回报：优化实施成本约 16.5 万元，预计 3.5 个月收回投资
+
+
+
+4. 附加收益：提升客户满意度，减少售后返修率约 40%</textarea>
+
+
+
+        </div>
+
+
+
+      </div>
+
+
+
+    </div>
+
+
+
+    <div class="modal-footer">
+
+
+
+      <button class="btn btn-ghost" onclick="closeModal('detailModal')">关闭</button>
+
+
+
+      <button class="btn btn-danger" onclick="rejectSuggestion('OPT-2026-0043')">驳回</button>
+
+
+
+      <button class="btn btn-success" onclick="adoptSuggestion('OPT-2026-0043')">采纳建议</button>
+
+
+
+    </div>
+
+
+
+  </div>
+
+
+
+</div>
+
+
+
+
+
+
+
+<div class="modal-overlay" id="trackModal">
+
+
+
+  <div class="modal modal-lg">
+
+
+
+    <div class="modal-header">
+
+
+
+      <span>&#128200; 效果追踪</span>
+
+
+
+      <button class="btn btn-ghost btn-sm" onclick="closeModal('trackModal')">&#10006;</button>
+
+
+
+    </div>
+
+
+
+    <div class="modal-body">
+
+
+
+      <div class="grid-2 gap-16">
+
+
+
+        <div class="form-group">
+
+
+
+          <label class="form-label">建议编号</label>
+
+
+
+          <input type="text" class="form-input" value="OPT-2026-0041" readonly>
+
+
+
+        </div>
+
+
+
+        <div class="form-group">
+
+
+
+          <label class="form-label">实施状态</label>
+
+
+
+          <input type="text" class="form-input" value="已完成" readonly>
+
+
+
+        </div>
+
+
+
+      </div>
+
+
+
+      <div class="form-group">
+
+
+
+        <label class="form-label">建议标题</label>
+
+
+
+        <input type="text" class="form-input" value="供应商优选策略" readonly>
+
+
+
+      </div>
+
+
+
+      <div class="grid-3 gap-12">
+
+
+
+        <div class="stat-card">
+
+
+
+          <div class="stat-value text-mono" style="font-size:20px;color:var(--text-accent);">¥ 68<span style="font-size:12px;">万</span></div>
+
+
+
+          <div class="stat-label">预期收益</div>
+
+
+
+        </div>
+
+
+
+        <div class="stat-card">
+
+
+
+          <div class="stat-value text-mono" style="font-size:20px;color:var(--color-success);">¥ 72.5<span style="font-size:12px;">万</span></div>
+
+
+
+          <div class="stat-label">已实现收益</div>
+
+
+
+        </div>
+
+
+
+        <div class="stat-card">
+
+
+
+          <div class="stat-value text-mono" style="font-size:20px;color:var(--color-success);">106.6<span style="font-size:12px;">%</span></div>
+
+
+
+          <div class="stat-label">达成率</div>
+
+
+
+        </div>
+
+
+
+      </div>
+
+
+
+      <div class="form-group">
+
+
+
+        <label class="form-label">实施进度</label>
+
+
+
+        <div class="track-progress"><div class="fill" style="width:100%;background:var(--color-success);"></div></div>
+
+
+
+      </div>
+
+
+
+      <div class="form-group">
+
+
+
+        <label class="form-label">效果评估</label>
+
+
+
+        <textarea class="form-textarea" readonly>实施效果超出预期，主要成果包括：
+
+
+
+1. 供应商绩效评估体系已建立并运行 2 个月
+
+
+
+2. 通过动态采购策略，原材料采购成本下降 8.5%
+
+
+
+3. 供应商准时交货率从 92% 提升至 98%
+
+
+
+4. 质量合格率从 96% 提升至 98.2%
+
+
+
+5. 年度预计节约成本 72.50 万元，超额完成目标 6.6%</textarea>
+
+
+
+      </div>
+
+
+
+      <div class="form-group">
+
+
+
+        <label class="form-label">实施时间线</label>
+
+
+
+        <div style="background:var(--bg-inset);border:1px solid var(--border-normal);border-radius:var(--radius-sm);padding:12px;">
+
+
+
+          <div style="font-size:12px;color:var(--text-secondary);margin-bottom:8px;">
+
+
+
+            <span style="color:var(--text-tertiary);">2026-05-15</span> - 建议采纳，成立项目组
+
+
+
+          </div>
+
+
+
+          <div style="font-size:12px;color:var(--text-secondary);margin-bottom:8px;">
+
+
+
+            <span style="color:var(--text-tertiary);">2026-05-25</span> - 完成供应商评估模型开发
+
+
+
+          </div>
+
+
+
+          <div style="font-size:12px;color:var(--text-secondary);margin-bottom:8px;">
+
+
+
+            <span style="color:var(--text-tertiary);">2026-06-10</span> - 系统上线试运行
+
+
+
+          </div>
+
+
+
+          <div style="font-size:12px;color:var(--text-secondary);margin-bottom:8px;">
+
+
+
+            <span style="color:var(--text-tertiary);">2026-06-25</span> - 全公司范围推广
+
+
+
+          </div>
+
+
+
+          <div style="font-size:12px;color:var(--text-secondary);">
+
+
+
+            <span style="color:var(--text-tertiary);">2026-07-15</span> - 项目验收，效果评估完成
+
+
+
+          </div>
+
+
+
+        </div>
+
+
+
+      </div>
+
+
+
+    </div>
+
+
+
+    <div class="modal-footer">
+
+
+
+      <button class="btn btn-ghost" onclick="closeModal('trackModal')">关闭</button>
+
+
+
+    </div>
+
+
+
+  </div>
+
+
+
+</div>
+
+
+
+
+
+
+
+<script>
+
+
+
+
+
+
+
+
+
+
+;
+
+
+
+  toast.className = 'toast toast-' + (type || 'info');
+
+
+
+  toast.innerHTML = '<span class="toast-icon">' + (icons[type] || icons.info) + '</span><span>' + message + '</span>';
+
+
+
+  container.appendChild(toast);
+
+
+
+  setTimeout(function() { toast.remove(); }, 3000);
+closeConfirmModal();
+
+
+
+
+
+
+
+function refreshData() {
+
+
+
+  showToast('数据已刷新', 'success');
+
+
+
+}
+
+
+
+function exportData() {
+
+
+
+  showToast('导出功能已触发', 'info');
+
+
+
+}
+
+
+
+function switchTab(tab) {
+
+
+
+  document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active'));
+
+
+
+  event.target.classList.add('active');
+
+
+
+}
+
+
+
+function applyFilter() {
+
+
+
+  showToast('查询条件已应用', 'info');
+
+
+
+}
+
+
+
+function resetFilter() {
+
+
+
+  document.getElementById('filter-type').value = '';
+
+
+
+  document.getElementById('filter-level').value = '';
+
+
+
+  document.getElementById('filter-status').value = '';
+
+
+
+  document.getElementById('filter-start').value = '';
+
+
+
+  document.getElementById('filter-end').value = '';
+
+
+
+}
+
+
+
+function prevPage() {}
+
+
+
+function nextPage() {}
+
+
+
+function showDetail(id) {
+
+
+
+  document.getElementById('detailModal').classList.add('active');
+
+
+
+}
+
+
+
+function trackEffect(id) {
+
+
+
+  document.getElementById('trackModal').classList.add('active');
+
+
+
+}
+
+
+
+function adoptSuggestion(id) {
+
+
+
+  showConfirm('确认要采纳该建议吗？', 'warning', function() {
+
+
+
+    showToast('建议 ' + id + ' 已采纳', 'success');
+
+
+
+    closeModal('detailModal');
+
+
+
+  });
+
+
+
+}
+
+
+
+function rejectSuggestion(id) {
+
+
+
+  showConfirm('确认要驳回该建议吗？', 'warning', function() {
+
+
+
+    showToast('建议 ' + id + ' 已驳回', 'info');
+
+
+
+    closeModal('detailModal');
+
+
+
+  });
+
+
+
+}
+
+
+
+function closeModal(id) {
+
+
+
+  document.getElementById(id).classList.remove('active');
+
+
+
+}
+
+
+
+
+
+
+
+
+
+
+
+}
+
+
+
+}
+
+
+
+}
+
+
+
+}
+</script>
+
+
+
+
+<div class="lookup-modal" id="lookupModal">
+  <div class="lookup-dialog">
+    <div class="lookup-header">
+      <div class="lookup-title" id="lookupTitle">选择</div>
+      <button class="lookup-close" onclick="closeLookup()">×</button>
+    </div>
+    <div class="lookup-body">
+      <div class="lookup-search">
+        <input type="text" id="lookupKeyword" placeholder="请输入编码或名称搜索" onkeydown="if(event.key==='Enter')filterLookup()">
+        <button onclick="filterLookup()">搜索</button>
+      </div>
+      <table class="lookup-table">
+        <thead id="lookupTableHead"></thead>
+        <tbody id="lookupTableBody"></tbody>
+      </table>
+    </div>
+    <div class="lookup-footer">
+      <button class="btn btn-cancel" onclick="closeLookup()">取消</button>
+      <button class="btn btn-primary" onclick="confirmLookup()">确定</button>
+    </div>
+  </div>
+</div>
+
+</body>
+
+
+
+</html>

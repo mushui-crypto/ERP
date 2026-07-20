@@ -1,0 +1,956 @@
+<!DOCTYPE html>
+
+
+<html lang="zh-CN">
+
+
+<head>
+
+
+<meta charset="UTF-8">
+
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+
+<title>拆件发货单 — 磐枢工业智能平台</title>
+
+
+<link rel="stylesheet" href="../common.css">
+
+
+<script src="../common.js"></script>
+<script>
+</script>
+
+
+<script src="../doc-data-store.js">
+var currentLookupField = null;
+var currentLookupType = null;
+var lookupData = [];
+var lookupColumns = [];
+
+function openLookup(fieldId, type) {
+  currentLookupField = fieldId;
+  currentLookupType = type;
+  
+  if (type === 'org') {
+    lookupColumns = ['编码', '名称', '形态', '上级组织'];
+    lookupData = JSON.parse(localStorage.getItem('erp_orgs') || '[]');
+    document.getElementById('lookupTitle').textContent = '选择组织';
+  } else if (type === 'department') {
+    lookupColumns = ['编码', '名称'];
+    lookupData = JSON.parse(localStorage.getItem('erp_departments_cache') || '[]');
+    document.getElementById('lookupTitle').textContent = '选择部门';
+  } else if (type === 'employee') {
+    lookupColumns = ['编号', '姓名', '所属部门'];
+    lookupData = JSON.parse(localStorage.getItem('erp_employees_cache') || '[]');
+    document.getElementById('lookupTitle').textContent = '选择员工';
+  } else if (type === 'supplier') {
+    lookupColumns = ['编码', '名称'];
+    lookupData = JSON.parse(localStorage.getItem('erp_suppliers_cache') || '[]');
+    document.getElementById('lookupTitle').textContent = '选择供应商';
+  } else if (type === 'customer') {
+    lookupColumns = ['编码', '名称'];
+    lookupData = JSON.parse(localStorage.getItem('erp_customers_cache') || '[]');
+    document.getElementById('lookupTitle').textContent = '选择客户';
+  } else if (type === 'material') {
+    lookupColumns = ['物料编码', '物料名称', '规格型号', '基本单位'];
+    lookupData = JSON.parse(localStorage.getItem('erp_materials_cache') || '[]');
+    document.getElementById('lookupTitle').textContent = '选择物料';
+  } else if (type === 'warehouse') {
+    lookupColumns = ['编码', '名称'];
+    lookupData = JSON.parse(localStorage.getItem('erp_warehouses_cache') || '[]');
+    document.getElementById('lookupTitle').textContent = '选择仓库';
+  }
+  
+  renderLookupTable(lookupData);
+  document.getElementById('lookupModal').classList.add('show');
+}
+
+function closeLookup() {
+  document.getElementById('lookupModal').classList.remove('show');
+}
+
+function filterLookup() {
+  var keyword = document.getElementById('lookupKeyword').value.trim().toLowerCase();
+  var filtered = lookupData.filter(function(item) {
+    var code = item.code || '';
+    var name = item.name || '';
+    return code.toLowerCase().includes(keyword) || name.toLowerCase().includes(keyword);
+  });
+  renderLookupTable(filtered);
+}
+
+function renderLookupTable(data) {
+  var head = document.getElementById('lookupTableHead');
+  var body = document.getElementById('lookupTableBody');
+  
+  head.innerHTML = '<tr><th class="checkbox-cell"><input type="checkbox" onclick="selectAllLookup()"></th>' + lookupColumns.map(function(col) { return '<th>' + col + '</th>'; }).join('') + '</tr>';
+  
+  body.innerHTML = '';
+  data.forEach(function(item) {
+    var row = document.createElement('tr');
+    row.onclick = function() { selectLookupRow(this); };
+    var cells = ['<td class="checkbox-cell"><input type="checkbox" class="lookup-checkbox" value="' + item.id + '"></td>'];
+    if (currentLookupType === 'org') {
+      cells.push('<td>' + item.code + '</td><td>' + item.name + '</td><td>' + (item.form || '') + '</td><td>' + (item.parentName || '') + '</td>');
+    } else if (currentLookupType === 'department') {
+      cells.push('<td>' + item.code + '</td><td>' + item.name + '</td>');
+    } else if (currentLookupType === 'employee') {
+      cells.push('<td>' + item.code + '</td><td>' + item.name + '</td><td>' + (item.department || '') + '</td>');
+    } else if (currentLookupType === 'supplier' || currentLookupType === 'customer') {
+      cells.push('<td>' + item.code + '</td><td>' + item.name + '</td>');
+    } else if (currentLookupType === 'material') {
+      cells.push('<td>' + item.code + '</td><td>' + item.name + '</td><td>' + (item.specification || '') + '</td><td>' + (item.unit || '') + '</td>');
+    } else if (currentLookupType === 'warehouse') {
+      cells.push('<td>' + item.code + '</td><td>' + item.name + '</td>');
+    }
+    row.innerHTML = cells.join('');
+    body.appendChild(row);
+  });
+  
+  if (data.length === 0) {
+    body.innerHTML = '<tr><td colspan="' + (lookupColumns.length + 1) + '" style="text-align:center;padding:40px;color:#999;">暂无数据</td></tr>';
+  }
+}
+
+function selectAllLookup() {
+  var master = document.querySelector('.lookup-table th input');
+  var checkboxes = document.querySelectorAll('.lookup-checkbox');
+  checkboxes.forEach(function(cb) { cb.checked = master.checked; });
+}
+
+function selectLookupRow(row) {
+  var checkbox = row.querySelector('.lookup-checkbox');
+  checkbox.checked = !checkbox.checked;
+}
+
+function confirmLookup() {
+  var checkboxes = document.querySelectorAll('.lookup-checkbox:checked');
+  if (checkboxes.length === 0) {
+    showToast('请选择一条记录', 'warning');
+    return;
+  }
+  
+  var item = lookupData.find(function(d) { return d.id === checkboxes[0].value; });
+  if (item) {
+    var field = document.getElementById(currentLookupField);
+    if (field) {
+      field.value = item.name;
+      field.setAttribute('data-id', item.id);
+      field.setAttribute('data-code', item.code);
+      
+      if (currentLookupType === 'material') {
+        var row = field.closest('tr');
+        if (row) {
+          row.querySelector('.material-name').value = item.name;
+          row.querySelector('.material-spec').value = item.specification || '';
+          row.querySelector('.material-unit').value = item.unit || '';
+        }
+      }
+    }
+  }
+  
+  closeLookup();
+}
+
+function openMaterialLookup(btn) {
+  var field = btn.previousElementSibling;
+  field.id = 'lookupField_' + Date.now();
+  currentLookupField = field.id;
+  openLookup(field.id, 'material');
+}
+
+function openOrgLookup(btn) {
+  var field = btn.previousElementSibling;
+  field.id = 'lookupField_' + Date.now();
+  currentLookupField = field.id;
+  openLookup(field.id, 'org');
+}
+
+function openSupplierLookup(btn) {
+  var field = btn.previousElementSibling;
+  field.id = 'lookupField_' + Date.now();
+  currentLookupField = field.id;
+  openLookup(field.id, 'supplier');
+}
+
+function openWarehouseLookup(btn) {
+  var field = btn.previousElementSibling;
+  field.id = 'lookupField_' + Date.now();
+  currentLookupField = field.id;
+  openLookup(field.id, 'warehouse');
+}
+
+function initLookupData() {
+  if (!localStorage.getItem('erp_orgs')) {
+    localStorage.setItem('erp_orgs', JSON.stringify([
+      { id: 'org-001', code: 'ORG-HQ', name: '磐枢工业集团', form: '集团', parentName: '' },
+      { id: 'org-002', code: 'ORG-SM', name: '磐枢智能制造有限公司', form: '公司', parentName: '磐枢工业集团' },
+      { id: 'org-003', code: 'ORG-SM-PD', name: '生产制造部', form: '部门', parentName: '磐枢智能制造有限公司' },
+      { id: 'org-004', code: 'ORG-SM-FA', name: '财务部', form: '部门', parentName: '磐枢智能制造有限公司' },
+      { id: 'org-005', code: 'ORG-SM-SD', name: '销售部', form: '部门', parentName: '磐枢智能制造有限公司' }
+    ]));
+  }
+  if (!localStorage.getItem('erp_departments_cache')) {
+    localStorage.setItem('erp_departments_cache', JSON.stringify([
+      { id: 'dept-001', code: 'DEPT-PD', name: '生产制造部', status: 1 },
+      { id: 'dept-002', code: 'DEPT-FA', name: '财务部', status: 1 },
+      { id: 'dept-003', code: 'DEPT-SD', name: '销售部', status: 1 },
+      { id: 'dept-004', code: 'DEPT-AS', name: '装配车间', status: 1 },
+      { id: 'dept-005', code: 'DEPT-QC', name: '质检车间', status: 1 }
+    ]));
+  }
+  if (!localStorage.getItem('erp_employees_cache')) {
+    localStorage.setItem('erp_employees_cache', JSON.stringify([
+      { id: 'emp-001', code: 'EMP-001', name: '张三', department: '生产制造部', status: 1 },
+      { id: 'emp-002', code: 'EMP-002', name: '李四', department: '生产制造部', status: 1 },
+      { id: 'emp-003', code: 'EMP-003', name: '王五', department: '财务部', status: 1 },
+      { id: 'emp-004', code: 'EMP-004', name: '赵六', department: '销售部', status: 1 },
+      { id: 'emp-005', code: 'EMP-005', name: '钱七', department: '质检车间', status: 1 }
+    ]));
+  }
+  if (!localStorage.getItem('erp_suppliers_cache')) {
+    localStorage.setItem('erp_suppliers_cache', JSON.stringify([
+      { id: 'sup-001', code: 'S-001', name: '深圳电子元器件有限公司', status: 1 },
+      { id: 'sup-002', code: 'S-002', name: '杭州精密机械加工厂', status: 1 },
+      { id: 'sup-003', code: 'S-003', name: '上海材料科技有限公司', status: 1 },
+      { id: 'sup-004', code: 'S-004', name: '东莞五金制品厂', status: 1 }
+    ]));
+  }
+  if (!localStorage.getItem('erp_materials_cache')) {
+    localStorage.setItem('erp_materials_cache', JSON.stringify([
+      { id: 'mat-001', code: 'P-001', name: '高频传感器模块', specification: 'HT-2026', unit: '个', status: 1 },
+      { id: 'mat-002', code: 'P-002', name: '控制电路板', specification: 'CB-2026', unit: '块', status: 1 },
+      { id: 'mat-003', code: 'P-003', name: '智能控制器', specification: 'IC-V3', unit: '台', status: 1 },
+      { id: 'mat-004', code: 'P-004', name: '电源模块', specification: 'PM-500W', unit: '个', status: 1 },
+      { id: 'mat-005', code: 'M-001', name: 'PCB电路板', specification: 'FR-4双层', unit: '块', status: 1 },
+      { id: 'mat-006', code: 'M-002', name: '贴片电阻', specification: '10KΩ 0603', unit: '个', status: 1 },
+      { id: 'mat-007', code: 'M-003', name: '贴片电容', specification: '100μF 0805', unit: '个', status: 1 },
+      { id: 'mat-008', code: 'M-004', name: '螺丝', specification: 'M4x10', unit: '包', status: 1 }
+    ]));
+  }
+  if (!localStorage.getItem('erp_warehouses_cache')) {
+    localStorage.setItem('erp_warehouses_cache', JSON.stringify([
+      { id: 'wh-001', code: 'WH-001', name: '成品仓', status: 1 },
+      { id: 'wh-002', code: 'WH-002', name: '原料仓', status: 1 },
+      { id: 'wh-003', code: 'WH-003', name: '半成品仓', status: 1 },
+      { id: 'wh-004', code: 'WH-004', name: '辅料仓', status: 1 }
+    ]));
+  }
+}
+
+
+
+function copyDoc() {
+  showToast('复制单据功能', 'info');
+}
+
+function prevDoc() {
+  showToast('上查功能', 'info');
+}
+
+function nextDoc() {
+  showToast('下查功能', 'info');
+}
+
+function selectSrcDoc() {
+  showToast('选择上游单据功能', 'info');
+}
+
+function reverseApprove() {
+  showConfirm('确认反审核此单据？', function() {
+    showToast('反审核成功', 'success');
+  });
+}
+
+function closeDoc() {
+  showConfirm('确认关闭此单据？', function() {
+    showToast('单据已关闭', 'success');
+  });
+}
+
+function reverseClose() {
+  showConfirm('确认反关闭此单据？', function() {
+    showToast('单据已反关闭', 'success');
+  });
+}
+
+function goToList() {
+  var listPage = window.location.pathname.replace('-create.html', '.html');
+  window.location.href = listPage;
+}
+
+function exitDoc() {
+  showConfirm('确认退出当前单据编辑？', function() {
+    var listPage = window.location.pathname.replace('-create.html', '.html');
+    window.location.href = listPage;
+  });
+}
+</script>
+
+
+<style>
+
+.doc-page { display: flex; height: 100vh; background: #f0f2f5; }
+.doc-sidebar { width: 220px; background: #fff; border-right: 1px solid #e8e8e8; padding: 16px 0; }
+.doc-sidebar-title { font-size: 12px; color: #999; padding: 0 16px 8px; }
+.doc-sidebar-menu { list-style: none; margin: 0; padding: 0; }
+.doc-sidebar-menu li { margin-bottom: 4px; }
+.doc-sidebar-menu a { display: flex; align-items: center; gap: 8px; padding: 8px 16px; color: #666; font-size: 13px; text-decoration: none; }
+.doc-sidebar-menu a:hover { background: #f5f5f5; }
+.doc-sidebar-menu a.active { background: #e6f7ff; color: #1890ff; }
+.doc-sidebar-menu .menu-icon { font-size: 14px; }
+.doc-content { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+.doc-header { background: #fff; border-bottom: 1px solid #e8e8e8; padding: 12px 20px; display: flex; align-items: center; justify-content: space-between; }
+.doc-header-title { font-size: 14px; font-weight: 600; color: #333; }
+.doc-header-subtitle { font-size: 13px; color: #666; }
+.doc-toolbar { display: flex; align-items: center; gap: 8px; }
+.toolbar-btn { display: flex; align-items: center; gap: 4px; padding: 6px 14px; border: none; background: transparent; font-size: 13px; color: #333; cursor: pointer; border-radius: 4px; }
+.toolbar-btn:hover { background: #e8e8e8; }
+.toolbar-btn.primary { color: #1890ff; }
+.toolbar-btn.danger { color: #f5222d; }
+.toolbar-btn.success { color: #52c41a; }
+.toolbar-separator { width: 1px; height: 20px; background: #ddd; margin: 0 4px; }
+.doc-body { flex: 1; overflow-y: auto; background: #f0f2f5; padding: 16px; }
+.doc-card { background: #fff; border-radius: 4px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); overflow: hidden; }
+.doc-tabs { display: flex; border-bottom: 2px solid #e8e8e8; background: #fafafa; }
+.doc-tab { padding: 10px 24px; font-size: 13px; color: #666; cursor: pointer; }
+.doc-tab:hover { color: #333; }
+.doc-tab.active { color: #1890ff; border-bottom: 2px solid #1890ff; font-weight: 500; background: #fff; }
+.doc-form { padding: 16px 20px; }
+.form-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 16px; }
+.form-item { display: flex; flex-direction: column; }
+.form-item label { font-size: 12px; color: #666; margin-bottom: 4px; font-weight: 500; }
+.form-item label .required { color: #f5222d; margin-right: 4px; }
+.form-item input, .form-item select, .form-item textarea { padding: 6px 10px; border: 1px solid #e8e8e8; border-radius: 4px; font-size: 13px; color: #333; background: #fff; }
+.form-item input:focus, .form-item select:focus, .form-item textarea:focus { border-color: #1890ff; outline: none; }
+.form-item textarea { resize: vertical; min-height: 60px; }
+.form-item .readonly { background: #fafafa; color: #999; }
+.doc-detail-card { background: #fff; border-radius: 4px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); overflow: hidden; }
+.detail-toolbar { display: flex; align-items: center; justify-content: space-between; padding: 8px 16px; background: #fafafa; border-bottom: 1px solid #e8e8e8; }
+.detail-toolbar-left { display: flex; align-items: center; gap: 12px; }
+.detail-toolbar-left span { font-size: 13px; font-weight: 500; color: #333; }
+.detail-toolbar-right { display: flex; gap: 4px; }
+.detail-btn { display: flex; align-items: center; gap: 4px; padding: 4px 12px; border: none; background: transparent; font-size: 12px; color: #666; cursor: pointer; border-radius: 4px; }
+.detail-btn:hover { background: #e8e8e8; color: #333; }
+.detail-btn.primary { color: #1890ff; }
+.detail-btn.danger { color: #f5222d; }
+.detail-table { width: 100%; border-collapse: collapse; }
+.detail-table th { background: #fafafa; padding: 8px 12px; text-align: left; font-size: 12px; font-weight: 500; color: #666; border-bottom: 1px solid #e8e8e8; }
+.detail-table td { padding: 8px 12px; font-size: 13px; color: #333; border-bottom: 1px solid #e8e8e8; }
+.detail-table tr:hover td { background: #fafafa; }
+.detail-table input, .detail-table select { padding: 4px 8px; border: 1px solid #e8e8e8; border-radius: 4px; font-size: 12px; width: 100%; max-width: 120px; background: #fff; }
+.detail-table input:focus, .detail-table select:focus { border-color: #1890ff; outline: none; }
+.doc-footer { background: #fff; border-top: 1px solid #e8e8e8; padding: 12px 20px; display: flex; justify-content: flex-end; gap: 24px; align-items: center; }
+.footer-item { display: flex; align-items: center; gap: 8px; }
+.footer-item label { font-size: 12px; color: #666; }
+.footer-item value { font-size: 14px; font-weight: 600; color: #333; }
+.footer-item value.important { color: #f5222d; }
+.toast { display: flex; align-items: center; gap: 10px; padding: 14px 18px; border-radius: 4px; background: #fff; box-shadow: 0 2px 8px rgba(0,0,0,0.15); position: fixed; top: 20px; right: 20px; z-index: 9999; animation: slideIn 0.3s ease; }
+@keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+.toast .toast-icon { font-size: 20px; }
+.toast .toast-content { flex: 1; }
+.toast .toast-title { font-weight: 600; margin-bottom: 2px; color: #333; }
+.toast .toast-message { font-size: 13px; color: #666; }
+.toast .toast-close { cursor: pointer; font-size: 18px; color: #999; }
+.toast-success { border-left: 4px solid #52c41a; }
+.toast-success .toast-title { color: #52c41a; }
+.toast-warning { border-left: 4px solid #faad14; }
+.toast-warning .toast-title { color: #faad14; }
+.toast-error { border-left: 4px solid #f5222d; }
+.toast-error .toast-title { color: #f5222d; }
+.toast-info { border-left: 4px solid #1890ff; }
+.toast-info .toast-title { color: #1890ff; }
+.modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 1000; justify-content: center; align-items: flex-start; padding-top: 40px; }
+.modal-overlay.active { display: flex; }
+.modal-dialog, .modal { background: #fff; border: 1px solid #e8e8e8; border-radius: 4px; width: 520px; max-height: 80vh; overflow-y: auto; }
+.modal-header { padding: 14px 18px; border-bottom: 1px solid #e8e8e8; display: flex; justify-content: space-between; align-items: center; }
+.modal-title { font-size: 15px; font-weight: 600; color: #333; }
+.modal-close { font-size: 18px; color: #999; cursor: pointer; }
+.modal-body { padding: 16px 18px; }
+.modal-footer { padding: 12px 18px; border-top: 1px solid #e8e8e8; display: flex; justify-content: flex-end; gap: 8px; }
+.btn { padding: 6px 16px; border: 1px solid #d9d9d9; border-radius: 4px; font-size: 13px; cursor: pointer; }
+.btn-primary { background: #1890ff; color: #fff; border: none; }
+.btn-primary:hover { background: #40a9ff; }
+.btn-danger { background: #f5222d; color: #fff; border: none; }
+.btn-danger:hover { background: #ff4d4f; }
+.btn-cancel { background: #fff; color: #666; }
+.btn-cancel:hover { background: #f5f5f5; }
+.confirm-modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 1001; justify-content: center; align-items: center; }
+.confirm-modal.active { display: flex; }
+.confirm-modal-dialog { background: #fff; border: 1px solid #d9d9d9; border-radius: 4px; width: 420px; overflow: hidden; }
+.confirm-modal-header { padding: 16px 20px; border-bottom: 1px solid #e8e8e8; display: flex; align-items: center; gap: 10px; }
+.confirm-modal-icon { font-size: 20px; }
+.confirm-modal-title { font-size: 15px; font-weight: 600; color: #1a1a1a; }
+.confirm-modal-body { padding: 20px; }
+.confirm-modal-message { font-size: 14px; color: #374151; line-height: 1.6; }
+.confirm-modal-footer { display: flex; gap: 12px; justify-content: flex-end; padding: 16px 20px; border-top: 1px solid #e8e8e8; background: #f9fafb; }
+.confirm-modal-footer .btn-cancel { padding: 6px 16px; border: 1px solid #d9d9d9; border-radius: 4px; font-size: 13px; background: #fff; color: #6b7280; cursor: pointer; }
+.confirm-modal-footer .btn-confirm { padding: 6px 16px; border: none; border-radius: 4px; font-size: 13px; background: #1890ff; color: #fff; cursor: pointer; }
+.split-info { background: #fffbe6; border: 1px solid #ffe58f; border-radius: 4px; padding: 12px 16px; margin-bottom: 16px; }
+.split-info .split-label { font-size: 12px; color: #ad8b00; font-weight: 500; }
+.split-info .split-value { font-size: 13px; color: #d4a800; }
+
+
+.lookup-modal { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:2000; justify-content:center; align-items:center; }
+.lookup-modal.show { display:flex; }
+.lookup-dialog { background:#fff; border:1px solid #e8e8e8; border-radius:4px; width:720px; max-height:70vh; overflow:hidden; }
+.lookup-header { padding:14px 20px; border-bottom:1px solid #e8e8e8; display:flex; align-items:center; justify-content:space-between; }
+.lookup-title { font-size:15px; font-weight:600; color:#333; }
+.lookup-close { font-size:20px; color:#666; cursor:pointer; background:none; border:none; }
+.lookup-close:hover { color:#333; }
+.lookup-body { padding:16px; }
+.lookup-search { display:flex; gap:8px; margin-bottom:12px; }
+.lookup-search input { flex:1; padding:6px 10px; border:1px solid #e8e8e8; border-radius:4px; font-size:13px; }
+.lookup-search button { padding:6px 16px; background:#1890ff; color:#fff; border:none; border-radius:4px; cursor:pointer; }
+.lookup-table { width:100%; border-collapse:collapse; font-size:13px; }
+.lookup-table th, .lookup-table td { padding:10px 12px; text-align:left; border-bottom:1px solid #e8e8e8; }
+.lookup-table th { background:#fafafa; font-weight:600; color:#333; }
+.lookup-table tr:hover { background:#f5f5f5; }
+.lookup-table .checkbox-cell { width:40px; }
+.lookup-footer { padding:12px 20px; border-top:1px solid #e8e8e8; display:flex; justify-content:flex-end; gap:8px; }
+.lookup-field { display:flex; align-items:center; }
+.lookup-field input { flex:1; padding:6px 10px; border:1px solid #e8e8e8; border-radius:4px 0 0 4px; font-size:13px; }
+.lookup-field button { width:28px; height:28px; border:1px solid #e8e8e8; border-left:none; border-radius:0 4px 4px 0; background:#fff; cursor:pointer; display:flex; align-items:center; justify-content:center; }
+.lookup-field button:hover { background:#f5f5f5; }
+
+.doc-section-title { font-size: 14px; font-weight: 600; color: #333; padding: 16px 20px 12px; border-top: 1px solid #e8e8e8; margin-top: 16px; }
+</style>
+
+
+</head>
+
+
+<body>
+
+
+<div class="doc-page">
+
+  <aside class="doc-sidebar">
+
+    <div class="doc-sidebar-title">业务导航</div>
+
+    <ul class="doc-sidebar-menu">
+
+      <li><a href="sales-split-delivery-list.html"><span class="menu-icon">&#128203;</span> 拆件发货单列表</a></li>
+
+      <li><a href="#" class="active"><span class="menu-icon">&#10010;</span> 拆件发货单新增</a></li>
+
+    </ul>
+
+  </aside>
+
+
+  <div class="doc-content">
+
+    <header class="doc-header">
+
+      <div>
+
+        <div class="doc-header-title">拆件发货单</div>
+
+        <div class="doc-header-subtitle">新建拆件发货单</div>
+
+      </div>
+
+            <div class="doc-toolbar">
+        <button class="toolbar-btn" onclick="saveDraft()"><span class="icon">💾</span> 保存草稿</button>
+        <button class="toolbar-btn primary" onclick="submitDoc()"><span class="icon">✓</span> 提交审核</button>
+        <button class="toolbar-btn" onclick="copyDoc()"><span class="icon">📋</span> 复制</button>
+        <button class="toolbar-btn" onclick="prevDoc()"><span class="icon">⬅️</span> 上查</button>
+        <button class="toolbar-btn" onclick="nextDoc()"><span class="icon">➡️</span> 下查</button>
+        <button class="toolbar-btn" onclick="selectSrcDoc()"><span class="icon">📄</span> 选单</button>
+        <button class="toolbar-btn" onclick="reverseApprove()"><span class="icon">↩️</span> 反审核</button>
+        <button class="toolbar-btn" onclick="closeDoc()"><span class="icon">🔒</span> 关闭</button>
+        <button class="toolbar-btn" onclick="reverseClose()"><span class="icon">🔓</span> 反关闭</button>
+        <button class="toolbar-btn" onclick="goToList()"><span class="icon">📋</span> 列表</button>
+        <button class="toolbar-btn danger" onclick="exitDoc()"><span class="icon">✖️</span> 退出</button>
+      </div>
+
+    </header>
+
+
+    <div class="doc-body">
+
+      <div id="splitInfo" class="split-info" style="display:none;">
+        <div class="split-label">拆件来源: <span class="split-value" id="sourceDocNo"></span></div>
+        <div class="split-label">原物料: <span class="split-value" id="sourceMaterial"></span></div>
+        <div class="split-label">原数量: <span class="split-value" id="sourceQty"></span></div>
+      </div>
+
+      <div class="doc-card">
+
+        <div class="doc-form">
+
+          <div class="form-row">
+
+            <div class="form-item">
+
+              <label><span class="required">*</span>单据编号</label>
+
+              <input type="text" id="docNo" readonly class="readonly" placeholder="自动生成">
+
+            </div>
+
+            <div class="form-item">
+
+              <label><span class="required">*</span>日期</label>
+
+              <input type="date" id="docDate">
+
+            </div>
+
+            <div class="form-item">
+
+              <label><span class="required">*</span>组织</label>
+
+              <select id="orgId">
+
+                <option value="">请选择组织</option>
+
+              </select>
+
+            </div>
+
+            <div class="form-item">
+
+              <label>备注</label>
+
+              <textarea id="remark" placeholder="请输入备注"></textarea>
+
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+      <div class="doc-card">
+
+        <div class="doc-detail-card">
+
+          <div class="detail-toolbar">
+
+            <div class="detail-toolbar-left">
+
+              <span>拆分明细</span>
+
+              <span style="color:#999;">共 <span id="detailCount">0</span> 行</span>
+
+            </div>
+
+            <div class="detail-toolbar-right">
+
+              <button class="detail-btn primary" onclick="addDetailRow()"><span class="icon">+</span> 添加行</button>
+
+              <button class="detail-btn danger" onclick="removeDetailRow()"><span class="icon">−</span> 删除行</button>
+
+            </div>
+
+          </div>
+
+          <table class="detail-table" id="detailTable">
+
+            <thead>
+
+              <tr>
+
+                <th><input type="checkbox" onclick="selectAllDetails()"></th>
+
+                <th>序号</th>
+
+                <th>物料编码</th>
+
+                <th>物料名称</th>
+
+                <th>规格型号</th>
+
+                <th>单位</th>
+
+                <th>拆分数量</th>
+
+                <th>单价</th>
+
+                <th>金额</th>
+
+                <th>备注</th>
+
+              </tr>
+
+            </thead>
+
+            <tbody id="detailBody">
+
+            </tbody>
+
+          </table>
+
+        </div>
+
+      </div>
+
+    </div>
+
+
+    <footer class="doc-footer">
+
+      <div class="footer-item">
+
+        <label>合计数量:</label>
+
+        <value id="totalQty">0</value>
+
+      </div>
+
+      <div class="footer-item">
+
+        <label>合计金额:</label>
+
+        <value id="totalAmount" class="important">0.00</value>
+
+      </div>
+
+    </footer>
+
+  </div>
+
+</div>
+
+
+<script>
+
+var currentTab = 'main';
+var docData = {};
+var sourceData = null;
+
+
+function init() {
+  initLocalData();
+  if (window.DocDataStore) DocDataStore.initTestData();
+  loadOrgs();
+  generateDocNo();
+  document.getElementById('docDate').valueAsDate = new Date();
+  loadPushData();
+}
+
+function initLocalData() {
+  localStorage.setItem('erp_warehouses_cache', JSON.stringify([
+    { id: 'wh-001', name: '成品仓', code: 'WH-001', status: 1 },
+    { id: 'wh-002', name: '原料仓', code: 'WH-002', status: 1 },
+    { id: 'wh-003', name: '半成品仓', code: 'WH-003', status: 1 },
+    { id: 'wh-004', name: '辅料仓', code: 'WH-004', status: 1 }
+  ]));
+  localStorage.setItem('erp_materials_cache', JSON.stringify([
+    { id: 'mat-001', name: '高频传感器模块', code: 'P-001', specification: 'HT-2026', unit: '个', inspectType: '0', status: 1 },
+    { id: 'mat-002', name: '控制电路板', code: 'P-002', specification: 'CB-2026', unit: '块', inspectType: '0', status: 1 },
+    { id: 'mat-005', name: '智能控制器', code: 'P-003', specification: 'IC-V3', unit: '台', inspectType: '0', status: 1 },
+    { id: 'mat-006', name: '电源模块', code: 'P-004', specification: 'PM-500W', unit: '个', inspectType: '0', status: 1 },
+    { id: 'mat-020', name: '工业网关', code: 'P-010', specification: 'GW-2000', unit: '台', inspectType: '1', status: 1 },
+    { id: 'mat-010', name: 'PCB电路板', code: 'M-010', specification: 'FR-4双层', unit: '块', inspectType: '0', status: 1 },
+    { id: 'mat-011', name: '贴片电阻', code: 'M-011', specification: '10KΩ 0603', unit: '个', inspectType: '0', status: 1 },
+    { id: 'mat-012', name: '贴片电容', code: 'M-012', specification: '100μF 0805', unit: '个', inspectType: '0', status: 1 },
+    { id: 'mat-008', name: '螺丝', code: 'M-004', specification: 'M4x10', unit: '包', inspectType: '0', status: 1 },
+    { id: 'mat-013', name: '变压器', code: 'M-013', specification: '220V→12V', unit: '个', inspectType: '0', status: 1 },
+    { id: 'mat-014', name: '散热片', code: 'M-014', specification: '铝制40x40', unit: '片', inspectType: '0', status: 1 },
+    { id: 'mat-015', name: '主控芯片', code: 'M-015', specification: 'ARM-A53', unit: '片', inspectType: '1', status: 1 },
+    { id: 'mat-016', name: '通信模组', code: 'M-016', specification: '4G+WiFi', unit: '个', inspectType: '1', status: 1 }
+  ]));
+}
+
+function loadPushData() {
+  var pushData = localStorage.getItem('temp_push_data');
+  if (!pushData) return;
+  
+  var data = JSON.parse(pushData);
+  if (data.sourceType === 'sales-delivery' && data.splitMode) {
+    sourceData = data;
+    document.getElementById('orgId').value = data.data.orgId;
+    document.getElementById('remark').value = '拆件发货，来源发货通知单[' + data.sourceNo + ']';
+    
+    var sourceDetail = data.data.details[0];
+    document.getElementById('sourceDocNo').textContent = data.sourceNo;
+    document.getElementById('sourceMaterial').textContent = sourceDetail.name + '(' + sourceDetail.code + ')';
+    document.getElementById('sourceQty').textContent = sourceDetail.qty + sourceDetail.unit;
+    document.getElementById('splitInfo').style.display = 'block';
+    
+    addDetailRow();
+    var rows = document.getElementById('detailBody').children;
+    var row = rows[rows.length - 1];
+    row.querySelector('.material-code').value = sourceDetail.code;
+    row.querySelector('.material-name').value = sourceDetail.name;
+    row.querySelector('.material-spec').value = sourceDetail.spec;
+    row.querySelector('.material-unit').value = sourceDetail.unit;
+    row.querySelector('.qty').value = sourceDetail.qty;
+    row.querySelector('.price').value = sourceDetail.price;
+    row.querySelector('.amount').value = (sourceDetail.qty * sourceDetail.price).toFixed(2);
+    
+    calcTotal();
+    showToast('已加载拆件发货数据', 'success');
+    localStorage.removeItem('temp_push_data');
+  }
+}
+
+function generateDocNo() {
+  var prefix = 'SPLIT'.toUpperCase();
+  var date = new Date();
+  var year = date.getFullYear().toString().slice(-2);
+  var month = String(date.getMonth() + 1).padStart(2, '0');
+  var day = String(date.getDate()).padStart(2, '0');
+  var seq = String(Math.floor(Math.random() * 10000)).padStart(4, '0');
+  document.getElementById('docNo').value = prefix + year + month + day + seq;
+}
+
+function loadOrgs() {
+  var orgs = JSON.parse(localStorage.getItem('erp_orgs') || '[]');
+  var select = document.getElementById('orgId');
+  orgs.forEach(function(org) {
+    var option = document.createElement('option');
+    option.value = org.id;
+    option.textContent = org.name;
+    select.appendChild(option);
+  });
+}
+
+function showTab(tab) {
+  currentTab = tab;
+  var tabs = document.querySelectorAll('.doc-tab');
+  for (var i = 0; i < tabs.length; i++) {
+    tabs[i].classList.remove('active');
+  }
+  tabs[tab === 'main' ? 0 : 1].classList.add('active');
+  document.getElementById('tab-main').style.display = tab === 'main' ? 'block' : 'none';
+  document.getElementById('tab-detail').style.display = tab === 'detail' ? 'block' : 'none';
+}
+
+function addDetailRow() {
+  var tbody = document.getElementById('detailBody');
+  var rowCount = tbody.children.length;
+  
+  var tr = document.createElement('tr');
+  tr.innerHTML = '\
+    <td><input type="checkbox" class="detail-checkbox"></td>\
+    <td>' + (rowCount + 1) + '</td>\
+    <td><input type="text" class="material-code" onchange="lookupMaterial(this)"></td>\
+    <td><input type="text" class="material-name" readonly></td>\
+    <td><input type="text" class="material-spec" readonly></td>\
+    <td><input type="text" class="material-unit" readonly></td>\
+    <td><input type="number" class="qty" onchange="calcRowAmount(this)"></td>\
+    <td><input type="number" class="price" onchange="calcRowAmount(this)"></td>\
+    <td><input type="number" class="amount" readonly></td>\
+    <td><input type="text" class="remark"></td>\
+  ';
+  tbody.appendChild(tr);
+  updateDetailCount();
+}
+
+function removeDetailRow() {
+  var checkboxes = document.querySelectorAll('.detail-checkbox:checked');
+  if (checkboxes.length === 0) {
+    showToast('请选择要删除的行', 'warning');
+    return;
+  }
+  checkboxes.forEach(function(cb) { cb.closest('tr').remove(); });
+  renumberRows();
+  updateDetailCount();
+  calcTotal();
+}
+
+function renumberRows() {
+  var rows = document.getElementById('detailBody').children;
+  for (var i = 0; i < rows.length; i++) {
+    rows[i].querySelector('td:nth-child(2)').textContent = i + 1;
+  }
+}
+
+function selectAllDetails() {
+  var master = document.querySelector('.detail-table th input');
+  var checkboxes = document.querySelectorAll('.detail-checkbox');
+  checkboxes.forEach(function(cb) { cb.checked = master.checked; });
+}
+
+function lookupMaterial(input) {
+  var code = input.value.trim();
+  if (!code) return;
+  
+  var materials = JSON.parse(localStorage.getItem('erp_materials') || '[]');
+  var material = materials.find(function(m) { return m.code === code; });
+  
+  if (material) {
+    var row = input.closest('tr');
+    row.querySelector('.material-name').value = material.name;
+    row.querySelector('.material-spec').value = material.specification;
+    row.querySelector('.material-unit').value = material.unit;
+  }
+}
+
+function calcRowAmount(input) {
+  var row = input.closest('tr');
+  var qty = parseFloat(row.querySelector('.qty').value) || 0;
+  var price = parseFloat(row.querySelector('.price').value) || 0;
+  var amount = (qty * price).toFixed(2);
+  row.querySelector('.amount').value = amount;
+  calcTotal();
+}
+
+function calcTotal() {
+  var rows = document.getElementById('detailBody').children;
+  var totalQty = 0;
+  var totalAmount = 0;
+  
+  for (var i = 0; i < rows.length; i++) {
+    totalQty += parseFloat(rows[i].querySelector('.qty').value) || 0;
+    totalAmount += parseFloat(rows[i].querySelector('.amount').value) || 0;
+  }
+  
+  document.getElementById('totalQty').textContent = totalQty;
+  document.getElementById('totalAmount').textContent = totalAmount.toFixed(2);
+}
+
+function updateDetailCount() {
+  document.getElementById('detailCount').textContent = document.getElementById('detailBody').children.length;
+}
+
+function validateForm() {
+  var docDate = document.getElementById('docDate').value;
+  var orgId = document.getElementById('orgId').value;
+  
+  if (!docDate) {
+    showToast('请选择日期', 'warning');
+    return false;
+  }
+  if (!orgId) {
+    showToast('请选择组织', 'warning');
+    return false;
+  }
+  
+  var detailCount = document.getElementById('detailBody').children.length;
+  if (detailCount === 0) {
+    showToast('请添加拆分明细行', 'warning');
+    return false;
+  }
+  
+  return true;
+}
+
+function saveDraft() {
+  if (!validateForm()) return;
+  
+  docData = collectDocData();
+  docData.status = 'draft';
+  
+  localStorage.setItem('draft_sales-split-delivery', JSON.stringify(docData));
+  showToast('草稿已保存', 'success');
+}
+
+function submitDoc() {
+  if (!validateForm()) return;
+  
+  docData = collectDocData();
+  docData.status = 'pending';
+  
+  showConfirm('确认提交审核？', function() {
+    localStorage.setItem('submitted_sales-split-delivery', JSON.stringify(docData));
+    
+    var list = JSON.parse(localStorage.getItem('erp_sales-split-delivery_list') || '[]');
+    list.unshift(docData);
+    localStorage.setItem('erp_sales-split-delivery_list', JSON.stringify(list));
+    
+    showToast('提交成功，等待审核', 'success');
+    setTimeout(function() { window.location.href = 'sales-split-delivery-list.html'; }, 1500);
+  });
+}
+
+function pushToOutbound() {
+  if (!validateForm()) return;
+  
+  docData = collectDocData();
+  docData.status = 'pushed';
+  
+  localStorage.setItem('temp_push_data', JSON.stringify({
+    sourceType: 'sales-split-delivery',
+    sourceId: docData.id,
+    sourceNo: docData.docNo,
+    data: docData
+  }));
+  
+  showToast('正在跳转到销售出库单创建页面...', 'info');
+  setTimeout(function() { window.location.href = 'sales-outbound-create.html'; }, 1000);
+}
+
+function collectDocData() {
+  var rows = document.getElementById('detailBody').children;
+  var details = [];
+  
+  for (var i = 0; i < rows.length; i++) {
+    details.push({
+      code: rows[i].querySelector('.material-code').value,
+      name: rows[i].querySelector('.material-name').value,
+      spec: rows[i].querySelector('.material-spec').value,
+      unit: rows[i].querySelector('.material-unit').value,
+      qty: parseFloat(rows[i].querySelector('.qty').value) || 0,
+      price: parseFloat(rows[i].querySelector('.price').value) || 0,
+      amount: parseFloat(rows[i].querySelector('.amount').value) || 0,
+      remark: rows[i].querySelector('.remark').value
+    });
+  }
+  
+  return {
+    id: 'doc-' + Date.now(),
+    docNo: document.getElementById('docNo').value,
+    docDate: document.getElementById('docDate').value,
+    orgId: document.getElementById('orgId').value,
+    orgName: document.getElementById('orgId').options[document.getElementById('orgId').selectedIndex].text,
+    remark: document.getElementById('remark').value,
+    details: details,
+    totalQty: parseFloat(document.getElementById('totalQty').textContent) || 0,
+    totalAmount: parseFloat(document.getElementById('totalAmount').textContent) || 0,
+    sourceDocNo: sourceData ? sourceData.sourceNo : '',
+    createdAt: new Date().toISOString()
+  };
+}
+
+function deleteDoc() {
+  showConfirm('确认删除此单据？', function() {
+    localStorage.removeItem('draft_sales-split-delivery');
+    showToast('已删除', 'success');
+    setTimeout(function() { window.location.href = 'sales-split-delivery-list.html'; }, 1500);
+  });
+}
+
+document.addEventListener('DOMContentLoaded', init);
+
+
+</script>
+
+
+
+<div class="lookup-modal" id="lookupModal">
+  <div class="lookup-dialog">
+    <div class="lookup-header">
+      <div class="lookup-title" id="lookupTitle">选择</div>
+      <button class="lookup-close" onclick="closeLookup()">×</button>
+    </div>
+    <div class="lookup-body">
+      <div class="lookup-search">
+        <input type="text" id="lookupKeyword" placeholder="请输入编码或名称搜索" onkeydown="if(event.key==='Enter')filterLookup()">
+        <button onclick="filterLookup()">搜索</button>
+      </div>
+      <table class="lookup-table">
+        <thead id="lookupTableHead"></thead>
+        <tbody id="lookupTableBody"></tbody>
+      </table>
+    </div>
+    <div class="lookup-footer">
+      <button class="btn btn-cancel" onclick="closeLookup()">取消</button>
+      <button class="btn btn-primary" onclick="confirmLookup()">确定</button>
+    </div>
+  </div>
+</div>
+
+</body>
+
+
+</html>

@@ -1,0 +1,189 @@
+生产制造-工程数据-BOM
+
+字段说明：
+单据头：FBillHead 
+	 实体主键：FID 
+	 数据状态：FDocumentStatus 
+	 禁用状态：FForbidStatus 
+	 BOM简称：FName 
+	 BOM版本：FNumber 
+	 描述：FDescription 
+	 创建组织：FCreateOrgId  (必填项)
+	 使用组织：FUseOrgId  (必填项)
+	 创建人：FCreatorId 
+	 修改人：FModifierId 
+	 创建日期：FCreateDate 
+	 修改日期：FModifyDate 
+	 禁用人：FForbidderId 
+	 审核人：FApproverId 
+	 禁用日期：FForbidDate 
+	 审核日期：FApproveDate 
+	 BOM分类：FBOMCATEGORY  (必填项)
+	 BOM用途：FBOMUSE  (必填项)
+	 父项物料编码：FMATERIALID  (必填项)
+	 物料名称：FITEMNAME 
+	 规格型号：FITEMMODEL 
+	 物料属性：FITEMPPROPERTY 
+	 成品率%：FYIELDRATE 
+	 单据类型：FBILLTYPE  (必填项)
+	 父项物料单位：FUNITID  (必填项)
+	 父项基本单位：FBaseUnitId 
+	 是否新版本：FISDEFAULT 
+	 配置BOM：FCfgBomId 
+	 批量：FQty 
+	 基本单位批量：FBaseQty 
+	 BOM分组：FGroup 
+	 PLMBOM内码：FPLMBOMId 
+	 BOM来源：FBOMSRC 
+	 校验：FIsValidate 
+	 辅助属性：FParentAuxPropId 
+	 产品模型：FMDLID 
+	 扩展版本变量：FExtVar 
+	 禁用原因：FForbidReson 
+	 是否变更中：FIsChange 
+子项明细：FTreeEntity 
+	 实体主键：FENTRYID 
+	 父级行主键：FParentRowId 
+	 行展开类型：FRowExpandType 
+	 行标识：FRowId 
+	 子项物料名称：FCHILDITEMNAME 
+	 子项规格型号：FCHILDITEMMODEL 
+	 子项物料属性：FCHILDITEMPROPERTY 
+	 子项类型：FMATERIALTYPE  (必填项)
+	 用量类型：FDOSAGETYPE  (必填项)
+	 作业：FPROCESSID 
+	 固定损耗：FFIXSCRAPQTY 
+	 生效日期：FEFFECTDATE  (必填项)
+	 失效日期：FEXPIREDATE  (必填项)
+	 发料方式：FISSUETYPE  (必填项)
+	 发料组织：FSUPPLYORG 
+	 默认发料仓库：FSTOCKID 
+	 默认发料仓位：FSTOCKLOCID 
+	 货位：FF100001
+	 允许超发：FALLOWOVER 
+	 倒冲时机：FBACKFLUSHTYPE 
+	 时间单位：FTIMEUNIT  (必填项)
+	 是否关键件：FISKEYCOMPONENT 
+	 子项物料编码：FMATERIALIDCHILD  (必填项)
+	 位置号：FPOSITIONNO 
+	 变动损耗率%：FSCRAPRATE 
+	 拆卸成本拆分比例：FDISASSMBLERATE 
+	 偏置时间：FOFFSETTIME 
+	 是否发损耗：FISGETSCRAP 
+	 子项BOM版本：FBOMID 
+	 用量:分子：FNUMERATOR 
+	 用量:分母：FDENOMINATOR 
+	 货主类型：FOWNERTYPEID  (必填项)
+	 货主：FOWNERID 
+	 工序：FOPERID 
+	 辅助属性：FAuxPropId 
+	 备注：FMEMO 
+	 子项单位：FCHILDUNITID  (必填项)
+	 子项标识：FEntryRowId 
+	 子项基本单位：FChildBaseUnitID 
+	 基本单位分子：FBaseNumerator 
+	 基本单位固定损耗：FBaseFixscrapQty 
+	 基本单位分母：FBaseDenominator 
+	 标准用量：FQty2 
+	 实际用量：FActualQty 
+	 超发控制方式：FOverControlMode  (必填项)
+	 项次：FReplaceGroup 
+	 替代策略：FReplacePolicy 
+	 替代方式：FReplaceType 
+	 替代优先级：FReplacePriority 
+	 动态优先级：FMRPPriority 
+	 替代主料：FIskeyItem 
+	 可选择：FIsCanChoose 
+	 可修改：FIsCanEdit 
+	 可替换：FIsCanReplace 
+	 配置BOM分录内码：FCFGBOMENTRYID 
+	 父项特征件分录内码：FCfgFeatureEntryId 
+	 最小发料批量：FBPMinIssueQty 
+	 库存单位：FBPStoreUnitID 
+	 供应组织：FChildSupplyOrgId 
+	 工序序列：FOptQueue 
+	 PLMBOM分录内码：FPLMBOMEntryId 
+	 BOM分录来源：FBOMEntrySRC 
+	 跳层：FISSkip 
+	 子项明细Id备份(引入时与BOP关联)：FTreeEntryIdBak 
+	 领料考虑最小发料批量：FISMinIssueQty 
+	 变更类型：FChangeType 
+	 变更日期：FChangeTime 
+	 变更单号：FECNBillNo 
+	 变更类型：FECNChgType 
+	 变更日期：FECNChgDate 
+	 供料方式：FSupplyMode 
+	 ECN行类型：FECNRowType 
+	 子项来源：FEntrySource  (必填项)
+	 最小发料批量单位：FMinissueUnitId 
+	 记录字段：FRecordData 
+	 子项产品模型：FSubMdlId 
+	 CloudPLMBOM分录内码：FPLMBOMENTRYROWID 
+	 MRP运算：FIsMrpRun 
+	 本次修改字段：FModifiedField 
+	 替代方案编码：FSubstitutionId 
+	 替代方案名称：FSubstitutionName 
+	 替代方案分录内码：FSTEntryId 
+	 供应类型：FSupplyType 
+	 存在多个替代方案：FIsMulCsd 
+	 净需求比例(%)：FNETDEMANDRATE 
+	 变更单分录内码：FEcnEntryId 
+	 PLM旧料标识：FPlmOldMaterialFlag 
+	 PLM变更日期：FPLMChangeDate 
+阶梯用量：FBOMCHILDLOTBASEDQTY 
+	 实体主键：FDETAILID 
+	 子项物料编码：FMATERIALIDLOTBASED  (必填项)
+	 物料名称：FCHILDITEMNAMELOT 
+	 规格型号：FCHILDITEMMODELLOT 
+	 起始数量（含）：FSTARTQTY 
+	 截止数量：FENDQTY 
+	 固定损耗：FFIXSCRAPQTYLOT 
+	 备注：FNOTELOT 
+	 变动损耗率：FSCRAPRATELOT 
+	 用量:分子：FNUMERATORLOT 
+	 用量:分母：FDENOMINATORLOT 
+	 子项单位：FUNITIDLOT  (必填项)
+	 子项阶梯基本单位：FBASEUNITIDLOT 
+	 子项基本单位分子：FBASENUMERATORLOT 
+	 基本单位起始数量：FBASESTARTQTY 
+	 基本单位截止数量：FBASEENDQTY 
+	 基本单位固定损耗数量：FBASEFIXSCRAPQTYLOT 
+	 子项基本单位分母：FBASEDENOMINATORLOT 
+联副产品：FEntryBOMCOBY 
+	 实体主键：FENTRYID 
+	 联副产品类型：FCOBYTYPE  (必填项)
+	 联副产品物料编码：FMATERIALIDCOBY  (必填项)
+	 物料名称：FMATERIALNAMECOBY 
+	 规格型号：FMATERIALMODELCOBY 
+	 数量：FQTYCOBY 
+	 成本权重：FCOSTRATECOBY 
+	 产出工序：FPPROCESSID 
+	 生效日期：FEFFECTDATECOBY 
+	 失效日期：FEXPIREDATECOBY 
+	 备注：FNOTECOBY 
+	 联副产品基本数量：FBaseQtyCoby 
+	 联副产品基本单位：FBaseUnitIdCoby 
+	 产出作业编码：FTASKIDCOBY 
+	 单位：FUNITIDCOBY  (必填项)
+	 辅助属性：FAuxPropIdCoby 
+	 产出工序序列：FOutPutOptQueue 
+	 BOM版本：FBOMIDCoby 
+	 倒冲领料：FISBACKFLUSH 
+BOP：FBopEntity 
+	 实体主键：FEntryID 
+	 项次：FReplaceGroupBop 
+	 生产线编码：FProductLineId 
+	 生产线名称：FProductLineName 
+	 工位/工序：FPrdLineLocId 
+	 工序描述：FPrdLineLocName 
+	 子项物料编码：FBopMaterialId 
+	 子项物料名称：FBopMaterialName 
+	 子项规格型号：FBopItemMode 
+	 子项单位：FBopUnitId 
+	 用量类型：FBopDosageType 
+	 用量:分子：FBopNumerator 
+	 用量:分母：FBopDenominator 
+	 子项基本单位：FBopBaseUnitID 
+	 BOP基本单位分子：FBaseBopNumerator 
+	 BOP基本单位分母：FBaseBopDenominator 
+	 子项明细Id：FTreeEntryId 

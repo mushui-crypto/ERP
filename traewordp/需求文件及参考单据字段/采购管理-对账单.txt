@@ -1,0 +1,123 @@
+采购管理--采购对账单
+
+基本信息：FBillHead 
+	 实体主键：FID 
+	 单据编号：FBillNo 
+	 单据状态：FDocumentStatus 
+	 单据日期：FDate 
+	 采购组织：FPurchaseOrgId 
+	 供应商：FSupplierId  (必填项)
+	 创建人：FCreatorId 
+	 创建日期：FCreateDate 
+	 最后修改人：FModifierId 
+	 最后修改日期：FModifyDate 
+	 审核人：FApproverId 
+	 审核日期：FApproveDate 
+	 备注：FRemark 
+	 发布人：FPublisherId 
+	 发布日期：FPublishDate 
+	 确认方确认人：FFirstConfirmerId 
+	 确认方确认日期：FFirstConfirmDate 
+	 发起方确认人：FSecondConfirmerId 
+	 发起方确认日期：FSecondConfirmDate 
+	 对账期间起：FBeginDate 
+	 对账期间至：FEndDate 
+	 对账类型：FReconciliationType 
+	 价格来源：FPriceSource 
+	 对账状态：FConfirmStatus 
+	 发起方类型：FInitiator  (必填项)
+	 已生成应付单据参与对账：FIsIncludeGenAP 
+	 立账类型：FSetAccountType 
+	 单据转换：FCONVERTRULEID 
+财务信息：FReconciliationFinance 
+	 实体主键：FEntryId 
+	 对账金额：FBillAmount 
+	 对账价税合计：FBillAllAmount 
+	 结算币别：FSettleCurrId  (必填项)
+	 对账税额：FBillTaxAmount 
+	 本位币：FLocalCurrId  (必填项)
+	 对账金额(本位币)：FBillAmount_LC 
+	 对账税额(本位币)：FBillTaxAmount_LC 
+	 对账价税合计(本位币)：FBillAllAmount_LC 
+	 汇率类型：FExchangeTypeId 
+	 汇率：FExchangeRate 
+	 结算组织：FSETTLEORGID 
+	 确认金额：FConfirmBillAmount 
+	 确认价税合计：FConfirmBillAllAmount 
+	 确认税额：FConfirmBillTaxAmount 
+	 确认税额(本位币)：FConfirmBillTaxAmount_LC 
+	 确认金额(本位币)：FConfirmBillAmount_LC 
+	 确认价税合计(本位币)：FConfirmBillAllAmount_LC 
+明细信息：FReconciliationEntry 
+	 实体主键：FEntryID 
+	 物料编码：FMaterialId  (必填项)
+	 对账单价：FPrice 
+	 对账折扣率%：FEntryDiscountRate 
+	 对账税率%：FEntryTaxRate 
+	 对账金额：FEntryAmount 
+	 对账价税合计：FAllAmount 
+	 对账折扣额：FEntryDiscount 
+	 业务单据备注：FEntryNote 
+	 本次对账数量：FPriceUnitQty 
+	 物料名称：FMaterialName 
+	 规格型号：FModel 
+	 对账含税单价：FTaxPrice 
+	 对账税额：FEntryTaxAmount 
+	 收料组织：FReceiveOrgId 
+	 需求组织：FRequireOrgId 
+	 对账金额(本位币)：FAmount_LC 
+	 对账价税合计(本位币)：FAllAmount_LC 
+	 对账税额(本位币)：FTaxAmount_LC 
+	 计价单位：FPriceUnitId  (必填项)
+	 基本单位：FBaseUnitId 
+	 辅助属性：FAuxPropId 
+	 物料说明：FMaterialDesc 
+	 供应商物料编码：FSupMatNO 
+	 供应商物料名称：FSupMatName 
+	 是否赠品：FGiveAway 
+	 本次对账数量（基本单位）：FPriceBaseQty 
+	 价目表：FPriceListId 
+	 价目表分录id：FPRILSTENTRYID 
+	 业务单据编号：FBusinessBillNo 
+	 业务日期：FBusinessDate 
+	 业务单据类型：FBillType 
+	 采购订单编号：FSrcOrderNo 
+	 订单日期：FOrderDate 
+	 业务单据源单编号：FStockBillNo 
+	 业务单据源单日期：FStockBillDate 
+	 含税：FIsIncludedTax 
+	 价外税：FISPRICEEXCLUDETAX 
+	 仓库：FStockId 
+	 仓位：FStockLocId 
+	 货位：FF100001
+	 确认数量：FConfirmQty 
+	 确认数量（基本单位）：FConfirmBaseQty 
+	 确认单价：FConfirmPrice 
+	 确认含税单价：FConfirmTaxPrice 
+	 确认折扣率%：FConfirmDiscountRate 
+	 确认折扣额：FConfirmDiscount 
+	 确认税率%：FConfirmEntryTaxRate 
+	 确认税额：FConfirmEntryTaxAmount 
+	 确认价税合计：FConfirmAllAmount 
+	 确认金额：FConfirmAmount 
+	 是否调整：FIsAdjust 
+	 剩余应付数量：FMustQty 
+	 剩余应付数量（基本单位）：FMustBaseQty 
+	 业务单据分录Id：FSID 
+	 业务单据Id：FSBILLID 
+	 对账备注：FConfirmRemark 
+	 确认税额(本位币)：FConfirmEntryTaxAmount_LC 
+	 确认价税合计(本位币)：FConfirmAllAmount_LC 
+	 确认金额(本位币)：FConfirmAmount_LC 
+	 业务单据标识：FSrcBillType 
+	 是否生成应付/发票：FIsGenerateAP 
+	 是否正在生成应付：FIsGenerateAPING 
+	 入库类型：FWWInType 
+	 不良品折让金额：FRejectsDiscountAmount 
+	 计价数量：FStockPriceQty 
+	 已应付/已开票数量：FAPJoinQty 
+	 已应付/已开票数量（基本单位）：FBaseAPJoinQty 
+	 业务单据源单类型：FStockBillType 
+	 应付/发票行号：FAPSEQ 
+	 应付/发票单号：FAPBILLNO 
+	 应付/发票单据标识：FAPFORMID 

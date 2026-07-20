@@ -1,0 +1,118 @@
+其他出库单
+
+库存管理
+
+字段说明：
+基本信息：FBillHead 
+	 实体主键：FID 
+	 单据编号：FBillNo 
+	 单据状态：FDocumentStatus 
+	 库存组织：FStockOrgId  (必填项)
+	 日期：FDate  (必填项)
+	 单据类型：FBillTypeID  (必填项)
+	 货主类型：FOwnerTypeIdHead  (必填项)
+	 货主：FOwnerIdHead 
+	 库存方向：FStockDirect  (必填项)
+	 领料部门：FDeptId 
+	 领料人：FPickerId 
+	 本位币：FBaseCurrId 
+	 客户：FCustId 
+	 备注：FNote 
+	 仓管员：FStockerId 
+	 库存组：FStockerGroupId 
+	 创建人：FCreatorId 
+	 创建日期：FCreateDate 
+	 最后修改人：FModifierId 
+	 最后修改日期：FModifyDate 
+	 作废人：FCancellerId 
+	 审核人：FApproverId 
+	 作废状态：FCancelStatus 
+	 作废日期：FCancelDate 
+	 审核日期：FApproveDate 
+	 业务类型：FBizType  (必填项)
+	 领用组织：FPickOrgId 
+	 跨组织业务类型：FTransferBizType 
+	 组织间结算跨法人标识：FIsInterLegalPerson 
+	 序列号上传：FScanBox 
+明细信息：FEntity 
+	 实体主键：FEntryID 
+	 物料编码：FMaterialId  (必填项)
+	 物料名称：FMaterialName 
+	 发货仓库：FStockId  (必填项)
+	 实发数量：FQty 
+	 成本价：FPrice 
+	 总成本：FAmount 
+	 实发数量(基本单位)：FBaseQty 
+	 实发数量(库存辅单位)：FSecQty 
+	 单位：FUnitID  (必填项)
+	 规格型号：FModel 
+	 项目编号：FProjectNo 
+	 生产日期：FProduceDate 
+	 保质期：FKFPeriod 
+	 保质期单位：FKFPeriodUnit 
+	 有效期至：FExpiryDate 
+	 计划跟踪号：FMtoNo 
+	 库存状态：FStockStatusId  (必填项)
+	 货主类型：FOwnerTypeId  (必填项)
+	 货主：FOwnerId  (必填项)
+	 保管者类型：FKeeperTypeId  (必填项)
+	 保管者：FKeeperId  (必填项)
+	 BOM版本：FBomId 
+	 基本单位：FBaseUnitId  (必填项)
+	 库存辅单位：FSecUnitId 
+	 库存更新标识：FStockFlag 
+	 关联数量：FJoinQty 
+	 辅助属性：FAuxPropId 
+	 关联数量(基本单位)：FBaseJoinQty 
+	 仓位：FStockLocId 
+	 货位：FF100001
+	 源单类型：FSrcBillTypeId 
+	 源单编号：FSrcBillNo 
+	 批号：FLot 
+	 备注：FEntryNote 
+	 服务上下文：FServiceContext 
+	 序列号单位：FSNUnitID 
+	 序列号单位数量：FSNQty 
+	 关联数量（辅单位）：FSECJOINQTY 
+	 消耗汇总：FIsConsumeSum 
+	 成本项目：FCostItem 
+	 参加费用分配：FDistribution 
+	 辅单位：FExtAuxUnitId 
+	 实发数量（辅单位）：FExtAuxUnitQty 
+	 产品组：FPRODUCTGROUPID 
+	 零售条形码：FCMKBarCode 
+	 源出库分录内码(分仓用)：FSrcMisdelEntryId 
+	 即时库存：FInvQty 
+	 参考实发数量：FREFQTY 
+	 参考实发数量(基本单位)：FREFBASEQTY 
+	 参考实发数量(辅单位)：FREFEXTAUXUNITQTY 
+	 参考实发数量(库存辅单位)：FREFSECQTY 
+	 参考总成本：FREFAMOUNT 
+	 客户物料编码：FCustMatId 
+	 客户物料名称：FCustMatName 
+序列号子单据体：FSerialSubEntity 
+	 实体主键：FDetailID 
+	 序列号：FSerialNo 
+	 序列号：FSerialId 
+	 备注：FSerialNote 
+	 SN：FSN 
+	 IMEI1：FIMEI1 
+	 IMEI2：FIMEI2 
+	 MEID：FMEID 
+关联关系表：FEntity_Link 
+	 实体主键：FLinkId 
+	 业务流程图：FEntity_Link_FFlowId 
+	 推进路线：FEntity_Link_FFlowLineId 
+	 转换规则：FEntity_Link_FRuleId 
+	 源单表内码：FEntity_Link_FSTableId 
+	 源单表：FEntity_Link_FSTableName 
+	 源单内码：FEntity_Link_FSBillId 
+	 源单分录内码：FEntity_Link_FSId 
+	 原始携带量：FEntity_Link_FBaseQtyOld 
+	 修改携带量：FEntity_Link_FBaseQty 
+	 迁移图：FEntity_Link_FLnkTrackerId 
+	 上游状态：FEntity_Link_FLnkSState 
+	 数量FLnk：FEntity_Link_FLnkAmount 
+	 迁移图：FEntity_Link_FLnk1TrackerId 
+	 上游状态：FEntity_Link_FLnk1SState 
+	 数量FLnk1：FEntity_Link_FLnk1Amount 

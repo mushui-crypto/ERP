@@ -1,0 +1,3346 @@
+<!DOCTYPE html>
+
+
+
+<html lang="zh-CN">
+
+
+
+<head>
+
+
+
+<meta charset="UTF-8">
+
+
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+
+
+<title>PO-2026-0456 详情 — 采购订单 — 磐枢工业智能平台</title>
+
+
+
+<link rel="stylesheet" href="../common.css">
+
+
+
+<script src="../common.js"></script>
+<script>
+</script>
+
+
+
+<script src="../common.js"></script>
+<script>
+var currentLookupField = null;
+var currentLookupType = null;
+var lookupData = [];
+var lookupColumns = [];
+
+function openLookup(fieldId, type) {
+  currentLookupField = fieldId;
+  currentLookupType = type;
+  
+  if (type === 'org') {
+    lookupColumns = ['编码', '名称', '形态', '上级组织'];
+    lookupData = JSON.parse(localStorage.getItem('erp_orgs') || '[]');
+    document.getElementById('lookupTitle').textContent = '选择组织';
+  } else if (type === 'department') {
+    lookupColumns = ['编码', '名称'];
+    lookupData = JSON.parse(localStorage.getItem('erp_departments_cache') || '[]');
+    document.getElementById('lookupTitle').textContent = '选择部门';
+  } else if (type === 'employee') {
+    lookupColumns = ['编号', '姓名', '所属部门'];
+    lookupData = JSON.parse(localStorage.getItem('erp_employees_cache') || '[]');
+    document.getElementById('lookupTitle').textContent = '选择员工';
+  } else if (type === 'supplier') {
+    lookupColumns = ['编码', '名称'];
+    lookupData = JSON.parse(localStorage.getItem('erp_suppliers_cache') || '[]');
+    document.getElementById('lookupTitle').textContent = '选择供应商';
+  } else if (type === 'customer') {
+    lookupColumns = ['编码', '名称'];
+    lookupData = JSON.parse(localStorage.getItem('erp_customers_cache') || '[]');
+    document.getElementById('lookupTitle').textContent = '选择客户';
+  } else if (type === 'material') {
+    lookupColumns = ['物料编码', '物料名称', '规格型号', '基本单位'];
+    lookupData = JSON.parse(localStorage.getItem('erp_materials_cache') || '[]');
+    document.getElementById('lookupTitle').textContent = '选择物料';
+  } else if (type === 'warehouse') {
+    lookupColumns = ['编码', '名称'];
+    lookupData = JSON.parse(localStorage.getItem('erp_warehouses_cache') || '[]');
+    document.getElementById('lookupTitle').textContent = '选择仓库';
+  }
+  
+  renderLookupTable(lookupData);
+  document.getElementById('lookupModal').classList.add('show');
+}
+
+function closeLookup() {
+  document.getElementById('lookupModal').classList.remove('show');
+}
+
+function filterLookup() {
+  var keyword = document.getElementById('lookupKeyword').value.trim().toLowerCase();
+  var filtered = lookupData.filter(function(item) {
+    var code = item.code || '';
+    var name = item.name || '';
+    return code.toLowerCase().includes(keyword) || name.toLowerCase().includes(keyword);
+  });
+  renderLookupTable(filtered);
+}
+
+function renderLookupTable(data) {
+  var head = document.getElementById('lookupTableHead');
+  var body = document.getElementById('lookupTableBody');
+  
+  head.innerHTML = '<tr><th class="checkbox-cell"><input type="checkbox" onclick="selectAllLookup()"></th>' + lookupColumns.map(function(col) { return '<th>' + col + '</th>'; }).join('') + '</tr>';
+  
+  body.innerHTML = '';
+  data.forEach(function(item) {
+    var row = document.createElement('tr');
+    row.onclick = function() { selectLookupRow(this); };
+    var cells = ['<td class="checkbox-cell"><input type="checkbox" class="lookup-checkbox" value="' + item.id + '"></td>'];
+    if (currentLookupType === 'org') {
+      cells.push('<td>' + item.code + '</td><td>' + item.name + '</td><td>' + (item.form || '') + '</td><td>' + (item.parentName || '') + '</td>');
+    } else if (currentLookupType === 'department') {
+      cells.push('<td>' + item.code + '</td><td>' + item.name + '</td>');
+    } else if (currentLookupType === 'employee') {
+      cells.push('<td>' + item.code + '</td><td>' + item.name + '</td><td>' + (item.department || '') + '</td>');
+    } else if (currentLookupType === 'supplier' || currentLookupType === 'customer') {
+      cells.push('<td>' + item.code + '</td><td>' + item.name + '</td>');
+    } else if (currentLookupType === 'material') {
+      cells.push('<td>' + item.code + '</td><td>' + item.name + '</td><td>' + (item.specification || '') + '</td><td>' + (item.unit || '') + '</td>');
+    } else if (currentLookupType === 'warehouse') {
+      cells.push('<td>' + item.code + '</td><td>' + item.name + '</td>');
+    }
+    row.innerHTML = cells.join('');
+    body.appendChild(row);
+  });
+  
+  if (data.length === 0) {
+    body.innerHTML = '<tr><td colspan="' + (lookupColumns.length + 1) + '" style="text-align:center;padding:40px;color:#999;">暂无数据</td></tr>';
+  }
+}
+
+function selectAllLookup() {
+  var master = document.querySelector('.lookup-table th input');
+  var checkboxes = document.querySelectorAll('.lookup-checkbox');
+  checkboxes.forEach(function(cb) { cb.checked = master.checked; });
+}
+
+function selectLookupRow(row) {
+  var checkbox = row.querySelector('.lookup-checkbox');
+  checkbox.checked = !checkbox.checked;
+}
+
+function confirmLookup() {
+  var checkboxes = document.querySelectorAll('.lookup-checkbox:checked');
+  if (checkboxes.length === 0) {
+    showToast('请选择一条记录', 'warning');
+    return;
+  }
+  
+  var item = lookupData.find(function(d) { return d.id === checkboxes[0].value; });
+  if (item) {
+    var field = document.getElementById(currentLookupField);
+    if (field) {
+      field.value = item.name;
+      field.setAttribute('data-id', item.id);
+      field.setAttribute('data-code', item.code);
+      
+      if (currentLookupType === 'material') {
+        var row = field.closest('tr');
+        if (row) {
+          row.querySelector('.material-name').value = item.name;
+          row.querySelector('.material-spec').value = item.specification || '';
+          row.querySelector('.material-unit').value = item.unit || '';
+        }
+      }
+    }
+  }
+  
+  closeLookup();
+}
+
+function openMaterialLookup(btn) {
+  var field = btn.previousElementSibling;
+  field.id = 'lookupField_' + Date.now();
+  currentLookupField = field.id;
+  openLookup(field.id, 'material');
+}
+
+function openOrgLookup(btn) {
+  var field = btn.previousElementSibling;
+  field.id = 'lookupField_' + Date.now();
+  currentLookupField = field.id;
+  openLookup(field.id, 'org');
+}
+
+function openSupplierLookup(btn) {
+  var field = btn.previousElementSibling;
+  field.id = 'lookupField_' + Date.now();
+  currentLookupField = field.id;
+  openLookup(field.id, 'supplier');
+}
+
+function openWarehouseLookup(btn) {
+  var field = btn.previousElementSibling;
+  field.id = 'lookupField_' + Date.now();
+  currentLookupField = field.id;
+  openLookup(field.id, 'warehouse');
+}
+
+function initLookupData() {
+  if (!localStorage.getItem('erp_orgs')) {
+    localStorage.setItem('erp_orgs', JSON.stringify([
+      { id: 'org-001', code: 'ORG-HQ', name: '磐枢工业集团', form: '集团', parentName: '' },
+      { id: 'org-002', code: 'ORG-SM', name: '磐枢智能制造有限公司', form: '公司', parentName: '磐枢工业集团' },
+      { id: 'org-003', code: 'ORG-SM-PD', name: '生产制造部', form: '部门', parentName: '磐枢智能制造有限公司' },
+      { id: 'org-004', code: 'ORG-SM-FA', name: '财务部', form: '部门', parentName: '磐枢智能制造有限公司' },
+      { id: 'org-005', code: 'ORG-SM-SD', name: '销售部', form: '部门', parentName: '磐枢智能制造有限公司' }
+    ]));
+  }
+  if (!localStorage.getItem('erp_departments_cache')) {
+    localStorage.setItem('erp_departments_cache', JSON.stringify([
+      { id: 'dept-001', code: 'DEPT-PD', name: '生产制造部', status: 1 },
+      { id: 'dept-002', code: 'DEPT-FA', name: '财务部', status: 1 },
+      { id: 'dept-003', code: 'DEPT-SD', name: '销售部', status: 1 },
+      { id: 'dept-004', code: 'DEPT-AS', name: '装配车间', status: 1 },
+      { id: 'dept-005', code: 'DEPT-QC', name: '质检车间', status: 1 }
+    ]));
+  }
+  if (!localStorage.getItem('erp_employees_cache')) {
+    localStorage.setItem('erp_employees_cache', JSON.stringify([
+      { id: 'emp-001', code: 'EMP-001', name: '张三', department: '生产制造部', status: 1 },
+      { id: 'emp-002', code: 'EMP-002', name: '李四', department: '生产制造部', status: 1 },
+      { id: 'emp-003', code: 'EMP-003', name: '王五', department: '财务部', status: 1 },
+      { id: 'emp-004', code: 'EMP-004', name: '赵六', department: '销售部', status: 1 },
+      { id: 'emp-005', code: 'EMP-005', name: '钱七', department: '质检车间', status: 1 }
+    ]));
+  }
+  if (!localStorage.getItem('erp_suppliers_cache')) {
+    localStorage.setItem('erp_suppliers_cache', JSON.stringify([
+      { id: 'sup-001', code: 'S-001', name: '深圳电子元器件有限公司', status: 1 },
+      { id: 'sup-002', code: 'S-002', name: '杭州精密机械加工厂', status: 1 },
+      { id: 'sup-003', code: 'S-003', name: '上海材料科技有限公司', status: 1 },
+      { id: 'sup-004', code: 'S-004', name: '东莞五金制品厂', status: 1 }
+    ]));
+  }
+  if (!localStorage.getItem('erp_materials_cache')) {
+    localStorage.setItem('erp_materials_cache', JSON.stringify([
+      { id: 'mat-001', code: 'P-001', name: '高频传感器模块', specification: 'HT-2026', unit: '个', status: 1 },
+      { id: 'mat-002', code: 'P-002', name: '控制电路板', specification: 'CB-2026', unit: '块', status: 1 },
+      { id: 'mat-003', code: 'P-003', name: '智能控制器', specification: 'IC-V3', unit: '台', status: 1 },
+      { id: 'mat-004', code: 'P-004', name: '电源模块', specification: 'PM-500W', unit: '个', status: 1 },
+      { id: 'mat-005', code: 'M-001', name: 'PCB电路板', specification: 'FR-4双层', unit: '块', status: 1 },
+      { id: 'mat-006', code: 'M-002', name: '贴片电阻', specification: '10KΩ 0603', unit: '个', status: 1 },
+      { id: 'mat-007', code: 'M-003', name: '贴片电容', specification: '100μF 0805', unit: '个', status: 1 },
+      { id: 'mat-008', code: 'M-004', name: '螺丝', specification: 'M4x10', unit: '包', status: 1 }
+    ]));
+  }
+  if (!localStorage.getItem('erp_warehouses_cache')) {
+    localStorage.setItem('erp_warehouses_cache', JSON.stringify([
+      { id: 'wh-001', code: 'WH-001', name: '成品仓', status: 1 },
+      { id: 'wh-002', code: 'WH-002', name: '原料仓', status: 1 },
+      { id: 'wh-003', code: 'WH-003', name: '半成品仓', status: 1 },
+      { id: 'wh-004', code: 'WH-004', name: '辅料仓', status: 1 }
+    ]));
+  }
+}
+
+</script>
+
+
+
+<style>
+
+
+
+
+
+
+
+.toast-container {
+
+
+
+  position: fixed;
+
+
+
+  top: 60px;
+
+
+
+  right: 20px;
+
+
+
+  z-index: 1000;
+
+
+
+  display: flex;
+
+
+
+  flex-direction: column;
+
+
+
+  gap: 8px;
+
+
+
+}
+
+
+
+.toast {
+
+
+
+  padding: 12px 16px;
+
+
+
+  border-radius: var(--radius-md);
+
+
+
+  font-size: 13px;
+
+
+
+  color: var(--text-primary);
+
+
+
+  min-width: 280px;
+
+
+
+  max-width: 400px;
+
+
+
+  display: flex;
+
+
+
+  align-items: center;
+
+
+
+  gap: 8px;
+
+
+
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+
+
+
+  animation: toastIn 0.3s ease;
+
+
+
+}
+
+
+
+@keyframes toastIn {
+
+
+
+  from { opacity: 0; transform: translateX(100%); }
+
+
+
+  to { opacity: 1; transform: translateX(0); }
+
+
+
+}
+
+
+
+.toast-success { background: rgba(34,197,94,0.9); }
+
+
+
+.toast-error { background: rgba(239,68,68,0.9); }
+
+
+
+.toast-warning { background: rgba(234,179,8,0.9); }
+
+
+
+.toast-info { background: rgba(6,182,212,0.9); }
+
+
+
+.toast-icon { font-size: 16px; }
+
+
+
+
+
+
+
+.confirm-modal-overlay {
+
+
+
+  position: fixed;
+
+
+
+  inset: 0;
+
+
+
+  background: rgba(0,0,0,0.6);
+
+
+
+  display: none;
+
+
+
+  align-items: center;
+
+
+
+  justify-content: center;
+
+
+
+  z-index: 2000;
+
+
+
+}
+
+
+
+.confirm-modal-overlay.show { display: flex; }
+
+
+
+.confirm-modal {
+
+
+
+  background: var(--bg-surface);
+
+
+
+  border: 1px solid var(--border-normal);
+
+
+
+  border-radius: var(--radius-lg);
+
+
+
+  padding: 24px;
+
+
+
+  min-width: 360px;
+
+
+
+  max-width: 480px;
+
+
+
+  box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+
+
+
+}
+
+
+
+.confirm-modal-header {
+
+
+
+  font-size: 14px;
+
+
+
+  font-weight: 600;
+
+
+
+  color: var(--text-primary);
+
+
+
+  margin-bottom: 12px;
+
+
+
+}
+
+
+
+.confirm-modal-body {
+
+
+
+  font-size: 13px;
+
+
+
+  color: var(--text-secondary);
+
+
+
+  line-height: 1.6;
+
+
+
+  margin-bottom: 20px;
+
+
+
+}
+
+
+
+.confirm-modal-footer {
+
+
+
+  display: flex;
+
+
+
+  justify-content: flex-end;
+
+
+
+  gap: 8px;
+
+
+
+}
+
+
+
+
+
+
+
+<style>
+
+
+
+.action-links a { color: var(--text-accent); font-size: 12px; margin-right: 8px; cursor: pointer; }
+
+
+
+.action-links a:hover { text-decoration: underline; }
+
+
+
+.data-table td.text-mono, .data-table th.text-mono { text-align: right; }
+
+
+
+.info-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+
+
+
+.info-item .info-label { font-size: 12px; color: var(--text-tertiary); margin-bottom: 4px; }
+
+
+
+.info-item .info-value { font-size: 13px; color: var(--text-primary); }
+
+
+
+.bottom-bar {
+
+
+
+  position: sticky; bottom: 0; left: 0; right: 0;
+
+
+
+  background: var(--bg-surface);
+
+
+
+  border-top: 1px solid var(--border-normal);
+
+
+
+  padding: 12px 24px;
+
+
+
+  display: flex; justify-content: space-between; align-items: center;
+
+
+
+}
+
+
+
+.related-link { color: var(--text-accent); font-size: 13px; }
+
+
+
+.related-link:hover { text-decoration: underline; }
+
+
+
+
+.lookup-modal { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:2000; justify-content:center; align-items:center; }
+.lookup-modal.show { display:flex; }
+.lookup-dialog { background:#fff; border:1px solid #e8e8e8; border-radius:4px; width:720px; max-height:70vh; overflow:hidden; }
+.lookup-header { padding:14px 20px; border-bottom:1px solid #e8e8e8; display:flex; align-items:center; justify-content:space-between; }
+.lookup-title { font-size:15px; font-weight:600; color:#333; }
+.lookup-close { font-size:20px; color:#666; cursor:pointer; background:none; border:none; }
+.lookup-close:hover { color:#333; }
+.lookup-body { padding:16px; }
+.lookup-search { display:flex; gap:8px; margin-bottom:12px; }
+.lookup-search input { flex:1; padding:6px 10px; border:1px solid #e8e8e8; border-radius:4px; font-size:13px; }
+.lookup-search button { padding:6px 16px; background:#1890ff; color:#fff; border:none; border-radius:4px; cursor:pointer; }
+.lookup-table { width:100%; border-collapse:collapse; font-size:13px; }
+.lookup-table th, .lookup-table td { padding:10px 12px; text-align:left; border-bottom:1px solid #e8e8e8; }
+.lookup-table th { background:#fafafa; font-weight:600; color:#333; }
+.lookup-table tr:hover { background:#f5f5f5; }
+.lookup-table .checkbox-cell { width:40px; }
+.lookup-footer { padding:12px 20px; border-top:1px solid #e8e8e8; display:flex; justify-content:flex-end; gap:8px; }
+.lookup-field { display:flex; align-items:center; }
+.lookup-field input { flex:1; padding:6px 10px; border:1px solid #e8e8e8; border-radius:4px 0 0 4px; font-size:13px; }
+.lookup-field button { width:28px; height:28px; border:1px solid #e8e8e8; border-left:none; border-radius:0 4px 4px 0; background:#fff; cursor:pointer; display:flex; align-items:center; justify-content:center; }
+.lookup-field button:hover { background:#f5f5f5; }
+
+</style>
+
+
+
+</head>
+
+
+
+</style>
+
+<body>
+
+
+
+
+
+
+
+<aside class="sidebar" id="sidebar">
+
+
+
+<div class="sidebar-logo">
+
+
+
+    <img src="../images/logo.png" alt="磐枢工业智能平台" style="width: 100%; max-width: 200px; margin-bottom: 8px;">
+
+
+
+    <h1 style="font-size: 16px; margin: 0;">磐枢工业智能平台</h1>
+
+
+
+  </div>
+
+
+
+  <nav class="sidebar-menu"></nav>
+
+
+
+<div class="sidebar-user"><div class="avatar">管</div>
+
+
+
+</aside>
+
+
+
+
+
+
+
+<div class="main-content" id="mainContent" id="mainContent">
+
+
+
+  <!-- Page Header -->
+
+
+
+  <div class="page-header">
+
+
+
+    <div>
+
+
+
+      <div class="flex items-center gap-8">
+
+
+
+        <button class="sidebar-toggle" onclick="">&#9776;</button>
+
+
+
+        <div>
+
+
+
+          <h2>采购订单详情</h2>
+
+
+
+          <div class="breadcrumb"><a href="../index.html">首页</a><span>></span><a href="#">供应链</a><span>></span><a href="purchase-order.html">采购管理</a><span>></span><a href="purchase-order.html">采购订单</a><span>></span><span>PO-2026-0456</span></div></div>
+
+
+
+        </div>
+
+
+
+      </div>
+
+
+
+    </div>
+
+
+
+    <div class="page-actions">
+
+
+
+      <span class="badge badge-success" style="padding:4px 12px;font-size:13px;">已审核</span>
+
+
+
+    </div>
+
+
+
+  </div>
+
+  <div class="doc-header" style="background:#fff;border-bottom:1px solid #e8e8e8;padding:12px 20px;display:flex;justify-content:space-between;align-items:center;">
+    <div style="font-size:14px;color:#666;">快捷操作</div>
+    <div class="doc-toolbar" style="display:flex;gap:8px;flex-wrap:wrap;">
+      <button class="toolbar-btn" style="padding:6px 12px;border-radius:4px;font-size:13px;cursor:pointer;border:1px solid #d9d9d9;background:#fff;color:#666;display:flex;align-items:center;gap:6px;transition:all 0.3s;" onclick="showToast('刷新功能开发中...', 'info')"><span>🔄</span> 刷新</button>
+      <button class="toolbar-btn" style="padding:6px 12px;border-radius:4px;font-size:13px;cursor:pointer;border:1px solid #d9d9d9;background:#fff;color:#666;display:flex;align-items:center;gap:6px;transition:all 0.3s;" onclick="showToast('列设置功能开发中...', 'info')"><span>⚙️</span> 显示/隐藏列</button>
+      <button class="toolbar-btn" style="padding:6px 12px;border-radius:4px;font-size:13px;cursor:pointer;border:1px solid #d9d9d9;background:#fff;color:#666;display:flex;align-items:center;gap:6px;transition:all 0.3s;" onclick="showToast('导出功能开发中...', 'info')"><span>📤</span> 导出</button>
+      <button class="toolbar-btn danger" style="padding:6px 12px;border-radius:4px;font-size:13px;cursor:pointer;border:1px solid #f5222d;background:#f5222d;color:#fff;display:flex;align-items:center;gap:6px;transition:all 0.3s;" onclick="showConfirm('确认退出？', function() {location.href='../index.html';});)"><span>✖️</span> 退出</button>
+    </div>
+  </div>
+
+  <div class="page-body">
+
+
+
+    <!-- Header Info Card -->
+
+
+
+    <div class="card mb-16">
+
+
+
+      <div class="card-body">
+
+
+
+        <div class="info-grid" style="grid-template-columns:repeat(4,1fr);gap:16px;">
+
+
+
+          <div class="info-item">
+
+
+
+            <div class="info-label">订单号</div>
+
+
+
+            <div class="info-value text-mono">PO-2026-0456</div>
+
+
+
+          </div>
+
+
+
+          <div class="info-item">
+
+
+
+            <div class="info-label">供应商</div>
+
+
+
+            <div class="info-value">深圳市华创电子科技有限公司</div>
+
+
+
+          </div>
+
+
+
+          <div class="info-item">
+
+
+
+            <div class="info-label">订单日期</div>
+
+
+
+            <div class="info-value text-mono">2026-07-08</div>
+
+
+
+          </div>
+
+
+
+          <div class="info-item">
+
+
+
+            <div class="info-label">交货日期</div>
+
+
+
+            <div class="info-value text-mono">2026-07-25</div>
+
+
+
+          </div>
+
+
+
+          <div class="info-item">
+
+
+
+            <div class="info-label">交货方式</div>
+
+
+
+            <div class="info-value">送货上门</div>
+
+
+
+          </div>
+
+
+
+          <div class="info-item">
+
+
+
+            <div class="info-label">付款条件</div>
+
+
+
+            <div class="info-value">月结30天</div>
+
+
+
+          </div>
+
+
+
+          <div class="info-item">
+
+
+
+            <div class="info-label">币种</div>
+
+
+
+            <div class="info-value">CNY 人民币</div>
+
+
+
+          </div>
+
+
+
+          <div class="info-item">
+
+
+
+            <div class="info-label">汇率</div>
+
+
+
+            <div class="info-value text-mono">1.0000</div>
+
+
+
+          </div>
+
+
+
+          <div class="info-item">
+
+
+
+            <div class="info-label">采购员</div>
+
+
+
+            <div class="info-value">张建国</div>
+
+
+
+          </div>
+
+
+
+          <div class="info-item">
+
+
+
+            <div class="info-label">采购部门</div>
+
+
+
+            <div class="info-value">采购部-华东区</div>
+
+
+
+          </div>
+
+
+
+          <div class="info-item">
+
+
+
+            <div class="info-label">状态</div>
+
+
+
+            <div class="info-value"><span class="badge badge-success">已审核</span></div>
+
+
+
+          </div>
+
+
+
+          <div class="info-item">
+
+
+
+            <div class="info-label">价税合计</div>
+
+
+
+            <div class="info-value text-mono font-bold" style="color:var(--color-success);">360,244.00 元</div>
+
+
+
+          </div>
+
+
+
+          <div class="info-item" style="grid-column:span 4;">
+
+
+
+            <div class="info-label">备注</div>
+
+
+
+            <div class="info-value">本订单物料用于第三季度生产计划，请供应商按交货日期准时交货。如有质量问题请在24小时内反馈。</div>
+
+
+
+          </div>
+
+
+
+        </div>
+
+
+
+      </div>
+
+
+
+    </div>
+
+
+
+
+
+
+
+    <!-- Workflow Steps -->
+
+
+
+    <div class="card mb-16">
+
+
+
+      <div class="card-body">
+
+
+
+        <div class="workflow-steps">
+
+
+
+          <div class="workflow-step done">
+
+
+
+            <span class="step-num">1</span>
+
+
+
+            <span>创建</span>
+
+
+
+          </div>
+
+
+
+          <div class="workflow-step done">
+
+
+
+            <span class="step-num">2</span>
+
+
+
+            <span>审核</span>
+
+
+
+          </div>
+
+
+
+          <div class="workflow-step active">
+
+
+
+            <span class="step-num">3</span>
+
+
+
+            <span>部分入库</span>
+
+
+
+          </div>
+
+
+
+          <div class="workflow-step">
+
+
+
+            <span class="step-num">4</span>
+
+
+
+            <span>关闭</span>
+
+
+
+          </div>
+
+
+
+        </div>
+
+
+
+      </div>
+
+
+
+    </div>
+
+
+
+
+
+
+
+    <!-- Tabs -->
+
+
+
+    <div class="card">
+
+
+
+      <div class="tabs" id="detailTabs">
+
+
+
+        <div class="tab-item active" data-tab="orderDetail">订单明细</div>
+
+
+
+        <div class="tab-item" data-tab="deliveryPlan">交货计划</div>
+
+
+
+        <div class="tab-item" data-tab="paymentPlan">付款计划</div>
+
+
+
+        <div class="tab-item" data-tab="relatedDocs">关联单据</div>
+
+
+
+      </div>
+
+
+
+
+
+
+
+      <!-- Tab: 订单明细 -->
+
+
+
+      <div class="tab-content">
+
+
+
+        <div class="tab-pane active" id="orderDetail">
+
+
+
+          <div class="table-wrapper">
+
+
+
+            <table class="data-table">
+
+
+
+              <thead>
+
+
+
+                <tr>
+
+
+
+                  <th>行号</th>
+
+
+
+                  <th>物料编码</th>
+
+
+
+                  <th>物料名称</th>
+
+
+
+                  <th>规格</th>
+
+
+
+                  <th>单位</th>
+
+
+
+                  <th class="text-mono">数量</th>
+
+
+
+                  <th class="text-mono">单价(元)</th>
+
+
+
+                  <th class="text-mono">金额(元)</th>
+
+
+
+                  <th class="text-mono">税率(%)</th>
+
+
+
+                  <th class="text-mono">税额(元)</th>
+
+
+
+                  <th class="text-mono">价税合计(元)</th>
+
+
+
+                  <th>交货日期</th>
+
+
+
+                  <th>备注</th>
+
+
+
+                </tr>
+
+
+
+              </thead>
+
+
+
+              <tbody>
+
+
+
+                <tr>
+
+
+
+                  <td>1</td>
+
+
+
+                  <td class="text-mono">WL-ABS-001</td>
+
+
+
+                  <td>ABS树脂</td>
+
+
+
+                  <td>PA-747 通用级</td>
+
+
+
+                  <td>KG</td>
+
+
+
+                  <td class="text-mono">2,000.00</td>
+
+
+
+                  <td class="text-mono">18.50</td>
+
+
+
+                  <td class="text-mono">37,000.00</td>
+
+
+
+                  <td class="text-mono">13</td>
+
+
+
+                  <td class="text-mono">4,810.00</td>
+
+
+
+                  <td class="text-mono">41,810.00</td>
+
+
+
+                  <td>2026-07-15</td>
+
+
+
+                  <td>通用级</td>
+
+
+
+                </tr>
+
+
+
+                <tr>
+
+
+
+                  <td>2</td>
+
+
+
+                  <td class="text-mono">WL-PC-012</td>
+
+
+
+                  <td>PC/ABS合金</td>
+
+
+
+                  <td>HAC-8250 阻燃级</td>
+
+
+
+                  <td>KG</td>
+
+
+
+                  <td class="text-mono">1,500.00</td>
+
+
+
+                  <td class="text-mono">28.60</td>
+
+
+
+                  <td class="text-mono">42,900.00</td>
+
+
+
+                  <td class="text-mono">13</td>
+
+
+
+                  <td class="text-mono">5,577.00</td>
+
+
+
+                  <td class="text-mono">48,477.00</td>
+
+
+
+                  <td>2026-07-18</td>
+
+
+
+                  <td>阻燃级</td>
+
+
+
+                </tr>
+
+
+
+                <tr>
+
+
+
+                  <td>3</td>
+
+
+
+                  <td class="text-mono">WL-PP-008</td>
+
+
+
+                  <td>PP聚丙烯</td>
+
+
+
+                  <td>K8003 注塑级</td>
+
+
+
+                  <td>KG</td>
+
+
+
+                  <td class="text-mono">5,000.00</td>
+
+
+
+                  <td class="text-mono">9.80</td>
+
+
+
+                  <td class="text-mono">49,000.00</td>
+
+
+
+                  <td class="text-mono">13</td>
+
+
+
+                  <td class="text-mono">6,370.00</td>
+
+
+
+                  <td class="text-mono">55,370.00</td>
+
+
+
+                  <td>2026-07-12</td>
+
+
+
+                  <td>注塑级</td>
+
+
+
+                </tr>
+
+
+
+                <tr>
+
+
+
+                  <td>4</td>
+
+
+
+                  <td class="text-mono">WL-POM-003</td>
+
+
+
+                  <td>POM聚甲醛</td>
+
+
+
+                  <td>M90-44 高韧性级</td>
+
+
+
+                  <td>KG</td>
+
+
+
+                  <td class="text-mono">800.00</td>
+
+
+
+                  <td class="text-mono">42.00</td>
+
+
+
+                  <td class="text-mono">33,600.00</td>
+
+
+
+                  <td class="text-mono">13</td>
+
+
+
+                  <td class="text-mono">4,368.00</td>
+
+
+
+                  <td class="text-mono">37,968.00</td>
+
+
+
+                  <td>2026-07-20</td>
+
+
+
+                  <td>高韧性级</td>
+
+
+
+                </tr>
+
+
+
+                <tr>
+
+
+
+                  <td>5</td>
+
+
+
+                  <td class="text-mono">WL-PA-016</td>
+
+
+
+                  <td>PA66尼龙66</td>
+
+
+
+                  <td>A3HG5 加纤35%</td>
+
+
+
+                  <td>KG</td>
+
+
+
+                  <td class="text-mono">3,000.00</td>
+
+
+
+                  <td class="text-mono">52.10</td>
+
+
+
+                  <td class="text-mono">156,300.00</td>
+
+
+
+                  <td class="text-mono">13</td>
+
+
+
+                  <td class="text-mono">20,319.00</td>
+
+
+
+                  <td class="text-mono">176,619.00</td>
+
+
+
+                  <td>2026-07-10</td>
+
+
+
+                  <td>加纤35%</td>
+
+
+
+                </tr>
+
+
+
+                <tr style="background:var(--bg-inset);font-weight:600;">
+
+
+
+                  <td colspan="5" style="text-align:right;color:var(--text-tertiary);">合计</td>
+
+
+
+                  <td class="text-mono">12,300.00</td>
+
+
+
+                  <td></td>
+
+
+
+                  <td class="text-mono">318,800.00</td>
+
+
+
+                  <td></td>
+
+
+
+                  <td class="text-mono">41,444.00</td>
+
+
+
+                  <td class="text-mono" style="color:var(--color-success);">360,244.00</td>
+
+
+
+                  <td colspan="2"></td>
+
+
+
+                </tr>
+
+
+
+              </tbody>
+
+
+
+            </table>
+
+
+
+          </div>
+
+
+
+        </div>
+
+
+
+
+
+
+
+        <!-- Tab: 交货计划 -->
+
+
+
+        <div class="tab-pane" id="deliveryPlan">
+
+
+
+          <div class="table-wrapper">
+
+
+
+            <table class="data-table">
+
+
+
+              <thead>
+
+
+
+                <tr>
+
+
+
+                  <th>行号</th>
+
+
+
+                  <th>物料名称</th>
+
+
+
+                  <th>规格型号</th>
+
+
+
+                  <th class="text-mono">计划数量</th>
+
+
+
+                  <th class="text-mono">已交数量</th>
+
+
+
+                  <th class="text-mono">待交数量</th>
+
+
+
+                  <th>计划交货日期</th>
+
+
+
+                  <th>交货仓库</th>
+
+
+
+                  <th>状态</th>
+
+
+
+                </tr>
+
+
+
+              </thead>
+
+
+
+              <tbody>
+
+
+
+                <tr>
+
+
+
+                  <td>1</td>
+
+
+
+                  <td>PA66尼龙66</td>
+
+
+
+                  <td>A3HG5 加纤35%</td>
+
+
+
+                  <td class="text-mono">3,000.00</td>
+
+
+
+                  <td class="text-mono">3,000.00</td>
+
+
+
+                  <td class="text-mono">0.00</td>
+
+
+
+                  <td>2026-07-10</td>
+
+
+
+                  <td>原料仓-A区</td>
+
+
+
+                  <td><span class="badge badge-success">已交货</span></td>
+
+
+
+                </tr>
+
+
+
+                <tr>
+
+
+
+                  <td>2</td>
+
+
+
+                  <td>PP聚丙烯</td>
+
+
+
+                  <td>K8003 注塑级</td>
+
+
+
+                  <td class="text-mono">5,000.00</td>
+
+
+
+                  <td class="text-mono">5,000.00</td>
+
+
+
+                  <td class="text-mono">0.00</td>
+
+
+
+                  <td>2026-07-12</td>
+
+
+
+                  <td>原料仓-A区</td>
+
+
+
+                  <td><span class="badge badge-success">已交货</span></td>
+
+
+
+                </tr>
+
+
+
+                <tr>
+
+
+
+                  <td>3</td>
+
+
+
+                  <td>ABS树脂</td>
+
+
+
+                  <td>PA-747 通用级</td>
+
+
+
+                  <td class="text-mono">2,000.00</td>
+
+
+
+                  <td class="text-mono">2,000.00</td>
+
+
+
+                  <td class="text-mono">0.00</td>
+
+
+
+                  <td>2026-07-15</td>
+
+
+
+                  <td>原料仓-B区</td>
+
+
+
+                  <td><span class="badge badge-success">已交货</span></td>
+
+
+
+                </tr>
+
+
+
+                <tr>
+
+
+
+                  <td>4</td>
+
+
+
+                  <td>PC/ABS合金</td>
+
+
+
+                  <td>HAC-8250 阻燃级</td>
+
+
+
+                  <td class="text-mono">1,500.00</td>
+
+
+
+                  <td class="text-mono">800.00</td>
+
+
+
+                  <td class="text-mono">700.00</td>
+
+
+
+                  <td>2026-07-18</td>
+
+
+
+                  <td>原料仓-B区</td>
+
+
+
+                  <td><span class="badge badge-warning">部分交货</span></td>
+
+
+
+                </tr>
+
+
+
+                <tr>
+
+
+
+                  <td>5</td>
+
+
+
+                  <td>POM聚甲醛</td>
+
+
+
+                  <td>M90-44 高韧性级</td>
+
+
+
+                  <td class="text-mono">800.00</td>
+
+
+
+                  <td class="text-mono">0.00</td>
+
+
+
+                  <td class="text-mono">800.00</td>
+
+
+
+                  <td>2026-07-20</td>
+
+
+
+                  <td>原料仓-C区</td>
+
+
+
+                  <td><span class="badge badge-info">待交货</span></td>
+
+
+
+                </tr>
+
+
+
+              </tbody>
+
+
+
+            </table>
+
+
+
+          </div>
+
+
+
+        </div>
+
+
+
+
+
+
+
+        <!-- Tab: 付款计划 -->
+
+
+
+        <div class="tab-pane" id="paymentPlan">
+
+
+
+          <div class="table-wrapper">
+
+
+
+            <table class="data-table">
+
+
+
+              <thead>
+
+
+
+                <tr>
+
+
+
+                  <th>期次</th>
+
+
+
+                  <th>付款条件</th>
+
+
+
+                  <th class="text-mono">计划金额(元)</th>
+
+
+
+                  <th class="text-mono">已付金额(元)</th>
+
+
+
+                  <th class="text-mono">未付金额(元)</th>
+
+
+
+                  <th>计划付款日期</th>
+
+
+
+                  <th>状态</th>
+
+
+
+                </tr>
+
+
+
+              </thead>
+
+
+
+              <tbody>
+
+
+
+                <tr>
+
+
+
+                  <td>第1期</td>
+
+
+
+                  <td>预付款30%（发货前）</td>
+
+
+
+                  <td class="text-mono">98,640.00</td>
+
+
+
+                  <td class="text-mono">98,640.00</td>
+
+
+
+                  <td class="text-mono">0.00</td>
+
+
+
+                  <td>2026-07-08</td>
+
+
+
+                  <td><span class="badge badge-success">已支付</span></td>
+
+
+
+                </tr>
+
+
+
+                <tr>
+
+
+
+                  <td>第2期</td>
+
+
+
+                  <td>到货款50%（验收后）</td>
+
+
+
+                  <td class="text-mono">164,250.00</td>
+
+
+
+                  <td class="text-mono">164,250.00</td>
+
+
+
+                  <td class="text-mono">0.00</td>
+
+
+
+                  <td>2026-07-20</td>
+
+
+
+                  <td><span class="badge badge-success">已支付</span></td>
+
+
+
+                </tr>
+
+
+
+                <tr>
+
+
+
+                  <td>第3期</td>
+
+
+
+                  <td>尾款20%（质保期满）</td>
+
+
+
+                  <td class="text-mono">65,700.00</td>
+
+
+
+                  <td class="text-mono">0.00</td>
+
+
+
+                  <td class="text-mono">65,700.00</td>
+
+
+
+                  <td>2026-10-08</td>
+
+
+
+                  <td><span class="badge badge-info">待支付</span></td>
+
+
+
+                </tr>
+
+
+
+              </tbody>
+
+
+
+            </table>
+
+
+
+          </div>
+
+
+
+        </div>
+
+
+
+
+
+
+
+        <!-- Tab: 关联单据 -->
+
+
+
+        <div class="tab-pane" id="relatedDocs">
+
+
+
+          <div class="table-wrapper">
+
+
+
+            <table class="data-table">
+
+
+
+              <thead>
+
+
+
+                <tr>
+
+
+
+                  <th>关联类型</th>
+
+
+
+                  <th>单据编号</th>
+
+
+
+                  <th>单据状态</th>
+
+
+
+                  <th>关联数量</th>
+
+
+
+                  <th>关联日期</th>
+
+
+
+                  <th>操作</th>
+
+
+
+                </tr>
+
+
+
+              </thead>
+
+
+
+              <tbody>
+
+
+
+                <tr>
+
+
+
+                  <td><span class="badge badge-info">采购申请</span></td>
+
+
+
+                  <td><a class="related-link" href="purchase-request.html">PR-2026-0312</a></td>
+
+
+
+                  <td><span class="badge badge-success">已批准</span></td>
+
+
+
+                  <td class="text-mono">5行</td>
+
+
+
+                  <td>2026-07-05</td>
+
+
+
+                  <td class="action-links"><a href="purchase-request.html">查看</a></td>
+
+
+
+                </tr>
+
+
+
+                <tr>
+
+
+
+                  <td><span class="badge badge-success">入库通知</span></td>
+
+
+
+                  <td><a class="related-link" href="purchase-inbound.html">RK-2026-0871</a></td>
+
+
+
+                  <td><span class="badge badge-success">已入库</span></td>
+
+
+
+                  <td class="text-mono">7,000 KG</td>
+
+
+
+                  <td>2026-07-10</td>
+
+
+
+                  <td class="action-links"><a href="purchase-inbound.html">查看</a></td>
+
+
+
+                </tr>
+
+
+
+                <tr>
+
+
+
+                  <td><span class="badge badge-success">入库通知</span></td>
+
+
+
+                  <td><a class="related-link" href="purchase-inbound.html">RK-2026-0875</a></td>
+
+
+
+                  <td><span class="badge badge-success">已入库</span></td>
+
+
+
+                  <td class="text-mono">3,000 KG</td>
+
+
+
+                  <td>2026-07-12</td>
+
+
+
+                  <td class="action-links"><a href="purchase-inbound.html">查看</a></td>
+
+
+
+                </tr>
+
+
+
+                <tr>
+
+
+
+                  <td><span class="badge badge-warning">来料检验</span></td>
+
+
+
+                  <td><a class="related-link" href="quality.html">QC-2026-0208</a></td>
+
+
+
+                  <td><span class="badge badge-success">质检通过</span></td>
+
+
+
+                  <td class="text-mono">7,000 KG</td>
+
+
+
+                  <td>2026-07-11</td>
+
+
+
+                  <td class="action-links"><a href="quality.html">查看</a></td>
+
+
+
+                </tr>
+
+
+
+                <tr>
+
+
+
+                  <td><span class="badge badge-warning">来料检验</span></td>
+
+
+
+                  <td><a class="related-link" href="quality.html">QC-2026-0212</a></td>
+
+
+
+                  <td><span class="badge badge-success">质检通过</span></td>
+
+
+
+                  <td class="text-mono">3,000 KG</td>
+
+
+
+                  <td>2026-07-13</td>
+
+
+
+                  <td class="action-links"><a href="quality.html">查看</a></td>
+
+
+
+                </tr>
+
+
+
+              </tbody>
+
+
+
+            </table>
+
+
+
+          </div>
+
+
+
+        </div>
+
+
+
+      </div>
+
+
+
+    </div>
+
+
+
+
+
+
+
+    <!-- 三栏卡片：附件/审批流程/操作日志 -->
+
+
+
+    <div class="grid-3 mt-16">
+
+
+
+      <!-- 附件区 -->
+
+
+
+      <div class="card">
+
+
+
+        <div class="card-header">
+
+
+
+          <span>附件区</span>
+
+
+
+          <button class="btn btn-ghost btn-sm">+ 上传</button>
+
+
+
+        </div>
+
+
+
+        <div class="card-body" style="padding:8px 0;">
+
+
+
+          <div class="alert-item">
+
+
+
+            <span class="alert-icon">📎</span>
+
+
+
+            <div class="alert-text"><a href="#">采购合同-PO-2026-0456.pdf</a><div class="text-muted text-sm">2.3 MB · 张建国 · 2026-07-08</div></div>
+
+
+
+          </div>
+
+
+
+          <div class="alert-item">
+
+
+
+            <span class="alert-icon">📄</span>
+
+
+
+            <div class="alert-text"><a href="#">技术规格书.pdf</a><div class="text-muted text-sm">1.8 MB · 张建国 · 2026-07-08</div></div>
+
+
+
+          </div>
+
+
+
+          <div class="alert-item">
+
+
+
+            <span class="alert-icon">🖼</span>
+
+
+
+            <div class="alert-text"><a href="#">物料样品图.jpg</a><div class="text-muted text-sm">856 KB · 李明华 · 2026-07-09</div></div>
+
+
+
+          </div>
+
+
+
+          <div class="alert-item">
+
+
+
+            <span class="alert-icon">📊</span>
+
+
+
+            <div class="alert-text"><a href="#">报价对比表.xlsx</a><div class="text-muted text-sm">124 KB · 张建国 · 2026-07-08</div></div>
+
+
+
+          </div>
+
+
+
+        </div>
+
+
+
+      </div>
+
+
+
+
+
+
+
+      <!-- 审批流程区 -->
+
+
+
+      <div class="card">
+
+
+
+        <div class="card-header"><span>审批流程</span></div>
+
+
+
+        <div class="card-body" style="padding:12px 16px;">
+
+
+
+          <div style="display:flex;gap:10px;margin-bottom:14px;">
+
+
+
+            <div class="avatar avatar-sm" style="background:rgba(34,197,94,0.15);color:var(--color-success);">张</div>
+
+
+
+            <div style="flex:1;">
+
+
+
+              <div style="font-size:13px;color:var(--text-primary);">张建国 <span class="text-muted text-sm">· 采购员</span></div>
+
+
+
+              <div class="text-muted text-sm">创建单据 · 2026-07-08 09:15</div>
+
+
+
+              <div class="text-sm" style="color:var(--text-secondary);margin-top:2px;">意见：申请采购第三季度生产物料</div>
+
+
+
+            </div>
+
+
+
+            <span class="badge badge-success">已通过</span>
+
+
+
+          </div>
+
+
+
+          <div style="display:flex;gap:10px;margin-bottom:14px;">
+
+
+
+            <div class="avatar avatar-sm" style="background:rgba(34,197,94,0.15);color:var(--color-success);">王</div>
+
+
+
+            <div style="flex:1;">
+
+
+
+              <div style="font-size:13px;color:var(--text-primary);">王经理 <span class="text-muted text-sm">· 采购部长</span></div>
+
+
+
+              <div class="text-muted text-sm">部门审批 · 2026-07-08 11:30</div>
+
+
+
+              <div class="text-sm" style="color:var(--text-secondary);margin-top:2px;">意见：同意采购，价格合理</div>
+
+
+
+            </div>
+
+
+
+            <span class="badge badge-success">已通过</span>
+
+
+
+          </div>
+
+
+
+          <div style="display:flex;gap:10px;margin-bottom:14px;">
+
+
+
+            <div class="avatar avatar-sm" style="background:rgba(34,197,94,0.15);color:var(--color-success);">李</div>
+
+
+
+            <div style="flex:1;">
+
+
+
+              <div style="font-size:13px;color:var(--text-primary);">李总监 <span class="text-muted text-sm">· 财务总监</span></div>
+
+
+
+              <div class="text-muted text-sm">财务审批 · 2026-07-08 14:20</div>
+
+
+
+              <div class="text-sm" style="color:var(--text-secondary);margin-top:2px;">意见：预算内，同意</div>
+
+
+
+            </div>
+
+
+
+            <span class="badge badge-success">已通过</span>
+
+
+
+          </div>
+
+
+
+          <div style="display:flex;gap:10px;">
+
+
+
+            <div class="avatar avatar-sm" style="background:rgba(34,197,94,0.15);color:var(--color-success);">赵</div>
+
+
+
+            <div style="flex:1;">
+
+
+
+              <div style="font-size:13px;color:var(--text-primary);">赵总 <span class="text-muted text-sm">· 总经理</span></div>
+
+
+
+              <div class="text-muted text-sm">终审 · 2026-07-08 16:45</div>
+
+
+
+              <div class="text-sm" style="color:var(--text-secondary);margin-top:2px;">意见：批准执行</div>
+
+
+
+            </div>
+
+
+
+            <span class="badge badge-success">已通过</span>
+
+
+
+          </div>
+
+
+
+        </div>
+
+
+
+      </div>
+
+
+
+
+
+
+
+      <!-- 操作日志区 -->
+
+
+
+      <div class="card">
+
+
+
+        <div class="card-header"><span>操作日志</span></div>
+
+
+
+        <div class="card-body" style="padding:8px 0;">
+
+
+
+          <div class="alert-item">
+
+
+
+            <span class="alert-icon" style="color:var(--color-info);">＋</span>
+
+
+
+            <div class="alert-text">创建采购订单<div class="text-muted text-sm">张建国 · 2026-07-08 09:15</div></div>
+
+
+
+          </div>
+
+
+
+          <div class="alert-item">
+
+
+
+            <span class="alert-icon" style="color:var(--color-warning);">✎</span>
+
+
+
+            <div class="alert-text">修改物料数量<div class="text-muted text-sm">张建国 · 2026-07-08 10:22</div></div>
+
+
+
+          </div>
+
+
+
+          <div class="alert-item">
+
+
+
+            <span class="alert-icon" style="color:var(--color-success);">✓</span>
+
+
+
+            <div class="alert-text">提交审核<div class="text-muted text-sm">张建国 · 2026-07-08 11:00</div></div>
+
+
+
+          </div>
+
+
+
+          <div class="alert-item">
+
+
+
+            <span class="alert-icon" style="color:var(--color-success);">✓</span>
+
+
+
+            <div class="alert-text">审核通过<div class="text-muted text-sm">赵总 · 2026-07-08 16:45</div></div>
+
+
+
+          </div>
+
+
+
+          <div class="alert-item">
+
+
+
+            <span class="alert-icon" style="color:var(--color-info);">→</span>
+
+
+
+            <div class="alert-text">下推入库单 RK-2026-0871<div class="text-muted text-sm">系统 · 2026-07-10 08:30</div></div>
+
+
+
+          </div>
+
+
+
+          <div class="alert-item">
+
+
+
+            <span class="alert-icon" style="color:var(--color-info);">→</span>
+
+
+
+            <div class="alert-text">下推入库单 RK-2026-0875<div class="text-muted text-sm">系统 · 2026-07-12 09:45</div></div>
+
+
+
+          </div>
+
+
+
+        </div>
+
+
+
+      </div>
+
+
+
+    </div>
+
+
+
+
+
+
+
+    <!-- 底部状态栏 -->
+
+
+
+    <div class="card mt-16">
+
+
+
+      <div class="card-body">
+
+
+
+        <div class="info-grid" style="grid-template-columns:repeat(5,1fr);gap:16px;">
+
+
+
+          <div class="info-item">
+
+
+
+            <div class="info-label">制单人</div>
+
+
+
+            <div class="info-value">张建国</div>
+
+
+
+          </div>
+
+
+
+          <div class="info-item">
+
+
+
+            <div class="info-label">制单日期</div>
+
+
+
+            <div class="info-value text-mono">2026-07-08 09:15</div>
+
+
+
+          </div>
+
+
+
+          <div class="info-item">
+
+
+
+            <div class="info-label">审核人</div>
+
+
+
+            <div class="info-value">赵总</div>
+
+
+
+          </div>
+
+
+
+          <div class="info-item">
+
+
+
+            <div class="info-label">审核日期</div>
+
+
+
+            <div class="info-value text-mono">2026-07-08 16:45</div>
+
+
+
+          </div>
+
+
+
+          <div class="info-item">
+
+
+
+            <div class="info-label">审核意见</div>
+
+
+
+            <div class="info-value">批准执行</div>
+
+
+
+          </div>
+
+
+
+        </div>
+
+
+
+      </div>
+
+
+
+    </div>
+
+
+
+  </div>
+
+
+
+
+
+
+
+  <!-- Bottom Action Bar -->
+
+
+
+  <div class="bottom-bar">
+
+
+
+    <div class="text-muted text-sm">最后修改：张建国 · 2026-07-08 14:30</div>
+
+
+
+    <div class="flex gap-8">
+
+
+
+      <button class="btn btn-ghost btn-sm" onclick="showToast('打印采购订单 PO-2026-0456', 'info')">打印</button>
+
+
+
+      <button class="btn btn-ghost btn-sm" onclick="showToast('审核操作：该订单已审核', 'info')">审核</button>
+
+
+
+      <button class="btn btn-primary btn-sm" onclick="showToast('下推入库：将生成采购入库单', 'info')">下推入库</button>
+
+
+
+      <button class="btn btn-ghost btn-sm" onclick="window.location.href='purchase-order.html'">返回</button>
+
+
+
+    </div>
+
+
+
+  </div>
+
+
+
+</div>
+
+
+
+
+
+
+
+<script>
+
+
+
+// Sidebar toggle
+
+
+
+document.querySelectorAll('.sidebar-menu-group-title').forEach(function(t) {
+
+
+
+  t.addEventListener('click', function() {
+
+
+
+    this.parentElement.classList.toggle('open');
+
+
+
+    var items = this.nextElementSibling;
+
+
+
+    if (items) items.style.display = items.style.display === 'none' ? 'block' : 'block';
+
+
+
+  });
+
+
+
+});
+
+
+
+
+
+
+
+// Tab switching
+
+
+
+document.querySelectorAll('#detailTabs .tab-item').forEach(function(tab) {
+
+
+
+  tab.addEventListener('click', function() {
+
+
+
+    document.querySelectorAll('#detailTabs .tab-item').forEach(function(t) { t.classList.remove('active'); });
+
+
+
+    this.classList.add('active');
+
+
+
+    var tabId = this.getAttribute('data-tab');
+
+
+
+    document.querySelectorAll('.tab-pane').forEach(function(pane) { pane.classList.remove('active'); });
+
+
+
+    document.getElementById(tabId).classList.add('active');
+
+
+
+  });
+
+
+
+});
+
+
+
+
+</script>
+
+
+
+<script>
+
+
+
+
+
+
+
+
+
+
+;
+
+
+
+  toast.className = 'toast toast-' + (type || 'info');
+
+
+
+  toast.innerHTML = '<span class="toast-icon">' + (icons[type] || icons.info) + '</span><span>' + message + '</span>';
+
+
+
+  container.appendChild(toast);
+
+
+
+  setTimeout(function() { toast.remove(); }, 3000);
+
+
+
+}
+function closeConfirmModal() {
+
+
+
+  document.getElementById('confirmModal').classList.remove('show');
+
+
+
+  confirmCallback = null;
+
+
+
+
+
+
+
+}
+
+
+
+function confirmOk() {
+
+
+
+  if (confirmCallback) {
+
+
+
+    confirmCallback();
+
+
+
+  }
+
+
+
+  closeConfirmModal();
+
+
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+var currentLookupField = null;
+var currentLookupType = null;
+var lookupData = [];
+var lookupColumns = [];
+
+function openLookup(fieldId, type) {
+  currentLookupField = fieldId;
+  currentLookupType = type;
+  
+  if (type === 'org') {
+    lookupColumns = ['编码', '名称', '形态', '上级组织'];
+    lookupData = JSON.parse(localStorage.getItem('erp_orgs') || '[]');
+    document.getElementById('lookupTitle').textContent = '选择组织';
+  } else if (type === 'department') {
+    lookupColumns = ['编码', '名称'];
+    lookupData = JSON.parse(localStorage.getItem('erp_departments_cache') || '[]');
+    document.getElementById('lookupTitle').textContent = '选择部门';
+  } else if (type === 'employee') {
+    lookupColumns = ['编号', '姓名', '所属部门'];
+    lookupData = JSON.parse(localStorage.getItem('erp_employees_cache') || '[]');
+    document.getElementById('lookupTitle').textContent = '选择员工';
+  } else if (type === 'supplier') {
+    lookupColumns = ['编码', '名称'];
+    lookupData = JSON.parse(localStorage.getItem('erp_suppliers_cache') || '[]');
+    document.getElementById('lookupTitle').textContent = '选择供应商';
+  } else if (type === 'customer') {
+    lookupColumns = ['编码', '名称'];
+    lookupData = JSON.parse(localStorage.getItem('erp_customers_cache') || '[]');
+    document.getElementById('lookupTitle').textContent = '选择客户';
+  } else if (type === 'material') {
+    lookupColumns = ['物料编码', '物料名称', '规格型号', '基本单位'];
+    lookupData = JSON.parse(localStorage.getItem('erp_materials_cache') || '[]');
+    document.getElementById('lookupTitle').textContent = '选择物料';
+  } else if (type === 'warehouse') {
+    lookupColumns = ['编码', '名称'];
+    lookupData = JSON.parse(localStorage.getItem('erp_warehouses_cache') || '[]');
+    document.getElementById('lookupTitle').textContent = '选择仓库';
+  }
+  
+  renderLookupTable(lookupData);
+  document.getElementById('lookupModal').classList.add('show');
+}
+
+function closeLookup() {
+  document.getElementById('lookupModal').classList.remove('show');
+}
+
+function filterLookup() {
+  var keyword = document.getElementById('lookupKeyword').value.trim().toLowerCase();
+  var filtered = lookupData.filter(function(item) {
+    var code = item.code || '';
+    var name = item.name || '';
+    return code.toLowerCase().includes(keyword) || name.toLowerCase().includes(keyword);
+  });
+  renderLookupTable(filtered);
+}
+
+function renderLookupTable(data) {
+  var head = document.getElementById('lookupTableHead');
+  var body = document.getElementById('lookupTableBody');
+  
+  head.innerHTML = '<tr><th class="checkbox-cell"><input type="checkbox" onclick="selectAllLookup()"></th>' + lookupColumns.map(function(col) { return '<th>' + col + '</th>'; }).join('') + '</tr>';
+  
+  body.innerHTML = '';
+  data.forEach(function(item) {
+    var row = document.createElement('tr');
+    row.onclick = function() { selectLookupRow(this); };
+    var cells = ['<td class="checkbox-cell"><input type="checkbox" class="lookup-checkbox" value="' + item.id + '"></td>'];
+    if (currentLookupType === 'org') {
+      cells.push('<td>' + item.code + '</td><td>' + item.name + '</td><td>' + (item.form || '') + '</td><td>' + (item.parentName || '') + '</td>');
+    } else if (currentLookupType === 'department') {
+      cells.push('<td>' + item.code + '</td><td>' + item.name + '</td>');
+    } else if (currentLookupType === 'employee') {
+      cells.push('<td>' + item.code + '</td><td>' + item.name + '</td><td>' + (item.department || '') + '</td>');
+    } else if (currentLookupType === 'supplier' || currentLookupType === 'customer') {
+      cells.push('<td>' + item.code + '</td><td>' + item.name + '</td>');
+    } else if (currentLookupType === 'material') {
+      cells.push('<td>' + item.code + '</td><td>' + item.name + '</td><td>' + (item.specification || '') + '</td><td>' + (item.unit || '') + '</td>');
+    } else if (currentLookupType === 'warehouse') {
+      cells.push('<td>' + item.code + '</td><td>' + item.name + '</td>');
+    }
+    row.innerHTML = cells.join('');
+    body.appendChild(row);
+  });
+  
+  if (data.length === 0) {
+    body.innerHTML = '<tr><td colspan="' + (lookupColumns.length + 1) + '" style="text-align:center;padding:40px;color:#999;">暂无数据</td></tr>';
+  }
+}
+
+function selectAllLookup() {
+  var master = document.querySelector('.lookup-table th input');
+  var checkboxes = document.querySelectorAll('.lookup-checkbox');
+  checkboxes.forEach(function(cb) { cb.checked = master.checked; });
+}
+
+function selectLookupRow(row) {
+  var checkbox = row.querySelector('.lookup-checkbox');
+  checkbox.checked = !checkbox.checked;
+}
+
+function confirmLookup() {
+  var checkboxes = document.querySelectorAll('.lookup-checkbox:checked');
+  if (checkboxes.length === 0) {
+    showToast('请选择一条记录', 'warning');
+    return;
+  }
+  
+  var item = lookupData.find(function(d) { return d.id === checkboxes[0].value; });
+  if (item) {
+    var field = document.getElementById(currentLookupField);
+    if (field) {
+      field.value = item.name;
+      field.setAttribute('data-id', item.id);
+      field.setAttribute('data-code', item.code);
+      
+      if (currentLookupType === 'material') {
+        var row = field.closest('tr');
+        if (row) {
+          row.querySelector('.material-name').value = item.name;
+          row.querySelector('.material-spec').value = item.specification || '';
+          row.querySelector('.material-unit').value = item.unit || '';
+        }
+      }
+    }
+  }
+  
+  closeLookup();
+}
+
+function openMaterialLookup(btn) {
+  var field = btn.previousElementSibling;
+  field.id = 'lookupField_' + Date.now();
+  currentLookupField = field.id;
+  openLookup(field.id, 'material');
+}
+
+function openOrgLookup(btn) {
+  var field = btn.previousElementSibling;
+  field.id = 'lookupField_' + Date.now();
+  currentLookupField = field.id;
+  openLookup(field.id, 'org');
+}
+
+function openSupplierLookup(btn) {
+  var field = btn.previousElementSibling;
+  field.id = 'lookupField_' + Date.now();
+  currentLookupField = field.id;
+  openLookup(field.id, 'supplier');
+}
+
+function openWarehouseLookup(btn) {
+  var field = btn.previousElementSibling;
+  field.id = 'lookupField_' + Date.now();
+  currentLookupField = field.id;
+  openLookup(field.id, 'warehouse');
+}
+
+function initLookupData() {
+  if (!localStorage.getItem('erp_orgs')) {
+    localStorage.setItem('erp_orgs', JSON.stringify([
+      { id: 'org-001', code: 'ORG-HQ', name: '磐枢工业集团', form: '集团', parentName: '' },
+      { id: 'org-002', code: 'ORG-SM', name: '磐枢智能制造有限公司', form: '公司', parentName: '磐枢工业集团' },
+      { id: 'org-003', code: 'ORG-SM-PD', name: '生产制造部', form: '部门', parentName: '磐枢智能制造有限公司' },
+      { id: 'org-004', code: 'ORG-SM-FA', name: '财务部', form: '部门', parentName: '磐枢智能制造有限公司' },
+      { id: 'org-005', code: 'ORG-SM-SD', name: '销售部', form: '部门', parentName: '磐枢智能制造有限公司' }
+    ]));
+  }
+  if (!localStorage.getItem('erp_departments_cache')) {
+    localStorage.setItem('erp_departments_cache', JSON.stringify([
+      { id: 'dept-001', code: 'DEPT-PD', name: '生产制造部', status: 1 },
+      { id: 'dept-002', code: 'DEPT-FA', name: '财务部', status: 1 },
+      { id: 'dept-003', code: 'DEPT-SD', name: '销售部', status: 1 },
+      { id: 'dept-004', code: 'DEPT-AS', name: '装配车间', status: 1 },
+      { id: 'dept-005', code: 'DEPT-QC', name: '质检车间', status: 1 }
+    ]));
+  }
+  if (!localStorage.getItem('erp_employees_cache')) {
+    localStorage.setItem('erp_employees_cache', JSON.stringify([
+      { id: 'emp-001', code: 'EMP-001', name: '张三', department: '生产制造部', status: 1 },
+      { id: 'emp-002', code: 'EMP-002', name: '李四', department: '生产制造部', status: 1 },
+      { id: 'emp-003', code: 'EMP-003', name: '王五', department: '财务部', status: 1 },
+      { id: 'emp-004', code: 'EMP-004', name: '赵六', department: '销售部', status: 1 },
+      { id: 'emp-005', code: 'EMP-005', name: '钱七', department: '质检车间', status: 1 }
+    ]));
+  }
+  if (!localStorage.getItem('erp_suppliers_cache')) {
+    localStorage.setItem('erp_suppliers_cache', JSON.stringify([
+      { id: 'sup-001', code: 'S-001', name: '深圳电子元器件有限公司', status: 1 },
+      { id: 'sup-002', code: 'S-002', name: '杭州精密机械加工厂', status: 1 },
+      { id: 'sup-003', code: 'S-003', name: '上海材料科技有限公司', status: 1 },
+      { id: 'sup-004', code: 'S-004', name: '东莞五金制品厂', status: 1 }
+    ]));
+  }
+  if (!localStorage.getItem('erp_materials_cache')) {
+    localStorage.setItem('erp_materials_cache', JSON.stringify([
+      { id: 'mat-001', code: 'P-001', name: '高频传感器模块', specification: 'HT-2026', unit: '个', status: 1 },
+      { id: 'mat-002', code: 'P-002', name: '控制电路板', specification: 'CB-2026', unit: '块', status: 1 },
+      { id: 'mat-003', code: 'P-003', name: '智能控制器', specification: 'IC-V3', unit: '台', status: 1 },
+      { id: 'mat-004', code: 'P-004', name: '电源模块', specification: 'PM-500W', unit: '个', status: 1 },
+      { id: 'mat-005', code: 'M-001', name: 'PCB电路板', specification: 'FR-4双层', unit: '块', status: 1 },
+      { id: 'mat-006', code: 'M-002', name: '贴片电阻', specification: '10KΩ 0603', unit: '个', status: 1 },
+      { id: 'mat-007', code: 'M-003', name: '贴片电容', specification: '100μF 0805', unit: '个', status: 1 },
+      { id: 'mat-008', code: 'M-004', name: '螺丝', specification: 'M4x10', unit: '包', status: 1 }
+    ]));
+  }
+  if (!localStorage.getItem('erp_warehouses_cache')) {
+    localStorage.setItem('erp_warehouses_cache', JSON.stringify([
+      { id: 'wh-001', code: 'WH-001', name: '成品仓', status: 1 },
+      { id: 'wh-002', code: 'WH-002', name: '原料仓', status: 1 },
+      { id: 'wh-003', code: 'WH-003', name: '半成品仓', status: 1 },
+      { id: 'wh-004', code: 'WH-004', name: '辅料仓', status: 1 }
+    ]));
+  }
+}
+
+</script>
+
+
+
+
+<div class="lookup-modal" id="lookupModal">
+  <div class="lookup-dialog">
+    <div class="lookup-header">
+      <div class="lookup-title" id="lookupTitle">选择</div>
+      <button class="lookup-close" onclick="closeLookup()">×</button>
+    </div>
+    <div class="lookup-body">
+      <div class="lookup-search">
+        <input type="text" id="lookupKeyword" placeholder="请输入编码或名称搜索" onkeydown="if(event.key==='Enter')filterLookup()">
+        <button onclick="filterLookup()">搜索</button>
+      </div>
+      <table class="lookup-table">
+        <thead id="lookupTableHead"></thead>
+        <tbody id="lookupTableBody"></tbody>
+      </table>
+    </div>
+    <div class="lookup-footer">
+      <button class="btn btn-cancel" onclick="closeLookup()">取消</button>
+      <button class="btn btn-primary" onclick="confirmLookup()">确定</button>
+    </div>
+  </div>
+</div>
+
+
+<div class="confirm-modal-overlay" id="confirmModal">
+  <div class="confirm-modal-dialog">
+    <div class="confirm-modal-header">
+      <span class="confirm-modal-icon" id="confirmIcon">&#9888;</span>
+      <span class="confirm-modal-title" id="confirmTitle">系统提示</span>
+    </div>
+    <div class="confirm-modal-body">
+      <div class="confirm-modal-message" id="confirmMessage"></div>
+    </div>
+    <div class="confirm-modal-footer">
+      <button class="btn-cancel" onclick="closeConfirmModal(false)">取消</button>
+      <button class="btn-confirm" onclick="closeConfirmModal(true)">确定</button>
+    </div>
+  </div>
+</div>
+
+<script src="../purchase-p0-api.js"></script>
+</body>
+
+
+
+</html>

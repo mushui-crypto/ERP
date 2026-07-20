@@ -1,0 +1,830 @@
+﻿<!DOCTYPE html>
+
+<html lang="zh-CN">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>单据转换配置 — 磐枢工业智能平台(管理端)</title>
+
+<link rel="stylesheet" href="../common-admin.css">
+
+<script src="../../common.js"></script>
+
+<style>
+
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+
+/* ===== 转换规则列表工具栏 ===== */
+
+.rule-toolbar { display: flex; align-items: center; gap: 8px; padding: 12px 16px; border-bottom: 1px solid var(--border-normal); flex-wrap: wrap; }
+
+.rule-toolbar .search-box { flex: 1; min-width: 180px; max-width: 280px; }
+
+/* ===== 规则列表表格文字清晰可见 ===== */
+
+.rule-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+
+.rule-table th { padding: 10px 12px; text-align: left; background: #f5f5f5; color: #999; font-weight: 600; border-bottom: 1px solid var(--border-strong); font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; }
+
+.rule-table td { padding: 11px 12px; border-bottom: 1px solid var(--border-normal); color: #666; }
+
+.rule-table tr:hover td { background: rgba(245, 158, 11, 0.04); }
+
+.rule-table .rule-name { color: #333; font-weight: 600; }
+
+.rule-table .arrow-cell { color: #1890ff; font-weight: 700; }
+
+.row-action-links { display: flex; gap: 10px; }
+
+.row-action-links a { color: #1890ff; cursor: pointer; font-size: 12px; }
+
+.row-action-links a:hover { color: #7dd3fc; }
+
+.row-action-links a.danger { color: #f5222d; }
+
+.row-action-links a.danger:hover { color: #f87171; }
+
+/* ===== 状态徽章 ===== */
+
+.status-pill { display: inline-flex; align-items: center; gap: 5px; padding: 2px 9px; border-radius: 10px; font-size: 11px; font-weight: 500; }
+
+.status-pill.on { background: rgba(34,197,94,0.15); color: #52c41a; }
+
+.status-pill.off { background: rgba(239,68,68,0.15); color: #f5222d; }
+
+.status-pill .dot { width: 6px; height: 6px; border-radius: 50%; }
+
+.status-pill.on .dot { background: var(--color-success); }
+
+.status-pill.off .dot { background: var(--color-error); }
+
+/* ===== 条件表格 ===== */
+
+.cond-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+
+.cond-table th { padding: 10px 12px; text-align: left; background: #f5f5f5; color: #999; font-weight: 600; border-bottom: 1px solid var(--border-strong); font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; }
+
+.cond-table td { padding: 11px 12px; border-bottom: 1px solid var(--border-normal); color: #666; }
+
+.cond-table tr:hover td { background: rgba(245, 158, 11, 0.04); }
+
+.cond-table .op-tag { display: inline-block; padding: 2px 8px; background: #e6f7ff; color: #1890ff; border-radius: var(--radius-sm); font-size: 11px; font-weight: 600; }
+
+.cond-table .logic-tag { display: inline-block; padding: 2px 8px; background: rgba(56,189,248,0.12); color: #1890ff; border-radius: var(--radius-sm); font-size: 11px; font-weight: 600; }
+
+/* ===== 单据流转图 ===== */
+
+.flow-diagram { display: flex; align-items: center; justify-content: center; gap: 0; padding: 28px 16px; flex-wrap: wrap; }
+
+.flow-node-box { position: relative; display: flex; flex-direction: column; align-items: center; gap: 6px; }
+
+.flow-node-card { min-width: 130px; padding: 14px 18px; border-radius: var(--radius-md); border: 1.5px solid var(--admin-accent); background: #e6f7ff; color: #333; text-align: center; transition: all var(--transition); }
+
+.flow-node-card:hover { box-shadow: 0 0 16px rgba(245,158,11,0.25); transform: translateY(-2px); }
+
+.flow-node-card .fn-icon { font-size: 18px; margin-bottom: 4px; }
+
+.flow-node-card .fn-title { font-size: 13px; font-weight: 600; }
+
+.flow-node-card .fn-sub { font-size: 11px; color: #999; margin-top: 2px; }
+
+.flow-node-card.start { border-color: #52c41a; background: rgba(34,197,94,0.10); }
+
+.flow-node-card.end { border-color: #f5222d; background: rgba(239,68,68,0.10); }
+
+.flow-arrow { display: flex; align-items: center; color: #1890ff; font-size: 22px; font-weight: 700; padding: 0 8px; }
+
+.flow-arrow .arr-label { font-size: 10px; color: #999; margin-top: -4px; text-align: center; }
+
+/* ===== 数量控制 ===== */
+
+.qty-section { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; }
+
+.qty-block { background: #f5f5f5; border: 1px solid var(--border-normal); border-radius: var(--radius-md); padding: 16px; }
+
+.qty-block .qb-title { font-size: 13px; font-weight: 600; color: #333; margin-bottom: 12px; display: flex; align-items: center; gap: 6px; }
+
+.qty-block .qb-title .qb-ico { color: #1890ff; }
+
+.qty-option { display: flex; align-items: center; gap: 8px; padding: 7px 0; font-size: 13px; color: #666; cursor: pointer; }
+
+.qty-option input { accent-color: #1890ff; width: 15px; height: 15px; }
+
+.qty-option.checked { color: #1890ff; font-weight: 500; }
+
+.qty-input-wrap { margin-top: 10px; display: flex; align-items: center; gap: 8px; }
+
+.qty-input-wrap .qty-input { width: 110px; padding: 7px 10px; background: var(--bg-raised); border: 1px solid var(--border-normal); border-radius: var(--radius-sm); color: #333; font-size: 13px; outline: none; font-family: var(--font-mono); }
+
+.qty-input-wrap .qty-input:focus { border-color: #1890ff; }
+
+.qty-input-wrap .qty-suffix { font-size: 13px; color: #999; }
+
+@media (max-width: 900px) { .qty-section { grid-template-columns: 1fr; } .flow-diagram { flex-direction: column; } .flow-arrow { transform: rotate(90deg); padding: 8px 0; } }
+
+</style>
+
+</head>
+
+<body>
+
+<aside class="sidebar admin-sidebar" id="sidebar">
+
+    <div class="sidebar-logo">
+
+    <img src="../../images/LOGO.png" alt="磐枢工业智能平台" style="width: 100%; max-width: 200px; margin-bottom: 8px;">
+
+    <h1 style="font-size: 16px; margin: 0;">磐枢工业智能平台</h1>
+
+  </div>
+
+  <nav class="sidebar-menu">
+
+    <div class="sidebar-menu-group"><div class="sidebar-menu-item" onclick="toggleGroup(this)"><span class="icon">&#128451;</span> 数据中心管理<span class="arrow">&#9654;</span></div><div class="sub-menu"><a class="sidebar-menu-item" href="../data-center/index.html">数据中心总览</a><a class="sidebar-menu-item" href="../data-center/new.html">新建数据中心</a><a class="sidebar-menu-item" href="../data-center/backup.html">备份管理</a></div></div>
+
+    <div class="sidebar-menu-group"><div class="sidebar-menu-item" onclick="toggleGroup(this)"><span class="icon">&#128101;</span> 组织与权限<span class="arrow">&#9654;</span></div><div class="sub-menu"><a class="sidebar-menu-item" href="../org-perm/org.html">组织架构</a><a class="sidebar-menu-item" href="../org-perm/user.html">用户管理</a><a class="sidebar-menu-item" href="../org-perm/role.html">角色管理</a><a class="sidebar-menu-item" href="../org-perm/menu.html">菜单管理</a></div></div>
+
+
+
+    <div class="sidebar-menu-group"><div class="sidebar-menu-item" onclick="toggleGroup(this)"><span class="icon">&#128187;</span> 开发设计<span class="arrow">&#9660;</span></div><div class="sub-menu"><a class="sidebar-menu-item" href="lowcode.html">低代码开发中心</a><a class="sidebar-menu-item" href="form-designer.html">表单设计器</a><a class="sidebar-menu-item active" href="doc-flow.html">单据转换配置</a><a class="sidebar-menu-item" href="print-template.html">套打模板设计</a><a class="sidebar-menu-item" href="workflow.html">流程配置</a></div></div>
+
+
+
+    <div class="sidebar-menu-group"><div class="sidebar-menu-item" onclick="toggleGroup(this)"><span class="icon">&#129302;</span> 智能应用<span class="arrow">&#9654;</span></div><div class="sub-menu"><a class="sidebar-menu-item" href="../ai-config/api-manage.html">API管理</a><a class="sidebar-menu-item" href="../ai-config/nl-training.html">自然语言训练</a><a class="sidebar-menu-item" href="../ai-config/data-analysis.html">数据分析训练</a><a class="sidebar-menu-item" href="../ai-config/agent-config.html">Agent配置</a></div></div>
+
+
+
+    <div class="sidebar-menu-item" onclick="window.location.href='../../index.html'"><span class="icon">&#8592;</span> 返回应用端</div>
+
+  </nav>
+
+  <div class="sidebar-user"><div class="avatar" style="background: #e6f7ff;color: #1890ff;">管</div><div><div class="user-name">系统管理员</div><div class="user-role">超级管理员</div></div></div>
+
+</aside>
+
+<div class="main-content" id="mainContent">
+
+  <div class="page-header">
+
+    <div><div class="flex items-center gap-8"><button class="sidebar-toggle" onclick="toggleSidebar()">&#9776;</button><div><h2>单据转换配置</h2><div class="breadcrumb"><a href="../../index.html">首页</a><span>/</span><a href="../index.html">管理端</a><span>/</span><span>开发设计 / 单据转换</span></div></div></div></div>
+
+    <div class="page-actions"><button class="btn btn-primary btn-sm">+ 新建转换规则</button></div>
+
+  </div>
+
+  <div class="page-body">
+
+
+
+    <!-- 转换规则列表 -->
+
+    <div class="card mb-16">
+
+      <div class="card-header"><span>转换规则列表</span><span style="font-size:12px;color: #999;font-weight:400;">共 6 条规则</span></div>
+
+      <div class="rule-toolbar">
+
+        <input type="text" class="form-input search-box" placeholder="搜索规则名称 / 单据类型...">
+
+        <div style="flex:1;"></div>
+
+        <button class="btn btn-primary btn-sm">+ 新建转换规则</button>
+
+        <button class="btn btn-ghost btn-sm">&#128230; 导入</button>
+
+        <button class="btn btn-ghost btn-sm">&#128190; 导出</button>
+
+        <button class="btn btn-ghost btn-sm">&#8635; 刷新</button>
+
+      </div>
+
+      <div class="table-wrapper">
+
+        <table class="rule-table">
+
+          <thead>
+
+            <tr><th>规则名称</th><th>源单类型</th><th></th><th>目标单类型</th><th>转换条件</th><th>状态</th><th>操作</th></tr>
+
+          </thead>
+
+          <tbody>
+
+            <tr>
+
+              <td class="rule-name">采购申请 → 采购订单</td>
+
+              <td>采购申请单</td>
+
+              <td class="arrow-cell">&#10140;</td>
+
+              <td>采购订单</td>
+
+              <td><span class="text-muted text-sm">订单状态 = 已审核</span></td>
+
+              <td><span class="status-pill on"><span class="dot"></span>启用</span></td>
+
+              <td class="row-action-links"><a>编辑</a><a>测试</a><a>复制</a><a class="danger">删除</a></td>
+
+            </tr>
+
+            <tr>
+
+              <td class="rule-name">销售订单 → 发货通知单</td>
+
+              <td>销售订单</td>
+
+              <td class="arrow-cell">&#10140;</td>
+
+              <td>发货通知单</td>
+
+              <td><span class="text-muted text-sm">订单状态 = 已确认</span></td>
+
+              <td><span class="status-pill on"><span class="dot"></span>启用</span></td>
+
+              <td class="row-action-links"><a>编辑</a><a>测试</a><a>复制</a><a class="danger">删除</a></td>
+
+            </tr>
+
+            <tr>
+
+              <td class="rule-name">发货通知 → 销售出库单</td>
+
+              <td>发货通知单</td>
+
+              <td class="arrow-cell">&#10140;</td>
+
+              <td>销售出库单</td>
+
+              <td><span class="text-muted text-sm">明细.数量 &gt; 0</span></td>
+
+              <td><span class="status-pill on"><span class="dot"></span>启用</span></td>
+
+              <td class="row-action-links"><a>编辑</a><a>测试</a><a>复制</a><a class="danger">删除</a></td>
+
+            </tr>
+
+            <tr>
+
+              <td class="rule-name">生产工单 → 领料单</td>
+
+              <td>生产工单</td>
+
+              <td class="arrow-cell">&#10140;</td>
+
+              <td>领料单</td>
+
+              <td><span class="text-muted text-sm">工单状态 = 已下达</span></td>
+
+              <td><span class="status-pill on"><span class="dot"></span>启用</span></td>
+
+              <td class="row-action-links"><a>编辑</a><a>测试</a><a>复制</a><a class="danger">删除</a></td>
+
+            </tr>
+
+            <tr>
+
+              <td class="rule-name">采购入库 → 检验单</td>
+
+              <td>采购入库单</td>
+
+              <td class="arrow-cell">&#10140;</td>
+
+              <td>质量检验单</td>
+
+              <td><span class="text-muted text-sm">无</span></td>
+
+              <td><span class="status-pill off"><span class="dot"></span>停用</span></td>
+
+              <td class="row-action-links"><a>编辑</a><a>测试</a><a>复制</a><a class="danger">删除</a></td>
+
+            </tr>
+
+            <tr>
+
+              <td class="rule-name">委外订单 → 委外领料单</td>
+
+              <td>委外订单</td>
+
+              <td class="arrow-cell">&#10140;</td>
+
+              <td>委外领料单</td>
+
+              <td><span class="text-muted text-sm">订单状态 = 已审核</span></td>
+
+              <td><span class="status-pill on"><span class="dot"></span>启用</span></td>
+
+              <td class="row-action-links"><a>编辑</a><a>测试</a><a>复制</a><a class="danger">删除</a></td>
+
+            </tr>
+
+          </tbody>
+
+        </table>
+
+      </div>
+
+    </div>
+
+
+
+    <!-- 转换规则配置 -->
+
+    <div class="card mb-16">
+
+      <div class="card-header"><span>转换规则配置: 采购申请 &#8594; 采购订单</span><div class="flex gap-8"><button class="btn btn-sm btn-ghost">&#128190; 保存</button><button class="btn btn-sm btn-ghost">&#9654; 测试转换</button></div></div>
+
+      <div class="card-body">
+
+        <div class="form-row mb-16">
+
+          <div class="form-group">
+
+            <label class="form-label">源单据</label>
+
+            <select class="form-select"><option>采购申请单</option><option>销售订单</option><option>生产工单</option></select>
+
+          </div>
+
+          <div class="form-group">
+
+            <label class="form-label">目标单据</label>
+
+            <select class="form-select"><option>采购订单</option><option>采购入库单</option><option>委外订单</option></select>
+
+          </div>
+
+        </div>
+
+        <div class="form-row">
+
+          <div class="form-group">
+
+            <label class="form-label">转换类型</label>
+
+            <select class="form-select"><option>下推</option><option>关联</option></select>
+
+          </div>
+
+          <div class="form-group">
+
+            <label class="form-label">控制规则</label>
+
+            <select class="form-select"><option>允许超量下推</option><option>严格数量匹配</option></select>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+
+
+    <!-- 字段映射关系 -->
+
+    <div class="card mb-16">
+
+      <div class="card-header">
+
+        <span>字段映射关系</span>
+
+        <button class="btn btn-sm btn-ghost">+ 添加映射</button>
+
+      </div>
+
+      <div class="table-wrapper">
+
+        <table class="mapping-table">
+
+          <thead>
+
+            <tr><th style="width:40px;"></th><th>源字段</th><th></th><th>目标字段</th><th>转换规则</th><th>必填</th><th>默认值</th><th>操作</th></tr>
+
+          </thead>
+
+          <tbody>
+
+            <tr>
+
+              <td>1</td>
+
+              <td><select class="form-select" style="width:160px;background: #f5f5f5;border:1px solid var(--border-normal);color: #333;padding:4px 8px;font-size:12px;border-radius:var(--radius-sm);"><option>申请单号</option><option>申请部门</option><option>申请人</option><option>明细.物料编码</option><option>明细.需求数量</option></select></td>
+
+              <td class="mapping-arrow">&#10140;</td>
+
+              <td><select class="form-select" style="width:160px;background: #f5f5f5;border:1px solid var(--border-normal);color: #333;padding:4px 8px;font-size:12px;border-radius:var(--radius-sm);"><option>来源单号</option><option>采购部门</option><option>采购员</option><option>明细.物料编码</option><option>明细.采购数量</option></select></td>
+
+              <td><span class="text-muted text-sm">直接映射</span></td>
+
+              <td class="mapping-required">&#10003;</td>
+
+              <td>--</td>
+
+              <td class="row-action-links"><a>编辑</a><a style="color: #f5222d;">删除</a></td>
+
+            </tr>
+
+            <tr>
+
+              <td>2</td>
+
+              <td><select class="form-select" style="width:160px;background: #f5f5f5;border:1px solid var(--border-normal);color: #333;padding:4px 8px;font-size:12px;border-radius:var(--radius-sm);"><option>申请部门</option></select></td>
+
+              <td class="mapping-arrow">&#10140;</td>
+
+              <td><select class="form-select" style="width:160px;background: #f5f5f5;border:1px solid var(--border-normal);color: #333;padding:4px 8px;font-size:12px;border-radius:var(--radius-sm);"><option>采购部门</option></select></td>
+
+              <td><span class="text-muted text-sm">直接映射</span></td>
+
+              <td class="mapping-required">&#10003;</td>
+
+              <td>--</td>
+
+              <td class="row-action-links"><a>编辑</a><a style="color: #f5222d;">删除</a></td>
+
+            </tr>
+
+            <tr>
+
+              <td>3</td>
+
+              <td><select class="form-select" style="width:160px;background: #f5f5f5;border:1px solid var(--border-normal);color: #333;padding:4px 8px;font-size:12px;border-radius:var(--radius-sm);"><option>申请人</option></select></td>
+
+              <td class="mapping-arrow">&#10140;</td>
+
+              <td><select class="form-select" style="width:160px;background: #f5f5f5;border:1px solid var(--border-normal);color: #333;padding:4px 8px;font-size:12px;border-radius:var(--radius-sm);"><option>采购员</option></select></td>
+
+              <td><span class="text-muted text-sm">直接映射</span></td>
+
+              <td class="mapping-required">&#10003;</td>
+
+              <td>--</td>
+
+              <td class="row-action-links"><a>编辑</a><a style="color: #f5222d;">删除</a></td>
+
+            </tr>
+
+            <tr>
+
+              <td>4</td>
+
+              <td><select class="form-select" style="width:160px;background: #f5f5f5;border:1px solid var(--border-normal);color: #333;padding:4px 8px;font-size:12px;border-radius:var(--radius-sm);"><option>明细.物料编码</option></select></td>
+
+              <td class="mapping-arrow">&#10140;</td>
+
+              <td><select class="form-select" style="width:160px;background: #f5f5f5;border:1px solid var(--border-normal);color: #333;padding:4px 8px;font-size:12px;border-radius:var(--radius-sm);"><option>明细.物料编码</option></select></td>
+
+              <td><span class="text-muted text-sm">直接映射</span></td>
+
+              <td class="mapping-required">&#10003;</td>
+
+              <td>--</td>
+
+              <td class="row-action-links"><a>编辑</a><a style="color: #f5222d;">删除</a></td>
+
+            </tr>
+
+            <tr>
+
+              <td>5</td>
+
+              <td><select class="form-select" style="width:160px;background: #f5f5f5;border:1px solid var(--border-normal);color: #333;padding:4px 8px;font-size:12px;border-radius:var(--radius-sm);"><option>明细.需求数量</option></select></td>
+
+              <td class="mapping-arrow">&#10140;</td>
+
+              <td><select class="form-select" style="width:160px;background: #f5f5f5;border:1px solid var(--border-normal);color: #333;padding:4px 8px;font-size:12px;border-radius:var(--radius-sm);"><option>明细.采购数量</option></select></td>
+
+              <td><span class="text-muted text-sm">需求数量 * 1.00</span></td>
+
+              <td class="mapping-required">&#10003;</td>
+
+              <td>--</td>
+
+              <td class="row-action-links"><a>编辑</a><a style="color: #f5222d;">删除</a></td>
+
+            </tr>
+
+            <tr>
+
+              <td>6</td>
+
+              <td><select class="form-select" style="width:160px;background: #f5f5f5;border:1px solid var(--border-normal);color: #333;padding:4px 8px;font-size:12px;border-radius:var(--radius-sm);"><option>明细.需求日期</option></select></td>
+
+              <td class="mapping-arrow">&#10140;</td>
+
+              <td><select class="form-select" style="width:160px;background: #f5f5f5;border:1px solid var(--border-normal);color: #333;padding:4px 8px;font-size:12px;border-radius:var(--radius-sm);"><option>明细.交货日期</option></select></td>
+
+              <td><span class="text-muted text-sm">直接映射</span></td>
+
+              <td></td>
+
+              <td>--</td>
+
+              <td class="row-action-links"><a>编辑</a><a style="color: #f5222d;">删除</a></td>
+
+            </tr>
+
+          </tbody>
+
+        </table>
+
+      </div>
+
+    </div>
+
+
+
+    <!-- 转换条件配置 -->
+
+    <div class="card mb-16">
+
+      <div class="card-header">
+
+        <span>转换条件配置</span>
+
+        <div class="flex gap-8">
+
+          <span style="font-size:12px;color: #999;font-weight:400;">满足全部条件时执行转换</span>
+
+          <button class="btn btn-sm btn-ghost">+ 添加条件</button>
+
+        </div>
+
+      </div>
+
+      <div class="table-wrapper">
+
+        <table class="cond-table">
+
+          <thead>
+
+            <tr><th style="width:40px;"></th><th>条件字段</th><th>操作符</th><th>条件值</th><th>逻辑关系</th><th>操作</th></tr>
+
+          </thead>
+
+          <tbody>
+
+            <tr>
+
+              <td>1</td>
+
+              <td style="color: #333;font-weight:500;">订单状态</td>
+
+              <td><span class="op-tag">等于</span></td>
+
+              <td style="color: #333;">已审核</td>
+
+              <td><span class="logic-tag">且 (AND)</span></td>
+
+              <td class="row-action-links"><a>编辑</a><a class="danger">删除</a></td>
+
+            </tr>
+
+            <tr>
+
+              <td>2</td>
+
+              <td style="color: #333;font-weight:500;">明细.需求数量</td>
+
+              <td><span class="op-tag">大于</span></td>
+
+              <td style="color: #333;">0.00</td>
+
+              <td><span class="logic-tag">且 (AND)</span></td>
+
+              <td class="row-action-links"><a>编辑</a><a class="danger">删除</a></td>
+
+            </tr>
+
+            <tr>
+
+              <td>3</td>
+
+              <td style="color: #333;font-weight:500;">申请类型</td>
+
+              <td><span class="op-tag">不等于</span></td>
+
+              <td style="color: #333;">项目采购</td>
+
+              <td><span class="logic-tag">或 (OR)</span></td>
+
+              <td class="row-action-links"><a>编辑</a><a class="danger">删除</a></td>
+
+            </tr>
+
+          </tbody>
+
+        </table>
+
+      </div>
+
+    </div>
+
+
+
+    <!-- 单据流转图 -->
+
+    <div class="card mb-16">
+
+      <div class="card-header">
+
+        <span>单据流转图</span>
+
+        <span style="font-size:12px;color: #999;font-weight:400;">销售业务单据流转链路</span>
+
+      </div>
+
+      <div class="flow-diagram">
+
+        <div class="flow-node-box">
+
+          <div class="flow-node-card start">
+
+            <div class="fn-icon">&#128196;</div>
+
+            <div class="fn-title">销售订单</div>
+
+            <div class="fn-sub">源单据</div>
+
+          </div>
+
+        </div>
+
+        <div class="flow-arrow">&#10142;</div>
+
+        <div class="flow-node-box">
+
+          <div class="flow-node-card">
+
+            <div class="fn-icon">&#128230;</div>
+
+            <div class="fn-title">发货通知</div>
+
+            <div class="fn-sub">中间单据</div>
+
+          </div>
+
+        </div>
+
+        <div class="flow-arrow">&#10142;</div>
+
+        <div class="flow-node-box">
+
+          <div class="flow-node-card">
+
+            <div class="fn-icon">&#128666;</div>
+
+            <div class="fn-title">销售出库</div>
+
+            <div class="fn-sub">执行单据</div>
+
+          </div>
+
+        </div>
+
+        <div class="flow-arrow">&#10142;</div>
+
+        <div class="flow-node-box">
+
+          <div class="flow-node-card end">
+
+            <div class="fn-icon">&#128176;</div>
+
+            <div class="fn-title">成本核算</div>
+
+            <div class="fn-sub">终结单据</div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+
+
+    <!-- 数量控制 -->
+
+    <div class="card">
+
+      <div class="card-header">
+
+        <span>数量控制</span>
+
+        <span style="font-size:12px;color: #999;font-weight:400;">控制单据转换时的数量规则与超量处理</span>
+
+      </div>
+
+      <div class="card-body">
+
+        <div class="qty-section">
+
+          <div class="qty-block">
+
+            <div class="qb-title"><span class="qb-ico">&#128202;</span>转换数量控制方式</div>
+
+            <label class="qty-option checked"><input type="radio" name="qty-mode" checked> 全额转换</label>
+
+            <label class="qty-option"><input type="radio" name="qty-mode"> 部分转换</label>
+
+            <label class="qty-option"><input type="radio" name="qty-mode"> 指定数量</label>
+
+          </div>
+
+          <div class="qty-block">
+
+            <div class="qb-title"><span class="qb-ico">&#9888;</span>超量控制</div>
+
+            <label class="qty-option"><input type="radio" name="over-mode"> 允许超量</label>
+
+            <label class="qty-option checked"><input type="radio" name="over-mode" checked> 禁止超量</label>
+
+            <label class="qty-option"><input type="radio" name="over-mode"> 超量需审批</label>
+
+          </div>
+
+          <div class="qty-block">
+
+            <div class="qb-title"><span class="qb-ico">&#128207;</span>超量比例阈值</div>
+
+            <div style="font-size:12px;color: #999;margin-bottom:8px;">当转换数量超过源单数量达到该比例时触发控制</div>
+
+            <div class="qty-input-wrap">
+
+              <input type="number" class="qty-input" value="10.00" step="0.01" min="0.00">
+
+              <span class="qty-suffix">%</span>
+
+            </div>
+
+            <div style="font-size:11px;color: #999;margin-top:10px;">提示: 阈值范围 0.00% ~ 100.00%，保留两位小数</div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+
+
+  </div>
+
+</div>
+
+<div id="sidebarOverlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:99;" onclick="toggleSidebar()"></div>
+
+<script>
+
+
+
+
+
+</script>
+
+
+
+<div class="toast-container" id="toastContainer"></div>
+
+<div class="confirm-modal-overlay" id="confirmModal">
+
+  <div class="confirm-modal-dialog">
+
+    <div class="confirm-modal-header">
+
+      <span class="confirm-modal-icon" id="confirmIcon">&#9888;</span>
+
+      <span class="confirm-modal-title" id="confirmTitle">温馨提示</span>
+
+    </div>
+
+    <div class="confirm-modal-body">
+
+      <div class="confirm-modal-message" id="confirmMessage"></div>
+
+    </div>
+
+    <div class="confirm-modal-footer">
+
+      <button class="btn btn-sm btn-cancel" onclick="closeConfirmModal(false)">取消</button>
+
+      <button class="btn btn-sm btn-primary" style="background: #1890ff;border-color: #1890ff;color:#0a0e1a;" onclick="closeConfirmModal(true)">确定</button>
+
+    </div>
+
+  </div>
+
+</div>
+
+</body>
+
+</html>
+

@@ -1,0 +1,843 @@
+﻿﻿﻿﻿﻿﻿<!DOCTYPE html>
+
+<html lang="zh-CN">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>知识库管理 — 磐枢工业智能平台(管理端)</title>
+
+<link rel="stylesheet" href="../common-admin.css">
+
+<script src="../../common.js"></script>
+
+<style>
+
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+
+.embedding-progress {
+
+  display: grid;
+
+  grid-template-columns: 1fr 1fr;
+
+  gap: 16px;
+
+}
+
+.progress-item {
+
+  background: var(--bg-surface);
+
+  border: 1px solid #e8e8e8;
+
+  border-radius: var(--radius-md);
+
+  padding: 16px;
+
+}
+
+.progress-item .progress-label {
+
+  font-size: 12px;
+
+  color: var(--text-tertiary);
+
+  margin-bottom: 8px;
+
+}
+
+.progress-item .progress-value {
+
+  font-family: var(--font-mono);
+
+  font-size: 28px;
+
+  font-weight: 700;
+
+  color: var(--text-primary);
+
+}
+
+.progress-item .progress-sub {
+
+  font-size: 12px;
+
+  color: var(--text-secondary);
+
+  margin-top: 4px;
+
+}
+
+.retrieval-test {
+
+  margin-top: 20px;
+
+}
+
+.retrieval-input {
+
+  display: flex;
+
+  gap: 8px;
+
+  margin-bottom: 12px;
+
+}
+
+.retrieval-results {
+
+  max-height: 300px;
+
+  overflow-y: auto;
+
+}
+
+.retrieval-item {
+
+  background: var(--bg-inset);
+
+  border: 1px solid #e8e8e8;
+
+  border-radius: var(--radius-sm);
+
+  padding: 12px;
+
+  margin-bottom: 8px;
+
+}
+
+.retrieval-item .retrieval-title {
+
+  font-size: 13px;
+
+  font-weight: 600;
+
+  color: var(--text-primary);
+
+  margin-bottom: 4px;
+
+}
+
+.retrieval-item .retrieval-score {
+
+  font-family: var(--font-mono);
+
+  font-size: 11px;
+
+  color: var(--text-accent);
+
+  margin-bottom: 8px;
+
+}
+
+.retrieval-item .retrieval-snippet {
+
+  font-size: 12px;
+
+  color: var(--text-secondary);
+
+  line-height: 1.5;
+
+}
+
+
+
+/* ===== Toast 提示框 ===== */
+.toast-container { position: fixed; top: 20px; right: 20px; z-index: 10000; display: flex; flex-direction: column; gap: 10px; }
+.toast { display: flex; align-items: center; gap: 10px; padding: 14px 18px; border-radius: var(--radius-md); background: #fff; border: 1px solid #e8e8e8; box-shadow: 0 4px 16px rgba(0,0,0,0.15); min-width: 280px; max-width: 420px; animation: slideIn 0.3s ease; }
+@keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+.toast .toast-icon { font-size: 18px; flex-shrink: 0; }
+.toast .toast-content { flex: 1; font-size: 13px; }
+.toast .toast-title { font-weight: 600; margin-bottom: 2px; color: #333; }
+.toast .toast-message { color: #666; font-size: 12px; }
+.toast-success { border-color: #b7eb8f; background: #f6ffed; }
+.toast-success .toast-title { color: #52c41a; }
+.toast-success .toast-message { color: #52c41a; }
+.toast-warning { border-color: #ffe58f; background: #fffbe6; }
+.toast-warning .toast-title { color: #faad14; }
+.toast-warning .toast-message { color: #faad14; }
+.toast-error { border-color: #ffccc7; background: #fff2f0; }
+.toast-error .toast-title { color: #f5222d; }
+.toast-error .toast-message { color: #f5222d; }
+.toast-info { border-color: #91d5ff; background: #e6f7ff; }
+.toast-info .toast-title { color: #1890ff; }
+.toast-info .toast-message { color: #1890ff; }
+
+/* ===== 确认对话框 ===== */
+.confirm-modal-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:2000; justify-content:center; align-items:center; }
+.confirm-modal-overlay.show { display:flex; }
+.modal-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:2000; justify-content:center; align-items:center; }
+.modal-overlay.active { display:flex; }
+.confirm-modal-dialog { background:#fff; border:1px solid #e8e8e8; border-radius:4px; width:420px; overflow:hidden; }
+.confirm-modal-header { padding:16px 20px; border-bottom:1px solid #e8e8e8; display:flex; align-items:center; gap:10px; background:#fafafa; }
+.confirm-modal-icon { font-size:20px; }
+.confirm-modal-title { font-size:15px; font-weight:600; color:#333; }
+.confirm-modal-body { padding:20px; text-align:center; }
+.confirm-modal-message { font-size:14px; color:#666; line-height:1.6; }
+.confirm-modal-footer { display:flex; gap:12px; justify-content:flex-end; padding:16px 20px; border-top:1px solid #e8e8e8; background:#fafafa; }
+
+</style>
+
+</head>
+
+<body>
+
+<aside class="sidebar admin-sidebar" id="sidebar">
+
+    <div class="sidebar-logo">
+
+    <img src="../../images/LOGO.png" alt="磐枢工业智能平台" style="width: 100%; max-width: 200px; margin-bottom: 8px;">
+
+    <h1 style="font-size: 16px; margin: 0;">磐枢工业智能平台</h1>
+
+  </div>
+
+  <nav class="sidebar-menu">
+
+    <div class="sidebar-menu-group"><div class="sidebar-menu-item" onclick="toggleGroup(this)"><span class="icon">&#128451;</span> 数据中心管理<span class="arrow">&#9654;</span></div><div class="sub-menu"><a class="sidebar-menu-item" href="../data-center/index.html">数据中心总览</a><a class="sidebar-menu-item" href="../data-center/new.html">新建数据中心</a><a class="sidebar-menu-item" href="../data-center/backup.html">备份管理</a></div></div>
+
+    <div class="sidebar-menu-group"><div class="sidebar-menu-item" onclick="toggleGroup(this)"><span class="icon">&#128101;</span> 组织与权限<span class="arrow">&#9654;</span></div><div class="sub-menu"><a class="sidebar-menu-item" href="../org-perm/org.html">组织架构</a><a class="sidebar-menu-item" href="../org-perm/user.html">用户管理</a><a class="sidebar-menu-item" href="../org-perm/role.html">角色管理</a><a class="sidebar-menu-item" href="../org-perm/menu.html">菜单管理</a></div></div>
+
+
+
+    <div class="sidebar-menu-group"><div class="sidebar-menu-item" onclick="toggleGroup(this)"><span class="icon">&#128187;</span> 开发设计<span class="arrow">&#9654;</span></div><div class="sub-menu"><a class="sidebar-menu-item" href="../dev-design/lowcode.html">低代码开发中心</a><a class="sidebar-menu-item" href="../dev-design/form-designer.html">表单设计器</a><a class="sidebar-menu-item" href="../dev-design/doc-flow.html">单据转换配置</a><a class="sidebar-menu-item" href="../dev-design/print-template.html">套打模板设计</a><a class="sidebar-menu-item" href="../dev-design/workflow.html">流程配置</a></div></div>
+
+
+
+    <div class="sidebar-menu-group"><div class="sidebar-menu-item" onclick="toggleGroup(this)"><span class="icon">&#129302;</span> 智能应用<span class="arrow">&#9660;</span></div><div class="sub-menu"><a class="sidebar-menu-item" href="api-manage.html">API管理</a><a class="sidebar-menu-item active" href="nl-training.html">自然语言训练</a><a class="sidebar-menu-item" href="data-analysis.html">数据分析训练</a><a class="sidebar-menu-item" href="agent-config.html">Agent配置</a></div></div>
+
+
+
+    <div class="sidebar-menu-item" onclick="window.location.href='../../index.html'"><span class="icon">&#8592;</span> 返回应用端</div>
+
+  </nav>
+
+  <div class="sidebar-user"><div class="avatar" style="background:var(--admin-accent-light);color:var(--admin-accent);">管</div><div><div class="user-name">系统管理员</div><div class="user-role">超级管理员</div></div></div>
+
+</aside>
+
+<div class="main-content" id="mainContent">
+
+  <div class="page-header">
+
+    <div><div class="flex items-center gap-8"><button class="sidebar-toggle" onclick="toggleSidebar()">&#9776;</button><div><h2>知识库管理</h2><div class="breadcrumb"><a href="../../index.html">首页</a><span>/</span><a href="../index.html">管理端</a><span>/</span><a href="../index.html">智能应用</a><span>/</span><span>知识库管理</span></div></div></div></div>
+
+    <div class="page-actions"><button class="btn btn-primary btn-sm" onclick="showKbConfigModal()">+ 新建知识库</button></div>
+
+  </div>
+
+  <div class="list-page-body" id="nl-training">
+
+    <div class="list-action-bar">
+
+      <button class="action-btn primary-action" onclick="showKbConfigModal()">&#128200; 新建知识库</button>
+
+      <div class="action-separator"></div>
+
+      <button class="action-btn danger-action">&#128465; 批量删除</button>
+
+      <div style="flex:1;"></div>
+
+      <button class="action-btn">&#8635; 刷新</button>
+
+    </div>
+
+    <div class="list-filter-section">
+
+      <div class="list-filter-tabs">
+
+        <span class="filter-tab active">全部</span>
+
+        <span class="filter-tab">运行中</span>
+
+        <span class="filter-tab">构建中</span>
+
+        <span class="filter-tab">已停止</span>
+
+      </div>
+
+      <div class="list-filter-row">
+
+        <div class="filter-field">
+
+          <select><option>全部类型</option><option>产品知识库</option><option>工艺知识库</option><option>设备知识库</option><option>质量知识库</option></select>
+
+          <input type="text" placeholder="搜索知识库名称...">
+
+        </div>
+
+        <div class="list-filter-btns">
+
+          <button class="btn-search">&#128269; 查询</button>
+
+          <button class="btn-reset">&#8634; 重置</button>
+
+        </div>
+
+      </div>
+
+    </div>
+
+    <div class="list-table-area">
+
+      <table class="data-table">
+
+        <thead><tr><th><input type="checkbox" class="row-checkbox"></th><th>知识库名称</th><th>类型</th><th>描述</th><th>文档数</th><th>状态</th><th>操作</th></tr></thead>
+
+        <tbody><tr><td colspan="100%" style="text-align:center;color:#999;padding:20px;">暂无数据</td></tr></tbody>
+
+      </table>
+
+    </div>
+
+    <div class="list-pagination">
+
+      <span class="page-info">共 0 条记录，第 0/0 页</span>
+
+      <div class="page-btns"><button>&#9664;</button><button class="active">1</button><button>&#9654;</button></div>
+
+    </div>
+
+  </div>
+
+</div>
+
+
+
+<div class="modal-overlay" id="kbConfigModal">
+
+  <div class="modal">
+
+    <div class="modal-header">
+
+      <span>知识库配置</span>
+
+      <button class="btn btn-ghost btn-sm" onclick="hideKbConfigModal()">✕</button>
+
+    </div>
+
+    <div class="modal-body">
+
+      <div class="form-row">
+
+        <div class="form-group"><label class="form-label">知识库名称</label><input type="text" class="form-input" placeholder="请输入知识库名称"></div>
+
+        <div class="form-group"><label class="form-label">类型</label><select class="form-select"><option>产品知识库</option><option>工艺知识库</option><option>设备知识库</option><option>质量知识库</option><option>业务知识库</option><option>通用知识库</option></select></div>
+
+      </div>
+
+      <div class="form-group"><label class="form-label">描述</label><textarea class="form-textarea" rows="3" placeholder="请输入知识库描述"></textarea></div>
+
+      <div class="form-row">
+
+        <div class="form-group"><label class="form-label">Embedding模型</label><select class="form-select"><option>text-embedding-3-large</option><option>bge-large-zh</option><option>text2vec-base-chinese</option><option>m3e-large</option></select></div>
+
+        <div class="form-group"><label class="form-label">分片策略</label><select class="form-select"><option>按段落分片(1000token)</option><option>按句子分片(500token)</option><option>按章节分片(2000token)</option><option>自定义分片</option></select></div>
+
+      </div>
+
+      <div class="form-group"><label class="form-label">状态</label><select class="form-select"><option>运行中</option><option>构建中</option><option>已停止</option></select></div>
+
+    </div>
+
+    <div class="modal-footer">
+
+      <button class="btn btn-ghost btn-sm" onclick="hideKbConfigModal()">取消</button>
+
+      <button class="btn btn-primary btn-sm" onclick="saveKbConfig()">保存配置</button>
+
+    </div>
+
+  </div>
+
+</div>
+
+
+
+<div class="modal-overlay" id="kbDetailModal">
+
+  <div class="modal" style="max-width:800px;">
+
+    <div class="modal-header">
+
+      <span>知识库详情 - 产品资料知识库</span>
+
+      <button class="btn btn-ghost btn-sm" onclick="hideKbDetailModal()">✕</button>
+
+    </div>
+
+    <div class="modal-body">
+
+      <div class="embedding-progress">
+
+        <div class="progress-item">
+
+          <div class="progress-label">文档总数</div>
+
+          <div class="progress-value">1,245</div>
+
+          <div class="progress-sub">个文档</div>
+
+        </div>
+
+        <div class="progress-item">
+
+          <div class="progress-label">已向量化</div>
+
+          <div class="progress-value">1,245</div>
+
+          <div class="progress-sub">个文档</div>
+
+        </div>
+
+        <div class="progress-item">
+
+          <div class="progress-label">向量化进度</div>
+
+          <div class="progress-value">100%</div>
+
+          <div class="progress-bar" style="margin-top:8px;"><div class="fill fill-success" style="width:100%;"></div></div>
+
+        </div>
+
+        <div class="progress-item">
+
+          <div class="progress-label">耗时</div>
+
+          <div class="progress-value">2h 35m</div>
+
+          <div class="progress-sub">总处理时间</div>
+
+        </div>
+
+      </div>
+
+      <div class="retrieval-test">
+
+        <div class="card-header" style="margin-bottom:12px;">检索效果测试</div>
+
+        <div class="retrieval-input">
+
+          <input type="text" class="form-input" placeholder="输入测试问题..." id="retrievalInput">
+
+          <button class="btn btn-primary btn-sm" onclick="testRetrieval()">测试检索</button>
+
+        </div>
+
+        <div class="retrieval-results">
+
+          <div class="retrieval-item">
+
+            <div class="retrieval-title">智能仪表盘总成BOM明细</div>
+
+            <div class="retrieval-score">相关性评分: 0.94</div>
+
+            <div class="retrieval-snippet">产品型号XG-2026-A01，包含仪表盘外壳(P-001)、仪表盘面板(P-002)、电子控制模块(E-001)、线束组件(H-001)和固定支架(F-001)...</div>
+
+          </div>
+
+          <div class="retrieval-item">
+
+            <div class="retrieval-title">产品规格书-V2.0</div>
+
+            <div class="retrieval-score">相关性评分: 0.87</div>
+
+            <div class="retrieval-snippet">智能仪表盘总成技术规格，工作温度范围-40°C~85°C，防护等级IP65，显示分辨率1280x720...</div>
+
+          </div>
+
+          <div class="retrieval-item">
+
+            <div class="retrieval-title">物料编码规则说明</div>
+
+            <div class="retrieval-score">相关性评分: 0.72</div>
+
+            <div class="retrieval-snippet">物料编码由前缀+类别码+流水号组成，P代表塑料件，E代表电子件，H代表线束...</div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+    <div class="modal-footer">
+
+      <button class="btn btn-ghost btn-sm" onclick="hideKbDetailModal()">关闭</button>
+
+    </div>
+
+  </div>
+
+</div>
+
+
+
+<div id="sidebarOverlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:99;" onclick="toggleSidebar()"></div>
+
+<script>
+
+const API_BASE = 'http://localhost:3001/api';
+
+var confirmCallback = null;
+
+function getAccessToken() {
+
+  return localStorage.getItem('accessToken');
+
+}
+
+function showToast(message, type) {
+
+  var container = document.getElementById('toastContainer');
+
+  var icons = { success: '&#9989;', warning: '&#9888;', error: '&#10060;', info: '&#9432;' };
+
+  var titles = { success: '操作成功', warning: '温馨提示', error: '系统提示', info: '系统提示' };
+
+  var t = type || 'info';
+
+  var toast = document.createElement('div');
+
+  toast.className = 'toast toast-' + t;
+
+  toast.innerHTML = '<div class="toast-icon">' + icons[t] + '</div><div class="toast-content"><div class="toast-title">' + titles[t] + '</div><div class="toast-message">' + message + '</div></div>';
+
+  container.appendChild(toast);
+
+  setTimeout(function() { toast.style.opacity = '0'; toast.style.transform = 'translateX(100%)'; setTimeout(function() { toast.remove(); }, 300); }, 3000);
+
+}
+
+
+
+function showConfirm(message, type, callback) {
+
+  document.getElementById('confirmMessage').textContent = message;
+
+  document.getElementById('confirmTitle').textContent = (type === 'warning') ? '温馨提示' : '系统提示';
+
+  document.getElementById('confirmIcon').innerHTML = (type === 'warning') ? '&#9888;' : '&#10060;';
+
+  confirmCallback = callback;
+
+  document.getElementById('confirmModal').classList.add('show');
+
+}
+
+
+
+function closeConfirmModal(result) {
+
+  document.getElementById('confirmModal').classList.remove('show');
+
+  if (confirmCallback) { confirmCallback(result); confirmCallback = null; }
+
+}
+
+
+
+function showKbConfigModal(){document.getElementById('kbConfigModal').classList.add('active');}
+
+function hideKbConfigModal(){document.getElementById('kbConfigModal').classList.remove('active');}
+
+
+
+async function saveKbConfig() {
+
+  var kbName = document.querySelector('#kbConfigModal input[placeholder*="知识库名称"]').value;
+
+  var kbType = document.querySelector('#kbConfigModal select').value;
+
+  var desc = document.querySelector('#kbConfigModal textarea').value;
+
+  
+
+  if (!kbName.trim()) {
+
+    showToast('请输入知识库名称', 'warning');
+
+    return;
+
+  }
+
+  
+
+  saveKbToLocal({ kbName, kbType, description: desc });
+
+  showToast('知识库创建成功', 'success');
+
+  hideKbConfigModal();
+
+  loadKnowledgeBases();
+
+  
+
+  try {
+
+    var response = await fetch(API_BASE + '/knowledge-base', {
+
+      method: 'POST',
+
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + getAccessToken() },
+
+      body: JSON.stringify({ kbName, kbType, description: desc })
+
+    });
+
+    var data = await response.json();
+
+    if (data.code !== 200) {
+
+      console.warn('后端创建失败，但已保存到本地缓存');
+
+    }
+
+  } catch (e) {
+
+    console.warn('后端不可用，数据已保存到本地缓存');
+
+  }
+
+}
+
+
+
+function saveKbToLocal(kbData) {
+
+  var kbList = JSON.parse(localStorage.getItem('erp_knowledge_bases') || '[]');
+
+  var newKb = {
+
+    id: 'kb-' + Date.now(),
+
+    kbName: kbData.kbName,
+
+    kbType: kbData.kbType,
+
+    description: kbData.description,
+
+    docCount: 0,
+
+    status: 'active',
+
+    createdAt: new Date().toISOString()
+
+  };
+
+  kbList.push(newKb);
+
+  localStorage.setItem('erp_knowledge_bases', JSON.stringify(kbList));
+
+}
+
+
+
+function showKbDetail(index){document.getElementById('kbDetailModal').classList.add('active');}
+
+function hideKbDetailModal(){document.getElementById('kbDetailModal').classList.remove('active');}
+
+function testRetrieval(){var input=document.getElementById('retrievalInput');if(input.value.trim()){showToast('正在测试检索效果...', 'info');}}
+
+
+
+async function loadKnowledgeBases() {
+
+  try {
+
+    var response = await fetch(API_BASE + '/knowledge-base?page=1&pageSize=20', {
+
+      headers: { 'Authorization': 'Bearer ' + getAccessToken() }
+
+    });
+
+    var data = await response.json();
+
+    if (data.code === 200) {
+
+      renderKbTable(data.data);
+
+      updateKbStats(data.data.total);
+
+    } else {
+
+      loadLocalKnowledgeBases();
+
+    }
+
+  } catch (e) {
+
+    loadLocalKnowledgeBases();
+
+  }
+
+}
+
+
+
+function loadLocalKnowledgeBases() {
+
+  var kbList = JSON.parse(localStorage.getItem('erp_knowledge_bases') || '[]');
+
+  if (kbList.length === 0) {
+
+    kbList = [
+
+      { id: 'kb-001', kbName: '产品资料知识库', kbType: 'product', description: '产品规格书、BOM表、图纸等产品相关资料', docCount: 1245, status: 'active', createdAt: new Date().toISOString() },
+
+      { id: 'kb-002', kbName: '工艺文件知识库', kbType: 'process', description: '工艺规程、作业指导书、质量标准等工艺文档', docCount: 890, status: 'active', createdAt: new Date().toISOString() },
+
+      { id: 'kb-003', kbName: '设备维护知识库', kbType: 'equipment', description: '设备手册、维护记录、故障排查指南', docCount: 560, status: 'active', createdAt: new Date().toISOString() }
+
+    ];
+
+  }
+
+  renderKbTable({ list: kbList, total: kbList.length });
+
+  updateKbStats(kbList.length);
+
+}
+
+
+
+function renderKbTable(data) {
+
+  var tbody = document.querySelector('#nl-training .data-table tbody');
+
+  if (data.list && data.list.length > 0) {
+
+    tbody.innerHTML = data.list.map(function(kb) {
+
+      var statusText = kb.isEnabled === 1 ? '运行中' : '已停止';
+
+      return '<tr><td><input type="checkbox" class="row-checkbox"></td><td>' + kb.kbName + '</td><td>' + kb.kbType + '</td><td>' + (kb.description || '-') + '</td><td>' + kb.documentCount + '</td><td>' + statusText + '</td><td><button class="btn btn-ghost btn-sm" onclick="editKb(\'' + kb.id + '\')">编辑</button><button class="btn btn-danger btn-sm" onclick="deleteKb(\'' + kb.id + '\')">删除</button></td></tr>';
+
+    }).join('');
+
+    document.querySelector('#nl-training .page-info').textContent = '共 ' + data.total + ' 条记录，第 ' + data.page + '/' + Math.ceil(data.total / data.pageSize) + ' 页';
+
+  } else {
+
+    tbody.innerHTML = '<tr><td colspan="100%" style="text-align:center;color:#999;padding:20px;">暂无数据</td></tr>';
+
+    document.querySelector('#nl-training .page-info').textContent = '共 0 条记录，第 0/0 页';
+
+  }
+
+}
+
+
+
+function updateKbStats(total) {
+
+  var filterTabs = document.querySelectorAll('#nl-training .filter-tab');
+
+  filterTabs[0].textContent = '全部 (' + total + ')';
+
+}
+
+
+
+async function deleteKb(id) {
+
+  showConfirm('确定要删除该知识库吗？', 'warning', async function(result) {
+
+    if (result) {
+
+      try {
+
+        var response = await fetch(API_BASE + '/knowledge-base/' + id, {
+
+          method: 'DELETE',
+
+          headers: { 'Authorization': 'Bearer ' + getAccessToken() }
+
+        });
+
+        var data = await response.json();
+
+        if (data.code === 200) {
+
+          showToast('删除成功', 'success');
+
+          loadKnowledgeBases();
+
+        } else {
+
+          showToast(data.message || '删除失败', 'error');
+
+        }
+
+      } catch (e) {
+
+        showToast('网络错误', 'error');
+
+      }
+
+    }
+
+  });
+
+}
+
+
+
+function editKb(id) {
+
+  showToast('编辑功能开发中', 'info');
+
+}
+
+
+
+document.addEventListener('DOMContentLoaded', function() {
+
+  loadKnowledgeBases();
+
+});
+
+</script>
+
+
+
+<div class="toast-container" id="toastContainer"></div>
+
+<div class="confirm-modal-overlay" id="confirmModal">
+
+  <div class="confirm-modal-dialog">
+
+    <div class="confirm-modal-header">
+
+      <span class="confirm-modal-icon" id="confirmIcon">&#9888;</span>
+
+      <span class="confirm-modal-title" id="confirmTitle">温馨提示</span>
+
+    </div>
+
+    <div class="confirm-modal-body">
+
+      <div class="confirm-modal-message" id="confirmMessage"></div>
+
+    </div>
+
+    <div class="confirm-modal-footer">
+
+      <button class="btn btn-sm btn-cancel" onclick="closeConfirmModal(false)">取消</button>
+
+      <button class="btn btn-sm btn-primary" style="background:var(--admin-accent);border-color:var(--admin-accent);color:#0a0e1a;" onclick="closeConfirmModal(true)">确定</button>
+
+    </div>
+
+  </div>
+
+</div>
+
+</body>
+
+</html>

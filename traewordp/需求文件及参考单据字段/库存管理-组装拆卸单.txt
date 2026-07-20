@@ -1,0 +1,149 @@
+组装拆卸单
+
+库存管理
+
+字段说明：
+基本信息：FBillHead 
+	 实体主键：FID 
+	 单据编号：FBillNo 
+	 单据状态：FDocumentStatus 
+	 库存组织：FStockOrgId 
+	 日期：FDate 
+	 单据类型：FBillTypeID  (必填项)
+	 成品货主类型：FOwnerTypeIdHead  (必填项)
+	 成品货主：FOwnerIdHead  (必填项)
+	 事务类型：FAffairType  (必填项)
+	 费用：FEE 
+	 本位币：FBASECURRID 
+	 部门：FDeptID 
+	 库存组：FSTOCKERGROUPID 
+	 仓管员：FSTOCKERID 
+	 备注：FNote 
+	 创建人：FCreatorId 
+	 创建日期：FCreateDate 
+	 最后修改人：FModifierId 
+	 最后修改日期：FModifyDate 
+	 审核人：FAPPROVERID 
+	 审核日期：FAPPROVEDATE 
+	 作废人：FCANCELLERID 
+	 作废日期：FCANCELDATE 
+	 作废状态：FCANCELSTATUS 
+	 子件货主类型：FSubProOwnTypeIdH  (必填项)
+	 子件货主：FSubProOwnerIdH  (必填项)
+	 序列号上传：FScanBox 
+	 序列号上传：FScanBoxSenty 
+成品表：FEntity 
+	 实体主键：FEntryID 
+	 行类型：FRowType 
+	 物料编码：FMaterialID  (必填项)
+	 物料名称：FMaterialName 
+	 规格型号：FUOM 
+	 物料类别：FMaterialType 
+	 参照BOM版本：FRefBomID 
+	 单位：FUnitID  (必填项)
+	 数量：FQty 
+	 基本单位：FBaseUnitID  (必填项)
+	 基本单位数量：FBaseQty 
+	 费用：Fee_ETY 
+	 仓库：FStockID  (必填项)
+	 库存状态：FStockStatusID  (必填项)
+	 备注：FDescription 
+	 计划跟踪号：FMTONO 
+	 项目编号：FProjectNo 
+	 货主类型：FOwnerTypeID  (必填项)
+	 货主：FOwnerID  (必填项)
+	 保管者类型：FKeeperTypeID  (必填项)
+	 保管者：FKeeperID  (必填项)
+	 BOM版本：FBomID 
+	 生产日期：FProduceDate 
+	 有效期至：FEXPIRYDATE 
+	 库存辅单位：FSecUnitID 
+	 数量（库存辅单位）：FSecQty 
+	 保质期：FExpirationDate 
+	 保质期单位：FExpirationDateUnit 
+	 成本价：FPrice 
+	 总成本：FAmount 
+	 辅助属性：FAuxPropId 
+	 已更新库存：FStockFlag 
+	 仓位：FStockLocId 
+	 货位：FF100001
+	 批号：FLOT 
+	 序列号单位：FSNUnitID 
+	 序列号单位数量：FSNQty 
+	 辅单位：FExtAuxUnitId 
+	 数量（辅单位）：FExtAuxUnitQty 
+	 源单类型：FSrcBillTypeId 
+	 源单编号：FSrcBillNo 
+	 销售单位：FSaleUnitId 
+	 销售基本数量：FSaleBaseQty 
+	 销售数量：FSaleQty 
+	 销售订单BOM：FSOBomId 
+	 携带源单主业务单位：FSrcBizUnitId 
+	 携带源单辅单位：FSrcAuxUnitId 
+	 源单主单位基本数量：FSrcBizBaseQty 
+	 源单辅单位基本数量：FSrcAuxBaseQty 
+	 入库日期：FInstockDate 
+	 即时库存(成品)：FInvQty 
+子件表：FSubEntity 
+	 实体主键：FDetailID 
+	 行类型：FRowTypeSETY 
+	 物料编码：FMaterialIDSETY  (必填项)
+	 物料名称：FMaterialNameSETY 
+	 规格型号：FUOMSETY 
+	 物料类别：FMaterialTypeSETY 
+	 单位：FUnitIDSETY  (必填项)
+	 数量：FQtySETY 
+	 成本拆分比例：FCostProportion 
+	 基本单位：FBaseUnitIDSETY  (必填项)
+	 基本单位数量：FBaseQtySETY 
+	 仓库：FStockIDSETY  (必填项)
+	 库存状态：FStockStatusIDSETY  (必填项)
+	 备注：FDescriptionSETY 
+	 计划跟踪号：FMTONOSETY 
+	 项目编号：FProjectNoSETY 
+	 货主类型：FOwnerTypeIDSETY  (必填项)
+	 货主：FOwnerIDSETY  (必填项)
+	 保管者类型：FKeeperTypeIDSETY  (必填项)
+	 保管者：FKeeperIDSETY  (必填项)
+	 生产日期：FProduceDateSETY 
+	 有效期至：FEXPIRYDATESETY 
+	 BOM版本：FBomIDSETY 
+	 保质期：FExpirationDateSETY 
+	 库存辅单位：FSecUnitIDSETY 
+	 数量（库存辅单位）：FSecQtySETY 
+	 保质期单位：FExpirationDateUnitSETY 
+	 成本价：FPriceSETY 
+	 总成本：FAmountSETY 
+	 辅助属性：FAuxPropIdSETY 
+	 已更新库存：FStockFlagSETY 
+	 仓位：FStockLocIdSETY 
+	 货位：FF100001
+	 批号：FLOTSETY 
+	 序列号单位：FSNUnitIDSety 
+	 序列号单位数量：FSNQtySety 
+	 辅单位：FExtAuxUnitIdSETY 
+	 数量（辅单位）：FExtAuxUnitQtySETY 
+	 入库日期：FInstockDateSety 
+	 即时库存(子件)：FInventoryQty 
+	 子件服务上下文：FSubServiceContext 
+成品序列号：FSerialEntity 
+	 实体主键：FDetailID 
+	 序列号：FSerialNo 
+	 序列号：FSerialId 
+	 备注：FSerialNote 
+子件序列号：FSubSerialEntity 
+	 实体主键：FSNDetailID 
+	 序列号：FSerialNoSety 
+	 序列号：FSerialIdSety 
+	 备注：FSerialNoteSety 
+关联关系表：FEntity_Link 
+	 实体主键：FLinkId 
+	 业务流程图：FEntity_Link_FFlowId 
+	 推进路线：FEntity_Link_FFlowLineId 
+	 转换规则：FEntity_Link_FRuleId 
+	 源单表内码：FEntity_Link_FSTableId 
+	 源单表：FEntity_Link_FSTableName 
+	 源单内码：FEntity_Link_FSBillId 
+	 源单分录内码：FEntity_Link_FSId 
+	 原始携带量：FEntity_Link_FBaseQtyOld 
+	 修改携带量：FEntity_Link_FBaseQty 

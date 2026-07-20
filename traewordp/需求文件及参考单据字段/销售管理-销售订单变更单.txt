@@ -1,0 +1,102 @@
+销售订单变更单
+
+字段说明：
+基本信息：FBillHead 
+	 实体主键：FID 
+	 单据编号：FBillNo 
+	 单据状态：FDocumentStatus 
+	 销售组织：FSaleOrgId  (必填项)
+	 日期：FDate  (必填项)
+	 客户：FCustId 
+	 结算币别：FSettleCurrId 
+	 销售组：FSaleGroupId 
+	 销售部门：FSaleDeptId 
+	 销售员：FSalerId 
+	 变更原因：FChangeReason  (必填项)
+	 创建人：FCreatorId 
+	 创建日期：FCreateDate 
+	 最后修改人：FModifierId 
+	 最后修改日期：FModifyDate 
+	 审核人：FApproverId 
+	 审核日期：FApproveDate 
+	 作废人：FCancellerId 
+	 作废日期：FCancelDate 
+	 收货方：FReceiveId 
+	 单据类型：FBillTypeID  (必填项)
+	 生效状态：FISACTIVE 
+	 作废状态：FCancelStatus 
+	 生效日期：FActiveDate 
+	 生效人：FActiverId 
+	 源订单编号：FSourceBillNo 
+	 源订单ID：FSourceBillId 
+ 
+	 是否含税：FIsIncludedTax 
+	 价目表：FPriceListId 
+	 价外税：FIsPriceExcludeTax 
+	 变更终止关联的发货通知：FStopRelatedDelivery 
+变更明细：FSaleOrderEntry 
+	 实体主键：FEntryID 
+	 物料编码：FMaterialId  (必填项)
+	 物料名称：FMaterialName 
+	 规格型号：FMaterialModel 
+	 物料类别：FMaterialType 
+	 销售单位：FUnitID  (必填项)
+	 原销售数量：FOQty 
+	 新销售数量：FNQty 
+	 原单价：FOPrice 
+	 新单价：FNPrice 
+	 原交货地点：FOLocationId 
+	 新交货地点：FNLocationId 
+	 备注：FNote 
+	 剩余未出数量：FSumOutQty 
+	 变更类型：FChangeType  (必填项)
+	 原订单内码：FORDERBILLID 
+	 是否赠品：FIsFree 
+	 原BOM版本：FOBomId 
+	 新BOM版本：FNBomId 
+	 原含税单价：FOTaxPrice 
+	 新含税单价：FNTaxPrice 
+	 客户物料编码：FMAPID 
+	 客户物料名称：FMAPNAME 
+	 最低限价：FLimitDownPrice 
+	 原要货日期：FODeliveryDate 
+	 新要货日期：FNDeliveryDate 
+	 退补类型：FReturnType 
+	 基本单位：FBaseUnitId 
+	 原销售基本数量：FOBaseUnitQty 
+	 新销售基本数量：FNBaseUnitQty 
+	 辅助属性：FAuxPropId 
+	 计价单位：FPRICEUNITID 
+	 库存单位：FSTOCKUNITID 
+	 携带的主业务单位：FSRCBIZUNITID 
+	 原计价数量：FOPRICEQTY 
+	 新计价数量：FNPRICEQTY 
+	 原库存数量：FOSTOCKQTY 
+	 新库存数量：FNSTOCKQTY 
+	 新计价基本数量：FNPRICEBASEQTY 
+	 新库存基本数量：FNSTOCKBASEQTY 
+	 销售基本分子：FSALBASENUM 
+	 库存基本分母：FStockBaseDen 
+	 原订单编号：FORDERBILLNO 
+	 原订单分录内码：FORDERENTRYID 
+交货明细：FSaleOrderEntryDeliPlan 
+	 实体主键：FDetailID 
+	 原要货日期：FDeliODeliveryDate 
+	 新要货日期：FDeliNDeliveryDate 
+	 原数量：FOPlanQty 
+	 新数量：FDeliNQty 
+	 原订单交货明细行内码：FOFDetailId 
+	 原计划发货日期：FOPlanDeliveryDate 
+	 新计划发货日期：FNPlanDeliveryDate 
+	 原运输提前期：FOTransportLeadTime 
+	 新运输提前期：FNTransportLeadTime 
+	 已出货数量：FDeliCommitQty 
+关联关系表：FSaleOrderEntry_Link 
+	 实体主键：FLinkId 
+	 业务流程图：FSaleOrderEntry_Link_FFlowId 
+	 推进路线：FSaleOrderEntry_Link_FFlowLineId 
+	 转换规则：FSaleOrderEntry_Link_FRuleId 
+	 源单表内码：FSaleOrderEntry_Link_FSTableId 
+	 源单表：FSaleOrderEntry_Link_FSTableName 
+	 源单内码：FSaleOrderEntry_Link_FSBillId 
+	 源单分录内码：FSaleOrderEntry_Link_FSId 

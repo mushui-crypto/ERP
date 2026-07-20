@@ -1,0 +1,147 @@
+生产管理-生产汇报单
+字段说明：
+单据头：FBillHead 
+	 实体主键：FID 
+	 单据编号：FBillNo 
+	 单据状态：FDocumentStatus  (必填项)
+	 审核人：FApproverId 
+	 审核日期：FApproveDate 
+	 修改人：FModifierId 
+	 创建日期：FCreateDate 
+	 创建人：FCreatorId 
+	 修改日期：FModifyDate 
+	 作废日期：FCancelDate 
+	 作废人：FCanceler 
+	 作废状态：FCancelStatus 
+	 备注：FDescription 
+	 单据类型：FBillType  (必填项)
+	 生产组织：FPrdOrgId  (必填项)
+	 生产车间：FWorkshipIdH 
+	 单据日期：FDate  (必填项)
+	 序列号上传：FScanBox 
+明细：FEntity 
+	 实体主键：FEntryID 
+	 生产订单：FMoBillNo 
+	 生产汇报类型：FReportType  (必填项)
+	 产品类型：FProductType 
+	 物料编码：FMaterialId 
+	 物料名称：FMaterialName 
+	 规格型号：FSpecification 
+	 辅助属性：FAuxPropId 
+	 单位：FUnitID 
+	 完成数量：FFinishQty 
+	 合格数量：FQuaQty 
+	 不合格数量：FFailQty 
+	 待返修数量：FReworkQty 
+	 人数：FHumanQty 
+	 机台数：FMachineQty 
+	 开始时间：FStartTime 
+	 结束时间：FEndTime 
+	 时间单位：FTimeUnitId  (必填项)
+	 生产订单行号：FMoEntrySeq 
+	 项目编号：FProjectNo 
+	 计划跟踪号：FMtoNo 
+	 批号：FLot 
+	 合格品入库选单数量：FStockInQuaSelOty 
+	 不合格品入库选单数量：FStockInFailSelQty 
+	 生产车间：FWorkshipId  (必填项)
+	 基本单位：FBaseUnitId 
+	 基本单位合格数量：FBaseQuaQty 
+	 基本单位不合格数量：FBaseFailQty 
+	 基本单位待返修数量：FBaseReworkQty 
+	 基本单位完成数量：FBaseFinishQty 
+	 基本单位合格品入库选单数量：FBaseStockInQuaSelQty 
+	 基本单位不合格品入库选单数量：FBaseStockInFailSelQty 
+	 生产订单内码：FMoId 
+	 生产订单分录号：FMoEntryId 
+	 备注：FDescriptionE 
+	 入库组织：FStockInOrgId 
+	 仓库：FStockId 
+	 仓位：FStockLocId 
+	 货位：FF100001
+	 货主类型：FOwnerTypeId 
+	 货主：FOwnerId 
+	 BOM版本：FBomId 
+	 源单类型：FSrcBillType 
+	 源单编号：FSrcBillNo 
+	 源单内码：FSrcInterId 
+	 源单分录内码：FSrcEntryId 
+	 源单行号：FSrcEntrySeq 
+	 单位标准工时：FStdManHour 
+	 人员准备工时：FHrPrepareTime 
+	 人员实作工时：FHrWorkTime 
+	 机器准备工时：FMacPrepareTime 
+	 机器实作工时：FMacWorkTime 
+	 物料生产单位：FMaterialUnitID 
+	 责任部门：FDeptId 
+	 供下推入库单使用-入库类型：FInStockType 
+	 业务流程：FBFLowId 
+	 班组：FShiftGroupId 
+	 基本单位报废数量：FBaseScrapQty 
+	 报废数量：FScrapQty 
+	 基本单位检验选单数量：FBaseSelInspectQty 
+	 检验选单数量：FSelInspectQty 
+	 基本单位报废品入库选单数：FBaseSelScrapInQty 
+	 报废品入库选单数：FSelScrapInQty 
+	 基本单位检验数量：FBaseInspectQty 
+	 检验数量：FInspectQty 
+	 产品检验：FCheckProduct 
+	 紧急放行：FQAIP 
+	 组织委托加工：FIsEntrust 
+	 成本权重：FCostRate 
+	 序列号单位：FSNUnitID 
+	 序列号单位数量：FSNQty 
+	 倒冲领料：FISBACKFLUSH 
+	 生产订单主产品分录：FMOMAINENTRYID 
+	 生产日期：FProduceDate 
+	 有效期至：FExpiryDate 
+	 需求来源：FReqSrc 
+	 需求单据：FReqBillNo 
+	 需求单据内码：FReqBillId 
+	 需求单据行号：FReqEntrySeq 
+	 需求单据分录内码：FReqEntryId 
+	 是否新增行：FIsNew 
+	 单位标准工时单位：FStandHourUnitId  (必填项)
+	 基本单位返工数量：FBaseReMadeQty 
+	 返工数量：FReMadeQty 
+	 基本单位返工入库选单数量：FBaseStockInReMadeSelQty 
+	 返工品入库选单数：FStockInReMadeSelQty 
+	 合格品入库数量：FStockInSelQty 
+	 基本单位合格品入库数量：FBaseStockInSelQty 
+	 领料选单数量：FPickMtrlSelQty 
+	 基本单位领料选单数量：FBasePickMtrlSelQty 
+	 首检：FIsFirstinspect 
+	 产线：FLINEID 
+	 基本单位样本破坏数量：FBaseSampleDamageQty 
+	 样本破坏数量：FSampleDamageQty 
+序列号子单据体：FSerialSubEntity 
+	 实体主键：FDetailID 
+	 检验结果：FInspectResult 
+	 辅助属性：FQcAuxPropId 
+	 数量：FQCQty 
+	 入库选单数量：FQCStockInSelQty 
+	 基本单位数量：FBaseQCQty 
+	 基本单位入库选单数量：FBaseQCStockInSelQty 
+	 物料：FQCMaterialId 
+	 序列号：FSerialNo 
+	 序列号：FSerialId 
+	 备注：FSerialNote 
+关联关系表：FEntity_Link 
+	 实体主键：FLinkId 
+	 业务流程图：FEntity_Link_FFlowId 
+	 推进路线：FEntity_Link_FFlowLineId 
+	 转换规则：FEntity_Link_FRuleId 
+	 源单表内码：FEntity_Link_FSTableId 
+	 源单表：FEntity_Link_FSTableName 
+	 源单内码：FEntity_Link_FSBillId 
+	 源单分录内码：FEntity_Link_FSId 
+	 原始携带量：FEntity_Link_FBaseQuaQtyOld 
+	 修改携带量：FEntity_Link_FBaseQuaQty 
+	 原始携带量：FEntity_Link_FBaseFailQtyOld 
+	 修改携带量：FEntity_Link_FBaseFailQty 
+	 迁移图：FEntity_Link_FLnkTrackerId 
+	 上游状态：FEntity_Link_FLnkSState 
+	 数量FLnk：FEntity_Link_FLnkAmount 
+	 迁移图：FEntity_Link_FLnk1TrackerId 
+	 上游状态：FEntity_Link_FLnk1SState 
+	 数量FLnk1：FEntity_Link_FLnk1Amount 

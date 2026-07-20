@@ -1,0 +1,424 @@
+{
+  "runTag": "P0ACC-20260720045249-5e1b",
+  "startedAt": "2026-07-20T04:52:49.628Z",
+  "env": {
+    "APP_PORT": "3001",
+    "APP_PREFIX": "/api",
+    "DB_TYPE": "mssql",
+    "DB_MSSQL_HOST": "localhost",
+    "DB_MSSQL_PORT": "1433",
+    "DB_MSSQL_USERNAME": "sa",
+    "DB_MSSQL_DATABASE": "panshu_erp"
+  },
+  "ids": {
+    "userId": "310A433E-F36B-1410-8B47-0096A7B40922",
+    "supplierId": "350A433E-F36B-1410-8B47-0096A7B40922",
+    "warehouseId": "390A433E-F36B-1410-8B47-0096A7B40922",
+    "unitId": "3D0A433E-F36B-1410-8B47-0096A7B40922",
+    "materialId": "410A433E-F36B-1410-8B47-0096A7B40922",
+    "currencyId": "450A433E-F36B-1410-8B47-0096A7B40922",
+    "paymentTermId": "490A433E-F36B-1410-8B47-0096A7B40922",
+    "paymentTermFailId": "4A0A433E-F36B-1410-8B47-0096A7B40922",
+    "orgId": "98f9e981-d482-44d3-a293-baec96f8cc4a"
+  },
+  "checks": [
+    {
+      "id": "ENV-DB-001",
+      "name": "MSSQL 可连接且迁移表可读",
+      "status": "PASS",
+      "detail": {
+        "migrations": 5
+      },
+      "at": "2026-07-20T04:52:49.681Z"
+    },
+    {
+      "id": "ENV-AUTH-001",
+      "name": "验收用户可登录并获取 token",
+      "status": "PASS",
+      "detail": {
+        "userId": "310A433E-F36B-1410-8B47-0096A7B40922"
+      },
+      "at": "2026-07-20T04:52:49.958Z"
+    },
+    {
+      "id": "ASSERT-PR-001",
+      "name": "申请审核后 approveQty=100 且 purchasedQty=0",
+      "status": "PASS",
+      "detail": {
+        "approveQty": 100,
+        "purchasedQty": 0
+      },
+      "at": "2026-07-20T04:52:50.056Z"
+    },
+    {
+      "id": "TC-P0-001",
+      "name": "采购申请创建、提交、审核",
+      "status": "PASS",
+      "detail": {
+        "requestId": "4E0A433E-F36B-1410-8B47-0096A7B40922",
+        "entryId": "520A433E-F36B-1410-8B47-0096A7B40922",
+        "status": 2,
+        "statusCode": "APPROVED"
+      },
+      "at": "2026-07-20T04:52:50.056Z"
+    },
+    {
+      "id": "ASSERT-PO-草稿不反写",
+      "name": "订单草稿不反写申请 purchasedQty",
+      "status": "PASS",
+      "detail": {
+        "purchasedQty": 0
+      },
+      "at": "2026-07-20T04:52:50.175Z"
+    },
+    {
+      "id": "ASSERT-PO-审核反写",
+      "name": "订单审核后申请 purchasedQty=60",
+      "status": "PASS",
+      "detail": {
+        "purchasedQty": 60
+      },
+      "at": "2026-07-20T04:52:50.248Z"
+    },
+    {
+      "id": "ASSERT-PO-取消回滚",
+      "name": "无下游订单取消回滚 purchasedQty=0",
+      "status": "PASS",
+      "detail": {
+        "purchasedQty": 0,
+        "orderStatus": 5
+      },
+      "at": "2026-07-20T04:52:50.306Z"
+    },
+    {
+      "id": "TC-P0-002-005",
+      "name": "申请部分下推、订单审核反写、订单取消回滚、恢复可下推",
+      "status": "PASS",
+      "detail": {
+        "requestId": "560A433E-F36B-1410-8B47-0096A7B40922",
+        "canceledOrderId": "600A433E-F36B-1410-8B47-0096A7B40922",
+        "repushOrderId": "690A433E-F36B-1410-8B47-0096A7B40922"
+      },
+      "at": "2026-07-20T04:52:50.353Z"
+    },
+    {
+      "id": "ASSERT-OS-01",
+      "name": "超批准数量下推返回失败且不生成订单",
+      "status": "PASS",
+      "detail": {
+        "httpStatus": 400,
+        "count": 0,
+        "message": "采购申请PR20260720125250357853第1行下推数量超过剩余批准数量100"
+      },
+      "at": "2026-07-20T04:52:50.494Z"
+    },
+    {
+      "id": "TC-P0-004/OS-01",
+      "name": "禁止采购申请超批准数量下推",
+      "status": "PASS",
+      "detail": {
+        "requestEntryId": "6E0A433E-F36B-1410-8B47-0096A7B40922",
+        "httpStatus": 400
+      },
+      "at": "2026-07-20T04:52:50.494Z"
+    },
+    {
+      "id": "ASSERT-RN-草稿不反写",
+      "name": "收料草稿不反写订单 receivedQty",
+      "status": "PASS",
+      "detail": {
+        "receivedQty": 0
+      },
+      "at": "2026-07-20T04:52:50.738Z"
+    },
+    {
+      "id": "ASSERT-RN-审核反写",
+      "name": "收料审核反写订单 receivedQty=60",
+      "status": "PASS",
+      "detail": {
+        "receivedQty": 60
+      },
+      "at": "2026-07-20T04:52:50.797Z"
+    },
+    {
+      "id": "ASSERT-RN-冲销回滚",
+      "name": "收料冲销生成独立记录且 receivedQty 回滚为0",
+      "status": "PASS",
+      "detail": {
+        "noticeStatus": 6,
+        "receivedQty": 0,
+        "reversalCount": 1,
+        "reversalId": "900A433E-F36B-1410-8B47-0096A7B40922"
+      },
+      "at": "2026-07-20T04:52:50.872Z"
+    },
+    {
+      "id": "TC-P0-007-009",
+      "name": "收料通知草稿不反写、审核反写、冲销回滚并幂等",
+      "status": "PASS",
+      "detail": {
+        "noticeId": "8B0A433E-F36B-1410-8B47-0096A7B40922",
+        "reverseResult1": "900A433E-F36B-1410-8B47-0096A7B40922",
+        "reverseResult2": "900A433E-F36B-1410-8B47-0096A7B40922"
+      },
+      "at": "2026-07-20T04:52:50.872Z"
+    },
+    {
+      "id": "ASSERT-OS-03",
+      "name": "超订单数量收料失败且不生成收料明细",
+      "status": "PASS",
+      "detail": {
+        "httpStatus": 400,
+        "count": 0,
+        "message": "订单明细 1 可新建收料数量为 60，本次为 61"
+      },
+      "at": "2026-07-20T04:52:51.042Z"
+    },
+    {
+      "id": "TC-P0-008/OS-03",
+      "name": "禁止订单超收",
+      "status": "PASS",
+      "detail": {
+        "orderEntryId": "A40A433E-F36B-1410-8B47-0096A7B40922",
+        "httpStatus": 400
+      },
+      "at": "2026-07-20T04:52:51.042Z"
+    },
+    {
+      "id": "ASSERT-QI-未检禁止入库",
+      "name": "需检未审核检验前禁止入库",
+      "status": "PASS",
+      "detail": {
+        "httpStatus": 400,
+        "message": "收料通知 PO20260720125251125316 明细 1 按合格数量+让步接收数量计算的可入库数量为 0，本次为 1"
+      },
+      "at": "2026-07-20T04:52:51.314Z"
+    },
+    {
+      "id": "ASSERT-QI-审核反写",
+      "name": "检验审核反写 inspected/qualified/unqualified/concession",
+      "status": "PASS",
+      "detail": {
+        "inspectedQty": 60,
+        "qualifiedQty": 50,
+        "unqualifiedQty": 10,
+        "concessionQty": 6
+      },
+      "at": "2026-07-20T04:52:51.398Z"
+    },
+    {
+      "id": "ASSERT-OS-06",
+      "name": "需检入库不得超过合格+让步数量",
+      "status": "PASS",
+      "detail": {
+        "httpStatus": 400,
+        "message": "收料通知 PO20260720125251125316 明细 1 按合格数量+让步接收数量计算的可入库数量为 56，本次为 57"
+      },
+      "at": "2026-07-20T04:52:51.428Z"
+    },
+    {
+      "id": "ASSERT-IN-草稿不反写",
+      "name": "采购入库草稿不反写 stockedQty",
+      "status": "PASS",
+      "detail": {
+        "stockedQty": 0
+      },
+      "at": "2026-07-20T04:52:51.491Z"
+    },
+    {
+      "id": "ASSERT-IN-审核反写过账应付",
+      "name": "入库审核反写 stockedQty、库存过账、生成一张暂估应付",
+      "status": "PASS",
+      "detail": {
+        "invStatus": 2,
+        "payableGenerationStatus": "GENERATED",
+        "receiveStockedQty": 56,
+        "orderStockedQty": 56,
+        "postingCount": 1,
+        "payableCount": 1,
+        "payableAmount": 632.8
+      },
+      "at": "2026-07-20T04:52:51.617Z"
+    },
+    {
+      "id": "ASSERT-AP-唯一幂等",
+      "name": "重复生成/重复审核不重复生成应付或过账",
+      "status": "PASS",
+      "detail": {
+        "payableCount": 1,
+        "postingCount": 1
+      },
+      "at": "2026-07-20T04:52:51.648Z"
+    },
+    {
+      "id": "TC-P0-010-015",
+      "name": "需检：检验反写、禁止超入、入库过账、暂估应付唯一",
+      "status": "PASS",
+      "detail": {
+        "inventoryInId": "C80A433E-F36B-1410-8B47-0096A7B40922",
+        "inventoryEntryId": "C90A433E-F36B-1410-8B47-0096A7B40922",
+        "payableId": "D50A433E-F36B-1410-8B47-0096A7B40922",
+        "payableAmount": 632.8
+      },
+      "at": "2026-07-20T04:52:51.649Z"
+    },
+    {
+      "id": "ASSERT-IN-免检",
+      "name": "免检入库按 receiveQty 入库并生成一张暂估应付",
+      "status": "PASS",
+      "detail": {
+        "invStatus": 2,
+        "payableStatus": "GENERATED",
+        "stockedQty": 40,
+        "payableCount": 1
+      },
+      "at": "2026-07-20T04:52:52.026Z"
+    },
+    {
+      "id": "TC-P0-012",
+      "name": "免检：收料后直接下推入库并生成暂估应付",
+      "status": "PASS",
+      "detail": {
+        "inventoryInId": "F70A433E-F36B-1410-8B47-0096A7B40922",
+        "payableId": "040B433E-F36B-1410-8B47-0096A7B40922"
+      },
+      "at": "2026-07-20T04:52:52.026Z"
+    },
+    {
+      "id": "ASSERT-AP-失败不回滚",
+      "name": "应付生成失败时入库保持已审核且 stockedQty 保留",
+      "status": "PASS",
+      "detail": {
+        "invStatus": 2,
+        "payableGenerationStatus": "FAILED",
+        "stockedQty": 10,
+        "responseStatus": "FAILED"
+      },
+      "at": "2026-07-20T04:52:52.390Z"
+    },
+    {
+      "id": "ASSERT-AP-并发重试唯一",
+      "name": "修复失败条件后并发重试成功且不重复生成",
+      "status": "PASS",
+      "detail": {
+        "payableGenerationStatus": "GENERATED",
+        "payableCount": 1,
+        "fulfilledCount": 2,
+        "rejected": []
+      },
+      "at": "2026-07-20T04:52:52.435Z"
+    },
+    {
+      "id": "AP-02-05",
+      "name": "暂估应付生成失败后入库不回滚、修复后可重试且唯一",
+      "status": "PASS",
+      "detail": {
+        "inventoryInId": "240B433E-F36B-1410-8B47-0096A7B40922",
+        "statusBeforeRetry": "FAILED",
+        "statusAfterRetry": "GENERATED",
+        "payableCount": 1,
+        "concurrentRetryFulfilled": 2
+      },
+      "at": "2026-07-20T04:52:52.435Z"
+    },
+    {
+      "id": "ASSERT-IDEM-订单下推",
+      "name": "订单下推相同幂等键同载荷不重复、异载荷冲突",
+      "status": "PASS",
+      "detail": {
+        "firstId": "510B433E-F36B-1410-8B47-0096A7B40922",
+        "secondId": "510B433E-F36B-1410-8B47-0096A7B40922",
+        "diffStatus": 400,
+        "diffMessage": "幂等键已被不同请求载荷使用"
+      },
+      "at": "2026-07-20T04:52:52.549Z"
+    },
+    {
+      "id": "ASSERT-CON-订单审核并发",
+      "name": "两个订单并发审核合计不得超过批准数量",
+      "status": "PASS",
+      "detail": {
+        "successCount": 1,
+        "purchasedQty": 60,
+        "rejections": [
+          "采购申请 PR20260720125252553875 第1行剩余可采购数量为 40，订单数量为 60"
+        ]
+      },
+      "at": "2026-07-20T04:52:52.806Z"
+    },
+    {
+      "id": "ASSERT-CON-收料并发",
+      "name": "两个并发收料草稿合计不得超过订单数量",
+      "status": "PASS",
+      "detail": {
+        "createSuccessCount": 1,
+        "receivedQty": 0,
+        "rejections": [
+          "订单明细 1 可新建收料数量为 40，本次为 60"
+        ]
+      },
+      "at": "2026-07-20T04:52:52.994Z"
+    },
+    {
+      "id": "ASSERT-CON-入库审核并发",
+      "name": "两人同时审核同一入库单不得重复过账或重复应付",
+      "status": "PASS",
+      "detail": {
+        "postingCount": 1,
+        "payableCount": 1,
+        "fulfilledCount": 2,
+        "rejected": []
+      },
+      "at": "2026-07-20T04:52:53.451Z"
+    },
+    {
+      "id": "IDEM/CON",
+      "name": "幂等和并发关键场景",
+      "status": "PASS",
+      "detail": {
+        "idempotentOrderId": "510B433E-F36B-1410-8B47-0096A7B40922",
+        "concurrentApproveSuccess": 1,
+        "concurrentReceiveCreateSuccess": 1,
+        "concurrentInventoryPostingCount": 1,
+        "concurrentInventoryPayableCount": 1
+      },
+      "at": "2026-07-20T04:52:53.451Z"
+    },
+    {
+      "id": "ASSERT-REG-ERP",
+      "name": "销售、生产、财务、资产、PLM、设备等原模块路由保留",
+      "status": "PASS",
+      "detail": {
+        "missing": []
+      },
+      "at": "2026-07-20T04:52:53.458Z"
+    },
+    {
+      "id": "REG-ERP-001",
+      "name": "原有 ERP 模块路由仍注册",
+      "status": "PASS",
+      "detail": {
+        "checked": [
+          "/api/sales-orders",
+          "/api/production-orders",
+          "/api/payables",
+          "/api/receivables",
+          "/api/fixed-asset",
+          "/api/plm-product",
+          "/api/equipments"
+        ],
+        "pathCount": 439
+      },
+      "at": "2026-07-20T04:52:53.458Z"
+    }
+  ],
+  "defects": [],
+  "notes": [],
+  "finishedAt": "2026-07-20T04:52:53.458Z",
+  "summary": {
+    "total": 35,
+    "pass": 35,
+    "fail": 0,
+    "warn": 0
+  }
+}

@@ -1,0 +1,4305 @@
+<!DOCTYPE html>
+
+
+
+<html lang="zh-CN">
+
+
+
+<head>
+
+
+
+<meta charset="UTF-8">
+
+
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+
+
+<title>智能分析中心 — 磐枢工业智能平台</title>
+
+
+
+<link rel="stylesheet" href="../common.css">
+
+
+
+<script src="../common.js"></script>
+<script>
+</script>
+
+
+
+<style>
+
+
+
+
+
+
+
+.toast-container {
+
+
+
+  position: fixed;
+
+
+
+  top: 60px;
+
+
+
+  right: 20px;
+
+
+
+  z-index: 1000;
+
+
+
+  display: flex;
+
+
+
+  flex-direction: column;
+
+
+
+  gap: 8px;
+
+
+
+}
+
+
+
+.toast {
+
+
+
+  padding: 12px 16px;
+
+
+
+  border-radius: var(--radius-md);
+
+
+
+  font-size: 13px;
+
+
+
+  color: var(--text-primary);
+
+
+
+  min-width: 280px;
+
+
+
+  max-width: 400px;
+
+
+
+  display: flex;
+
+
+
+  align-items: center;
+
+
+
+  gap: 8px;
+
+
+
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+
+
+
+  animation: toastIn 0.3s ease;
+
+
+
+}
+
+
+
+@keyframes toastIn {
+
+
+
+  from { opacity: 0; transform: translateX(100%); }
+
+
+
+  to { opacity: 1; transform: translateX(0); }
+
+
+
+}
+
+
+
+.toast-success { background: rgba(34,197,94,0.9); }
+
+
+
+.toast-error { background: rgba(239,68,68,0.9); }
+
+
+
+.toast-warning { background: rgba(234,179,8,0.9); }
+
+
+
+.toast-info { background: rgba(6,182,212,0.9); }
+
+
+
+.toast-icon { font-size: 16px; }
+</style>
+
+
+</style>
+<style>
+.confirm-modal-overlay {
+
+
+
+  position: fixed;
+
+
+
+  inset: 0;
+
+
+
+  background: rgba(0,0,0,0.6);
+
+
+
+  display: none;
+
+
+
+  align-items: center;
+
+
+
+  justify-content: center;
+
+
+
+  z-index: 2000;
+
+
+
+}
+
+
+
+.confirm-modal-overlay.show { display: flex; }
+
+
+
+.confirm-modal {
+
+
+
+  background: var(--bg-surface);
+
+
+
+  border: 1px solid var(--border-normal);
+
+
+
+  border-radius: var(--radius-lg);
+
+
+
+  padding: 24px;
+
+
+
+  min-width: 360px;
+
+
+
+  max-width: 480px;
+
+
+
+  box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+
+
+
+}
+
+
+
+.confirm-modal-header {
+
+
+
+  font-size: 14px;
+
+
+
+  font-weight: 600;
+
+
+
+  color: var(--text-primary);
+
+
+
+  margin-bottom: 12px;
+
+
+
+}
+
+
+
+.confirm-modal-body {
+
+
+
+  font-size: 13px;
+
+
+
+  color: var(--text-secondary);
+
+
+
+  line-height: 1.6;
+
+
+
+  margin-bottom: 20px;
+
+
+
+}
+
+
+
+.confirm-modal-footer {
+
+
+
+  display: flex;
+
+
+
+  justify-content: flex-end;
+
+
+
+  gap: 8px;
+
+
+
+}
+
+
+
+
+
+
+
+<style>
+
+
+
+.analysis-container {
+
+
+
+  display: grid;
+
+
+
+  grid-template-columns: 260px 1fr;
+
+
+
+  gap: 0;
+
+
+
+}
+
+
+
+
+
+
+
+.analysis-sidebar {
+
+
+
+  background: var(--bg-surface);
+
+
+
+  border-right: 1px solid var(--border-normal);
+
+
+
+  display: flex;
+
+
+
+  flex-direction: column;
+
+
+
+  overflow: hidden;
+
+
+
+}
+
+
+
+
+
+
+
+.analysis-sidebar-header {
+
+
+
+  padding: 16px;
+
+
+
+  border-bottom: 1px solid var(--border-normal);
+
+
+
+}
+
+
+
+
+
+
+
+.analysis-sidebar-header h3 {
+
+
+
+  font-size: 14px;
+
+
+
+  font-weight: 600;
+
+
+
+  color: var(--text-primary);
+
+
+
+  margin-bottom: 8px;
+
+
+
+}
+
+
+
+
+
+
+
+.report-outline {
+
+
+
+  flex: 1;
+
+
+
+  overflow-y: auto;
+
+
+
+  padding: 8px 0;
+
+
+
+}
+
+
+
+
+
+
+
+.outline-item {
+
+
+
+  padding: 10px 16px;
+
+
+
+  cursor: pointer;
+
+
+
+  font-size: 13px;
+
+
+
+  color: var(--text-secondary);
+
+
+
+  transition: all var(--transition);
+
+
+
+  border-left: 3px solid transparent;
+
+
+
+}
+
+
+
+
+
+
+
+.outline-item:hover {
+
+
+
+  background: rgba(56,189,248,0.04);
+
+
+
+}
+
+
+
+
+
+
+
+.outline-item.active {
+
+
+
+  background: rgba(56,189,248,0.08);
+
+
+
+  border-left-color: var(--text-accent);
+
+
+
+  color: var(--text-accent);
+
+
+
+}
+
+
+
+
+
+
+
+.outline-item.sub-item {
+
+
+
+  padding-left: 32px;
+
+
+
+  font-size: 12px;
+
+
+
+  color: var(--text-tertiary);
+
+
+
+}
+
+
+
+
+
+
+
+.outline-item.sub-item.active {
+
+
+
+  color: var(--text-accent);
+
+
+
+}
+
+
+
+
+
+
+
+.report-history {
+
+
+
+  padding: 16px;
+
+
+
+  border-top: 1px solid var(--border-normal);
+
+
+
+}
+
+
+
+
+
+
+
+.report-history h4 {
+
+
+
+  font-size: 12px;
+
+
+
+  font-weight: 600;
+
+
+
+  color: var(--text-tertiary);
+
+
+
+  margin-bottom: 10px;
+
+
+
+  text-transform: uppercase;
+
+
+
+  letter-spacing: 1px;
+
+
+
+}
+
+
+
+
+
+
+
+.history-list {
+
+
+
+  list-style: none;
+
+
+
+  padding: 0;
+
+
+
+  margin: 0;
+
+
+
+}
+
+
+
+
+
+
+
+.history-list li {
+
+
+
+  padding: 8px 0;
+
+
+
+  border-bottom: 1px solid var(--border-normal);
+
+
+
+  font-size: 12px;
+
+
+
+  color: var(--text-secondary);
+
+
+
+  cursor: pointer;
+
+
+
+  transition: all var(--transition);
+
+
+
+}
+
+
+
+
+
+
+
+.history-list li:last-child {
+
+
+
+  border-bottom: none;
+
+
+
+}
+
+
+
+
+
+
+
+.history-list li:hover {
+
+
+
+  color: var(--text-accent);
+
+
+
+}
+
+
+
+
+
+
+
+.history-list .history-title {
+
+
+
+  display: block;
+
+
+
+  margin-bottom: 2px;
+
+
+
+}
+
+
+
+
+
+
+
+.history-list .history-date {
+
+
+
+  font-size: 11px;
+
+
+
+  color: var(--text-tertiary);
+
+
+
+}
+
+
+
+
+
+
+
+.analysis-main {
+
+
+
+  display: flex;
+
+
+
+  flex-direction: column;
+
+
+
+}
+
+
+
+
+
+
+
+.analysis-toolbar {
+
+
+
+  padding: 16px 24px;
+
+
+
+  border-bottom: 1px solid var(--border-normal);
+
+
+
+  background: var(--bg-surface);
+
+
+
+  display: flex;
+
+
+
+  align-items: center;
+
+
+
+  gap: 16px;
+
+
+
+  flex-wrap: wrap;
+
+
+
+}
+
+
+
+
+
+
+
+.toolbar-group {
+
+
+
+  display: flex;
+
+
+
+  align-items: center;
+
+
+
+  gap: 8px;
+
+
+
+}
+
+
+
+
+
+
+
+.toolbar-group label {
+
+
+
+  font-size: 12px;
+
+
+
+  color: var(--text-tertiary);
+
+
+
+  font-weight: 500;
+
+
+
+}
+
+
+
+
+
+
+
+.toolbar-group select {
+
+
+
+  padding: 6px 12px;
+
+
+
+  background: var(--bg-inset);
+
+
+
+  border: 1px solid var(--border-normal);
+
+
+
+  border-radius: var(--radius-sm);
+
+
+
+  color: var(--text-primary);
+
+
+
+  font-size: 13px;
+
+
+
+}
+
+
+
+
+
+
+
+.toolbar-group input[type="date"] {
+
+
+
+  padding: 6px 10px;
+
+
+
+  background: var(--bg-inset);
+
+
+
+  border: 1px solid var(--border-normal);
+
+
+
+  border-radius: var(--radius-sm);
+
+
+
+  color: var(--text-primary);
+
+
+
+  font-size: 13px;
+
+
+
+}
+
+
+
+
+
+
+
+.analysis-content {
+
+
+
+  flex: 1;
+
+
+
+  overflow-y: auto;
+
+
+
+  padding: 24px;
+
+
+
+}
+
+
+
+
+
+
+
+.report-section {
+
+
+
+  margin-bottom: 32px;
+
+
+
+  scroll-margin-top: 80px;
+
+
+
+}
+
+
+
+
+
+
+
+.report-section-title {
+
+
+
+  font-size: 20px;
+
+
+
+  font-weight: 700;
+
+
+
+  color: var(--text-primary);
+
+
+
+  margin-bottom: 16px;
+
+
+
+  padding-bottom: 8px;
+
+
+
+  border-bottom: 2px solid var(--text-accent);
+
+
+
+  display: flex;
+
+
+
+  align-items: center;
+
+
+
+  gap: 10px;
+
+
+
+}
+
+
+
+
+
+
+
+.report-section-title .section-icon {
+
+
+
+  font-size: 22px;
+
+
+
+}
+
+
+
+
+
+
+
+.report-subtitle {
+
+
+
+  font-size: 15px;
+
+
+
+  font-weight: 600;
+
+
+
+  color: var(--text-primary);
+
+
+
+  margin-top: 20px;
+
+
+
+  margin-bottom: 12px;
+
+
+
+}
+
+
+
+
+
+
+
+.report-summary {
+
+
+
+  display: grid;
+
+
+
+  grid-template-columns: repeat(4, 1fr);
+
+
+
+  gap: 16px;
+
+
+
+  margin-bottom: 24px;
+
+
+
+}
+
+
+
+
+
+
+
+.summary-card {
+
+
+
+  background: var(--bg-surface);
+
+
+
+  border: 1px solid var(--border-normal);
+
+
+
+  border-radius: var(--radius-md);
+
+
+
+  padding: 20px;
+
+
+
+  text-align: center;
+
+
+
+}
+
+
+
+
+
+
+
+.summary-card .summary-value {
+
+
+
+  font-family: var(--font-mono);
+
+
+
+  font-size: 32px;
+
+
+
+  font-weight: 700;
+
+
+
+  color: var(--text-primary);
+
+
+
+  margin-bottom: 6px;
+
+
+
+}
+
+
+
+
+
+
+
+.summary-card .summary-label {
+
+
+
+  font-size: 13px;
+
+
+
+  color: var(--text-tertiary);
+
+
+
+}
+
+
+
+
+
+
+
+.summary-card .summary-trend {
+
+
+
+  font-size: 11px;
+
+
+
+  font-family: var(--font-mono);
+
+
+
+  margin-top: 4px;
+
+
+
+}
+
+
+
+
+
+
+
+.summary-card .summary-trend.up { color: var(--color-success); }
+
+
+
+.summary-card .summary-trend.down { color: var(--color-error); }
+
+
+
+
+
+
+
+.analysis-grid {
+
+
+
+  display: grid;
+
+
+
+  grid-template-columns: 1fr 1fr;
+
+
+
+  gap: 16px;
+
+
+
+  margin-bottom: 24px;
+
+
+
+}
+
+
+
+
+
+
+
+.analysis-chart-card {
+
+
+
+  background: var(--bg-surface);
+
+
+
+  border: 1px solid var(--border-normal);
+
+
+
+  border-radius: var(--radius-md);
+
+
+
+  padding: 20px;
+
+
+
+}
+
+
+
+
+
+
+
+.chart-card-title {
+
+
+
+  font-size: 14px;
+
+
+
+  font-weight: 600;
+
+
+
+  color: var(--text-primary);
+
+
+
+  margin-bottom: 16px;
+
+
+
+}
+
+
+
+
+
+
+
+.chart-legend {
+
+
+
+  display: flex;
+
+
+
+  gap: 20px;
+
+
+
+  margin-bottom: 16px;
+
+
+
+  font-size: 12px;
+
+
+
+  color: var(--text-tertiary);
+
+
+
+}
+
+
+
+
+
+
+
+.legend-item {
+
+
+
+  display: flex;
+
+
+
+  align-items: center;
+
+
+
+  gap: 6px;
+
+
+
+}
+
+
+
+
+
+
+
+.legend-color {
+
+
+
+  width: 12px;
+
+
+
+  height: 4px;
+
+
+
+  border-radius: 2px;
+
+
+
+}
+
+
+
+
+
+
+
+.css-bar-chart {
+
+
+
+  display: flex;
+
+
+
+  align-items: flex-end;
+
+
+
+  gap: 12px;
+
+
+
+  height: 180px;
+
+
+
+  padding-top: 8px;
+
+
+
+  border-bottom: 1px solid var(--border-normal);
+
+
+
+}
+
+
+
+
+
+
+
+.css-bar-chart .bar-wrapper {
+
+
+
+  flex: 1;
+
+
+
+  display: flex;
+
+
+
+  flex-direction: column;
+
+
+
+  align-items: center;
+
+
+
+  gap: 6px;
+
+
+
+}
+
+
+
+
+
+
+
+.css-bar-chart .bar {
+
+
+
+  width: 100%;
+
+
+
+  max-width: 50px;
+
+
+
+  min-height: 4px;
+
+
+
+  border-radius:var(--radius-sm) 4px 0 0;
+
+
+
+  transition: height 500ms ease;
+
+
+
+  position: relative;
+
+
+
+}
+
+
+
+
+
+
+
+.css-bar-chart .bar::before {
+
+
+
+  content: attr(data-value);
+
+
+
+  position: absolute;
+
+
+
+  top: -24px;
+
+
+
+  left: 50%;
+
+
+
+  transform: translateX(-50%);
+
+
+
+  font-size: 11px;
+
+
+
+  font-family: var(--font-mono);
+
+
+
+  color: var(--text-secondary);
+
+
+
+  white-space: nowrap;
+
+
+
+}
+
+
+
+
+
+
+
+.css-bar-chart .bar-label {
+
+
+
+  font-size: 11px;
+
+
+
+  color: var(--text-tertiary);
+
+
+
+}
+
+
+
+
+
+
+
+.css-line-chart {
+
+
+
+  position: relative;
+
+
+
+  height: 180px;
+
+
+
+  padding-top: 8px;
+
+
+
+  border-bottom: 1px solid var(--border-normal);
+
+
+
+}
+
+
+
+
+
+
+
+.css-line-chart svg {
+
+
+
+  width: 100%;
+
+
+
+  height: 100%;
+
+
+
+}
+
+
+
+
+
+
+
+.line-chart-line {
+
+
+
+  fill: none;
+
+
+
+  stroke: var(--text-accent);
+
+
+
+  stroke-width: 2.5;
+
+
+
+  stroke-linecap: round;
+
+
+
+  stroke-linejoin: round;
+
+
+
+  filter: drop-shadow(0 0 4px rgba(56,189,248,0.3));
+
+
+
+}
+
+
+
+
+
+
+
+.line-chart-area {
+
+
+
+  fill: rgba(56,189,248,0.06);
+
+
+
+}
+
+
+
+
+
+
+
+.line-chart-dot {
+
+
+
+  fill: var(--text-accent);
+
+
+
+  stroke: var(--bg-surface);
+
+
+
+  stroke-width: 2;
+
+
+
+}
+
+
+
+
+
+
+
+.ai-insights {
+
+
+
+  background: linear-gradient(135deg, rgba(56,189,248,0.06), rgba(6,182,212,0.04));
+
+
+
+  border: 1px solid rgba(56,189,248,0.2);
+
+
+
+  border-radius: var(--radius-md);
+
+
+
+  padding: 20px;
+
+
+
+  margin-bottom: 24px;
+
+
+
+}
+
+
+
+
+
+
+
+.insights-title {
+
+
+
+  font-size: 15px;
+
+
+
+  font-weight: 600;
+
+
+
+  color: var(--text-accent);
+
+
+
+  margin-bottom: 12px;
+
+
+
+  display: flex;
+
+
+
+  align-items: center;
+
+
+
+  gap: 8px;
+
+
+
+}
+
+
+
+
+
+
+
+.insights-list {
+
+
+
+  list-style: none;
+
+
+
+  padding: 0;
+
+
+
+  margin: 0;
+
+
+
+}
+
+
+
+
+
+
+
+.insights-list li {
+
+
+
+  padding: 10px 0;
+
+
+
+  border-bottom: 1px solid var(--border-normal);
+
+
+
+  font-size: 13px;
+
+
+
+  color: var(--text-secondary);
+
+
+
+  line-height: 1.6;
+
+
+
+}
+
+
+
+
+
+
+
+.insights-list li:last-child {
+
+
+
+  border-bottom: none;
+
+
+
+}
+
+
+
+
+
+
+
+.insights-list li::before {
+
+
+
+  content: '💡';
+
+
+
+  margin-right: 8px;
+
+
+
+}
+
+
+
+
+
+
+
+.action-suggestions {
+
+
+
+  background: var(--bg-surface);
+
+
+
+  border: 1px solid var(--border-normal);
+
+
+
+  border-radius: var(--radius-md);
+
+
+
+  padding: 20px;
+
+
+
+}
+
+
+
+
+
+
+
+.suggestions-title {
+
+
+
+  font-size: 15px;
+
+
+
+  font-weight: 600;
+
+
+
+  color: var(--text-primary);
+
+
+
+  margin-bottom: 16px;
+
+
+
+}
+
+
+
+
+
+
+
+.suggestion-item {
+
+
+
+  display: flex;
+
+
+
+  gap: 12px;
+
+
+
+  padding: 16px;
+
+
+
+  background: var(--bg-inset);
+
+
+
+  border-radius: var(--radius-sm);
+
+
+
+  margin-bottom: 12px;
+
+
+
+}
+
+
+
+
+
+
+
+.suggestion-item:last-child {
+
+
+
+  margin-bottom: 0;
+
+
+
+}
+
+
+
+
+
+
+
+.suggestion-icon {
+
+
+
+  font-size: 24px;
+
+
+
+  flex-shrink: 0;
+
+
+
+}
+
+
+
+
+
+
+
+.suggestion-content h4 {
+
+
+
+  font-size: 14px;
+
+
+
+  font-weight: 600;
+
+
+
+  color: var(--text-primary);
+
+
+
+  margin-bottom: 6px;
+
+
+
+}
+
+
+
+
+
+
+
+.suggestion-content p {
+
+
+
+  font-size: 13px;
+
+
+
+  color: var(--text-secondary);
+
+
+
+  line-height: 1.6;
+
+
+
+}
+
+
+
+
+
+
+
+.export-buttons {
+
+
+
+  position: sticky;
+
+
+
+  top: 0;
+
+
+
+  padding: 12px 24px;
+
+
+
+  background: var(--bg-surface);
+
+
+
+  border-bottom: 1px solid var(--border-normal);
+
+
+
+  display: flex;
+
+
+
+  justify-content: flex-end;
+
+
+
+  gap: 8px;
+
+
+
+  z-index: 10;
+
+
+
+}
+
+
+
+
+
+
+
+@media (max-width: 992px) {
+
+
+
+  .analysis-container {
+
+
+
+    grid-template-columns: 1fr;
+
+
+
+  }
+
+
+
+  .analysis-sidebar {
+
+
+
+    display: none;
+
+
+
+  }
+
+
+
+  .report-summary {
+
+
+
+    grid-template-columns: repeat(2, 1fr);
+
+
+
+  }
+
+
+
+  .analysis-grid {
+
+
+
+    grid-template-columns: 1fr;
+
+
+
+  }
+
+
+
+}
+
+
+
+
+
+
+
+@media (max-width: 768px) {
+
+
+
+  .report-summary {
+
+
+
+    grid-template-columns: 1fr;
+
+
+
+  }
+
+
+
+}
+
+
+
+
+.lookup-modal { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:2000; justify-content:center; align-items:center; }
+.lookup-modal.show { display:flex; }
+.lookup-dialog { background:#fff; border:1px solid #e8e8e8; border-radius:4px; width:720px; max-height:70vh; overflow:hidden; }
+.lookup-header { padding:14px 20px; border-bottom:1px solid #e8e8e8; display:flex; align-items:center; justify-content:space-between; }
+.lookup-title { font-size:15px; font-weight:600; color:#333; }
+.lookup-close { font-size:20px; color:#666; cursor:pointer; background:none; border:none; }
+.lookup-close:hover { color:#333; }
+.lookup-body { padding:16px; }
+.lookup-search { display:flex; gap:8px; margin-bottom:12px; }
+.lookup-search input { flex:1; padding:6px 10px; border:1px solid #e8e8e8; border-radius:4px; font-size:13px; }
+.lookup-search button { padding:6px 16px; background:#1890ff; color:#fff; border:none; border-radius:4px; cursor:pointer; }
+.lookup-table { width:100%; border-collapse:collapse; font-size:13px; }
+.lookup-table th, .lookup-table td { padding:10px 12px; text-align:left; border-bottom:1px solid #e8e8e8; }
+.lookup-table th { background:#fafafa; font-weight:600; color:#333; }
+.lookup-table tr:hover { background:#f5f5f5; }
+.lookup-table .checkbox-cell { width:40px; }
+.lookup-footer { padding:12px 20px; border-top:1px solid #e8e8e8; display:flex; justify-content:flex-end; gap:8px; }
+.lookup-field { display:flex; align-items:center; }
+.lookup-field input { flex:1; padding:6px 10px; border:1px solid #e8e8e8; border-radius:4px 0 0 4px; font-size:13px; }
+.lookup-field button { width:28px; height:28px; border:1px solid #e8e8e8; border-left:none; border-radius:0 4px 4px 0; background:#fff; cursor:pointer; display:flex; align-items:center; justify-content:center; }
+.lookup-field button:hover { background:#f5f5f5; }
+
+</style>
+
+
+
+</head>
+
+<body>
+
+
+
+
+
+
+
+<aside class="sidebar" id="sidebar">
+
+
+
+<div class="sidebar-logo">
+
+
+
+    <img src="../images/logo.png" alt="磐枢工业智能平台" style="width: 100%; max-width: 200px; margin-bottom: 8px;">
+
+
+
+    <h1 style="font-size: 16px; margin: 0;">磐枢工业智能平台</h1>
+
+
+
+  </div>
+
+
+
+  <nav class="sidebar-menu"></nav>
+
+
+
+<div class="sidebar-user"><div class="avatar">管</div>
+
+
+
+</aside>
+
+
+
+
+
+
+
+<div class="main-content" id="mainContent">
+
+
+
+  <div class="page-header">
+
+
+
+    <div>
+
+
+
+      <div class="flex items-center gap-8">
+
+
+
+        <button class="sidebar-toggle" onclick="toggleSidebar()">☰</button>
+
+
+
+        <div>
+
+
+
+          <h2>智能分析中心</h2>
+
+
+
+          <div class="breadcrumb"><a href="../index.html">首页</a><span>></span><span>AI智能体</span><span>></span><span>智能分析中心</span></div></div>
+
+
+
+        </div>
+
+
+
+      </div>
+
+
+
+    </div>
+
+
+
+    <div class="page-actions">
+
+
+
+      <button class="btn btn-ghost btn-sm">🔔 消息</button>
+
+      </div>
+
+
+
+  </div>
+
+
+
+
+
+
+
+  <div class="analysis-container">
+
+
+
+    <div class="analysis-sidebar">
+
+
+
+      <div class="analysis-sidebar-header">
+
+
+
+        <h3>报告大纲</h3>
+
+
+
+      </div>
+
+
+
+      <div class="report-outline" id="reportOutline">
+
+
+
+        <div class="outline-item active" onclick="scrollToSection('overview')">📋 执行摘要</div>
+
+
+
+        <div class="outline-item" onclick="scrollToSection('sales-analysis')">📊 销售数据分析</div>
+
+
+
+        <div class="outline-item" onclick="scrollToSection('production-analysis')">🏭 生产数据分析</div>
+
+
+
+        <div class="outline-item" onclick="scrollToSection('inventory-analysis')">📦 库存数据分析</div>
+
+
+
+        <div class="outline-item" onclick="scrollToSection('quality-analysis')">✅ 质量数据分析</div>
+
+
+
+        <div class="outline-item" onclick="scrollToSection('finance-analysis')">💰 财务数据分析</div>
+
+
+
+        <div class="outline-item" onclick="scrollToSection('ai-insights-section')">💡 AI洞察</div>
+
+
+
+        <div class="outline-item" onclick="scrollToSection('suggestions-section')">🎯 改进建议</div>
+
+
+
+      </div>
+
+
+
+      <div class="report-history">
+
+
+
+        <h4>历史报告</h4>
+
+
+
+        <ul class="history-list">
+
+
+
+          <li>
+
+
+
+            <span class="history-title">经营分析月报 - 2026年6月</span>
+
+
+
+            <span class="history-date">2026-07-01</span>
+
+
+
+          </li>
+
+
+
+          <li>
+
+
+
+            <span class="history-title">生产分析周报 - 第26周</span>
+
+
+
+            <span class="history-date">2026-06-28</span>
+
+
+
+          </li>
+
+
+
+          <li>
+
+
+
+            <span class="history-title">库存分析报告 - 2026年6月</span>
+
+
+
+            <span class="history-date">2026-06-25</span>
+
+
+
+          </li>
+
+
+
+          <li>
+
+
+
+            <span class="history-title">质量分析月报 - 2026年5月</span>
+
+
+
+            <span class="history-date">2026-06-01</span>
+
+
+
+          </li>
+
+
+
+          <li>
+
+
+
+            <span class="history-title">经营分析月报 - 2026年5月</span>
+
+
+
+            <span class="history-date">2026-06-01</span>
+
+
+
+          </li>
+
+
+
+        </ul>
+
+
+
+      </div>
+
+
+
+    </div>
+
+
+
+
+
+
+
+    <div class="analysis-main">
+
+
+
+      <div class="analysis-toolbar">
+
+
+
+        <div class="toolbar-group">
+
+
+
+          <label>分析主题：</label>
+
+
+
+          <select id="analysisTheme">
+
+
+
+            <option value="business">经营分析</option>
+
+
+
+            <option value="production">生产分析</option>
+
+
+
+            <option value="quality">质量分析</option>
+
+
+
+            <option value="cost">成本分析</option>
+
+
+
+            <option value="inventory">库存分析</option>
+
+
+
+          </select>
+
+
+
+        </div>
+
+
+
+        <div class="toolbar-group">
+
+
+
+          <label>分析周期：</label>
+
+
+
+          <select id="analysisPeriod">
+
+
+
+            <option value="monthly">月报</option>
+
+
+
+            <option value="weekly">周报</option>
+
+
+
+            <option value="daily">日报</option>
+
+
+
+            <option value="custom">自定义</option>
+
+
+
+          </select>
+
+
+
+        </div>
+
+
+
+        <div class="toolbar-group" id="customDateRange" style="display:none;">
+
+
+
+          <input type="date" value="2026-06-01">
+
+
+
+          <span style="color:var(--text-tertiary);">-</span>
+
+
+
+          <input type="date" value="2026-06-30">
+
+
+
+        </div>
+
+
+
+        <div class="toolbar-group">
+
+
+
+          <button class="btn btn-primary" onclick="generateReport()">生成分析报告</button>
+
+
+
+        </div>
+
+
+
+      </div>
+
+
+
+
+
+
+
+      <div class="export-buttons">
+
+
+
+        <button class="btn btn-ghost btn-sm" onclick="exportReport('pdf')">📄 导出PDF</button>
+
+
+
+        <button class="btn btn-ghost btn-sm" onclick="exportReport('word')">📝 导出Word</button>
+
+
+
+        <button class="btn btn-ghost btn-sm" onclick="exportReport('excel')">📊 导出Excel</button>
+
+
+
+      </div>
+
+
+
+
+
+
+
+      <div class="analysis-content">
+
+
+
+        <div class="report-section" id="overview">
+
+
+
+          <div class="report-section-title">
+
+
+
+            <span class="section-icon">📋</span>
+
+
+
+            <span>执行摘要</span>
+
+
+
+          </div>
+
+
+
+          <p style="font-size:14px;color:var(--text-secondary);line-height:1.8;margin-bottom:20px;">
+
+
+
+            本报告基于观略智能工业平台各业务系统数据，对2026年6月企业经营状况进行全面分析。报告涵盖销售、生产、库存、质量、财务五大核心维度，通过AI智能分析技术挖掘数据洞察，为管理层提供决策支持。
+
+
+
+          </p>
+
+
+
+          <div class="report-summary">
+
+
+
+            <div class="summary-card">
+
+
+
+              <div class="summary-value">2,340<span style="font-size:16px;">万</span></div>
+
+
+
+              <div class="summary-label">本月销售额</div>
+
+
+
+              <div class="summary-trend up">↑ +8.5% 同比</div>
+
+
+
+            </div>
+
+
+
+            <div class="summary-card">
+
+
+
+              <div class="summary-value">87.2<span style="font-size:16px;">%</span></div>
+
+
+
+              <div class="summary-label">生产订单完成率</div>
+
+
+
+              <div class="summary-trend up">↑ +3.2% 环比</div>
+
+
+
+            </div>
+
+
+
+            <div class="summary-card">
+
+
+
+              <div class="summary-value">18.5<span style="font-size:16px;">天</span></div>
+
+
+
+              <div class="summary-label">库存周转天数</div>
+
+
+
+              <div class="summary-trend down">↓ -2.1天</div>
+
+
+
+            </div>
+
+
+
+            <div class="summary-card">
+
+
+
+              <div class="summary-value">98.6<span style="font-size:16px;">%</span></div>
+
+
+
+              <div class="summary-label">良品率</div>
+
+
+
+              <div class="summary-trend up">↑ +0.3% 环比</div>
+
+
+
+            </div>
+
+
+
+          </div>
+
+
+
+        </div>
+
+
+
+
+
+
+
+        <div class="report-section" id="sales-analysis">
+
+
+
+          <div class="report-section-title">
+
+
+
+            <span class="section-icon">📊</span>
+
+
+
+            <span>销售数据分析</span>
+
+
+
+          </div>
+
+
+
+          <div class="analysis-grid">
+
+
+
+            <div class="analysis-chart-card">
+
+
+
+              <div class="chart-card-title">月度销售趋势</div>
+
+
+
+              <div class="chart-legend">
+
+
+
+                <div class="legend-item"><div class="legend-color" style="background:linear-gradient(to right,#0ea5e9,#38bdf8);"></div><span>销售额</span></div>
+
+
+
+              </div>
+
+
+
+              <div class="css-bar-chart">
+
+
+
+                <div class="bar-wrapper"><div class="bar" data-value="1,820" style="height:60%;background:linear-gradient(to top,#0ea5e9,#38bdf8);"></div><span class="bar-label">1月</span></div>
+
+
+
+                <div class="bar-wrapper"><div class="bar" data-value="1,560" style="height:51%;background:linear-gradient(to top,#0ea5e9,#38bdf8);"></div><span class="bar-label">2月</span></div>
+
+
+
+                <div class="bar-wrapper"><div class="bar" data-value="2,080" style="height:68%;background:linear-gradient(to top,#0ea5e9,#38bdf8);"></div><span class="bar-label">3月</span></div>
+
+
+
+                <div class="bar-wrapper"><div class="bar" data-value="1,960" style="height:64%;background:linear-gradient(to top,#0ea5e9,#38bdf8);"></div><span class="bar-label">4月</span></div>
+
+
+
+                <div class="bar-wrapper"><div class="bar" data-value="2,158" style="height:71%;background:linear-gradient(to top,#0ea5e9,#38bdf8);"></div><span class="bar-label">5月</span></div>
+
+
+
+                <div class="bar-wrapper"><div class="bar" data-value="2,340" style="height:77%;background:linear-gradient(to top,#0ea5e9,#7dd3fc);box-shadow:0 0 12px rgba(56,189,248,0.4);"></div><span class="bar-label" style="color:var(--text-accent);font-weight:600;">6月</span></div>
+
+
+
+              </div>
+
+
+
+            </div>
+
+
+
+            <div class="analysis-chart-card">
+
+
+
+              <div class="chart-card-title">区域销售占比</div>
+
+
+
+              <div class="css-bar-chart">
+
+
+
+                <div class="bar-wrapper"><div class="bar" data-value="680万" style="height:100%;background:var(--color-success);"></div><span class="bar-label">华东</span></div>
+
+
+
+                <div class="bar-wrapper"><div class="bar" data-value="520万" style="height:76%;background:var(--text-accent);"></div><span class="bar-label">华南</span></div>
+
+
+
+                <div class="bar-wrapper"><div class="bar" data-value="450万" style="height:66%;background:var(--color-info);"></div><span class="bar-label">华中</span></div>
+
+
+
+                <div class="bar-wrapper"><div class="bar" data-value="380万" style="height:56%;background:var(--color-warning);"></div><span class="bar-label">华北</span></div>
+
+
+
+                <div class="bar-wrapper"><div class="bar" data-value="310万" style="height:46%;background:var(--color-error);"></div><span class="bar-label">西南</span></div>
+
+
+
+              </div>
+
+
+
+            </div>
+
+
+
+          </div>
+
+
+
+          <table class="data-table" style="margin-top:20px;">
+
+
+
+            <thead>
+
+
+
+              <tr><th>区域</th><th>销售额(万元)</th><th>订单数</th><th>同比增长</th><th>环比增长</th></tr>
+
+
+
+            </thead>
+
+
+
+            <tbody>
+
+
+
+              <tr><td>华东区域</td><td class="text-mono">680.00</td><td class="text-mono">356</td><td class="text-success">+15.3%</td><td class="text-success">+8.2%</td></tr>
+
+
+
+              <tr><td>华南区域</td><td class="text-mono">520.00</td><td class="text-mono">284</td><td class="text-success">+8.7%</td><td class="text-success">+5.6%</td></tr>
+
+
+
+              <tr><td>华中区域</td><td class="text-mono">450.00</td><td class="text-mono">236</td><td class="text-success">+5.2%</td><td class="text-success">+3.1%</td></tr>
+
+
+
+              <tr><td>华北区域</td><td class="text-mono">380.00</td><td class="text-mono">210</td><td class="text-error">-2.1%</td><td class="text-error">-1.5%</td></tr>
+
+
+
+              <tr><td>西南区域</td><td class="text-mono">310.00</td><td class="text-mono">200</td><td class="text-success">+12.8%</td><td class="text-success">+6.4%</td></tr>
+
+
+
+            </tbody>
+
+
+
+          </table>
+
+
+
+        </div>
+
+
+
+
+
+
+
+        <div class="report-section" id="production-analysis">
+
+
+
+          <div class="report-section-title">
+
+
+
+            <span class="section-icon">🏭</span>
+
+
+
+            <span>生产数据分析</span>
+
+
+
+          </div>
+
+
+
+          <div class="analysis-grid">
+
+
+
+            <div class="analysis-chart-card">
+
+
+
+              <div class="chart-card-title">生产订单完成趋势</div>
+
+
+
+              <div class="css-line-chart">
+
+
+
+                <svg viewBox="0 0 400 160" preserveAspectRatio="none">
+
+
+
+                  <defs>
+
+
+
+                    <linearGradient id="lineGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+
+
+
+                      <stop offset="0%" style="stop-color:#38bdf8;stop-opacity:0.15" />
+
+
+
+                      <stop offset="100%" style="stop-color:#38bdf8;stop-opacity:0" />
+
+
+
+                    </linearGradient>
+
+
+
+                  </defs>
+
+
+
+                  <path class="line-chart-area" d="M 20 140 Q 80 100 140 80 T 260 60 T 380 40 L 380 160 L 20 160 Z" fill="url(#lineGradient)"/>
+
+
+
+                  <polyline class="line-chart-line" points="20,140 80,100 140,80 200,70 260,60 320,50 380,40"/>
+
+
+
+                  <circle class="line-chart-dot" cx="20" cy="140" r="4"/>
+
+
+
+                  <circle class="line-chart-dot" cx="80" cy="100" r="4"/>
+
+
+
+                  <circle class="line-chart-dot" cx="140" cy="80" r="4"/>
+
+
+
+                  <circle class="line-chart-dot" cx="200" cy="70" r="4"/>
+
+
+
+                  <circle class="line-chart-dot" cx="260" cy="60" r="4"/>
+
+
+
+                  <circle class="line-chart-dot" cx="320" cy="50" r="4"/>
+
+
+
+                  <circle class="line-chart-dot" cx="380" cy="40" r="4"/>
+
+
+
+                  <text x="20" y="155" font-size="10" fill="var(--text-tertiary)" text-anchor="middle">第1周</text>
+
+
+
+                  <text x="80" y="155" font-size="10" fill="var(--text-tertiary)" text-anchor="middle">第2周</text>
+
+
+
+                  <text x="140" y="155" font-size="10" fill="var(--text-tertiary)" text-anchor="middle">第3周</text>
+
+
+
+                  <text x="200" y="155" font-size="10" fill="var(--text-tertiary)" text-anchor="middle">第4周</text>
+
+
+
+                  <text x="260" y="155" font-size="10" fill="var(--text-tertiary)" text-anchor="middle">第5周</text>
+
+
+
+                  <text x="320" y="155" font-size="10" fill="var(--text-tertiary)" text-anchor="middle">第6周</text>
+
+
+
+                  <text x="380" y="155" font-size="10" fill="var(--text-accent)" text-anchor="middle">第7周</text>
+
+
+
+                </svg>
+
+
+
+              </div>
+
+
+
+            </div>
+
+
+
+            <div class="analysis-chart-card">
+
+
+
+              <div class="chart-card-title">车间稼动率对比</div>
+
+
+
+              <div class="css-bar-chart">
+
+
+
+                <div class="bar-wrapper"><div class="bar" data-value="78%" style="height:78%;background:var(--text-accent);"></div><span class="bar-label">注塑一车间</span></div>
+
+
+
+                <div class="bar-wrapper"><div class="bar" data-value="82%" style="height:82%;background:var(--color-success);"></div><span class="bar-label">注塑二车间</span></div>
+
+
+
+                <div class="bar-wrapper"><div class="bar" data-value="72%" style="height:72%;background:var(--color-warning);"></div><span class="bar-label">模具车间</span></div>
+
+
+
+                <div class="bar-wrapper"><div class="bar" data-value="68%" style="height:68%;background:var(--color-error);"></div><span class="bar-label">装配车间</span></div>
+
+
+
+              </div>
+
+
+
+            </div>
+
+
+
+          </div>
+
+
+
+          <table class="data-table" style="margin-top:20px;">
+
+
+
+            <thead>
+
+
+
+              <tr><th>订单号</th><th>产品名称</th><th>计划数量</th><th>完成数量</th><th>完成率</th><th>状态</th></tr>
+
+
+
+            </thead>
+
+
+
+            <tbody>
+
+
+
+              <tr><td class="text-mono">MO-2026-0345</td><td>仪表盘外壳</td><td class="text-mono">2,000</td><td class="text-mono">1,840</td><td class="text-success">92%</td><td><span class="badge badge-success">即将完工</span></td></tr>
+
+
+
+              <tr><td class="text-mono">MO-2026-0346</td><td>门板内饰件</td><td class="text-mono">3,000</td><td class="text-mono">2,340</td><td class="text-success">78%</td><td><span class="badge badge-info">生产中</span></td></tr>
+
+
+
+              <tr><td class="text-mono">MO-2026-0347</td><td>保险杠支架</td><td class="text-mono">1,500</td><td class="text-mono">825</td><td class="text-info">55%</td><td><span class="badge badge-info">生产中</span></td></tr>
+
+
+
+              <tr><td class="text-mono">MO-2026-0348</td><td>仪表盘面板组件</td><td class="text-mono">5,000</td><td class="text-mono">1,600</td><td class="text-warning">32%</td><td><span class="badge badge-warning">进度偏慢</span></td></tr>
+
+
+
+            </tbody>
+
+
+
+          </table>
+
+
+
+        </div>
+
+
+
+
+
+
+
+        <div class="report-section" id="inventory-analysis">
+
+
+
+          <div class="report-section-title">
+
+
+
+            <span class="section-icon">📦</span>
+
+
+
+            <span>库存数据分析</span>
+
+
+
+          </div>
+
+
+
+          <div class="analysis-grid">
+
+
+
+            <div class="analysis-chart-card">
+
+
+
+              <div class="chart-card-title">库存周转天数趋势</div>
+
+
+
+              <div class="css-line-chart">
+
+
+
+                <svg viewBox="0 0 400 160" preserveAspectRatio="none">
+
+
+
+                  <polyline class="line-chart-line" points="20,100 80,95 140,88 200,82 260,78 320,72 380,68" style="stroke:#22c55e;"/>
+
+
+
+                  <circle cx="20" cy="100" r="4" fill="#22c55e" stroke="var(--bg-surface)" stroke-width="2"/>
+
+
+
+                  <circle cx="80" cy="95" r="4" fill="#22c55e" stroke="var(--bg-surface)" stroke-width="2"/>
+
+
+
+                  <circle cx="140" cy="88" r="4" fill="#22c55e" stroke="var(--bg-surface)" stroke-width="2"/>
+
+
+
+                  <circle cx="200" cy="82" r="4" fill="#22c55e" stroke="var(--bg-surface)" stroke-width="2"/>
+
+
+
+                  <circle cx="260" cy="78" r="4" fill="#22c55e" stroke="var(--bg-surface)" stroke-width="2"/>
+
+
+
+                  <circle cx="320" cy="72" r="4" fill="#22c55e" stroke="var(--bg-surface)" stroke-width="2"/>
+
+
+
+                  <circle cx="380" cy="68" r="4" fill="#22c55e" stroke="var(--bg-surface)" stroke-width="2"/>
+
+
+
+                  <text x="20" y="155" font-size="10" fill="var(--text-tertiary)" text-anchor="middle">1月</text>
+
+
+
+                  <text x="80" y="155" font-size="10" fill="var(--text-tertiary)" text-anchor="middle">2月</text>
+
+
+
+                  <text x="140" y="155" font-size="10" fill="var(--text-tertiary)" text-anchor="middle">3月</text>
+
+
+
+                  <text x="200" y="155" font-size="10" fill="var(--text-tertiary)" text-anchor="middle">4月</text>
+
+
+
+                  <text x="260" y="155" font-size="10" fill="var(--text-tertiary)" text-anchor="middle">5月</text>
+
+
+
+                  <text x="320" y="155" font-size="10" fill="var(--text-tertiary)" text-anchor="middle">6月</text>
+
+
+
+                  <text x="380" y="155" font-size="10" fill="var(--color-success)" text-anchor="middle">7月</text>
+
+
+
+                </svg>
+
+
+
+              </div>
+
+
+
+            </div>
+
+
+
+            <div class="analysis-chart-card">
+
+
+
+              <div class="chart-card-title">库存预警物料</div>
+
+
+
+              <div class="css-bar-chart">
+
+
+
+                <div class="bar-wrapper"><div class="bar" data-value="32%" style="height:32%;background:var(--color-error);"></div><span class="bar-label">ABS树脂</span></div>
+
+
+
+                <div class="bar-wrapper"><div class="bar" data-value="45%" style="height:45%;background:var(--color-warning);"></div><span class="bar-label">PMMA</span></div>
+
+
+
+                <div class="bar-wrapper"><div class="bar" data-value="52%" style="height:52%;background:var(--color-warning);"></div><span class="bar-label">TPU弹性体</span></div>
+
+
+
+                <div class="bar-wrapper"><div class="bar" data-value="68%" style="height:68%;background:var(--color-info);"></div><span class="bar-label">PA66尼龙</span></div>
+
+
+
+                <div class="bar-wrapper"><div class="bar" data-value="72%" style="height:72%;background:var(--color-info);"></div><span class="bar-label">玻纤PP</span></div>
+
+
+
+              </div>
+
+
+
+            </div>
+
+
+
+          </div>
+
+
+
+        </div>
+
+
+
+
+
+
+
+        <div class="report-section" id="quality-analysis">
+
+
+
+          <div class="report-section-title">
+
+
+
+            <span class="section-icon">✅</span>
+
+
+
+            <span>质量数据分析</span>
+
+
+
+          </div>
+
+
+
+          <div class="analysis-grid">
+
+
+
+            <div class="analysis-chart-card">
+
+
+
+              <div class="chart-card-title">不良类型分布</div>
+
+
+
+              <div class="css-bar-chart">
+
+
+
+                <div class="bar-wrapper"><div class="bar" data-value="28" style="height:100%;background:var(--color-error);"></div><span class="bar-label">缩水凹陷</span></div>
+
+
+
+                <div class="bar-wrapper"><div class="bar" data-value="19" style="height:68%;background:var(--color-warning);"></div><span class="bar-label">熔接痕</span></div>
+
+
+
+                <div class="bar-wrapper"><div class="bar" data-value="14" style="height:50%;background:var(--color-warning);"></div><span class="bar-label">翘曲变形</span></div>
+
+
+
+                <div class="bar-wrapper"><div class="bar" data-value="8" style="height:29%;background:var(--color-info);"></div><span class="bar-label">表面流纹</span></div>
+
+
+
+                <div class="bar-wrapper"><div class="bar" data-value="5" style="height:18%;background:var(--color-info);"></div><span class="bar-label">尺寸超差</span></div>
+
+
+
+              </div>
+
+
+
+            </div>
+
+
+
+            <div class="analysis-chart-card">
+
+
+
+              <div class="chart-card-title">良品率趋势</div>
+
+
+
+              <div class="css-line-chart">
+
+
+
+                <svg viewBox="0 0 400 160" preserveAspectRatio="none">
+
+
+
+                  <polyline class="line-chart-line" points="20,60 80,55 140,50 200,48 260,45 320,42 380,40" style="stroke:#22c55e;"/>
+
+
+
+                  <circle cx="20" cy="60" r="4" fill="#22c55e" stroke="var(--bg-surface)" stroke-width="2"/>
+
+
+
+                  <circle cx="80" cy="55" r="4" fill="#22c55e" stroke="var(--bg-surface)" stroke-width="2"/>
+
+
+
+                  <circle cx="140" cy="50" r="4" fill="#22c55e" stroke="var(--bg-surface)" stroke-width="2"/>
+
+
+
+                  <circle cx="200" cy="48" r="4" fill="#22c55e" stroke="var(--bg-surface)" stroke-width="2"/>
+
+
+
+                  <circle cx="260" cy="45" r="4" fill="#22c55e" stroke="var(--bg-surface)" stroke-width="2"/>
+
+
+
+                  <circle cx="320" cy="42" r="4" fill="#22c55e" stroke="var(--bg-surface)" stroke-width="2"/>
+
+
+
+                  <circle cx="380" cy="40" r="4" fill="#22c55e" stroke="var(--bg-surface)" stroke-width="2"/>
+
+
+
+                  <text x="20" y="155" font-size="10" fill="var(--text-tertiary)" text-anchor="middle">第1周</text>
+
+
+
+                  <text x="80" y="155" font-size="10" fill="var(--text-tertiary)" text-anchor="middle">第2周</text>
+
+
+
+                  <text x="140" y="155" font-size="10" fill="var(--text-tertiary)" text-anchor="middle">第3周</text>
+
+
+
+                  <text x="200" y="155" font-size="10" fill="var(--text-tertiary)" text-anchor="middle">第4周</text>
+
+
+
+                  <text x="260" y="155" font-size="10" fill="var(--text-tertiary)" text-anchor="middle">第5周</text>
+
+
+
+                  <text x="320" y="155" font-size="10" fill="var(--text-tertiary)" text-anchor="middle">第6周</text>
+
+
+
+                  <text x="380" y="155" font-size="10" fill="var(--color-success)" text-anchor="middle">第7周</text>
+
+
+
+                </svg>
+
+
+
+              </div>
+
+
+
+            </div>
+
+
+
+          </div>
+
+
+
+        </div>
+
+
+
+
+
+
+
+        <div class="report-section" id="finance-analysis">
+
+
+
+          <div class="report-section-title">
+
+
+
+            <span class="section-icon">💰</span>
+
+
+
+            <span>财务数据分析</span>
+
+
+
+          </div>
+
+
+
+          <div class="analysis-grid">
+
+
+
+            <div class="analysis-chart-card">
+
+
+
+              <div class="chart-card-title">应收账款账龄分布</div>
+
+
+
+              <div class="css-bar-chart">
+
+
+
+                <div class="bar-wrapper"><div class="bar" data-value="45%" style="height:45%;background:var(--color-success);"></div><span class="bar-label">0-30天</span></div>
+
+
+
+                <div class="bar-wrapper"><div class="bar" data-value="28%" style="height:28%;background:var(--color-info);"></div><span class="bar-label">31-60天</span></div>
+
+
+
+                <div class="bar-wrapper"><div class="bar" data-value="18%" style="height:18%;background:var(--color-warning);"></div><span class="bar-label">61-90天</span></div>
+
+
+
+                <div class="bar-wrapper"><div class="bar" data-value="9%" style="height:9%;background:var(--color-error);"></div><span class="bar-label">90天+</span></div>
+
+
+
+              </div>
+
+
+
+            </div>
+
+
+
+            <div class="analysis-chart-card">
+
+
+
+              <div class="chart-card-title">成本构成分析</div>
+
+
+
+              <div class="css-bar-chart">
+
+
+
+                <div class="bar-wrapper"><div class="bar" data-value="42%" style="height:42%;background:var(--text-accent);"></div><span class="bar-label">原材料</span></div>
+
+
+
+                <div class="bar-wrapper"><div class="bar" data-value="28%" style="height:28%;background:var(--color-info);"></div><span class="bar-label">人工</span></div>
+
+
+
+                <div class="bar-wrapper"><div class="bar" data-value="18%" style="height:18%;background:var(--color-warning);"></div><span class="bar-label">制造费用</span></div>
+
+
+
+                <div class="bar-wrapper"><div class="bar" data-value="12%" style="height:12%;background:var(--color-success);"></div><span class="bar-label">其他</span></div>
+
+
+
+              </div>
+
+
+
+            </div>
+
+
+
+          </div>
+
+
+
+          <table class="data-table" style="margin-top:20px;">
+
+
+
+            <thead>
+
+
+
+              <tr><th>客户名称</th><th>应收金额(万元)</th><th>账龄</th><th>状态</th></tr>
+
+
+
+            </thead>
+
+
+
+            <tbody>
+
+
+
+              <tr><td>华东科技有限公司</td><td class="text-mono">380.00</td><td>30天以内</td><td><span class="badge badge-success">正常</span></td></tr>
+
+
+
+              <tr><td>华南电子集团</td><td class="text-mono">260.00</td><td>31-60天</td><td><span class="badge badge-info">关注</span></td></tr>
+
+
+
+              <tr><td>华中汽车配件</td><td class="text-mono">210.00</td><td>61-90天</td><td><span class="badge badge-warning">逾期</span></td></tr>
+
+
+
+              <tr><td>华北重工机械</td><td class="text-mono">180.00</td><td>90天以上</td><td><span class="badge badge-error">高风险</span></td></tr>
+
+
+
+            </tbody>
+
+
+
+          </table>
+
+
+
+        </div>
+
+
+
+
+
+
+
+        <div class="report-section" id="ai-insights-section">
+
+
+
+          <div class="report-section-title">
+
+
+
+            <span class="section-icon">💡</span>
+
+
+
+            <span>AI洞察</span>
+
+
+
+          </div>
+
+
+
+          <div class="ai-insights">
+
+
+
+            <div class="insights-title">🤖 AI智能分析洞察</div>
+
+
+
+            <ul class="insights-list">
+
+
+
+              <li><strong>销售增长强劲：</strong>本月销售额2,340万元，同比增长8.5%，超出目标3.2%。华东区域表现最为突出，同比增长15.3%，建议加大市场投入。</li>
+
+
+
+              <li><strong>生产效率提升：</strong>生产订单完成率87.2%，较上月提升3.2%。但MO-2026-0348进度偏慢，需关注设备稼动情况。</li>
+
+
+
+              <li><strong>库存管理改善：</strong>库存周转天数18.5天，较上月减少2.1天，优于目标值。但5项物料库存预警，需及时补货。</li>
+
+
+
+              <li><strong>质量稳定：</strong>良品率98.6%，呈稳步上升趋势。前两项不良占比63.5%，建议优先改进缩水凹陷和熔接痕问题。</li>
+
+
+
+              <li><strong>应收账款风险：</strong>9%应收账款账龄超过90天，华北重工机械180万元逾期严重，需立即催收。</li>
+
+
+
+              <li><strong>成本结构优化：</strong>原材料成本占比42%，建议与核心供应商协商价格，降低采购成本。</li>
+
+
+
+            </ul>
+
+
+
+          </div>
+
+
+
+        </div>
+
+
+
+
+
+
+
+        <div class="report-section" id="suggestions-section">
+
+
+
+          <div class="report-section-title">
+
+
+
+            <span class="section-icon">🎯</span>
+
+
+
+            <span>改进建议</span>
+
+
+
+          </div>
+
+
+
+          <div class="action-suggestions">
+
+
+
+            <div class="suggestion-item">
+
+
+
+              <div class="suggestion-icon">📦</div>
+
+
+
+              <div class="suggestion-content">
+
+
+
+                <h4>紧急补货建议</h4>
+
+
+
+                <p>ABS树脂库存仅为安全库存的32%，需在48小时内完成采购下单，避免影响MO-2026-0348等订单的生产进度。建议优先联系深圳材料科技，该供应商准时交货率达98.5%。</p>
+
+
+
+              </div>
+
+
+
+            </div>
+
+
+
+            <div class="suggestion-item">
+
+
+
+              <div class="suggestion-icon">🏭</div>
+
+
+
+              <div class="suggestion-content">
+
+
+
+                <h4>生产调度优化</h4>
+
+
+
+                <p>MO-2026-0348进度偏慢（32%），建议将注塑一车间完成MO-2026-0345后的产能向该订单倾斜。同时检查设备CNC-003的稼动情况，该设备曾出现主轴温度异常预警。</p>
+
+
+
+              </div>
+
+
+
+            </div>
+
+
+
+            <div class="suggestion-item">
+
+
+
+              <div class="suggestion-icon">💰</div>
+
+
+
+              <div class="suggestion-content">
+
+
+
+                <h4>应收账款催收</h4>
+
+
+
+                <p>华北重工机械180万元账款逾期超过90天，建议测试部门门立即采取催收措施。可考虑暂停新订单发货，直至账款收回或达成还款协议。</p>
+
+
+
+              </div>
+
+
+
+            </div>
+
+
+
+            <div class="suggestion-item">
+
+
+
+              <div class="suggestion-icon">✅</div>
+
+
+
+              <div class="suggestion-content">
+
+
+
+                <h4>质量改进措施</h4>
+
+
+
+                <p>缩水凹陷占不良总数的37.8%，建议调整注塑工艺参数，增加保压时间和压力。同时对模具浇口进行优化设计，减少熔接痕问题。</p>
+
+
+
+              </div>
+
+
+
+            </div>
+
+
+
+            <div class="suggestion-item">
+
+
+
+              <div class="suggestion-icon">📊</div>
+
+
+
+              <div class="suggestion-content">
+
+
+
+                <h4>供应商管理</h4>
+
+
+
+                <p>佛山新材料交货准时率89.6%，需与供应商沟通改进。中山橡塑制品评级为C级，建议启动备选供应商评估流程，降低供应风险。</p>
+
+
+
+              </div>
+
+
+
+            </div>
+
+
+
+          </div>
+
+
+
+        </div>
+
+
+
+      </div>
+
+
+
+    </div>
+
+
+
+  </div>
+
+
+
+</div>
+
+
+
+
+
+
+
+<script>
+
+
+
+document.getElementById('analysisPeriod').addEventListener('change', function() {
+
+
+
+  document.getElementById('customDateRange').style.display = this.value === 'custom' ? 'flex' : 'none';
+
+
+
+});
+
+
+
+
+
+
+
+function scrollToSection(id) {
+
+
+
+  document.querySelectorAll('.outline-item').forEach(function(item) {
+
+
+
+    item.classList.remove('active');
+
+
+
+  });
+
+
+
+  event.target.classList.add('active');
+
+
+
+  
+
+
+
+  var element = document.getElementById(id);
+
+
+
+  if (element) {
+
+
+
+    element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+
+
+  }
+
+
+
+
+
+
+
+function generateReport() {
+
+
+
+  var theme = document.getElementById('analysisTheme').value;
+
+
+
+  var period = document.getElementById('analysisPeriod').value;
+
+
+
+  
+
+
+
+  showToast('正在生成' + getThemeName(theme) + '报告（' + getPeriodName(period) + '）...\n\n报告生成中，请稍候。', 'info');
+
+
+
+
+
+
+
+function getThemeName(value) {
+
+
+
+  var names = { 'business': '经营分析', 'production': '生产分析', 'quality': '质量分析', 'cost': '成本分析', 'inventory': '库存分析' };
+
+
+
+  return names[value] || value;
+
+
+
+
+
+
+
+function getPeriodName(value) {
+
+
+
+  var names = { 'daily': '日报', 'weekly': '周报', 'monthly': '月报', 'custom': '自定义' };
+
+
+
+  return names[value] || value;
+
+
+
+
+
+
+
+function exportReport(format) {
+
+
+
+  var formatNames = { 'pdf': 'PDF', 'word': 'Word', 'excel': 'Excel' };
+
+
+
+  showToast('正在导出报告为' + formatNames[format] + '格式...\n\n导出功能即将上线。', 'info');
+
+
+
+}
+
+
+
+
+
+
+
+
+
+
+
+}
+
+
+
+
+
+
+
+
+
+
+
+}
+
+
+
+}
+
+
+
+}
+var currentLookupField = null;
+var currentLookupType = null;
+var lookupData = [];
+var lookupColumns = [];
+
+function openLookup(fieldId, type) {
+  currentLookupField = fieldId;
+  currentLookupType = type;
+  
+  if (type === 'org') {
+    lookupColumns = ['编码', '名称', '形态', '上级组织'];
+    lookupData = JSON.parse(localStorage.getItem('erp_orgs') || '[]');
+    document.getElementById('lookupTitle').textContent = '选择组织';
+  } else if (type === 'department') {
+    lookupColumns = ['编码', '名称'];
+    lookupData = JSON.parse(localStorage.getItem('erp_departments_cache') || '[]');
+    document.getElementById('lookupTitle').textContent = '选择部门';
+  } else if (type === 'employee') {
+    lookupColumns = ['编号', '姓名', '所属部门'];
+    lookupData = JSON.parse(localStorage.getItem('erp_employees_cache') || '[]');
+    document.getElementById('lookupTitle').textContent = '选择员工';
+  } else if (type === 'supplier') {
+    lookupColumns = ['编码', '名称'];
+    lookupData = JSON.parse(localStorage.getItem('erp_suppliers_cache') || '[]');
+    document.getElementById('lookupTitle').textContent = '选择供应商';
+  } else if (type === 'customer') {
+    lookupColumns = ['编码', '名称'];
+    lookupData = JSON.parse(localStorage.getItem('erp_customers_cache') || '[]');
+    document.getElementById('lookupTitle').textContent = '选择客户';
+  } else if (type === 'material') {
+    lookupColumns = ['物料编码', '物料名称', '规格型号', '基本单位'];
+    lookupData = JSON.parse(localStorage.getItem('erp_materials_cache') || '[]');
+    document.getElementById('lookupTitle').textContent = '选择物料';
+  } else if (type === 'warehouse') {
+    lookupColumns = ['编码', '名称'];
+    lookupData = JSON.parse(localStorage.getItem('erp_warehouses_cache') || '[]');
+    document.getElementById('lookupTitle').textContent = '选择仓库';
+  }
+  
+  renderLookupTable(lookupData);
+  document.getElementById('lookupModal').classList.add('show');
+}
+
+function closeLookup() {
+  document.getElementById('lookupModal').classList.remove('show');
+}
+
+function filterLookup() {
+  var keyword = document.getElementById('lookupKeyword').value.trim().toLowerCase();
+  var filtered = lookupData.filter(function(item) {
+    var code = item.code || '';
+    var name = item.name || '';
+    return code.toLowerCase().includes(keyword) || name.toLowerCase().includes(keyword);
+  });
+  renderLookupTable(filtered);
+}
+
+function renderLookupTable(data) {
+  var head = document.getElementById('lookupTableHead');
+  var body = document.getElementById('lookupTableBody');
+  
+  head.innerHTML = '<tr><th class="checkbox-cell"><input type="checkbox" onclick="selectAllLookup()"></th>' + lookupColumns.map(function(col) { return '<th>' + col + '</th>'; }).join('') + '</tr>';
+  
+  body.innerHTML = '';
+  data.forEach(function(item) {
+    var row = document.createElement('tr');
+    row.onclick = function() { selectLookupRow(this); };
+    var cells = ['<td class="checkbox-cell"><input type="checkbox" class="lookup-checkbox" value="' + item.id + '"></td>'];
+    if (currentLookupType === 'org') {
+      cells.push('<td>' + item.code + '</td><td>' + item.name + '</td><td>' + (item.form || '') + '</td><td>' + (item.parentName || '') + '</td>');
+    } else if (currentLookupType === 'department') {
+      cells.push('<td>' + item.code + '</td><td>' + item.name + '</td>');
+    } else if (currentLookupType === 'employee') {
+      cells.push('<td>' + item.code + '</td><td>' + item.name + '</td><td>' + (item.department || '') + '</td>');
+    } else if (currentLookupType === 'supplier' || currentLookupType === 'customer') {
+      cells.push('<td>' + item.code + '</td><td>' + item.name + '</td>');
+    } else if (currentLookupType === 'material') {
+      cells.push('<td>' + item.code + '</td><td>' + item.name + '</td><td>' + (item.specification || '') + '</td><td>' + (item.unit || '') + '</td>');
+    } else if (currentLookupType === 'warehouse') {
+      cells.push('<td>' + item.code + '</td><td>' + item.name + '</td>');
+    }
+    row.innerHTML = cells.join('');
+    body.appendChild(row);
+  });
+  
+  if (data.length === 0) {
+    body.innerHTML = '<tr><td colspan="' + (lookupColumns.length + 1) + '" style="text-align:center;padding:40px;color:#999;">暂无数据</td></tr>';
+  }
+}
+
+function selectAllLookup() {
+  var master = document.querySelector('.lookup-table th input');
+  var checkboxes = document.querySelectorAll('.lookup-checkbox');
+  checkboxes.forEach(function(cb) { cb.checked = master.checked; });
+}
+
+function selectLookupRow(row) {
+  var checkbox = row.querySelector('.lookup-checkbox');
+  checkbox.checked = !checkbox.checked;
+}
+
+function confirmLookup() {
+  var checkboxes = document.querySelectorAll('.lookup-checkbox:checked');
+  if (checkboxes.length === 0) {
+    showToast('请选择一条记录', 'warning');
+    return;
+  }
+  
+  var item = lookupData.find(function(d) { return d.id === checkboxes[0].value; });
+  if (item) {
+    var field = document.getElementById(currentLookupField);
+    if (field) {
+      field.value = item.name;
+      field.setAttribute('data-id', item.id);
+      field.setAttribute('data-code', item.code);
+      
+      if (currentLookupType === 'material') {
+        var row = field.closest('tr');
+        if (row) {
+          row.querySelector('.material-name').value = item.name;
+          row.querySelector('.material-spec').value = item.specification || '';
+          row.querySelector('.material-unit').value = item.unit || '';
+        }
+      }
+    }
+  }
+  
+  closeLookup();
+}
+
+function openMaterialLookup(btn) {
+  var field = btn.previousElementSibling;
+  field.id = 'lookupField_' + Date.now();
+  currentLookupField = field.id;
+  openLookup(field.id, 'material');
+}
+
+function openOrgLookup(btn) {
+  var field = btn.previousElementSibling;
+  field.id = 'lookupField_' + Date.now();
+  currentLookupField = field.id;
+  openLookup(field.id, 'org');
+}
+
+function openSupplierLookup(btn) {
+  var field = btn.previousElementSibling;
+  field.id = 'lookupField_' + Date.now();
+  currentLookupField = field.id;
+  openLookup(field.id, 'supplier');
+}
+
+function openWarehouseLookup(btn) {
+  var field = btn.previousElementSibling;
+  field.id = 'lookupField_' + Date.now();
+  currentLookupField = field.id;
+  openLookup(field.id, 'warehouse');
+}
+
+function initLookupData() {
+  if (!localStorage.getItem('erp_orgs')) {
+    localStorage.setItem('erp_orgs', JSON.stringify([
+      { id: 'org-001', code: 'ORG-HQ', name: '磐枢工业集团', form: '集团', parentName: '' },
+      { id: 'org-002', code: 'ORG-SM', name: '磐枢智能制造有限公司', form: '公司', parentName: '磐枢工业集团' },
+      { id: 'org-003', code: 'ORG-SM-PD', name: '生产制造部', form: '部门', parentName: '磐枢智能制造有限公司' },
+      { id: 'org-004', code: 'ORG-SM-FA', name: '财务部', form: '部门', parentName: '磐枢智能制造有限公司' },
+      { id: 'org-005', code: 'ORG-SM-SD', name: '销售部', form: '部门', parentName: '磐枢智能制造有限公司' }
+    ]));
+  }
+  if (!localStorage.getItem('erp_departments_cache')) {
+    localStorage.setItem('erp_departments_cache', JSON.stringify([
+      { id: 'dept-001', code: 'DEPT-PD', name: '生产制造部', status: 1 },
+      { id: 'dept-002', code: 'DEPT-FA', name: '财务部', status: 1 },
+      { id: 'dept-003', code: 'DEPT-SD', name: '销售部', status: 1 },
+      { id: 'dept-004', code: 'DEPT-AS', name: '装配车间', status: 1 },
+      { id: 'dept-005', code: 'DEPT-QC', name: '质检车间', status: 1 }
+    ]));
+  }
+  if (!localStorage.getItem('erp_employees_cache')) {
+    localStorage.setItem('erp_employees_cache', JSON.stringify([
+      { id: 'emp-001', code: 'EMP-001', name: '张三', department: '生产制造部', status: 1 },
+      { id: 'emp-002', code: 'EMP-002', name: '李四', department: '生产制造部', status: 1 },
+      { id: 'emp-003', code: 'EMP-003', name: '王五', department: '财务部', status: 1 },
+      { id: 'emp-004', code: 'EMP-004', name: '赵六', department: '销售部', status: 1 },
+      { id: 'emp-005', code: 'EMP-005', name: '钱七', department: '质检车间', status: 1 }
+    ]));
+  }
+  if (!localStorage.getItem('erp_suppliers_cache')) {
+    localStorage.setItem('erp_suppliers_cache', JSON.stringify([
+      { id: 'sup-001', code: 'S-001', name: '深圳电子元器件有限公司', status: 1 },
+      { id: 'sup-002', code: 'S-002', name: '杭州精密机械加工厂', status: 1 },
+      { id: 'sup-003', code: 'S-003', name: '上海材料科技有限公司', status: 1 },
+      { id: 'sup-004', code: 'S-004', name: '东莞五金制品厂', status: 1 }
+    ]));
+  }
+  if (!localStorage.getItem('erp_materials_cache')) {
+    localStorage.setItem('erp_materials_cache', JSON.stringify([
+      { id: 'mat-001', code: 'P-001', name: '高频传感器模块', specification: 'HT-2026', unit: '个', status: 1 },
+      { id: 'mat-002', code: 'P-002', name: '控制电路板', specification: 'CB-2026', unit: '块', status: 1 },
+      { id: 'mat-003', code: 'P-003', name: '智能控制器', specification: 'IC-V3', unit: '台', status: 1 },
+      { id: 'mat-004', code: 'P-004', name: '电源模块', specification: 'PM-500W', unit: '个', status: 1 },
+      { id: 'mat-005', code: 'M-001', name: 'PCB电路板', specification: 'FR-4双层', unit: '块', status: 1 },
+      { id: 'mat-006', code: 'M-002', name: '贴片电阻', specification: '10KΩ 0603', unit: '个', status: 1 },
+      { id: 'mat-007', code: 'M-003', name: '贴片电容', specification: '100μF 0805', unit: '个', status: 1 },
+      { id: 'mat-008', code: 'M-004', name: '螺丝', specification: 'M4x10', unit: '包', status: 1 }
+    ]));
+  }
+  if (!localStorage.getItem('erp_warehouses_cache')) {
+    localStorage.setItem('erp_warehouses_cache', JSON.stringify([
+      { id: 'wh-001', code: 'WH-001', name: '成品仓', status: 1 },
+      { id: 'wh-002', code: 'WH-002', name: '原料仓', status: 1 },
+      { id: 'wh-003', code: 'WH-003', name: '半成品仓', status: 1 },
+      { id: 'wh-004', code: 'WH-004', name: '辅料仓', status: 1 }
+    ]));
+  }
+}
+
+</script>
+
+
+
+
+<div class="lookup-modal" id="lookupModal">
+  <div class="lookup-dialog">
+    <div class="lookup-header">
+      <div class="lookup-title" id="lookupTitle">选择</div>
+      <button class="lookup-close" onclick="closeLookup()">×</button>
+    </div>
+    <div class="lookup-body">
+      <div class="lookup-search">
+        <input type="text" id="lookupKeyword" placeholder="请输入编码或名称搜索" onkeydown="if(event.key==='Enter')filterLookup()">
+        <button onclick="filterLookup()">搜索</button>
+      </div>
+      <table class="lookup-table">
+        <thead id="lookupTableHead"></thead>
+        <tbody id="lookupTableBody"></tbody>
+      </table>
+    </div>
+    <div class="lookup-footer">
+      <button class="btn btn-cancel" onclick="closeLookup()">取消</button>
+      <button class="btn btn-primary" onclick="confirmLookup()">确定</button>
+    </div>
+  </div>
+</div>
+
+</body>
+
+
+
+</html>

@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+
+
+
+<html lang="zh-CN">
+
+
+
+<head>
+
+
+
+<meta charset="UTF-8">
+
+
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+
+
+<title>其他往来单位 - 磐枢工业智能平台</title>
+
+
+
+<link rel="stylesheet" href="../common.css">
+
+
+
+<script src="../common.js"></script>
+<script></script>
+
+
+
+</head>
+
+
+
+<body>
+
+
+
+<aside class="sidebar" id="sidebar">
+
+
+
+<div class="sidebar-logo">
+
+
+
+    <img src="../images/logo.png" alt="磐枢工业智能平台" style="width: 100%; max-width: 200px; margin-bottom: 8px;">
+
+
+
+    <h1 style="font-size: 16px; margin: 0;">磐枢工业智能平台</h1>
+
+
+
+  </div>
+
+
+
+  <nav class="sidebar-menu"></nav>
+
+
+
+<div class="sidebar-user"><div class="avatar">管</div>
+
+
+
+</aside>
+
+
+
+<div class="main-content" id="mainContent">
+
+
+
+  <div class="page-header" style="position:sticky;top:0;z-index:100;">
+
+
+
+    <div>
+
+
+
+      <div class="flex items-center gap-8">
+
+
+
+        <button class="sidebar-toggle" onclick="toggleSidebar()">☰</button>
+
+
+
+        <div>
+
+
+
+          <h2>其他往来单位</h2>
+
+
+
+          <div class="breadcrumb"><a href="../index.html">首页</a><span>></span><span>基础管理</span><span>></span><span>财务会计</span><span>></span><span>其他往来单位</span></div></div>
+
+
+
+        </div>
+
+
+
+      </div>
+
+
+
+    </div>
+
+
+
+    <div class="page-actions">
+
+
+
+      <button class="btn btn-ghost btn-sm">&#128276; 消息</button>
+      </div>
+
+
+
+  </div>
+
+
+
+  <div class="page-body list-page-body">
+
+
+
+    <div class="list-action-bar">
+
+
+
+      <span class="action-btn">过滤</span>
+
+
+
+      <span class="action-btn">刷新</span>
+
+
+
+      <span class="action-separator"></span>
+
+
+
+      <span class="action-btn">新增</span>
+
+
+
+      <span class="action-btn">删除</span>
+
+
+
+      <span class="action-btn">修改</span>
+
+
+
+      <span class="action-separator"></span>
+
+
+
+      <span class="action-btn">选项</span>
+
+
+
+      <span class="action-btn">退出</span>
+
+
+
+    </div>
+
+
+
+    <div class="list-filter-section">
+
+
+
+      <div class="list-filter-tabs">
+
+
+
+        <span class="filter-tab active">默认方案</span>
+
+
+
+        <span class="filter-tab">今天</span>
+
+
+
+        <span class="filter-tab">本周</span>
+
+
+
+        <span class="filter-tab">本月</span>
+
+
+
+        <span class="filter-tab">自定义方案</span>
+
+
+
+      </div>
+
+
+
+      <div class="list-filter-row">
+
+
+
+        <div class="filter-field">
+
+
+
+          <label>单位编码</label>
+
+
+
+          <input type="text" class="form-input" placeholder="请输入单位编码">
+
+
+
+        </div>
+
+
+
+        <div class="filter-field">
+
+
+
+          <label>单位名称</label>
+
+
+
+          <input type="text" class="form-input" placeholder="请输入单位名称">
+
+
+
+        </div>
+
+
+
+        <div class="filter-field">
+
+
+
+          <label>状态</label>
+
+
+
+          <select class="form-select">
+
+
+
+            <option value="">全部</option>
+
+
+
+            <option>启用</option>
+
+
+
+            <option>禁用</option>
+
+
+
+          </select>
+
+
+
+        </div>
+
+
+
+      </div>
+
+
+
+      <div class="list-filter-btns">
+
+
+
+        <button class="btn-search">&#128269; 查询</button>
+
+
+
+        <button class="btn-save">&#128190; 保存方案</button>
+
+
+
+        <button class="btn-reset">&#8634; 重置</button>
+
+
+
+      </div>
+
+
+
+    </div>
+
+
+
+    <div class="list-table-area">
+
+
+
+      <table class="data-table">
+
+
+
+        <thead>
+
+
+
+            <tr>
+
+
+
+              <th style="width:40px;"><input type="checkbox" class="row-checkbox"></th>
+
+
+
+              <th>单位编码</th>
+
+
+
+              <th>单位名称</th>
+
+
+
+              <th>单位类型</th>
+
+
+
+              <th>联系人</th>
+
+
+
+              <th>电话</th>
+
+
+
+              <th>状态</th>
+
+
+
+              <th>操作</th>
+
+
+
+            </tr>
+
+
+
+        </thead>
+
+
+
+        <tbody><tr><td colspan="100%" style="text-align:center;color:var(--text-tertiary);padding:20px;">暂无数据</td></tr></tbody>
+
+
+
+      </table>
+
+
+
+      <div class="list-pagination">
+
+
+
+        <span class="page-info">共 6 条记录，每页 20 条</span>
+
+
+
+        <span class="page-btn">&laquo;</span>
+
+
+
+        <span class="page-btn active">1</span>
+
+
+
+        <span class="page-btn">&raquo;</span>
+
+
+
+      </div>
+
+
+
+    </div>
+
+
+
+  </div>
+
+
+
+</div>
+
+
+
+<script>
+
+
+
+document.querySelectorAll('.filter-tab').forEach(function(tab){tab.addEventListener('click',function(){this.parentElement.querySelectorAll('.filter-tab').forEach(function(t){t.classList.remove('active');});this.classList.add('active');});});
+
+
+
+</script>
+
+
+
+</body>
+
+
+
+</html>

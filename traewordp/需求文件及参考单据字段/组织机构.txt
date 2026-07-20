@@ -1,0 +1,44 @@
+组织机构
+
+字段说明：
+组织机构：FBillHead 
+	 实体主键：FOrgID 
+	 数据状态：FDocumentStatus 
+	 禁用状态：FForbidStatus 
+	 名称：FName  (必填项)
+	 编码：FNumber  (必填项)
+	 修改人：FModifierId 
+	 创建人：FCreatorId 
+	 创建日期：FCreateDate 
+	 修改日期：FModifyDate 
+	 描述：FDescription 
+	 联系人：FContact 
+	 形态：FOrgFormID  (必填项)
+	 地址：FADDRESS 
+	 联系电话：FTel 
+	 核算组织类型：FAcctOrgType 
+	 利润中心：FIsProfileCenter 
+	 法人：FIsCorp 
+	 所属法人：FParentID 
+	 禁用人：FFORBIDORID 
+	 禁用日期：FForbidDate 
+	 业务组织：FIsBusinessOrg 
+	 核算组织：FIsAccountOrg 
+	 审核日期：FAUDITDATE 
+	 审核人：FAUDITORID 
+	 邮编：FPostCode 
+	 销售职能：FSaleBox 
+	 采购职能：FPurchaseBox 
+	 库存职能：FStockBox 
+	 工厂职能：FFactoryBox 
+	 HR职能：FHRBox 
+	 结算职能：FClearingBox 
+	 资产职能：FAssetBox 
+	 收付职能：FReceiptAndPayBox 
+	 质检职能：FQualityBox 
+	 资金职能：FCapitalBox 
+	 营销职能：FMarketing 
+	 组织职能：FOrgFunctions 
+	 服务职能：FService 
+	 时区：FTimeZone 
+	 研发职能：FDevelopmentBox 

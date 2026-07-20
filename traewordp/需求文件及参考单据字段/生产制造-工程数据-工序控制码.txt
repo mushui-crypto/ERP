@@ -1,0 +1,30 @@
+生产制造-工程数据-工序控制码
+
+字段说明：
+单据头：FBillHead 
+	 实体主键：FID 
+	 数据状态：FDocumentStatus 
+	 禁用状态：FForbidStatus 
+	 名称：FName  (必填项)
+	 编码：FNumber 
+	 描述：FDescription 
+	 创建组织：FCreateOrgId  (必填项)
+	 使用组织：FUseOrgId  (必填项)
+	 创建人：FCreatorId 
+	 修改人：FModifierId 
+	 创建日期：FCreateDate 
+	 修改日期：FModifyDate 
+	 禁用人：FForbidderId 
+	 审核人：FApproverId 
+	 禁用日期：FForbidDate 
+	 审核日期：FApproveDate 
+	 自动入库：FIsAutoStorage 
+	 汇报方式：FReportMode  (必填项)
+	 加工方式：FProcessingMode  (必填项)
+	 参与工序排程：FIsScheduling 
+	 生成能力需求：FIsGenCapacity 
+	 工序时间默认单位：FOptTimeUnit  (必填项)
+	 检验方式：FCheckType  (必填项)
+	 不良品明细：FIsDefectDetail 
+	 返修方式：FReworkType  (必填项)
+	 汇报顺序控制：FReportSequenceControl 

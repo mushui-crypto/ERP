@@ -1,0 +1,199 @@
+生产制造-工程数据-工程变更 
+
+字段说明：
+单据头：FBillHead 
+	 实体主键：FID 
+	 单据编号：FBillNo 
+	 单据状态：FDocumentStatus 
+	 审核人：FApproverId 
+	 审核日期：FApproveDate 
+	 修改人：FModifierId 
+	 创建日期：FCreateDate 
+	 创建人：FCreatorId 
+	 修改日期：FModifyDate 
+	 作废日期：FCancelDate 
+	 作废人：FCanceler 
+	 作废状态：FCancelStatus 
+	 备注：FDescription 
+	 单据类型：FBillTypeID  (必填项)
+	 变更原因：FChangeReason 
+	 变更组织：FChangeOrgId 
+	 版本升级：FIsUpdateVersion 
+	 更新用料清单：FIsUpdatePPBom 
+	 申请单号：FApplyBillNo 
+	 申请组织：FApplyOrgId 
+	 申请部门：FApplyDeptId 
+	 申请人：FApplierId 
+	 变更状态：FECNStatus0 
+	 变更日期：FECNChangeDate 
+	 变更人：FECNChangerId 
+	 变更类型：FChangeType 
+	 生效日期：FEffectDate0 
+	 申请日期：FApplyDate 
+	 调试模式：FIsDebugMode 
+	 申请单行号：FECREntrySeq 
+	 申请单分录号：FECREntryId 
+	 子项更换：FRepItemAlterPolicy  (必填项)
+	 禁用原BOM版本：FIsForbidSrcBom 
+	 模拟变更状态：FSimECNStatus 
+	 模拟BOM标识：FSIMBOMID 
+子项明细：FTreeEntity 
+	 实体主键：FENTRYID 
+	 父级行主键：FParentRowId 
+	 行展开类型：FRowExpandType 
+	 行标识：FRowId 
+	 项次：FReplaceGroup 
+	 子项物料编码：FMATERIALIDCHILD 
+	 子项物料名称：FCHILDITEMNAME 
+	 子项规格型号：FCHILDITEMMODEL 
+	 子项物料属性：FCHILDITEMPROPERTY 
+	 子项标识：FEntryRowId 
+	 子项类型：FMATERIALTYPE  (必填项)
+	 作业：FPROCESSID 
+	 子项单位：FCHILDUNITID 
+	 用量类型：FDOSAGETYPE  (必填项)
+	 用量:分子：FNUMERATOR 
+	 用量:分母：FDENOMINATOR 
+	 固定损耗：FFIXSCRAPQTY 
+	 变动损耗率%：FSCRAPRATE 
+	 供应组织：FChildSupplyOrgId 
+	 子项BOM版本：FBOMID 
+	 备注：FMEMO 
+	 超发控制方式：FOverControlMode  (必填项)
+	 工序序列：FOptQueue 
+	 发料组织：FSUPPLYORG 
+	 默认发料仓库：FSTOCKID 
+	 默认发料仓位：FSTOCKLOCID 
+	 货位：FF100001
+	 子项基本单位：FChildBaseUnitID 
+	 基本单位分子：FBaseNumerator 
+	 基本单位固定损耗：FBaseFixscrapQty 
+	 可选择：FIsCanChoose 
+	 基本单位分母：FBaseDenominator 
+	 可修改：FIsCanEdit 
+	 替代策略：FReplacePolicy 
+	 可替换：FIsCanReplace 
+	 替代方式：FReplaceType 
+	 替代优先级：FReplacePriority 
+	 动态优先级：FMRPPriority 
+	 替代主料：FIskeyItem 
+	 PLMBOM分录内码：FPLMBOMEntryId 
+	 BOM分录来源：FBOMEntrySRC 
+	 允许超发：FALLOWOVER 
+	 最小发料批量：FBPMinIssueQty 
+	 库存单位：FBPStoreUnitID 
+	 跳层：FISSkip 
+	 子项明细Id备份(引入时与BOP关联)：FTreeEntryIdBak 
+	 领料考虑最小发料批量：FISMinIssueQty 
+	 父项特征件分录内码：FCfgFeatureEntryId 
+	 配置BOM分录内码：FCFGBOMENTRYID 
+	 生效日期：FEFFECTDATE  (必填项)
+	 失效日期：FEXPIREDATE  (必填项)
+	 发料方式：FISSUETYPE  (必填项)
+	 倒冲时机：FBACKFLUSHTYPE 
+	 是否发损耗：FISGETSCRAP 
+	 偏置时间：FOFFSETTIME 
+	 时间单位：FTIMEUNIT  (必填项)
+	 是否关键件：FISKEYCOMPONENT 
+	 工序：FOPERID 
+	 位置号：FPOSITIONNO 
+	 货主类型：FOWNERTYPEID  (必填项)
+	 货主：FOWNERID 
+	 辅助属性：FAuxPropId 
+	 拆卸成本拆分比例：FDISASSMBLERATE 
+	 标准用量：FQty2 
+	 实际用量：FActualQty 
+	 父项物料编码：FParentMaterialId  (必填项)
+	 BOM版本：FBOMVERSION 
+	 ECN行类型：FRowType 
+	 ECN行标识：FECNRowId 
+	 ECN父行标识：FECNParentRowId 
+	 ECN行组别：FECNGroup 
+	 BOM分类：FBOMCATEGORY 
+	 变更标识：FChangeLabel 
+	 单位：FParentUnitID 
+	 基本计量单位：FParentBaseUnitId 
+	 BOM子项内码：FBomEntryId 
+	 ECN变更状态：FECNStatus 
+	 ECN行展开类型：FECNRowExpandType 
+	 更换子项物料：FIsChangeMtrl 
+	 父项物料名称：FBaseProperty 
+	 新版本：FUpdatedVersion 
+	 同步标记：FIsNeedSync 
+	 供料方式：FSUPPLYMODE 
+	 指定项次：FInsertRow 
+	 MRP运算：FIsMrpRun 
+	 替代方案编码：FSubstitutionId 
+	 替代方案名称：FSubstitutionName 
+	 替代方案分录内码：FSTEntryId 
+	 供应类型：FSupplyType 
+	 原BOM版本：FSRCBOMNO 
+	 新BOM版本：FDSTBOMNO 
+	 净需求比例(%)：FNETDEMANDRATE 
+	 是否旧料清理：FIsEcnClearOldMtrl 
+	 父项辅助属性：FParentAuxPropId 
+BOM版本升级明细：FUpdateVersionEntity 
+	 实体主键：FEntryID 
+	 原BOM版本：FSRCBOM 
+	 指定BOM版本：FUPDTBOM 
+	 主产品编码：FMaterialIdU 
+	 新BOM版本：FDSTBOM 
+阶梯用量：FStairDosage 
+	 实体主键：FDETAILID 
+	 子项物料编码：FMaterialIdLotBased  (必填项)
+	 物料名称：FChildItemNameLot 
+	 规格型号：FChildItemModelLot 
+	 起始数量（含）：FStartQty 
+	 截止数量：FEndQty 
+	 子项单位：FUnitIDLot 
+	 用量:分子：FNumeratorLot 
+	 用量:分母：FDenominatorLot 
+	 固定损耗：FFixScrapQtyLot 
+	 变动损耗率：FScrapraQtyLot 
+	 备注：FNoteLot 
+	 子项基本单位分子：FBaseNumeratorLot 
+	 基本单位起始数量：FBaseStartQty 
+	 基本单位截止数量：FBaseEndQty 
+	 基本单位固定损耗数量：FBaseFixScrapQtyLot 
+	 子项阶梯基本单位：FBaseUnitIDLot 
+	 子项基本单位分母：FBaseDenominatorLot 
+	 MasterId：FMasterId 
+联副产品：FCobyEntity 
+	 实体主键：FEntryID 
+	 行标识：FCobyChangeLabel 
+	 BOM版本：FCobyBomVersion 
+	 父项物料编码：FCobyPartMtrlId  (必填项)
+	 父项物料名称：FCobyPartMtrlName 
+	 联副产品物料编码：FMATERIALIDCOBY  (必填项)
+	 联副产品物料规格：FMATERIALMODELCOBY 
+	 联副产品物料名称：FMATERIALNAMECOBY 
+	 联副产品单位：FUNITIDCOBY 
+	 联副产品基本单位：FBaseUnitIdCoby 
+	 数量：FQTYCOBY 
+	 联副产品基本单位数量：FBaseQtyCoby 
+	 辅助属性：FAuxPropIdCoby 
+	 联副产品BOM版本：FBOMIDCoby 
+	 类型：FCobyType  (必填项)
+	 是否倒冲：FISBACKFLUSH 
+	 成本权重：FCOSTRATECOBY 
+	 产出工序序列：FOutPutOptQueue 
+	 产出工序：FPPROCESSID 
+	 产出作业编码：FTASKIDCOBY 
+	 备注：FNOTECOBY 
+	 Ecn分组：FEcnCobyGroup 
+	 联副产品BOM分录内码：FCobyBomEntryId 
+	 新BOM编码：FCobyNewBom 
+	 原BOM编码：FCobySrcBoM 
+	 ECN变更状态：FCobyEcnStatus  (必填项)
+	 失效日期：FEXPIREDATECOBY 
+	 生效日期：FEFFECTDATECOBY 
+	 行类型：FCobyECNRowType 
+关联关系表：FBillHead_Link 
+	 实体主键：FLinkId 
+	 业务流程图：FBillHead_Link_FFlowId 
+	 推进路线：FBillHead_Link_FFlowLineId 
+	 转换规则：FBillHead_Link_FRuleId 
+	 源单表内码：FBillHead_Link_FSTableId 
+	 源单表：FBillHead_Link_FSTableName 
+	 源单内码：FBillHead_Link_FSBillId 
+	 源单分录内码：FBillHead_Link_FSId 

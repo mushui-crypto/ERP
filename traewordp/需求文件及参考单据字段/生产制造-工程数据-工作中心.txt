@@ -1,0 +1,101 @@
+生产制造-工程数据-工作中心
+
+字段说明：
+单据头：FBillHead 
+	 实体主键：FID 
+	 数据状态：FDocumentStatus 
+	 禁用状态：FForbidStatus 
+	 名称：FName  (必填项)
+	 编码：FNumber 
+	 描述：FDescription 
+	 创建组织：FCreateOrgId  (必填项)
+	 使用组织：FUseOrgId  (必填项)
+	 创建人：FCreatorId 
+	 修改人：FModifierId 
+	 创建日期：FCreateDate 
+	 修改日期：FModifyDate 
+	 禁用人：FForbidderId 
+	 审核人：FApproverId 
+	 禁用日期：FForbidDate 
+	 审核日期：FApproveDate 
+	 所属部门：FDeptID  (必填项)
+	 关键资源类别：FKeyRESType 
+	 关键工作中心：FIsKey 
+	 生效日期：FEffectDate  (必填项)
+	 失效日期：FExpireDate  (必填项)
+	 工序控制码：FOptCtrlCodeID  (必填项)
+	 工作中心组：FGroup 
+	 作业：FProcessID 
+	 已设置工作日历：FIsSetWorkCal 
+	 生产类型：FWorkCenterType 
+	 PLM内码：FPLMWorkCenterId 
+	 数据来源：FWorkCenterSrc 
+	 生产线仓库：FReworkStockId 
+	 生产线仓位：FReworkStockLocId 
+	 货位：FF100001
+	 包装作业推送方式：FPackageTaskPushType 
+	 上料防错类型：FDeductMtrlType 
+	 启用派工明细：FIsDiscreteOperDispDetail 
+	 派工后自动开工：FHMIDispAutoStart 
+	 扫描校验领料：FIsCheckPickMtrl 
+	 手动扫描汇报完工自动推送任务：FIsAutoPushTask 
+	 根据出库单分录扫描关键件：FIsScanByOutStock 
+	 出库条码规则：FOutStockBarCodeRule 
+	 允许用户同时开工多个任务：FALLOWSTARTMULTIPLEBILLS 
+	 加工工时按实际操作时间计算：FIsUseRealTimeCalc 
+	 超时自动报工：FAutoReportOverTime 
+	 非首序扫描自动查找任务(非包装作业)：FIsMidSeqAutoChangeMo 
+	 非首序切单自动发送换型请求（设备联网）：FIsMidSeqAutoSendRequest 
+	 按投入物料指定批次倒冲：FIsAsMtrlLotBackFlush 
+	 序列号关键件物料上料：FIsLoadByLot 
+	 批次关键物料投料方式：FLotMtrlFeedType 
+	 批次物料条码规则：FLoadBarCodeRule 
+	 SMT上料校验飞达：FIsLoadCheckFeeder 
+	 切换工单自动挪料：FISAutoMove 
+能力：FEntity 
+	 实体主键：FEntryID 
+	 资源：FResourceID  (必填项)
+	 资源分类：FRESTypeID 
+	 单位：FCapacityUnitID 
+	 准备能力需求公式：FSetFormula 
+	 加工能力需求公式：FProcessFormula 
+	 拆卸能力需求公式：FTearDownFormula 
+	 实际准备能力活动：FSetActivity 
+	 实际加工能力活动：FProcessActivity 
+	 实际拆卸能力活动：FTearDownActivity 
+	 参与排程：FJoinScheduling 
+	 效率%：FRESEfficiency 
+	 作业：FProcessIdEntry 
+基本活动：FEntityBaseActivity 
+	 实体主键：FEntryID 
+	 基本活动：FBaseActivityID  (必填项)
+	 默认值：FDefaultValue 
+	 活动量公式：FActFormula 
+	 单位：FTimeUnit  (必填项)
+	 活动汇报量公式：FActRepFormula 
+	 活动类型：FBaseActType  (必填项)
+	 数据分录来源：FWorkCenterEntrySrc 
+排程(列表)：FEntityScheduling 
+	 实体主键：FEntryID 
+	 准备工期公式：FSetTimeFormula 
+	 加工工期公式：FProcessTimeFormula 
+	 拆卸工期公式：FTearDownTimeFormula 
+	 标准排队时间：FStdQueueTime 
+	 标准排队时间单位：FStdQueueTimeUnit 
+	 标准等待时间：FStdWaitTime 
+	 标准等待时间单位：FStdWaitTimeUnit 
+	 标准移动时间：FStdCarryTime 
+	 标准移动时间单位：FStdCarryTimeUnit 
+	 最小排队时间：FMinQueueTime 
+	 最小排队时间单位：FMinQueueTimeUnit 
+	 最小等待时间：FMinWaitTime 
+	 最小等待时间单位：FMinWaitTimeUnit 
+	 最小移动时间：FMinCarryTime 
+	 最小移动时间单位：FMinCarryTimeUnit 
+	 排产能力方式：FScheduleType 
+	 节拍产量：FTaktTimeOutput 
+	 节拍产量单位：FTaktTimeOutputUnit 
+	 节拍时间：FTaktTime 
+	 节拍时间单位：FTaktTimeUnit 
+	 总节拍数：FSumTaktTime 
+	 排产依据：FScheduleBasis 

@@ -1,0 +1,1116 @@
+﻿<!DOCTYPE html>
+
+<html lang="zh-CN">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>流程配置 — 磐枢工业智能平台(管理端)</title>
+
+<link rel="stylesheet" href="../common-admin.css">
+
+<script src="../../common.js"></script>
+
+<style>
+
+/* ===== 流程设计双栏布局：画布60% + 节点属性40% ===== */
+
+.flow-workspace { display: flex; flex-direction: column; height: calc(100vh - 56px - 41px - 45px); overflow: hidden; }
+
+.flow-canvas-wrap { flex: 0 0 60%; min-height: 280px; overflow: auto; position: relative; }
+
+.flow-props-wrap { flex: 0 0 40%; min-height: 200px; overflow-y: auto; border-top: 2px solid var(--border-strong); background: #fff; }
+
+/* ===== 流程版本信息条 ===== */
+
+.version-bar { display: flex; align-items: center; gap: 18px; padding: 10px 16px; background: #fff; border-bottom: 1px solid var(--border-normal); flex-wrap: wrap; }
+
+.version-bar .vb-item { display: flex; align-items: center; gap: 6px; font-size: 12px; }
+
+.version-bar .vb-label { color: #999; }
+
+.version-bar .vb-value { color: #333; font-weight: 500; }
+
+.version-bar .vb-version { font-family: var(--font-mono); color: #1890ff; font-weight: 700; font-size: 13px; }
+
+.version-bar .vb-divider { width: 1px; height: 16px; background: var(--border-normal); }
+
+.version-bar .status-pill { display: inline-flex; align-items: center; gap: 5px; padding: 2px 9px; border-radius: 10px; font-size: 11px; font-weight: 500; }
+
+.version-bar .status-pill.published { background: rgba(34,197,94,0.15); color: #52c41a; }
+
+.version-bar .status-pill.draft { background: rgba(234,179,8,0.15); color: #faad14; }
+
+.version-bar .status-pill .dot { width: 6px; height: 6px; border-radius: 50%; }
+
+.version-bar .status-pill.published .dot { background: var(--color-success); }
+
+.version-bar .status-pill.draft .dot { background: var(--color-warning); }
+
+.version-bar .vb-select { padding: 4px 8px; background: #f5f5f5; border: 1px solid var(--border-normal); border-radius: var(--radius-sm); color: #333; font-size: 12px; outline: none; }
+
+/* ===== 节点属性面板 ===== */
+
+.node-props { padding: 16px; }
+
+.node-props-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; padding-bottom: 10px; border-bottom: 1px solid var(--border-normal); }
+
+.node-props-header .nph-title { display: flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 600; color: #333; }
+
+.node-props-header .nph-title .nph-icon { color: #1890ff; font-size: 16px; }
+
+.node-props-header .nph-hint { font-size: 11px; color: #999; }
+
+.props-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; }
+
+.props-grid .pg-full { grid-column: 1 / -1; }
+
+.pg-field { display: flex; flex-direction: column; gap: 5px; }
+
+.pg-field .pg-label { font-size: 11px; color: #999; font-weight: 500; }
+
+.pg-field .pg-input, .pg-field .pg-select { width: 100%; padding: 6px 9px; background: #f5f5f5; border: 1px solid var(--border-normal); border-radius: var(--radius-sm); color: #333; font-size: 12px; outline: none; }
+
+.pg-field .pg-input:focus, .pg-field .pg-select:focus { border-color: #1890ff; }
+
+.pg-field .pg-select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%2394a3b8'%3E%3Cpath d='M6 8L1 3h10z'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 8px center; padding-right: 26px; }
+
+/* 审批方式单选 */
+
+.pg-radios { display: flex; gap: 8px; flex-wrap: wrap; }
+
+.pg-radio { display: inline-flex; align-items: center; gap: 5px; padding: 5px 10px; border: 1px solid var(--border-normal); border-radius: var(--radius-sm); font-size: 12px; color: #666; cursor: pointer; user-select: none; transition: all var(--transition); }
+
+.pg-radio input { accent-color: #1890ff; width: 14px; height: 14px; }
+
+.pg-radio.checked { border-color: #1890ff; background: #e6f7ff; color: #1890ff; }
+
+/* 审批操作多选 */
+
+.pg-checks { display: flex; gap: 8px; flex-wrap: wrap; }
+
+.pg-check { display: inline-flex; align-items: center; gap: 5px; padding: 5px 10px; border: 1px solid var(--border-normal); border-radius: var(--radius-sm); font-size: 12px; color: #666; cursor: pointer; user-select: none; transition: all var(--transition); }
+
+.pg-check input { accent-color: #1890ff; width: 14px; height: 14px; }
+
+.pg-check.checked { border-color: #1890ff; background: #e6f7ff; color: #1890ff; }
+
+/* 表达式编辑器 */
+
+.expr-editor { width: 100%; min-height: 60px; padding: 8px 10px; background: #f5f5f5; border: 1px solid var(--border-normal); border-radius: var(--radius-sm); color: #1890ff; font-size: 12px; font-family: var(--font-mono); outline: none; resize: vertical; }
+
+.expr-editor:focus { border-color: #1890ff; }
+
+.expr-hint { font-size: 10px; color: #999; margin-top: 4px; }
+
+/* ===== 监控/实例表格 ===== */
+
+.wf-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+
+.wf-table th { padding: 10px 12px; text-align: left; background: #f5f5f5; color: #999; font-weight: 600; border-bottom: 1px solid var(--border-strong); font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; }
+
+.wf-table td { padding: 11px 12px; border-bottom: 1px solid var(--border-normal); color: #666; }
+
+.wf-table tr:hover td { background: rgba(245, 158, 11, 0.04); }
+
+.wf-table .wf-id { color: #1890ff; font-family: var(--font-mono); font-size: 12px; }
+
+.wf-table .wf-name { color: #333; font-weight: 500; }
+
+.row-action-links { display: flex; gap: 10px; }
+
+.row-action-links a { color: #1890ff; cursor: pointer; font-size: 12px; }
+
+.row-action-links a:hover { color: #7dd3fc; }
+
+/* 运行轨迹时间线 */
+
+.trace-timeline { padding: 16px 20px; }
+
+.trace-item { display: flex; gap: 12px; padding-bottom: 16px; position: relative; }
+
+.trace-item:last-child { padding-bottom: 0; }
+
+.trace-item::before { content: ''; position: absolute; left: 7px; top: 18px; bottom: 0; width: 2px; background: var(--border-normal); }
+
+.trace-item:last-child::before { display: none; }
+
+.trace-dot { width: 16px; height: 16px; border-radius: 50%; flex-shrink: 0; margin-top: 2px; border: 2px solid var(--bg-surface); z-index: 1; }
+
+.trace-dot.done { background: var(--color-success); }
+
+.trace-dot.current { background: #1890ff; box-shadow: 0 0 8px rgba(245,158,11,0.5); }
+
+.trace-dot.pending { background: var(--bg-raised); border-color: #d9d9d9; }
+
+.trace-body { flex: 1; }
+
+.trace-body .tb-title { font-size: 13px; color: #333; font-weight: 500; }
+
+.trace-body .tb-meta { font-size: 11px; color: #999; margin-top: 3px; display: flex; gap: 12px; flex-wrap: wrap; }
+
+.trace-body .tb-meta .tb-tag { color: #1890ff; }
+
+/* 统计卡片行 */
+
+.stats-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 16px; }
+
+.stat-mini { background: #fff; border: 1px solid var(--border-normal); border-radius: var(--radius-md); padding: 16px; }
+
+.stat-mini .sm-label { font-size: 12px; color: #999; }
+
+.stat-mini .sm-value { font-family: var(--font-mono); font-size: 26px; font-weight: 700; color: #333; line-height: 1.2; margin-top: 6px; }
+
+.stat-mini .sm-value.accent { color: #1890ff; }
+
+.stat-mini .sm-value.success { color: #52c41a; }
+
+.stat-mini .sm-value.error { color: #f5222d; }
+
+.stat-mini .sm-sub { font-size: 11px; color: #999; margin-top: 4px; }
+
+@media (max-width: 900px) { .props-grid { grid-template-columns: 1fr 1fr; } .stats-row { grid-template-columns: 1fr 1fr; } }
+
+</style>
+
+</head>
+
+<body>
+
+<aside class="sidebar admin-sidebar" id="sidebar">
+
+    <div class="sidebar-logo">
+
+    <img src="../../images/LOGO.png" alt="磐枢工业智能平台" style="width: 100%; max-width: 200px; margin-bottom: 8px;">
+
+    <h1 style="font-size: 16px; margin: 0;">磐枢工业智能平台</h1>
+
+  </div>
+
+  <nav class="sidebar-menu">
+
+    <div class="sidebar-menu-group"><div class="sidebar-menu-item" onclick="toggleGroup(this)"><span class="icon">&#128451;</span> 数据中心管理<span class="arrow">&#9654;</span></div><div class="sub-menu"><a class="sidebar-menu-item" href="../data-center/index.html">数据中心总览</a><a class="sidebar-menu-item" href="../data-center/new.html">新建数据中心</a><a class="sidebar-menu-item" href="../data-center/backup.html">备份管理</a></div></div>
+
+    <div class="sidebar-menu-group"><div class="sidebar-menu-item" onclick="toggleGroup(this)"><span class="icon">&#128101;</span> 组织与权限<span class="arrow">&#9654;</span></div><div class="sub-menu"><a class="sidebar-menu-item" href="../org-perm/org.html">组织架构</a><a class="sidebar-menu-item" href="../org-perm/user.html">用户管理</a><a class="sidebar-menu-item" href="../org-perm/role.html">角色管理</a><a class="sidebar-menu-item" href="../org-perm/menu.html">菜单管理</a></div></div>
+
+
+
+    <div class="sidebar-menu-group"><div class="sidebar-menu-item" onclick="toggleGroup(this)"><span class="icon">&#128187;</span> 开发设计<span class="arrow">&#9660;</span></div><div class="sub-menu"><a class="sidebar-menu-item" href="lowcode.html">低代码开发中心</a><a class="sidebar-menu-item" href="form-designer.html">表单设计器</a><a class="sidebar-menu-item" href="doc-flow.html">单据转换配置</a><a class="sidebar-menu-item" href="print-template.html">套打模板设计</a><a class="sidebar-menu-item active" href="workflow.html">流程配置</a></div></div>
+
+
+
+    <div class="sidebar-menu-group"><div class="sidebar-menu-item" onclick="toggleGroup(this)"><span class="icon">&#129302;</span> 智能应用<span class="arrow">&#9654;</span></div><div class="sub-menu"><a class="sidebar-menu-item" href="../ai-config/api-manage.html">API管理</a><a class="sidebar-menu-item" href="../ai-config/nl-training.html">自然语言训练</a><a class="sidebar-menu-item" href="../ai-config/data-analysis.html">数据分析训练</a><a class="sidebar-menu-item" href="../ai-config/agent-config.html">Agent配置</a></div></div>
+
+
+
+    <div class="sidebar-menu-item" onclick="window.location.href='../../index.html'"><span class="icon">&#8592;</span> 返回应用端</div>
+
+  </nav>
+
+  <div class="sidebar-user"><div class="avatar" style="background: #e6f7ff;color: #1890ff;">管</div><div><div class="user-name">系统管理员</div><div class="user-role">超级管理员</div></div></div>
+
+</aside>
+
+<div class="main-content" id="mainContent">
+
+  <div class="page-header">
+
+    <div><div class="flex items-center gap-8"><button class="sidebar-toggle" onclick="toggleSidebar()">&#9776;</button><div><h2>流程配置</h2><div class="breadcrumb"><a href="../../index.html">首页</a><span>/</span><a href="../index.html">管理端</a><span>/</span><span>开发设计 / 流程配置</span></div></div></div></div>
+
+    <div class="page-actions">
+
+      <select class="form-select" style="width:200px;font-size:12px;"><option>采购订单审批流程</option><option>销售订单审批流程</option><option>生产工单审批流程</option><option>采购申请审批流程</option><option>费用报销审批流程</option></select>
+
+      <button class="btn btn-ghost btn-sm">+ 新建流程</button>
+
+      <button class="btn btn-primary btn-sm">&#128190; 保存</button>
+
+      <button class="btn btn-ghost btn-sm">&#9654; 发布</button>
+
+    </div>
+
+  </div>
+
+
+
+  <!-- Tab 切换 -->
+
+  <div class="tabs">
+
+    <div class="tab-item active" onclick="switchTab(this,'tab-design')">流程设计</div>
+
+    <div class="tab-item" onclick="switchTab(this,'tab-monitor')">流程监控</div>
+
+    <div class="tab-item" onclick="switchTab(this,'tab-instance')">流程实例</div>
+
+  </div>
+
+
+
+  <!-- ===== Tab: 流程设计 ===== -->
+
+  <div class="tab-content" id="tab-design" style="display:block;">
+
+    <!-- 流程版本信息 -->
+
+    <div class="version-bar">
+
+      <div class="vb-item"><span class="vb-label">当前版本:</span><span class="vb-version">V2.0</span></div>
+
+      <div class="vb-divider"></div>
+
+      <div class="vb-item"><span class="vb-label">状态:</span><span class="status-pill published"><span class="dot"></span>已发布</span></div>
+
+      <div class="vb-divider"></div>
+
+      <div class="vb-item"><span class="vb-label">上次发布:</span><span class="vb-value">2026-06-28 14:32</span></div>
+
+      <div class="vb-divider"></div>
+
+      <div class="vb-item"><span class="vb-label">创建人:</span><span class="vb-value">系统管理员</span></div>
+
+      <div style="flex:1;"></div>
+
+      <div class="vb-item">
+
+        <span class="vb-label">版本切换:</span>
+
+        <select class="vb-select"><option>V2.0 (当前)</option><option>V1.1</option><option>V1.0</option></select>
+
+      </div>
+
+    </div>
+
+
+
+    <!-- 流程工具栏（含新增节点类型） -->
+
+    <div class="flow-toolbar">
+
+      <div class="flow-tool">&#128100; 审批节点</div>
+
+      <div class="flow-tool">&#9989; 条件分支</div>
+
+      <div class="flow-tool">&#128203; 抄送节点</div>
+
+      <div class="flow-tool">&#128279; 子流程</div>
+
+      <div class="flow-tool">&#9888; 网关</div>
+
+      <div class="flow-tool">&#9881; 服务任务</div>
+
+      <div class="flow-tool">&#128187; 脚本任务</div>
+
+      <div class="flow-tool">&#9201; 定时器事件</div>
+
+      <div class="flow-tool">&#128680; 信号事件</div>
+
+      <div class="flow-tool">&#128221; 开始事件</div>
+
+      <div class="flow-tool">&#128466; 结束事件</div>
+
+      <div style="flex:1;"></div>
+
+      <button class="btn btn-sm btn-ghost">&#128260; 自动布局</button>
+
+      <button class="btn btn-sm btn-ghost">&#128269; 缩放适应</button>
+
+      <button class="btn btn-sm btn-ghost">&#8635; 刷新</button>
+
+    </div>
+
+
+
+    <!-- 双栏布局：流程画布(60%) + 节点属性(40%) -->
+
+    <div class="flow-workspace">
+
+      <div class="flow-canvas-wrap">
+
+        <div class="flow-designer" style="min-height:100%;border:none;border-radius:0;">
+
+          <div class="flow-canvas">
+
+            <!-- SVG Lines -->
+
+            <svg width="100%" height="100%" style="position:absolute;top:0;left:0;pointer-events:none;z-index:1;">
+
+              <!-- Start -> Submit -->
+
+              <line x1="105" y1="60" x2="205" y2="60" stroke="var(--admin-accent)" stroke-width="2" marker-end="url(#arrowhead)"/>
+
+              <!-- Submit -> Dept Manager -->
+
+              <line x1="345" y1="60" x2="465" y2="60" stroke="var(--admin-accent)" stroke-width="2" marker-end="url(#arrowhead)"/>
+
+              <!-- Dept Manager -> Amount Check -->
+
+              <line x1="625" y1="60" x2="725" y2="60" stroke="var(--admin-accent)" stroke-width="2" marker-end="url(#arrowhead)"/>
+
+              <!-- Amount Check -> GM (large) -->
+
+              <line x1="805" y1="100" x2="880" y2="170" stroke="var(--color-warning)" stroke-width="2" marker-end="url(#arrowhead)"/>
+
+              <text x="810" y="145" fill="var(--color-warning)" font-size="11">&gt;5万</text>
+
+              <!-- Amount Check -> Warehouse (small) -->
+
+              <line x1="805" y1="30" x2="880" y2="30" stroke="var(--color-success)" stroke-width="2" marker-end="url(#arrowhead)"/>
+
+              <text x="810" y="22" fill="var(--color-success)" font-size="11">&lt;=5万</text>
+
+              <!-- GM -> CFO -->
+
+              <line x1="1010" y1="200" x2="1080" y2="200" stroke="var(--admin-accent)" stroke-width="2" marker-end="url(#arrowhead)"/>
+
+              <!-- CFO -> End -->
+
+              <line x1="1210" y1="200" x2="1280" y2="200" stroke="var(--admin-accent)" stroke-width="2" marker-end="url(#arrowhead)"/>
+
+              <!-- Warehouse -> End -->
+
+              <line x1="1010" y1="60" x2="1280" y2="180" stroke="var(--admin-accent)" stroke-width="2" marker-end="url(#arrowhead)"/>
+
+              <defs>
+
+                <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto"><polygon points="0 0, 10 3.5, 0 7" fill="var(--admin-accent)"/></marker>
+
+              </defs>
+
+            </svg>
+
+
+
+            <!-- Start Node -->
+
+            <div class="flow-node node-start" style="left:40px;top:30px;">
+
+              <div class="node-icon">&#9654;</div>
+
+              <div class="node-title" style="font-size:10px;">开始</div>
+
+            </div>
+
+
+
+            <!-- Submit Node -->
+
+            <div class="flow-node" style="left:210px;top:25px;width:130px;">
+
+              <div class="node-icon">&#128196;</div>
+
+              <div class="node-title">提交申请</div>
+
+              <div class="node-info">发起人</div>
+
+            </div>
+
+
+
+            <!-- Dept Manager (选中状态) -->
+
+            <div class="flow-node active" style="left:470px;top:25px;width:150px;">
+
+              <div class="node-icon">&#128100;</div>
+
+              <div class="node-title">部门经理审批</div>
+
+              <div class="node-info">审批人: 部门经理</div>
+
+            </div>
+
+
+
+            <!-- Condition Gateway -->
+
+            <div class="flow-node" style="left:730px;top:25px;width:70px;height:70px;border-radius:50%;border-color: #1890ff;padding:8px;">
+
+              <div class="node-icon">&#10067;</div>
+
+              <div class="node-title" style="font-size:10px;">金额判断</div>
+
+            </div>
+
+
+
+            <!-- GM Approval -->
+
+            <div class="flow-node" style="left:885px;top:140px;width:120px;">
+
+              <div class="node-icon">&#128100;</div>
+
+              <div class="node-title">总经理审批</div>
+
+              <div class="node-info">&gt;5万时</div>
+
+            </div>
+
+
+
+            <!-- Warehouse (small amount) -->
+
+            <div class="flow-node" style="left:885px;top:15px;width:120px;">
+
+              <div class="node-icon">&#128190;</div>
+
+              <div class="node-title">仓库备货</div>
+
+              <div class="node-info">&lt;=5万时</div>
+
+            </div>
+
+
+
+            <!-- CFO -->
+
+            <div class="flow-node" style="left:1085px;top:170px;width:120px;">
+
+              <div class="node-icon">&#128100;</div>
+
+              <div class="node-title">财务审核</div>
+
+              <div class="node-info">CFO</div>
+
+            </div>
+
+
+
+            <!-- End Node -->
+
+            <div class="flow-node node-end" style="left:1290px;top:160px;">
+
+              <div class="node-icon">&#9632;</div>
+
+              <div class="node-title" style="font-size:10px;">结束</div>
+
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+
+
+      <!-- 节点属性配置面板 -->
+
+      <div class="flow-props-wrap">
+
+        <div class="node-props">
+
+          <div class="node-props-header">
+
+            <div class="nph-title"><span class="nph-icon">&#128100;</span> 节点属性配置 — 部门经理审批</div>
+
+            <div class="nph-hint">已选中审批节点 · 修改后请保存</div>
+
+          </div>
+
+
+
+          <div class="props-grid">
+
+            <div class="pg-field">
+
+              <div class="pg-label">节点名称</div>
+
+              <input type="text" class="pg-input" value="部门经理审批">
+
+            </div>
+
+            <div class="pg-field">
+
+              <div class="pg-label">节点类型</div>
+
+              <select class="pg-select"><option>审批</option><option>抄送</option><option>服务</option><option>脚本</option></select>
+
+            </div>
+
+            <div class="pg-field">
+
+              <div class="pg-label">审批人类型</div>
+
+              <select class="pg-select"><option>固定角色</option><option>固定人员</option><option>部门负责人</option><option>岗位</option><option>直属领导</option><option>动态字段</option></select>
+
+            </div>
+
+
+
+            <div class="pg-field pg-full">
+
+              <div class="pg-label">具体审批人 / 角色</div>
+
+              <select class="pg-select"><option>部门经理 (角色)</option><option>采购部经理 - 张伟</option><option>测试部门经理 - 李娜</option><option>测试部门经理 - 王强</option></select>
+
+            </div>
+
+
+
+            <div class="pg-field pg-full">
+
+              <div class="pg-label">审批方式</div>
+
+              <div class="pg-radios">
+
+                <label class="pg-radio checked"><input type="radio" name="approve-mode" checked> 会签 (所有人都审批)</label>
+
+                <label class="pg-radio"><input type="radio" name="approve-mode"> 或签 (任一人审批)</label>
+
+                <label class="pg-radio"><input type="radio" name="approve-mode"> 依次审批</label>
+
+              </div>
+
+            </div>
+
+
+
+            <div class="pg-field pg-full">
+
+              <div class="pg-label">审批操作 (允许的操作)</div>
+
+              <div class="pg-checks">
+
+                <label class="pg-check checked"><input type="checkbox" checked> 同意</label>
+
+                <label class="pg-check checked"><input type="checkbox" checked> 驳回</label>
+
+                <label class="pg-check"><input type="checkbox"> 转办</label>
+
+                <label class="pg-check"><input type="checkbox"> 加签</label>
+
+                <label class="pg-check checked"><input type="checkbox" checked> 抄送</label>
+
+              </div>
+
+            </div>
+
+
+
+            <div class="pg-field">
+
+              <div class="pg-label">超时时间 (小时)</div>
+
+              <input type="number" class="pg-input" value="48.00" step="0.01" min="0.00" style="font-family:var(--font-mono);">
+
+            </div>
+
+            <div class="pg-field">
+
+              <div class="pg-label">超时动作</div>
+
+              <select class="pg-select"><option>自动通过</option><option>自动驳回</option><option>提醒</option><option>转交</option></select>
+
+            </div>
+
+            <div class="pg-field">
+
+              <div class="pg-label">提醒方式</div>
+
+              <select class="pg-select"><option>站内消息</option><option>邮件</option><option>短信</option><option>站内+邮件</option></select>
+
+            </div>
+
+
+
+            <div class="pg-field pg-full">
+
+              <div class="pg-label">流转条件 (满足条件时流转到下一节点)</div>
+
+              <textarea class="expr-editor" rows="3">amount &lt;= 50000 &amp;&amp; status == 'approved'</textarea>
+
+              <div class="expr-hint">表达式语法: 字段名 操作符 值，支持 &amp;&amp; (且) / || (或)，例: amount &gt; 50000 &amp;&amp; type == 'urgent'</div>
+
+            </div>
+
+          </div>
+
+
+
+          <div style="display:flex;gap:8px;margin-top:16px;padding-top:12px;border-top:1px solid var(--border-normal);">
+
+            <button class="btn btn-primary btn-sm">&#128190; 保存节点配置</button>
+
+            <button class="btn btn-ghost btn-sm">&#8634; 重置</button>
+
+            <div style="flex:1;"></div>
+
+            <button class="btn btn-ghost btn-sm">&#128196; 复制配置</button>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+
+
+  <!-- ===== Tab: 流程监控 ===== -->
+
+  <div class="tab-content" id="tab-monitor" style="display:none;padding:16px;">
+
+    <div style="display:grid;grid-template-columns:1fr 320px;gap:16px;">
+
+      <!-- 运行中实例列表 -->
+
+      <div class="card">
+
+        <div class="card-header">
+
+          <span>运行中实例</span>
+
+          <span style="font-size:12px;color: #999;font-weight:400;">共 4 条 · 实时刷新</span>
+
+        </div>
+
+        <div class="table-wrapper">
+
+          <table class="wf-table">
+
+            <thead>
+
+              <tr><th>实例ID</th><th>发起人</th><th>当前节点</th><th>发起时间</th><th>状态</th><th>操作</th></tr>
+
+            </thead>
+
+            <tbody>
+
+              <tr>
+
+                <td class="wf-id">PO-2026-0712</td>
+
+                <td class="wf-name">张伟 (采购部)</td>
+
+                <td>部门经理审批</td>
+
+                <td>2026-07-10 09:32</td>
+
+                <td><span class="badge badge-warning">审批中</span></td>
+
+                <td class="row-action-links"><a>查看</a><a>催办</a></td>
+
+              </tr>
+
+              <tr>
+
+                <td class="wf-id">PO-2026-0711</td>
+
+                <td class="wf-name">李娜 (测试部门)</td>
+
+                <td>总经理审批</td>
+
+                <td>2026-07-10 08:15</td>
+
+                <td><span class="badge badge-warning">审批中</span></td>
+
+                <td class="row-action-links"><a>查看</a><a>催办</a></td>
+
+              </tr>
+
+              <tr>
+
+                <td class="wf-id">PO-2026-0709</td>
+
+                <td class="wf-name">王强 (测试部门)</td>
+
+                <td>财务审核</td>
+
+                <td>2026-07-09 16:48</td>
+
+                <td><span class="badge badge-info">待审核</span></td>
+
+                <td class="row-action-links"><a>查看</a><a>催办</a></td>
+
+              </tr>
+
+              <tr>
+
+                <td class="wf-id">PO-2026-0708</td>
+
+                <td class="wf-name">赵敏 (采购部)</td>
+
+                <td>提交申请</td>
+
+                <td>2026-07-09 14:20</td>
+
+                <td><span class="badge badge-warning">审批中</span></td>
+
+                <td class="row-action-links"><a>查看</a><a>催办</a></td>
+
+              </tr>
+
+            </tbody>
+
+          </table>
+
+        </div>
+
+      </div>
+
+
+
+      <!-- 运行轨迹 -->
+
+      <div class="card">
+
+        <div class="card-header"><span>运行轨迹 — PO-2026-0712</span></div>
+
+        <div class="trace-timeline">
+
+          <div class="trace-item">
+
+            <div class="trace-dot done"></div>
+
+            <div class="trace-body">
+
+              <div class="tb-title">提交申请</div>
+
+              <div class="tb-meta"><span>张伟 (采购部)</span><span>2026-07-10 09:32</span><span class="tb-tag">已提交</span></div>
+
+            </div>
+
+          </div>
+
+          <div class="trace-item">
+
+            <div class="trace-dot current"></div>
+
+            <div class="trace-body">
+
+              <div class="tb-title">部门经理审批</div>
+
+              <div class="tb-meta"><span>审批人: 采购部经理</span><span>预计 48.00 小时</span><span class="tb-tag">进行中</span></div>
+
+            </div>
+
+          </div>
+
+          <div class="trace-item">
+
+            <div class="trace-dot pending"></div>
+
+            <div class="trace-body">
+
+              <div class="tb-title">金额判断 (网关)</div>
+
+              <div class="tb-meta"><span>条件: amount &lt;= 50000.00</span><span>待执行</span></div>
+
+            </div>
+
+          </div>
+
+          <div class="trace-item">
+
+            <div class="trace-dot pending"></div>
+
+            <div class="trace-body">
+
+              <div class="tb-title">仓库备货 / 总经理审批</div>
+
+              <div class="tb-meta"><span>根据金额判断分流</span><span>待执行</span></div>
+
+            </div>
+
+          </div>
+
+          <div class="trace-item">
+
+            <div class="trace-dot pending"></div>
+
+            <div class="trace-body">
+
+              <div class="tb-title">结束</div>
+
+              <div class="tb-meta"><span>流程完结</span><span>待执行</span></div>
+
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+
+
+  <!-- ===== Tab: 流程实例 ===== -->
+
+  <div class="tab-content" id="tab-instance" style="display:none;padding:16px;">
+
+    <!-- 统计数据 -->
+
+    <div class="stats-row">
+
+      <div class="stat-mini">
+
+        <div class="sm-label">总实例数</div>
+
+        <div class="sm-value accent">128</div>
+
+        <div class="sm-sub">较上周 +12</div>
+
+      </div>
+
+      <div class="stat-mini">
+
+        <div class="sm-label">平均审批时长</div>
+
+        <div class="sm-value">6.50 小时</div>
+
+        <div class="sm-sub">较上周 -0.80 小时</div>
+
+      </div>
+
+      <div class="stat-mini">
+
+        <div class="sm-label">通过率</div>
+
+        <div class="sm-value success">87.50%</div>
+
+        <div class="sm-sub">112 / 128 通过</div>
+
+      </div>
+
+      <div class="stat-mini">
+
+        <div class="sm-label">驳回率</div>
+
+        <div class="sm-value error">12.50%</div>
+
+        <div class="sm-sub">16 / 128 驳回</div>
+
+      </div>
+
+    </div>
+
+
+
+    <!-- 已完结实例列表 -->
+
+    <div class="card">
+
+      <div class="card-header">
+
+        <span>已完结实例</span>
+
+        <div class="flex gap-8">
+
+          <select class="form-select" style="width:140px;font-size:12px;"><option>全部状态</option><option>已通过</option><option>已驳回</option><option>已撤回</option></select>
+
+          <button class="btn btn-sm btn-ghost">&#128190; 导出</button>
+
+        </div>
+
+      </div>
+
+      <div class="table-wrapper">
+
+        <table class="wf-table">
+
+          <thead>
+
+            <tr><th>实例ID</th><th>发起人</th><th>发起时间</th><th>完结时间</th><th>审批耗时</th><th>结果</th><th>操作</th></tr>
+
+          </thead>
+
+          <tbody>
+
+            <tr>
+
+              <td class="wf-id">PO-2026-0705</td>
+
+              <td class="wf-name">张伟 (采购部)</td>
+
+              <td>2026-07-08 10:15</td>
+
+              <td>2026-07-08 14:32</td>
+
+              <td>4.28 小时</td>
+
+              <td><span class="badge badge-success">已通过</span></td>
+
+              <td class="row-action-links"><a>详情</a><a>轨迹</a></td>
+
+            </tr>
+
+            <tr>
+
+              <td class="wf-id">PO-2026-0701</td>
+
+              <td class="wf-name">李娜 (测试部门)</td>
+
+              <td>2026-07-07 09:20</td>
+
+              <td>2026-07-07 16:48</td>
+
+              <td>7.47 小时</td>
+
+              <td><span class="badge badge-success">已通过</span></td>
+
+              <td class="row-action-links"><a>详情</a><a>轨迹</a></td>
+
+            </tr>
+
+            <tr>
+
+              <td class="wf-id">PO-2026-0698</td>
+
+              <td class="wf-name">王强 (测试部门)</td>
+
+              <td>2026-07-06 14:05</td>
+
+              <td>2026-07-06 18:20</td>
+
+              <td>4.25 小时</td>
+
+              <td><span class="badge badge-error">已驳回</span></td>
+
+              <td class="row-action-links"><a>详情</a><a>轨迹</a></td>
+
+            </tr>
+
+            <tr>
+
+              <td class="wf-id">PO-2026-0695</td>
+
+              <td class="wf-name">赵敏 (采购部)</td>
+
+              <td>2026-07-05 11:30</td>
+
+              <td>2026-07-05 15:12</td>
+
+              <td>3.70 小时</td>
+
+              <td><span class="badge badge-success">已通过</span></td>
+
+              <td class="row-action-links"><a>详情</a><a>轨迹</a></td>
+
+            </tr>
+
+            <tr>
+
+              <td class="wf-id">PO-2026-0690</td>
+
+              <td class="wf-name">孙磊 (仓储部)</td>
+
+              <td>2026-07-04 08:45</td>
+
+              <td>2026-07-04 17:30</td>
+
+              <td>8.75 小时</td>
+
+              <td><span class="badge badge-success">已通过</span></td>
+
+              <td class="row-action-links"><a>详情</a><a>轨迹</a></td>
+
+            </tr>
+
+            <tr>
+
+              <td class="wf-id">PO-2026-0685</td>
+
+              <td class="wf-name">周婷 (测试部门)</td>
+
+              <td>2026-07-03 13:20</td>
+
+              <td>2026-07-03 20:05</td>
+
+              <td>6.75 小时</td>
+
+              <td><span class="badge badge-error">已驳回</span></td>
+
+              <td class="row-action-links"><a>详情</a><a>轨迹</a></td>
+
+            </tr>
+
+          </tbody>
+
+        </table>
+
+      </div>
+
+      <div class="pagination">
+
+        <button class="page-btn">&laquo; 上一页</button>
+
+        <button class="page-btn active">1</button>
+
+        <button class="page-btn">2</button>
+
+        <button class="page-btn">3</button>
+
+        <button class="page-btn">下一页 &raquo;</button>
+
+        <span class="page-info">共 128 条 / 22 页</span>
+
+      </div>
+
+    </div>
+
+  </div>
+
+
+
+</div>
+
+<div id="sidebarOverlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:99;" onclick="toggleSidebar()"></div>
+
+<script>
+
+
+
+
+
+function switchTab(el,id){var tabs=document.querySelectorAll('.tabs .tab-item');var panes=document.querySelectorAll('.tab-content');tabs.forEach(function(t){t.classList.remove('active');});panes.forEach(function(p){p.style.display='none';});el.classList.add('active');var pane=document.getElementById(id);if(pane)pane.style.display='block';}
+
+</script>
+
+
+
+<div class="toast-container" id="toastContainer"></div>
+
+<div class="confirm-modal-overlay" id="confirmModal">
+
+  <div class="confirm-modal-dialog">
+
+    <div class="confirm-modal-header">
+
+      <span class="confirm-modal-icon" id="confirmIcon">&#9888;</span>
+
+      <span class="confirm-modal-title" id="confirmTitle">温馨提示</span>
+
+    </div>
+
+    <div class="confirm-modal-body">
+
+      <div class="confirm-modal-message" id="confirmMessage"></div>
+
+    </div>
+
+    <div class="confirm-modal-footer">
+
+      <button class="btn btn-sm btn-cancel" onclick="closeConfirmModal(false)">取消</button>
+
+      <button class="btn btn-sm btn-primary" style="background: #1890ff;border-color: #1890ff;color:#0a0e1a;" onclick="closeConfirmModal(true)">确定</button>
+
+    </div>
+
+  </div>
+
+</div>
+
+</body>
+
+</html>
+

@@ -1,0 +1,2294 @@
+<!DOCTYPE html>
+
+
+
+<html lang="zh-CN">
+
+
+
+<head>
+
+
+
+<meta charset="UTF-8">
+
+
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+
+
+<title>招聘管理 - 磐枢工业智能平台</title>
+
+
+
+<link rel="stylesheet" href="../common.css">
+
+
+
+<script src="../common.js"></script>
+<script>
+</script>
+
+
+
+</head>
+
+
+
+<body>
+
+
+
+<aside class="sidebar" id="sidebar">
+
+
+
+<div class="sidebar-logo">
+
+
+
+    <img src="../images/logo.png" alt="磐枢工业智能平台" style="width: 100%; max-width: 200px; margin-bottom: 8px;">
+
+
+
+    <h1 style="font-size: 16px; margin: 0;">磐枢工业智能平台</h1>
+
+
+
+  </div>
+
+
+
+  <nav class="sidebar-menu"></nav>
+
+
+
+<div class="sidebar-user"><div class="avatar">管</div>
+
+
+
+</aside>
+
+
+
+<div class="main-content" id="mainContent">
+
+
+
+  <div class="page-header" style="position:sticky;top:0;z-index:100;">
+
+
+
+    <div>
+
+
+
+      <div class="flex items-center gap-8">
+
+
+
+        <button class="sidebar-toggle" onclick="toggleSidebar()">&#9776;</button>
+
+
+
+        <div>
+
+
+
+          <h2>招聘管理</h2>
+
+
+
+          <div class="breadcrumb"><a href="../index.html">首页</a> <span>/</span> <span>HR人力</span> <span>/</span> <span>招聘管理</span></div></div>
+
+
+
+        </div>
+
+
+
+      </div>
+
+
+
+    </div>
+
+
+
+    <div class="page-actions">
+
+
+
+      <button class="btn btn-ghost btn-sm">&#128276; 消息</button>
+
+
+
+      <button class="btn btn-ghost btn-sm" onclick="window.location.href='../login.html'">&#9211; 退出</button>
+
+      </div>
+
+
+
+  </div>
+
+
+
+  <div class="page-body">
+
+
+
+    <div class="tabs">
+
+
+
+      <div class="tab-item active" onclick="switchTab(this, 'demand')">招聘需求</div>
+
+
+
+      <div class="tab-item" onclick="switchTab(this, 'resume')">简历管理</div>
+
+
+
+      <div class="tab-item" onclick="switchTab(this, 'interview')">面试安排</div>
+
+      <button class="btn btn-ghost btn-sm" style="margin-left:auto;" onclick="openColumnSettings()">⚙️ 显示/隐藏列</button>
+
+    </div>
+
+
+
+    <div class="tab-content">
+
+
+
+      <div class="tab-pane active" id="tab-demand">
+
+
+
+        <div class="card">
+
+
+
+          <div class="card-header">
+
+
+
+            <span>招聘需求列表</span>
+
+
+
+            <button class="btn btn-primary btn-sm" onclick="openModal('addDemandModal')">+ 新增需求</button>
+
+
+
+          </div>
+
+
+
+          <div class="card-body">
+
+
+
+            <div class="list-filter-row" style="margin-bottom:16px;">
+
+
+
+              <div class="filter-field">
+
+
+
+                <select>
+
+
+
+                  <option>需求编号</option>
+
+
+
+                  <option>岗位名称</option>
+
+
+
+                </select>
+
+
+
+                <input type="text" placeholder="请输入搜索内容">
+
+
+
+              </div>
+
+
+
+              <div class="filter-field">
+
+
+
+                <select>
+
+
+
+                  <option>全部状态</option>
+
+
+
+                  <option>待审核</option>
+
+
+
+                  <option>已发布</option>
+
+
+
+                  <option>已关闭</option>
+
+
+
+                </select>
+
+
+
+              </div>
+
+
+
+              <div class="list-filter-btns">
+
+
+
+                <button class="btn-search">查询</button>
+
+
+
+                <button class="btn-reset">重置</button>
+
+
+
+              </div>
+
+
+
+            </div>
+
+
+
+            <div class="table-wrapper">
+
+
+
+              <table class="data-table">
+
+
+
+                <thead>
+
+
+
+                  <tr>
+
+                    <th>需求编号</th>
+
+                    <th data-column="positionName">岗位名称</th>
+
+                    <th data-column="recruitCount">招聘人数</th>
+
+                    <th data-column="status">招聘状态</th>
+
+                    <th data-column="publishDate">发布日期</th>
+
+                    <th data-column="endDate">截止日期</th>
+
+                    <th data-column="manager">招聘负责人</th>
+
+                    <th>操作</th>
+
+                  </tr>
+
+
+
+                </thead>
+
+
+
+                <tbody>
+
+                  <tr><td>REQ-2026-001</td><td data-column="positionName">高级前端开发工程师</td><td data-column="recruitCount">2</td><td data-column="status"><span class="badge badge-success">已发布</span></td><td data-column="publishDate">2026-07-01</td><td data-column="endDate">2026-08-31</td><td data-column="manager">李主管</td><td class="row-action-links"><a>查看</a><a>编辑</a><a>关闭</a></td></tr>
+
+                  <tr><td>REQ-2026-002</td><td data-column="positionName">Java后端开发工程师</td><td data-column="recruitCount">3</td><td data-column="status"><span class="badge badge-success">已发布</span></td><td data-column="publishDate">2026-07-03</td><td data-column="endDate">2026-09-30</td><td data-column="manager">王经理</td><td class="row-action-links"><a>查看</a><a>编辑</a><a>关闭</a></td></tr>
+
+                  <tr><td>REQ-2026-003</td><td data-column="positionName">产品经理</td><td data-column="recruitCount">1</td><td data-column="status"><span class="badge badge-warning">待审核</span></td><td data-column="publishDate">2026-07-05</td><td data-column="endDate">2026-08-15</td><td data-column="manager">张总监</td><td class="row-action-links"><a>查看</a><a>编辑</a><a>审核</a></td></tr>
+
+                  <tr><td>REQ-2026-004</td><td data-column="positionName">UI设计师</td><td data-column="recruitCount">1</td><td data-column="status"><span class="badge badge-info">已关闭</span></td><td data-column="publishDate">2026-06-28</td><td data-column="endDate">2026-07-28</td><td data-column="manager">李主管</td><td class="row-action-links"><a>查看</a></td></tr>
+
+                  <tr><td>REQ-2026-005</td><td data-column="positionName">测试工程师</td><td data-column="recruitCount">2</td><td data-column="status"><span class="badge badge-success">已发布</span></td><td data-column="publishDate">2026-07-08</td><td data-column="endDate">2026-09-08</td><td data-column="manager">陈主管</td><td class="row-action-links"><a>查看</a><a>编辑</a><a>关闭</a></td></tr>
+
+                  <tr><td>REQ-2026-006</td><td data-column="positionName">运维工程师</td><td data-column="recruitCount">1</td><td data-column="status"><span class="badge badge-warning">待审核</span></td><td data-column="publishDate">2026-07-10</td><td data-column="endDate">2026-08-20</td><td data-column="manager">周经理</td><td class="row-action-links"><a>查看</a><a>编辑</a><a>审核</a></td></tr>
+
+                  <tr><td>REQ-2026-007</td><td data-column="positionName">项目经理</td><td data-column="recruitCount">1</td><td data-column="status"><span class="badge badge-info">已关闭</span></td><td data-column="publishDate">2026-06-15</td><td data-column="endDate">2026-07-15</td><td data-column="manager">张总监</td><td class="row-action-links"><a>查看</a></td></tr>
+
+                  <tr><td>REQ-2026-008</td><td data-column="positionName">财务分析师</td><td data-column="recruitCount">2</td><td data-column="status"><span class="badge badge-success">已发布</span></td><td data-column="publishDate">2026-07-09</td><td data-column="endDate">2026-09-09</td><td data-column="manager">孙主管</td><td class="row-action-links"><a>查看</a><a>编辑</a><a>关闭</a></td></tr>
+
+                </tbody>
+
+
+
+              </table>
+
+
+
+            </div>
+
+
+
+            <div class="list-pagination">
+
+
+
+              <div class="page-info">共 8 条记录，当前第 1 页</div>
+
+
+
+              <div class="page-btns">
+
+
+
+                <button>‹</button>
+
+
+
+                <button class="active">1</button>
+
+
+
+                <button>›</button>
+
+
+
+              </div>
+
+
+
+            </div>
+
+
+
+          </div>
+
+
+
+        </div>
+
+
+
+      </div>
+
+
+
+      <div class="tab-pane" id="tab-resume">
+
+
+
+        <div class="card">
+
+
+
+          <div class="card-header">
+
+
+
+            <span>简历管理</span>
+
+
+
+            <button class="btn btn-primary btn-sm" onclick="openModal('addResumeModal')">+ 录入简历</button>
+
+
+
+          </div>
+
+
+
+          <div class="card-body">
+
+
+
+            <div class="list-filter-row" style="margin-bottom:16px;">
+
+
+
+              <div class="filter-field">
+
+
+
+                <select>
+
+
+
+                  <option>姓名</option>
+
+
+
+                  <option>应聘岗位</option>
+
+
+
+                </select>
+
+
+
+                <input type="text" placeholder="请输入搜索内容">
+
+
+
+              </div>
+
+
+
+              <div class="filter-field">
+
+
+
+                <select>
+
+
+
+                  <option>全部状态</option>
+
+
+
+                  <option>待筛选</option>
+
+
+
+                  <option>已筛选</option>
+
+
+
+                  <option>已面试</option>
+
+
+
+                  <option>已录用</option>
+
+
+
+                  <option>已拒绝</option>
+
+
+
+                </select>
+
+
+
+              </div>
+
+
+
+              <div class="list-filter-btns">
+
+
+
+                <button class="btn-search">查询</button>
+
+
+
+                <button class="btn-reset">重置</button>
+
+
+
+              </div>
+
+
+
+            </div>
+
+
+
+            <div class="table-wrapper">
+
+
+
+              <table class="data-table">
+
+
+
+                <thead>
+
+
+
+                  <tr>
+
+
+
+                    <th>姓名</th>
+
+
+
+                    <th>应聘岗位</th>
+
+
+
+                    <th>来源渠道</th>
+
+
+
+                    <th>学历</th>
+
+
+
+                    <th>工作经验</th>
+
+
+
+                    <th>状态</th>
+
+
+
+                    <th>操作</th>
+
+
+
+                  </tr>
+
+
+
+                </thead>
+
+
+
+                <tbody>
+
+
+
+                  <tr><td>张明</td><td>高级前端开发工程师</td><td>拉勾网</td><td>本科</td><td>5年</td><td><span class="badge badge-success">已录用</span></td><td class="row-action-links"><a>查看</a><a>安排面试</a></td></tr>
+
+
+
+                  <tr><td>李华</td><td>Java后端开发工程师</td><td>BOSS直聘</td><td>硕士</td><td>3年</td><td><span class="badge badge-info">已面试</span></td><td class="row-action-links"><a>查看</a><a>安排面试</a></td></tr>
+
+
+
+                  <tr><td>王芳</td><td>产品经理</td><td>智联招聘</td><td>本科</td><td>4年</td><td><span class="badge badge-warning">已筛选</span></td><td class="row-action-links"><a>查看</a><a>安排面试</a></td></tr>
+
+
+
+                  <tr><td>陈伟</td><td>UI设计师</td><td>设计师平台</td><td>本科</td><td>3年</td><td><span class="badge badge-error">已拒绝</span></td><td class="row-action-links"><a>查看</a></td></tr>
+
+
+
+                  <tr><td>刘洋</td><td>测试工程师</td><td>内推</td><td>本科</td><td>2年</td><td><span class="badge badge-secondary">待筛选</span></td><td class="row-action-links"><a>查看</a><a>筛选</a></td></tr>
+
+
+
+                  <tr><td>赵静</td><td>运维工程师</td><td>拉勾网</td><td>大专</td><td>6年</td><td><span class="badge badge-warning">已筛选</span></td><td class="row-action-links"><a>查看</a><a>安排面试</a></td></tr>
+
+
+
+                  <tr><td>孙伟</td><td>项目经理</td><td>BOSS直聘</td><td>硕士</td><td>8年</td><td><span class="badge badge-success">已录用</span></td><td class="row-action-links"><a>查看</a></td></tr>
+
+
+
+                  <tr><td>周婷</td><td>财务分析师</td><td>智联招聘</td><td>本科</td><td>3年</td><td><span class="badge badge-secondary">待筛选</span></td><td class="row-action-links"><a>查看</a><a>筛选</a></td></tr>
+
+
+
+                </tbody>
+
+
+
+              </table>
+
+
+
+            </div>
+
+
+
+            <div class="list-pagination">
+
+
+
+              <div class="page-info">共 8 条记录，当前第 1 页</div>
+
+
+
+              <div class="page-btns">
+
+
+
+                <button>‹</button>
+
+
+
+                <button class="active">1</button>
+
+
+
+                <button>›</button>
+
+
+
+              </div>
+
+
+
+            </div>
+
+
+
+          </div>
+
+
+
+        </div>
+
+
+
+      </div>
+
+
+
+      <div class="tab-pane" id="tab-interview">
+
+
+
+        <div class="card">
+
+
+
+          <div class="card-header">
+
+
+
+            <span>面试安排</span>
+
+
+
+            <button class="btn btn-primary btn-sm" onclick="openModal('addInterviewModal')">+ 安排面试</button>
+
+
+
+          </div>
+
+
+
+          <div class="card-body">
+
+
+
+            <div class="list-filter-row" style="margin-bottom:16px;">
+
+
+
+              <div class="filter-field">
+
+
+
+                <select>
+
+
+
+                  <option>姓名</option>
+
+
+
+                  <option>岗位</option>
+
+
+
+                </select>
+
+
+
+                <input type="text" placeholder="请输入搜索内容">
+
+
+
+              </div>
+
+
+
+              <div class="filter-field">
+
+
+
+                <select>
+
+
+
+                  <option>全部结果</option>
+
+
+
+                  <option>通过</option>
+
+
+
+                  <option>待定</option>
+
+
+
+                  <option>未通过</option>
+
+
+
+                </select>
+
+
+
+              </div>
+
+
+
+              <div class="list-filter-btns">
+
+
+
+                <button class="btn-search">查询</button>
+
+
+
+                <button class="btn-reset">重置</button>
+
+
+
+              </div>
+
+
+
+            </div>
+
+
+
+            <div class="table-wrapper">
+
+
+
+              <table class="data-table">
+
+
+
+                <thead>
+
+
+
+                  <tr>
+
+
+
+                    <th>姓名</th>
+
+
+
+                    <th>岗位</th>
+
+
+
+                    <th>面试轮次</th>
+
+
+
+                    <th>面试时间</th>
+
+
+
+                    <th>面试官</th>
+
+
+
+                    <th>结果</th>
+
+
+
+                    <th>操作</th>
+
+
+
+                  </tr>
+
+
+
+                </thead>
+
+
+
+                <tbody>
+
+
+
+                  <tr><td>张明</td><td>高级前端开发工程师</td><td>终面</td><td>2026-07-05 14:00</td><td>李主管</td><td><span class="badge badge-success">通过</span></td><td class="row-action-links"><a>查看</a><a>评价</a></td></tr>
+
+
+
+                  <tr><td>李华</td><td>Java后端开发工程师</td><td>二面</td><td>2026-07-08 10:00</td><td>王经理</td><td><span class="badge badge-warning">待定</span></td><td class="row-action-links"><a>查看</a><a>评价</a></td></tr>
+
+
+
+                  <tr><td>王芳</td><td>产品经理</td><td>一面</td><td>2026-07-11 15:00</td><td>张总监</td><td><span class="badge badge-secondary">未开始</span></td><td class="row-action-links"><a>查看</a><a>修改</a></td></tr>
+
+
+
+                  <tr><td>刘洋</td><td>测试工程师</td><td>一面</td><td>2026-07-12 09:00</td><td>陈主管</td><td><span class="badge badge-secondary">未开始</span></td><td class="row-action-links"><a>查看</a><a>修改</a></td></tr>
+
+
+
+                  <tr><td>赵静</td><td>运维工程师</td><td>一面</td><td>2026-07-09 11:00</td><td>周经理</td><td><span class="badge badge-error">未通过</span></td><td class="row-action-links"><a>查看</a></td></tr>
+
+
+
+                  <tr><td>周婷</td><td>财务分析师</td><td>一面</td><td>2026-07-13 14:00</td><td>孙主管</td><td><span class="badge badge-secondary">未开始</span></td><td class="row-action-links"><a>查看</a><a>修改</a></td></tr>
+
+
+
+                </tbody>
+
+
+
+              </table>
+
+
+
+            </div>
+
+
+
+            <div class="list-pagination">
+
+
+
+              <div class="page-info">共 6 条记录，当前第 1 页</div>
+
+
+
+              <div class="page-btns">
+
+
+
+                <button>‹</button>
+
+
+
+                <button class="active">1</button>
+
+
+
+                <button>›</button>
+
+
+
+              </div>
+
+
+
+            </div>
+
+
+
+          </div>
+
+
+
+        </div>
+
+
+
+      </div>
+
+
+
+    </div>
+
+
+
+  </div>
+
+
+
+  <div class="modal-overlay" id="addDemandModal">
+
+
+
+    <div class="modal-dialog">
+
+
+
+      <div class="modal-header">
+
+
+
+        <h3>新增招聘需求</h3>
+
+
+
+        <button class="modal-close" onclick="closeModal('addDemandModal')">×</button>
+
+
+
+      </div>
+
+
+
+      <div class="modal-body">
+
+
+
+        <div class="grid-2" style="gap:16px;">
+
+
+
+          <div class="form-group">
+
+
+
+            <label class="form-label">需求编号</label>
+
+
+
+            <input type="text" class="form-input" value="REQ-2026-009" readonly>
+
+
+
+          </div>
+
+
+
+          <div class="form-group">
+
+
+
+            <label class="form-label">岗位名称</label>
+
+
+
+            <input type="text" class="form-input" placeholder="请输入岗位名称">
+
+
+
+          </div>
+
+
+
+          <div class="form-group">
+
+
+
+            <label class="form-label">需求人数</label>
+
+
+
+            <input type="number" class="form-input" placeholder="请输入需求人数">
+
+
+
+          </div>
+
+
+
+          <div class="form-group">
+
+
+
+            <label class="form-label">所属部门</label>
+
+
+
+            <select class="form-select">
+
+
+
+              <option>研发部</option>
+
+
+
+              <option>测试部门</option>
+
+
+
+              <option>测试部门</option>
+
+
+
+              <option>测试部门</option>
+
+
+
+              <option>测试部门</option>
+
+
+
+            </select>
+
+
+
+          </div>
+
+
+
+          <div class="form-group">
+
+
+
+            <label class="form-label">发布日期</label>
+
+
+
+            <input type="date" class="form-input">
+
+
+
+          </div>
+
+
+
+          <div class="form-group">
+
+
+
+            <label class="form-label">截止日期</label>
+
+
+
+            <input type="date" class="form-input">
+
+
+
+          </div>
+
+
+
+        </div>
+
+
+
+        <div class="form-group" style="margin-top:16px;">
+
+
+
+          <label class="form-label">岗位描述</label>
+
+
+
+          <textarea class="form-textarea" placeholder="请输入岗位描述"></textarea>
+
+
+
+        </div>
+
+
+
+        <div class="form-group">
+
+
+
+          <label class="form-label">任职要求</label>
+
+
+
+          <textarea class="form-textarea" placeholder="请输入任职要求"></textarea>
+
+
+
+        </div>
+
+
+
+      </div>
+
+
+
+      <div class="modal-footer">
+
+
+
+        <button class="btn btn-ghost" onclick="closeModal('addDemandModal')">取消</button>
+
+
+
+        <button class="btn btn-primary" onclick="saveDemand()">保存</button>
+
+
+
+      </div>
+
+
+
+    </div>
+
+
+
+  </div>
+
+
+
+  <div class="modal-overlay" id="addResumeModal">
+
+
+
+    <div class="modal-dialog">
+
+
+
+      <div class="modal-header">
+
+
+
+        <h3>录入简历</h3>
+
+
+
+        <button class="modal-close" onclick="closeModal('addResumeModal')">×</button>
+
+
+
+      </div>
+
+
+
+      <div class="modal-body">
+
+
+
+        <div class="grid-2" style="gap:16px;">
+
+
+
+          <div class="form-group">
+
+
+
+            <label class="form-label">姓名</label>
+
+
+
+            <input type="text" class="form-input" placeholder="请输入姓名">
+
+
+
+          </div>
+
+
+
+          <div class="form-group">
+
+
+
+            <label class="form-label">应聘岗位</label>
+
+
+
+            <select class="form-select">
+
+
+
+              <option>高级前端开发工程师</option>
+
+
+
+              <option>Java后端开发工程师</option>
+
+
+
+              <option>产品经理</option>
+
+
+
+              <option>UI设计师</option>
+
+
+
+              <option>测试工程师</option>
+
+
+
+            </select>
+
+
+
+          </div>
+
+
+
+          <div class="form-group">
+
+
+
+            <label class="form-label">来源渠道</label>
+
+
+
+            <select class="form-select">
+
+
+
+              <option>拉勾网</option>
+
+
+
+              <option>BOSS直聘</option>
+
+
+
+              <option>智联招聘</option>
+
+
+
+              <option>内推</option>
+
+
+
+              <option>设计师平台</option>
+
+
+
+            </select>
+
+
+
+          </div>
+
+
+
+          <div class="form-group">
+
+
+
+            <label class="form-label">学历</label>
+
+
+
+            <select class="form-select">
+
+
+
+              <option>大专</option>
+
+
+
+              <option>本科</option>
+
+
+
+              <option>硕士</option>
+
+
+
+              <option>博士</option>
+
+
+
+            </select>
+
+
+
+          </div>
+
+
+
+          <div class="form-group">
+
+
+
+            <label class="form-label">工作经验</label>
+
+
+
+            <input type="text" class="form-input" placeholder="如：3年">
+
+
+
+          </div>
+
+
+
+          <div class="form-group">
+
+
+
+            <label class="form-label">联系电话</label>
+
+
+
+            <input type="text" class="form-input" placeholder="请输入联系电话">
+
+
+
+          </div>
+
+
+
+        </div>
+
+
+
+        <div class="form-group" style="margin-top:16px;">
+
+
+
+          <label class="form-label">简历附件</label>
+
+
+
+          <input type="file" class="form-input" style="padding:4px;">
+
+
+
+        </div>
+
+
+
+      </div>
+
+
+
+      <div class="modal-footer">
+
+
+
+        <button class="btn btn-ghost" onclick="closeModal('addResumeModal')">取消</button>
+
+
+
+        <button class="btn btn-primary" onclick="saveResume()">保存</button>
+
+
+
+      </div>
+
+
+
+    </div>
+
+
+
+  </div>
+
+
+
+  <div class="modal-overlay" id="addInterviewModal">
+
+
+
+    <div class="modal-dialog">
+
+
+
+      <div class="modal-header">
+
+
+
+        <h3>安排面试</h3>
+
+
+
+        <button class="modal-close" onclick="closeModal('addInterviewModal')">×</button>
+
+
+
+      </div>
+
+
+
+      <div class="modal-body">
+
+
+
+        <div class="grid-2" style="gap:16px;">
+
+
+
+          <div class="form-group">
+
+
+
+            <label class="form-label">姓名</label>
+
+
+
+            <select class="form-select">
+
+
+
+              <option>王芳</option>
+
+
+
+              <option>刘洋</option>
+
+
+
+              <option>周婷</option>
+
+
+
+            </select>
+
+
+
+          </div>
+
+
+
+          <div class="form-group">
+
+
+
+            <label class="form-label">岗位</label>
+
+
+
+            <input type="text" class="form-input" value="产品经理" readonly>
+
+
+
+          </div>
+
+
+
+          <div class="form-group">
+
+
+
+            <label class="form-label">面试轮次</label>
+
+
+
+            <select class="form-select">
+
+
+
+              <option>一面</option>
+
+
+
+              <option>二面</option>
+
+
+
+              <option>终面</option>
+
+
+
+            </select>
+
+
+
+          </div>
+
+
+
+          <div class="form-group">
+
+
+
+            <label class="form-label">面试时间</label>
+
+
+
+            <input type="datetime-local" class="form-input">
+
+
+
+          </div>
+
+
+
+          <div class="form-group">
+
+
+
+            <label class="form-label">面试官</label>
+
+
+
+            <select class="form-select">
+
+
+
+              <option>张总监</option>
+
+
+
+              <option>李主管</option>
+
+
+
+              <option>王经理</option>
+
+
+
+            </select>
+
+
+
+          </div>
+
+
+
+          <div class="form-group">
+
+
+
+            <label class="form-label">面试地点</label>
+
+
+
+            <input type="text" class="form-input" placeholder="请输入面试地点">
+
+
+
+          </div>
+
+
+
+        </div>
+
+
+
+      </div>
+
+
+
+      <div class="modal-footer">
+
+
+
+        <button class="btn btn-ghost" onclick="closeModal('addInterviewModal')">取消</button>
+
+
+
+        <button class="btn btn-primary" onclick="saveInterview()">保存</button>
+
+
+
+      </div>
+
+
+
+    </div>
+
+
+
+  </div>
+
+
+
+</div>
+
+
+
+<script>
+var allColumns = ['positionName', 'recruitCount', 'status', 'publishDate', 'endDate', 'manager'];
+var visibleColumns = JSON.parse(localStorage.getItem('hr_recruitment_columns') || JSON.stringify(allColumns));
+
+function openModal(id) {
+
+
+
+  document.getElementById(id).classList.add('show');
+
+
+
+}
+
+
+
+function closeModal(id) {
+
+
+
+  document.getElementById(id).classList.remove('show');
+
+
+
+}
+
+
+
+function switchTab(el, type) {
+
+
+
+  document.querySelectorAll('.tab-item').forEach(function(t) { t.classList.remove('active'); });
+
+
+
+  document.querySelectorAll('.tab-pane').forEach(function(p) { p.classList.remove('active'); });
+
+
+
+  el.classList.add('active');
+
+
+
+  document.getElementById('tab-' + type).classList.add('active');
+
+
+
+}
+
+
+
+function validateDemandForm() {
+
+
+
+  var title = document.querySelector('#addDemandModal input[placeholder*="岗位名称"]').value.trim();
+
+
+
+  var count = document.querySelector('#addDemandModal input[type="number"]').value;
+
+
+
+  var startDate = document.querySelector('#addDemandModal input[type="date"]:nth-of-type(1)').value;
+
+
+
+  var endDate = document.querySelector('#addDemandModal input[type="date"]:nth-of-type(2)').value;
+
+
+
+  if (!title) {
+
+
+
+    showToast('请输入岗位名称', 'info');
+
+
+
+    return false;
+
+
+
+  }
+
+
+
+  if (!count || parseInt(count) <= 0) {
+
+
+
+    showToast('请输入有效的需求人数', 'info');
+
+
+
+    return false;
+
+
+
+  }
+
+
+
+  if (!startDate) {
+
+
+
+    showToast('请选择发布日期', 'info');
+
+
+
+    return false;
+
+
+
+  }
+
+
+
+  return true;
+
+
+
+}
+
+
+
+function validateResumeForm() {
+
+
+
+  var name = document.querySelector('#addResumeModal input[placeholder*="姓名"]').value.trim();
+
+
+
+  var phone = document.querySelector('#addResumeModal input[placeholder*="联系电话"]').value.trim();
+
+
+
+  if (!name) {
+
+
+
+    showToast('请输入姓名', 'info');
+
+
+
+    return false;
+
+
+
+  }
+
+
+
+  if (!phone) {
+
+
+
+    showToast('请输入联系电话', 'info');
+
+
+
+    return false;
+
+
+
+  }
+
+
+
+  return true;
+
+
+
+}
+
+
+
+function validateInterviewForm() {
+
+
+
+  var time = document.querySelector('#addInterviewModal input[type="datetime-local"]').value;
+
+
+
+  var location = document.querySelector('#addInterviewModal input[placeholder*="面试地点"]').value.trim();
+
+
+
+  if (!time) {
+
+
+
+    showToast('请选择面试时间', 'info');
+
+
+
+    return false;
+
+
+
+  }
+
+
+
+  if (!location) {
+
+
+
+    showToast('请输入面试地点', 'info');
+
+
+
+    return false;
+
+
+
+  }
+
+
+
+  return true;
+
+
+
+}
+
+
+
+function saveDemand() {
+
+
+
+  if (!validateDemandForm()) return;
+
+
+
+  closeModal('addDemandModal');
+
+
+
+  showToast('招聘需求保存成功', 'info');
+
+
+
+}
+
+
+
+function saveResume() {
+
+
+
+  if (!validateResumeForm()) return;
+
+
+
+  closeModal('addResumeModal');
+
+
+
+  showToast('简历录入成功', 'info');
+
+
+
+}
+
+
+
+function saveInterview() {
+
+
+
+  if (!validateInterviewForm()) return;
+
+
+
+  closeModal('addInterviewModal');
+
+
+
+  showToast('面试安排成功', 'info');
+
+
+
+}
+
+
+
+function viewDemand(id) {
+
+
+
+  showToast('查看招聘需求: ' + id);
+
+
+
+}
+
+
+
+function editDemand(id) {
+
+
+
+  showToast('编辑招聘需求: ' + id);
+
+
+
+}
+
+
+
+function auditDemand(id) {
+
+
+
+  if (!showConfirm("确认退出？")) return;
+
+
+
+  showToast('审核通过', 'info');
+
+
+
+}
+
+
+
+function closeDemand(id) {
+
+
+
+  if (!showConfirm("确认退出？")) return;
+
+
+
+  showToast('已关闭', 'info');
+
+
+
+}
+
+
+
+function viewResume(id) {
+
+
+
+  showToast('查看简历', 'info');
+
+
+
+}
+
+
+
+function screenResume(id) {
+
+
+
+  showToast('筛选简历', 'info');
+
+
+
+}
+
+
+
+function arrangeInterview(id) {
+
+
+
+  showToast('安排面试', 'info');
+
+
+
+}
+
+
+
+function viewInterview(id) {
+
+
+
+  showToast('查看面试记录', 'info');
+
+
+
+}
+
+
+
+function modifyInterview(id) {
+
+
+
+  showToast('修改面试安排', 'info');
+
+
+
+}
+
+
+
+function evaluateInterview(id) {
+
+  showToast('评价面试', 'info');
+
+}
+function updateColumnVisibility() {
+  document.querySelectorAll('th[data-column], td[data-column]').forEach(function(el) {
+    var col = el.getAttribute('data-column');
+    el.style.display = visibleColumns.includes(col) ? '' : 'none';
+  });
+}
+
+function openColumnSettings() {
+  var container = document.getElementById('columnCheckboxes');
+  container.innerHTML = '';
+  var colLabels = { 'positionName': '岗位名称', 'recruitCount': '招聘人数', 'status': '招聘状态', 'publishDate': '发布日期', 'endDate': '截止日期', 'manager': '招聘负责人' };
+  allColumns.forEach(function(col) {
+    var item = document.createElement('div');
+    item.className = 'column-item';
+    var checked = visibleColumns.includes(col) ? 'checked' : '';
+    item.innerHTML = '<input type="checkbox" ' + checked + ' value="' + col + '" onchange="toggleColumn(this)">' + '<label>' + (colLabels[col] || col) + '</label>';
+    container.appendChild(item);
+  });
+  document.getElementById('columnModal').classList.add('show');
+}
+
+function closeColumnSettings() { document.getElementById('columnModal').classList.remove('show'); }
+
+function toggleColumn(cb) {
+  var idx = visibleColumns.indexOf(cb.value);
+  if (cb.checked && idx === -1) visibleColumns.push(cb.value);
+  else if (!cb.checked && idx !== -1) visibleColumns.splice(idx, 1);
+}
+
+function saveColumnSettings() {
+  localStorage.setItem('hr_recruitment_columns', JSON.stringify(visibleColumns));
+  showToast('列设置已保存', 'success');
+  closeColumnSettings();
+  location.reload();
+}
+
+
+var currentLookupField = null;
+var currentLookupType = null;
+var lookupData = [];
+var lookupColumns = [];
+
+function openLookup(fieldId, type) {
+  currentLookupField = fieldId;
+  currentLookupType = type;
+  
+  if (type === 'org') {
+    lookupColumns = ['编码', '名称', '形态', '上级组织'];
+    lookupData = JSON.parse(localStorage.getItem('erp_orgs') || '[]');
+    document.getElementById('lookupTitle').textContent = '选择组织';
+  } else if (type === 'department') {
+    lookupColumns = ['编码', '名称'];
+    lookupData = JSON.parse(localStorage.getItem('erp_departments_cache') || '[]');
+    document.getElementById('lookupTitle').textContent = '选择部门';
+  } else if (type === 'employee') {
+    lookupColumns = ['编号', '姓名', '所属部门'];
+    lookupData = JSON.parse(localStorage.getItem('erp_employees_cache') || '[]');
+    document.getElementById('lookupTitle').textContent = '选择员工';
+  } else if (type === 'supplier') {
+    lookupColumns = ['编码', '名称'];
+    lookupData = JSON.parse(localStorage.getItem('erp_suppliers_cache') || '[]');
+    document.getElementById('lookupTitle').textContent = '选择供应商';
+  } else if (type === 'customer') {
+    lookupColumns = ['编码', '名称'];
+    lookupData = JSON.parse(localStorage.getItem('erp_customers_cache') || '[]');
+    document.getElementById('lookupTitle').textContent = '选择客户';
+  } else if (type === 'material') {
+    lookupColumns = ['物料编码', '物料名称', '规格型号', '基本单位'];
+    lookupData = JSON.parse(localStorage.getItem('erp_materials_cache') || '[]');
+    document.getElementById('lookupTitle').textContent = '选择物料';
+  } else if (type === 'warehouse') {
+    lookupColumns = ['编码', '名称'];
+    lookupData = JSON.parse(localStorage.getItem('erp_warehouses_cache') || '[]');
+    document.getElementById('lookupTitle').textContent = '选择仓库';
+  }
+  
+  renderLookupTable(lookupData);
+  document.getElementById('lookupModal').classList.add('show');
+}
+
+function closeLookup() {
+  document.getElementById('lookupModal').classList.remove('show');
+}
+
+function filterLookup() {
+  var keyword = document.getElementById('lookupKeyword').value.trim().toLowerCase();
+  var filtered = lookupData.filter(function(item) {
+    var code = item.code || '';
+    var name = item.name || '';
+    return code.toLowerCase().includes(keyword) || name.toLowerCase().includes(keyword);
+  });
+  renderLookupTable(filtered);
+}
+
+function renderLookupTable(data) {
+  var head = document.getElementById('lookupTableHead');
+  var body = document.getElementById('lookupTableBody');
+  
+  head.innerHTML = '<tr><th class="checkbox-cell"><input type="checkbox" onclick="selectAllLookup()"></th>' + lookupColumns.map(function(col) { return '<th>' + col + '</th>'; }).join('') + '</tr>';
+  
+  body.innerHTML = '';
+  data.forEach(function(item) {
+    var row = document.createElement('tr');
+    row.onclick = function() { selectLookupRow(this); };
+    var cells = ['<td class="checkbox-cell"><input type="checkbox" class="lookup-checkbox" value="' + item.id + '"></td>'];
+    if (currentLookupType === 'org') {
+      cells.push('<td>' + item.code + '</td><td>' + item.name + '</td><td>' + (item.form || '') + '</td><td>' + (item.parentName || '') + '</td>');
+    } else if (currentLookupType === 'department') {
+      cells.push('<td>' + item.code + '</td><td>' + item.name + '</td>');
+    } else if (currentLookupType === 'employee') {
+      cells.push('<td>' + item.code + '</td><td>' + item.name + '</td><td>' + (item.department || '') + '</td>');
+    } else if (currentLookupType === 'supplier' || currentLookupType === 'customer') {
+      cells.push('<td>' + item.code + '</td><td>' + item.name + '</td>');
+    } else if (currentLookupType === 'material') {
+      cells.push('<td>' + item.code + '</td><td>' + item.name + '</td><td>' + (item.specification || '') + '</td><td>' + (item.unit || '') + '</td>');
+    } else if (currentLookupType === 'warehouse') {
+      cells.push('<td>' + item.code + '</td><td>' + item.name + '</td>');
+    }
+    row.innerHTML = cells.join('');
+    body.appendChild(row);
+  });
+  
+  if (data.length === 0) {
+    body.innerHTML = '<tr><td colspan="' + (lookupColumns.length + 1) + '" style="text-align:center;padding:40px;color:#999;">暂无数据</td></tr>';
+  }
+}
+
+function selectAllLookup() {
+  var master = document.querySelector('.lookup-table th input');
+  var checkboxes = document.querySelectorAll('.lookup-checkbox');
+  checkboxes.forEach(function(cb) { cb.checked = master.checked; });
+}
+
+function selectLookupRow(row) {
+  var checkbox = row.querySelector('.lookup-checkbox');
+  checkbox.checked = !checkbox.checked;
+}
+
+function confirmLookup() {
+  var checkboxes = document.querySelectorAll('.lookup-checkbox:checked');
+  if (checkboxes.length === 0) {
+    showToast('请选择一条记录', 'warning');
+    return;
+  }
+  
+  var item = lookupData.find(function(d) { return d.id === checkboxes[0].value; });
+  if (item) {
+    var field = document.getElementById(currentLookupField);
+    if (field) {
+      field.value = item.name;
+      field.setAttribute('data-id', item.id);
+      field.setAttribute('data-code', item.code);
+      
+      if (currentLookupType === 'material') {
+        var row = field.closest('tr');
+        if (row) {
+          row.querySelector('.material-name').value = item.name;
+          row.querySelector('.material-spec').value = item.specification || '';
+          row.querySelector('.material-unit').value = item.unit || '';
+        }
+      }
+    }
+  }
+  
+  closeLookup();
+}
+
+function openMaterialLookup(btn) {
+  var field = btn.previousElementSibling;
+  field.id = 'lookupField_' + Date.now();
+  currentLookupField = field.id;
+  openLookup(field.id, 'material');
+}
+
+function openOrgLookup(btn) {
+  var field = btn.previousElementSibling;
+  field.id = 'lookupField_' + Date.now();
+  currentLookupField = field.id;
+  openLookup(field.id, 'org');
+}
+
+function openSupplierLookup(btn) {
+  var field = btn.previousElementSibling;
+  field.id = 'lookupField_' + Date.now();
+  currentLookupField = field.id;
+  openLookup(field.id, 'supplier');
+}
+
+function openWarehouseLookup(btn) {
+  var field = btn.previousElementSibling;
+  field.id = 'lookupField_' + Date.now();
+  currentLookupField = field.id;
+  openLookup(field.id, 'warehouse');
+}
+
+function initLookupData() {
+  if (!localStorage.getItem('erp_orgs')) {
+    localStorage.setItem('erp_orgs', JSON.stringify([
+      { id: 'org-001', code: 'ORG-HQ', name: '磐枢工业集团', form: '集团', parentName: '' },
+      { id: 'org-002', code: 'ORG-SM', name: '磐枢智能制造有限公司', form: '公司', parentName: '磐枢工业集团' },
+      { id: 'org-003', code: 'ORG-SM-PD', name: '生产制造部', form: '部门', parentName: '磐枢智能制造有限公司' },
+      { id: 'org-004', code: 'ORG-SM-FA', name: '财务部', form: '部门', parentName: '磐枢智能制造有限公司' },
+      { id: 'org-005', code: 'ORG-SM-SD', name: '销售部', form: '部门', parentName: '磐枢智能制造有限公司' }
+    ]));
+  }
+  if (!localStorage.getItem('erp_departments_cache')) {
+    localStorage.setItem('erp_departments_cache', JSON.stringify([
+      { id: 'dept-001', code: 'DEPT-PD', name: '生产制造部', status: 1 },
+      { id: 'dept-002', code: 'DEPT-FA', name: '财务部', status: 1 },
+      { id: 'dept-003', code: 'DEPT-SD', name: '销售部', status: 1 },
+      { id: 'dept-004', code: 'DEPT-AS', name: '装配车间', status: 1 },
+      { id: 'dept-005', code: 'DEPT-QC', name: '质检车间', status: 1 }
+    ]));
+  }
+  if (!localStorage.getItem('erp_employees_cache')) {
+    localStorage.setItem('erp_employees_cache', JSON.stringify([
+      { id: 'emp-001', code: 'EMP-001', name: '张三', department: '生产制造部', status: 1 },
+      { id: 'emp-002', code: 'EMP-002', name: '李四', department: '生产制造部', status: 1 },
+      { id: 'emp-003', code: 'EMP-003', name: '王五', department: '财务部', status: 1 },
+      { id: 'emp-004', code: 'EMP-004', name: '赵六', department: '销售部', status: 1 },
+      { id: 'emp-005', code: 'EMP-005', name: '钱七', department: '质检车间', status: 1 }
+    ]));
+  }
+  if (!localStorage.getItem('erp_suppliers_cache')) {
+    localStorage.setItem('erp_suppliers_cache', JSON.stringify([
+      { id: 'sup-001', code: 'S-001', name: '深圳电子元器件有限公司', status: 1 },
+      { id: 'sup-002', code: 'S-002', name: '杭州精密机械加工厂', status: 1 },
+      { id: 'sup-003', code: 'S-003', name: '上海材料科技有限公司', status: 1 },
+      { id: 'sup-004', code: 'S-004', name: '东莞五金制品厂', status: 1 }
+    ]));
+  }
+  if (!localStorage.getItem('erp_materials_cache')) {
+    localStorage.setItem('erp_materials_cache', JSON.stringify([
+      { id: 'mat-001', code: 'P-001', name: '高频传感器模块', specification: 'HT-2026', unit: '个', status: 1 },
+      { id: 'mat-002', code: 'P-002', name: '控制电路板', specification: 'CB-2026', unit: '块', status: 1 },
+      { id: 'mat-003', code: 'P-003', name: '智能控制器', specification: 'IC-V3', unit: '台', status: 1 },
+      { id: 'mat-004', code: 'P-004', name: '电源模块', specification: 'PM-500W', unit: '个', status: 1 },
+      { id: 'mat-005', code: 'M-001', name: 'PCB电路板', specification: 'FR-4双层', unit: '块', status: 1 },
+      { id: 'mat-006', code: 'M-002', name: '贴片电阻', specification: '10KΩ 0603', unit: '个', status: 1 },
+      { id: 'mat-007', code: 'M-003', name: '贴片电容', specification: '100μF 0805', unit: '个', status: 1 },
+      { id: 'mat-008', code: 'M-004', name: '螺丝', specification: 'M4x10', unit: '包', status: 1 }
+    ]));
+  }
+  if (!localStorage.getItem('erp_warehouses_cache')) {
+    localStorage.setItem('erp_warehouses_cache', JSON.stringify([
+      { id: 'wh-001', code: 'WH-001', name: '成品仓', status: 1 },
+      { id: 'wh-002', code: 'WH-002', name: '原料仓', status: 1 },
+      { id: 'wh-003', code: 'WH-003', name: '半成品仓', status: 1 },
+      { id: 'wh-004', code: 'WH-004', name: '辅料仓', status: 1 }
+    ]));
+  }
+}
+
+</script>
+
+
+
+
+<div class="lookup-modal" id="lookupModal">
+  <div class="lookup-dialog">
+    <div class="lookup-header">
+      <div class="lookup-title" id="lookupTitle">选择</div>
+      <button class="lookup-close" onclick="closeLookup()">×</button>
+    </div>
+    <div class="lookup-body">
+      <div class="lookup-search">
+        <input type="text" id="lookupKeyword" placeholder="请输入编码或名称搜索" onkeydown="if(event.key==='Enter')filterLookup()">
+        <button onclick="filterLookup()">搜索</button>
+      </div>
+      <table class="lookup-table">
+        <thead id="lookupTableHead"></thead>
+        <tbody id="lookupTableBody"></tbody>
+      </table>
+    </div>
+    <div class="lookup-footer">
+      <button class="btn btn-cancel" onclick="closeLookup()">取消</button>
+      <button class="btn btn-primary" onclick="confirmLookup()">确定</button>
+    </div>
+  </div>
+</div>
+<div class="column-modal" id="columnModal">
+  <div class="column-dialog">
+    <div class="column-header">
+      <div class="column-title">列设置</div>
+      <button class="column-close" onclick="closeColumnSettings()">×</button>
+    </div>
+    <div class="column-body">
+      <div id="columnCheckboxes"></div>
+    </div>
+    <div class="column-footer">
+      <button class="btn btn-cancel" onclick="closeColumnSettings()">取消</button>
+      <button class="btn btn-primary" onclick="saveColumnSettings()">确定</button>
+    </div>
+  </div>
+</div>
+
+</body>
+
+
+
+</html>

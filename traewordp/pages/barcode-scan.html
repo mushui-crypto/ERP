@@ -1,0 +1,2221 @@
+<!DOCTYPE html>
+
+
+
+
+<html lang="zh-CN">
+
+
+
+
+<head>
+
+
+
+
+<meta charset="UTF-8">
+
+
+
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+
+
+
+<title>扫码作业 - PDA端演示 — 磐枢工业智能平台</title>
+
+
+
+
+<link rel="stylesheet" href="../common.css">
+
+
+
+<script src="../common.js"></script>
+<script>
+</script>
+
+
+
+
+<style>
+
+
+
+
+.pda-container {
+
+
+
+
+  max-width: 420px;
+
+
+
+
+  margin: 0 auto;
+
+
+
+
+  background: var(--bg-base);
+
+
+
+
+  min-height: 100vh;
+
+
+
+
+  border: 1px solid var(--border-normal);
+
+
+
+
+  box-shadow: 0 0 40px rgba(0,0,0,0.3);
+
+
+
+
+}
+
+
+
+
+.pda-header {
+
+
+
+
+  display: flex;
+
+
+
+
+  justify-content: space-between;
+
+
+
+
+  align-items: center;
+
+
+
+
+  padding: 12px 16px;
+
+
+
+
+  background: var(--bg-surface);
+
+
+
+
+  border-bottom: 1px solid var(--border-normal);
+
+
+
+
+}
+
+
+
+
+.pda-header .logo { font-size: 14px; font-weight: 600; }
+
+
+
+
+.pda-header .user-info { font-size: 12px; color: var(--text-secondary); }
+
+
+
+
+.pda-header .time { font-size: 11px; color: var(--text-tertiary); }
+
+
+
+
+.pda-mode-tabs {
+
+
+
+
+  display: flex;
+
+
+
+
+  gap: 4px;
+
+
+
+
+  padding: 8px 12px;
+
+
+
+
+  background: var(--bg-surface);
+
+
+
+
+  border-bottom: 1px solid var(--border-normal);
+
+
+
+
+  overflow-x: auto;
+
+
+
+
+}
+
+
+
+
+.pda-mode-tabs button {
+
+
+
+
+  flex-shrink: 0;
+
+
+
+
+  padding: 8px 12px;
+
+
+
+
+  font-size: 12px;
+
+
+
+
+  border: none;
+
+
+
+
+  border-radius: 20px;
+
+
+
+
+  background: var(--bg-inset);
+
+
+
+
+  color: var(--text-secondary);
+
+
+
+
+  cursor: pointer;
+
+
+
+
+  transition: all 0.2s;
+
+
+
+
+}
+
+
+
+
+.pda-mode-tabs button.active {
+
+
+
+
+  background: var(--text-accent);
+
+
+
+
+  color: white;
+
+
+
+
+}
+
+
+
+
+.pda-scan-area {
+
+
+
+
+  padding: 16px;
+
+
+
+
+  background: var(--bg-surface);
+
+
+
+
+}
+
+
+
+
+.pda-scan-box {
+
+
+
+
+  background: var(--bg-inset);
+
+
+
+
+  border: 2px dashed var(--border-normal);
+
+
+
+
+  border-radius: var(--radius-md);
+
+
+
+
+  height: 180px;
+
+
+
+
+  display: flex;
+
+
+
+
+  flex-direction: column;
+
+
+
+
+  align-items: center;
+
+
+
+
+  justify-content: center;
+
+
+
+
+  position: relative;
+
+
+
+
+}
+
+
+
+
+.pda-scan-box::after {
+
+
+
+
+  content: '';
+
+
+
+
+  position: absolute;
+
+
+
+
+  top: 0;
+
+
+
+
+  left: 0;
+
+
+
+
+  right: 0;
+
+
+
+
+  height: 2px;
+
+
+
+
+  background: var(--text-accent);
+
+
+
+
+  animation: scan 2s linear infinite;
+
+
+
+
+}
+
+
+
+
+@keyframes scan {
+
+
+
+
+  0% { top: 0; opacity: 0; }
+
+
+
+
+  50% { opacity: 1; }
+
+
+
+
+  100% { top: 100%; opacity: 0; }
+
+
+
+
+}
+
+
+
+
+.pda-scan-box .scan-icon {
+
+
+
+
+  font-size: 40px;
+
+
+
+
+  color: var(--text-tertiary);
+
+
+
+
+  margin-bottom: 8px;
+
+
+
+
+}
+
+
+
+
+.pda-scan-box .scan-text {
+
+
+
+
+  font-size: 12px;
+
+
+
+
+  color: var(--text-tertiary);
+
+
+
+
+}
+
+
+
+
+.pda-barcode-display {
+
+
+
+
+  margin-top: 12px;
+
+
+
+
+  background: var(--bg-inset);
+
+
+
+
+  border: 1px solid var(--border-normal);
+
+
+
+
+  border-radius: var(--radius-sm);
+
+
+
+
+  padding: 10px 12px;
+
+
+
+
+  text-align: center;
+
+
+
+
+}
+
+
+
+
+.pda-barcode-display .label {
+
+
+
+
+  font-size: 10px;
+
+
+
+
+  color: var(--text-tertiary);
+
+
+
+
+  margin-bottom: 4px;
+
+
+
+
+}
+
+
+
+
+.pda-barcode-display .code {
+
+
+
+
+  font-family: var(--font-mono);
+
+
+
+
+  font-size: 14px;
+
+
+
+
+  color: var(--text-primary);
+
+
+
+
+  letter-spacing: 1px;
+
+
+
+
+}
+
+
+
+
+.pda-config {
+
+
+
+
+  padding: 12px 16px;
+
+
+
+
+  background: var(--bg-surface);
+
+
+
+
+  border-top: 1px solid var(--border-normal);
+
+
+
+
+}
+
+
+
+
+.pda-config-row {
+
+
+
+
+  display: flex;
+
+
+
+
+  gap: 8px;
+
+
+
+
+  margin-bottom: 8px;
+
+
+
+
+}
+
+
+
+
+.pda-config-row label {
+
+
+
+
+  font-size: 11px;
+
+
+
+
+  color: var(--text-secondary);
+
+
+
+
+  width: 60px;
+
+
+
+
+  flex-shrink: 0;
+
+
+
+
+  align-self: center;
+
+
+
+
+}
+
+
+
+
+.pda-config-row select,
+
+
+
+
+.pda-config-row input {
+
+
+
+
+  flex: 1;
+
+
+
+
+  padding: 6px 8px;
+
+
+
+
+  font-size: 12px;
+
+
+
+
+  border: 1px solid var(--border-normal);
+
+
+
+
+  border-radius: var(--radius-sm);
+
+
+
+
+  background: var(--bg-inset);
+
+
+
+
+  color: var(--text-primary);
+
+
+
+
+}
+
+
+
+
+.pda-actions {
+
+
+
+
+  padding: 12px 16px;
+
+
+
+
+  background: var(--bg-surface);
+
+
+
+
+  border-top: 1px solid var(--border-normal);
+
+
+
+
+  display: flex;
+
+
+
+
+  gap: 8px;
+
+
+
+
+}
+
+
+
+
+.pda-actions button {
+
+
+
+
+  flex: 1;
+
+
+
+
+  padding: 10px;
+
+
+
+
+  font-size: 13px;
+
+
+
+
+  border: none;
+
+
+
+
+  border-radius: var(--radius-sm);
+
+
+
+
+  cursor: pointer;
+
+
+
+
+  transition: all 0.2s;
+
+
+
+
+}
+
+
+
+
+.pda-actions .btn-primary {
+
+
+
+
+  background: var(--text-accent);
+
+
+
+
+  color: white;
+
+
+
+
+}
+
+
+
+
+.pda-actions .btn-danger {
+
+
+
+
+  background: var(--color-error);
+
+
+
+
+  color: white;
+
+
+
+
+}
+
+
+
+
+.pda-actions .btn-secondary {
+
+
+
+
+  background: var(--bg-inset);
+
+
+
+
+  color: var(--text-secondary);
+
+
+
+
+}
+
+
+
+
+.pda-list {
+
+
+
+
+  padding: 0 16px 16px;
+
+
+
+
+  background: var(--bg-surface);
+
+
+
+
+}
+
+
+
+
+.pda-list-header {
+
+
+
+
+  display: flex;
+
+
+
+
+  justify-content: space-between;
+
+
+
+
+  align-items: center;
+
+
+
+
+  padding: 8px 0;
+
+
+
+
+  font-size: 12px;
+
+
+
+
+  font-weight: 600;
+
+
+
+
+  color: var(--text-primary);
+
+
+
+
+}
+
+
+
+
+.pda-list-item {
+
+
+
+
+  display: flex;
+
+
+
+
+  justify-content: space-between;
+
+
+
+
+  align-items: center;
+
+
+
+
+  padding: 8px 10px;
+
+
+
+
+  background: var(--bg-inset);
+
+
+
+
+  border-radius: var(--radius-sm);
+
+
+
+
+  margin-bottom: 6px;
+
+
+
+
+  font-size: 12px;
+
+
+
+
+}
+
+
+
+
+.pda-list-item .item-info {
+
+
+
+
+  flex: 1;
+
+
+
+
+  overflow: hidden;
+
+
+
+
+}
+
+
+
+
+.pda-list-item .item-info .name {
+
+
+
+
+  color: var(--text-primary);
+
+
+
+
+  white-space: nowrap;
+
+
+
+
+  overflow: hidden;
+
+
+
+
+  text-overflow: ellipsis;
+
+
+
+
+}
+
+
+
+
+.pda-list-item .item-info .code {
+
+
+
+
+  font-size: 10px;
+
+
+
+
+  color: var(--text-tertiary);
+
+
+
+
+}
+
+
+
+
+.pda-list-item .item-qty {
+
+
+
+
+  font-family: var(--font-mono);
+
+
+
+
+  color: var(--text-accent);
+
+
+
+
+  margin-left: 8px;
+
+
+
+
+}
+
+
+
+
+.pda-footer {
+
+
+
+
+  padding: 10px 16px;
+
+
+
+
+  background: var(--bg-surface);
+
+
+
+
+  border-top: 1px solid var(--border-normal);
+
+
+
+
+  display: flex;
+
+
+
+
+  justify-content: space-around;
+
+
+
+
+}
+
+
+
+
+.pda-footer button {
+
+
+
+
+  display: flex;
+
+
+
+
+  flex-direction: column;
+
+
+
+
+  align-items: center;
+
+
+
+
+  gap: 2px;
+
+
+
+
+  padding: 6px 12px;
+
+
+
+
+  background: transparent;
+
+
+
+
+  border: none;
+
+
+
+
+  color: var(--text-secondary);
+
+
+
+
+  font-size: 10px;
+
+
+
+
+  cursor: pointer;
+
+
+
+
+}
+
+
+
+
+.pda-footer button.active {
+
+
+
+
+  color: var(--text-accent);
+
+
+
+
+}
+
+
+
+
+.pda-footer button .icon {
+
+
+
+
+  font-size: 18px;
+
+
+
+
+}
+
+
+
+
+.desktop-note {
+
+
+
+
+  text-align: center;
+
+
+
+
+  padding: 16px;
+
+
+
+
+  color: var(--text-tertiary);
+
+
+
+
+  font-size: 12px;
+
+
+
+
+}
+
+
+
+
+
+.lookup-modal { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:2000; justify-content:center; align-items:center; }
+.lookup-modal.show { display:flex; }
+.lookup-dialog { background:#fff; border:1px solid #e8e8e8; border-radius:4px; width:720px; max-height:70vh; overflow:hidden; }
+.lookup-header { padding:14px 20px; border-bottom:1px solid #e8e8e8; display:flex; align-items:center; justify-content:space-between; }
+.lookup-title { font-size:15px; font-weight:600; color:#333; }
+.lookup-close { font-size:20px; color:#666; cursor:pointer; background:none; border:none; }
+.lookup-close:hover { color:#333; }
+.lookup-body { padding:16px; }
+.lookup-search { display:flex; gap:8px; margin-bottom:12px; }
+.lookup-search input { flex:1; padding:6px 10px; border:1px solid #e8e8e8; border-radius:4px; font-size:13px; }
+.lookup-search button { padding:6px 16px; background:#1890ff; color:#fff; border:none; border-radius:4px; cursor:pointer; }
+.lookup-table { width:100%; border-collapse:collapse; font-size:13px; }
+.lookup-table th, .lookup-table td { padding:10px 12px; text-align:left; border-bottom:1px solid #e8e8e8; }
+.lookup-table th { background:#fafafa; font-weight:600; color:#333; }
+.lookup-table tr:hover { background:#f5f5f5; }
+.lookup-table .checkbox-cell { width:40px; }
+.lookup-footer { padding:12px 20px; border-top:1px solid #e8e8e8; display:flex; justify-content:flex-end; gap:8px; }
+.lookup-field { display:flex; align-items:center; }
+.lookup-field input { flex:1; padding:6px 10px; border:1px solid #e8e8e8; border-radius:4px 0 0 4px; font-size:13px; }
+.lookup-field button { width:28px; height:28px; border:1px solid #e8e8e8; border-left:none; border-radius:0 4px 4px 0; background:#fff; cursor:pointer; display:flex; align-items:center; justify-content:center; }
+.lookup-field button:hover { background:#f5f5f5; }
+
+</style>
+
+
+
+
+</head>
+
+
+
+
+<body>
+
+
+
+
+
+
+
+
+
+<div class="page-header" style="position:sticky;top:0;z-index:100;">
+
+
+
+
+  <div>
+
+
+
+
+    <div class="flex items-center gap-8">
+
+
+
+
+      <button class="sidebar-toggle" onclick="toggleSidebar()">&#9776;</button>
+
+
+
+
+      <div>
+
+
+
+
+        <h2>PDA扫码作业演示</h2>
+
+
+
+
+        <div class="breadcrumb"><a href="../index.html">首页</a><span>/</span><span>售后与条码</span><span>/</span><span>条码管理</span><span>/</span><span>PDA扫码作业</span></div></div>
+
+
+
+
+      </div>
+
+
+
+
+    </div>
+
+
+
+
+  </div>
+
+
+
+
+</div>
+
+
+
+
+
+
+
+
+
+<div class="page-body">
+
+
+
+
+  <div class="desktop-note">以下为PDA移动端扫码作业界面演示效果（模拟手机端展示）</div>
+
+
+
+
+  
+
+
+
+
+  <div class="pda-container">
+
+
+
+
+    <div class="pda-header">
+
+
+
+
+      <div>
+
+
+
+
+        <div class="logo">磐枢工业智能平台</div>
+
+
+
+
+        <div class="user-info">操作员：李明辉</div>
+
+
+
+
+      </div>
+
+
+
+
+      <div class="time">10:30</div>
+
+
+
+
+    </div>
+
+
+
+
+    
+
+
+
+
+    <div class="pda-mode-tabs">
+
+
+
+
+      <button class="active" onclick="setScanMode(this, 'inbound')">入库</button>
+
+
+
+
+      <button onclick="setScanMode(this, 'outbound')">出库</button>
+
+
+
+
+      <button onclick="setScanMode(this, 'inventory')">盘点</button>
+
+
+
+
+      <button onclick="setScanMode(this, 'report')">报工</button>
+
+
+
+
+      <button onclick="setScanMode(this, 'transfer')">移库</button>
+
+
+
+
+      <button onclick="setScanMode(this, 'quality')">质检</button>
+
+
+
+
+    </div>
+
+
+
+
+    
+
+
+
+
+    <div class="pda-scan-area">
+
+
+
+
+      <div class="pda-scan-box">
+
+
+
+
+        <div class="scan-icon">&#128262;</div>
+
+
+
+
+        <div class="scan-text">点击扫码或等待自动识别</div>
+
+
+
+
+      </div>
+
+
+
+
+      <div class="pda-barcode-display">
+
+
+
+
+        <div class="label">当前条码</div>
+
+
+
+
+        <div class="code">等待扫描...</div>
+
+
+
+
+      </div>
+
+
+
+
+    </div>
+
+
+
+
+    
+
+
+
+
+    <div class="pda-config">
+
+
+
+
+      <div class="pda-config-row">
+
+
+
+
+        <label>单据</label>
+
+
+
+
+        <select>
+
+
+
+
+          <option>PO-IN-2026-0015</option>
+
+
+
+
+          <option>PO-IN-2026-0016</option>
+
+
+
+
+        </select>
+
+
+
+
+      </div>
+
+
+
+
+      <div class="pda-config-row">
+
+
+
+
+        <label>仓库</label>
+
+
+
+
+        <select>
+
+
+
+
+          <option>原材料仓</option>
+
+
+
+
+          <option>成品仓</option>
+
+
+
+
+        </select>
+
+
+
+
+      </div>
+
+
+
+
+    </div>
+
+
+
+
+    
+
+
+
+
+    <div class="pda-list">
+
+
+
+
+      <div class="pda-list-header">
+
+
+
+
+        <span>已扫描记录</span>
+
+
+
+
+        <span>共 5 条</span>
+
+
+
+
+      </div>
+
+
+
+
+      <div class="pda-list-item">
+
+
+
+
+        <div class="item-info">
+
+
+
+
+          <div class="name">汽车仪表盘外壳</div>
+
+
+
+
+          <div class="code">FG-20260710-0001</div>
+
+
+
+
+        </div>
+
+
+
+
+        <div class="item-qty">x 2</div>
+
+
+
+
+      </div>
+
+
+
+
+      <div class="pda-list-item">
+
+
+
+
+        <div class="item-info">
+
+
+
+
+          <div class="name">仪表盘电路板</div>
+
+
+
+
+          <div class="code">FG-20260710-0002</div>
+
+
+
+
+        </div>
+
+
+
+
+        <div class="item-qty">x 2</div>
+
+
+
+
+      </div>
+
+
+
+
+      <div class="pda-list-item">
+
+
+
+
+        <div class="item-info">
+
+
+
+
+          <div class="name">LED指示灯组</div>
+
+
+
+
+          <div class="code">FG-20260710-0003</div>
+
+
+
+
+        </div>
+
+
+
+
+        <div class="item-qty">x 1</div>
+
+
+
+
+      </div>
+
+
+
+
+    </div>
+
+
+
+
+    
+
+
+
+
+    <div class="pda-actions">
+
+
+
+
+      <button class="btn-danger" onclick="cancelScan()">取消</button>
+
+
+
+
+      <button class="btn-primary" onclick="submitScan()">确认提交</button>
+
+
+
+
+    </div>
+
+
+
+
+    
+
+
+
+
+    <div class="pda-footer">
+
+
+
+
+      <button class="active">
+
+
+
+
+        <span class="icon">&#128262;</span>
+
+
+
+
+        <span>扫码</span>
+
+
+
+
+      </button>
+
+
+
+
+      <button>
+
+
+
+
+        <span class="icon">&#128203;</span>
+
+
+
+
+        <span>任务</span>
+
+
+
+
+      </button>
+
+
+
+
+      <button>
+
+
+
+
+        <span class="icon">&#128176;</span>
+
+
+
+
+        <span>统计</span>
+
+
+
+
+      </button>
+
+
+
+
+      <button>
+
+
+
+
+        <span class="icon">&#9881;</span>
+
+
+
+
+        <span>设置</span>
+
+
+
+
+      </button>
+
+
+
+
+    </div>
+
+
+
+
+  </div>
+
+
+
+
+</div>
+
+
+
+
+
+
+
+
+
+<script>
+
+
+
+
+function setScanMode(btn, mode) {
+
+
+
+
+  document.querySelectorAll('.pda-mode-tabs button').forEach(b => b.classList.remove('active'));
+
+
+
+
+  btn.classList.add('active');
+
+
+
+
+  const modes = ['inbound', 'outbound', 'inventory', 'report', 'transfer', 'quality'];
+
+
+
+
+  const names = ['入库', '出库', '盘点', '报工', '移库', '质检'];
+
+
+
+
+  const index = modes.indexOf(mode);
+
+
+
+
+  const configLabels = {
+
+
+
+
+    inbound: ['入库单据', '目标仓库'],
+
+
+
+
+    outbound: ['出库单据', '发货仓库'],
+
+
+
+
+    inventory: ['盘点任务', '盘点仓库'],
+
+
+
+
+    report: ['生产工单', '工序'],
+
+
+
+
+    transfer: ['移出仓库', '移入仓库'],
+
+
+
+
+    quality: ['质检任务', '质检类型']
+
+
+
+
+  };
+
+
+
+
+}
+
+
+
+
+
+
+
+
+
+function submitScan() {
+
+
+
+
+  var scanCount = document.querySelectorAll('.pda-list-item').length;
+
+
+
+
+  if (scanCount === 0) {
+
+
+
+
+    showToast('请先扫描条码', 'info');
+
+
+
+
+    return;
+
+
+
+
+  }
+
+
+
+
+  showConfirm('确定要提交 ' + scanCount + ' 条扫码记录吗？', function() {
+
+
+
+
+    showToast('提交成功', 'info');
+
+
+
+
+  });
+
+
+
+
+}
+
+
+
+
+
+
+
+
+
+function cancelScan() {
+
+
+
+
+  showConfirm("确认退出？", function(result) { if(result) {
+
+
+
+
+    showToast('操作已取消', 'info');
+
+
+
+
+  } });
+
+
+
+
+}
+
+
+
+
+
+var currentLookupField = null;
+var currentLookupType = null;
+var lookupData = [];
+var lookupColumns = [];
+
+function openLookup(fieldId, type) {
+  currentLookupField = fieldId;
+  currentLookupType = type;
+  
+  if (type === 'org') {
+    lookupColumns = ['编码', '名称', '形态', '上级组织'];
+    lookupData = JSON.parse(localStorage.getItem('erp_orgs') || '[]');
+    document.getElementById('lookupTitle').textContent = '选择组织';
+  } else if (type === 'department') {
+    lookupColumns = ['编码', '名称'];
+    lookupData = JSON.parse(localStorage.getItem('erp_departments_cache') || '[]');
+    document.getElementById('lookupTitle').textContent = '选择部门';
+  } else if (type === 'employee') {
+    lookupColumns = ['编号', '姓名', '所属部门'];
+    lookupData = JSON.parse(localStorage.getItem('erp_employees_cache') || '[]');
+    document.getElementById('lookupTitle').textContent = '选择员工';
+  } else if (type === 'supplier') {
+    lookupColumns = ['编码', '名称'];
+    lookupData = JSON.parse(localStorage.getItem('erp_suppliers_cache') || '[]');
+    document.getElementById('lookupTitle').textContent = '选择供应商';
+  } else if (type === 'customer') {
+    lookupColumns = ['编码', '名称'];
+    lookupData = JSON.parse(localStorage.getItem('erp_customers_cache') || '[]');
+    document.getElementById('lookupTitle').textContent = '选择客户';
+  } else if (type === 'material') {
+    lookupColumns = ['物料编码', '物料名称', '规格型号', '基本单位'];
+    lookupData = JSON.parse(localStorage.getItem('erp_materials_cache') || '[]');
+    document.getElementById('lookupTitle').textContent = '选择物料';
+  } else if (type === 'warehouse') {
+    lookupColumns = ['编码', '名称'];
+    lookupData = JSON.parse(localStorage.getItem('erp_warehouses_cache') || '[]');
+    document.getElementById('lookupTitle').textContent = '选择仓库';
+  }
+  
+  renderLookupTable(lookupData);
+  document.getElementById('lookupModal').classList.add('show');
+}
+
+function closeLookup() {
+  document.getElementById('lookupModal').classList.remove('show');
+}
+
+function filterLookup() {
+  var keyword = document.getElementById('lookupKeyword').value.trim().toLowerCase();
+  var filtered = lookupData.filter(function(item) {
+    var code = item.code || '';
+    var name = item.name || '';
+    return code.toLowerCase().includes(keyword) || name.toLowerCase().includes(keyword);
+  });
+  renderLookupTable(filtered);
+}
+
+function renderLookupTable(data) {
+  var head = document.getElementById('lookupTableHead');
+  var body = document.getElementById('lookupTableBody');
+  
+  head.innerHTML = '<tr><th class="checkbox-cell"><input type="checkbox" onclick="selectAllLookup()"></th>' + lookupColumns.map(function(col) { return '<th>' + col + '</th>'; }).join('') + '</tr>';
+  
+  body.innerHTML = '';
+  data.forEach(function(item) {
+    var row = document.createElement('tr');
+    row.onclick = function() { selectLookupRow(this); };
+    var cells = ['<td class="checkbox-cell"><input type="checkbox" class="lookup-checkbox" value="' + item.id + '"></td>'];
+    if (currentLookupType === 'org') {
+      cells.push('<td>' + item.code + '</td><td>' + item.name + '</td><td>' + (item.form || '') + '</td><td>' + (item.parentName || '') + '</td>');
+    } else if (currentLookupType === 'department') {
+      cells.push('<td>' + item.code + '</td><td>' + item.name + '</td>');
+    } else if (currentLookupType === 'employee') {
+      cells.push('<td>' + item.code + '</td><td>' + item.name + '</td><td>' + (item.department || '') + '</td>');
+    } else if (currentLookupType === 'supplier' || currentLookupType === 'customer') {
+      cells.push('<td>' + item.code + '</td><td>' + item.name + '</td>');
+    } else if (currentLookupType === 'material') {
+      cells.push('<td>' + item.code + '</td><td>' + item.name + '</td><td>' + (item.specification || '') + '</td><td>' + (item.unit || '') + '</td>');
+    } else if (currentLookupType === 'warehouse') {
+      cells.push('<td>' + item.code + '</td><td>' + item.name + '</td>');
+    }
+    row.innerHTML = cells.join('');
+    body.appendChild(row);
+  });
+  
+  if (data.length === 0) {
+    body.innerHTML = '<tr><td colspan="' + (lookupColumns.length + 1) + '" style="text-align:center;padding:40px;color:#999;">暂无数据</td></tr>';
+  }
+}
+
+function selectAllLookup() {
+  var master = document.querySelector('.lookup-table th input');
+  var checkboxes = document.querySelectorAll('.lookup-checkbox');
+  checkboxes.forEach(function(cb) { cb.checked = master.checked; });
+}
+
+function selectLookupRow(row) {
+  var checkbox = row.querySelector('.lookup-checkbox');
+  checkbox.checked = !checkbox.checked;
+}
+
+function confirmLookup() {
+  var checkboxes = document.querySelectorAll('.lookup-checkbox:checked');
+  if (checkboxes.length === 0) {
+    showToast('请选择一条记录', 'warning');
+    return;
+  }
+  
+  var item = lookupData.find(function(d) { return d.id === checkboxes[0].value; });
+  if (item) {
+    var field = document.getElementById(currentLookupField);
+    if (field) {
+      field.value = item.name;
+      field.setAttribute('data-id', item.id);
+      field.setAttribute('data-code', item.code);
+      
+      if (currentLookupType === 'material') {
+        var row = field.closest('tr');
+        if (row) {
+          row.querySelector('.material-name').value = item.name;
+          row.querySelector('.material-spec').value = item.specification || '';
+          row.querySelector('.material-unit').value = item.unit || '';
+        }
+      }
+    }
+  }
+  
+  closeLookup();
+}
+
+function openMaterialLookup(btn) {
+  var field = btn.previousElementSibling;
+  field.id = 'lookupField_' + Date.now();
+  currentLookupField = field.id;
+  openLookup(field.id, 'material');
+}
+
+function openOrgLookup(btn) {
+  var field = btn.previousElementSibling;
+  field.id = 'lookupField_' + Date.now();
+  currentLookupField = field.id;
+  openLookup(field.id, 'org');
+}
+
+function openSupplierLookup(btn) {
+  var field = btn.previousElementSibling;
+  field.id = 'lookupField_' + Date.now();
+  currentLookupField = field.id;
+  openLookup(field.id, 'supplier');
+}
+
+function openWarehouseLookup(btn) {
+  var field = btn.previousElementSibling;
+  field.id = 'lookupField_' + Date.now();
+  currentLookupField = field.id;
+  openLookup(field.id, 'warehouse');
+}
+
+function initLookupData() {
+  if (!localStorage.getItem('erp_orgs')) {
+    localStorage.setItem('erp_orgs', JSON.stringify([
+      { id: 'org-001', code: 'ORG-HQ', name: '磐枢工业集团', form: '集团', parentName: '' },
+      { id: 'org-002', code: 'ORG-SM', name: '磐枢智能制造有限公司', form: '公司', parentName: '磐枢工业集团' },
+      { id: 'org-003', code: 'ORG-SM-PD', name: '生产制造部', form: '部门', parentName: '磐枢智能制造有限公司' },
+      { id: 'org-004', code: 'ORG-SM-FA', name: '财务部', form: '部门', parentName: '磐枢智能制造有限公司' },
+      { id: 'org-005', code: 'ORG-SM-SD', name: '销售部', form: '部门', parentName: '磐枢智能制造有限公司' }
+    ]));
+  }
+  if (!localStorage.getItem('erp_departments_cache')) {
+    localStorage.setItem('erp_departments_cache', JSON.stringify([
+      { id: 'dept-001', code: 'DEPT-PD', name: '生产制造部', status: 1 },
+      { id: 'dept-002', code: 'DEPT-FA', name: '财务部', status: 1 },
+      { id: 'dept-003', code: 'DEPT-SD', name: '销售部', status: 1 },
+      { id: 'dept-004', code: 'DEPT-AS', name: '装配车间', status: 1 },
+      { id: 'dept-005', code: 'DEPT-QC', name: '质检车间', status: 1 }
+    ]));
+  }
+  if (!localStorage.getItem('erp_employees_cache')) {
+    localStorage.setItem('erp_employees_cache', JSON.stringify([
+      { id: 'emp-001', code: 'EMP-001', name: '张三', department: '生产制造部', status: 1 },
+      { id: 'emp-002', code: 'EMP-002', name: '李四', department: '生产制造部', status: 1 },
+      { id: 'emp-003', code: 'EMP-003', name: '王五', department: '财务部', status: 1 },
+      { id: 'emp-004', code: 'EMP-004', name: '赵六', department: '销售部', status: 1 },
+      { id: 'emp-005', code: 'EMP-005', name: '钱七', department: '质检车间', status: 1 }
+    ]));
+  }
+  if (!localStorage.getItem('erp_suppliers_cache')) {
+    localStorage.setItem('erp_suppliers_cache', JSON.stringify([
+      { id: 'sup-001', code: 'S-001', name: '深圳电子元器件有限公司', status: 1 },
+      { id: 'sup-002', code: 'S-002', name: '杭州精密机械加工厂', status: 1 },
+      { id: 'sup-003', code: 'S-003', name: '上海材料科技有限公司', status: 1 },
+      { id: 'sup-004', code: 'S-004', name: '东莞五金制品厂', status: 1 }
+    ]));
+  }
+  if (!localStorage.getItem('erp_materials_cache')) {
+    localStorage.setItem('erp_materials_cache', JSON.stringify([
+      { id: 'mat-001', code: 'P-001', name: '高频传感器模块', specification: 'HT-2026', unit: '个', status: 1 },
+      { id: 'mat-002', code: 'P-002', name: '控制电路板', specification: 'CB-2026', unit: '块', status: 1 },
+      { id: 'mat-003', code: 'P-003', name: '智能控制器', specification: 'IC-V3', unit: '台', status: 1 },
+      { id: 'mat-004', code: 'P-004', name: '电源模块', specification: 'PM-500W', unit: '个', status: 1 },
+      { id: 'mat-005', code: 'M-001', name: 'PCB电路板', specification: 'FR-4双层', unit: '块', status: 1 },
+      { id: 'mat-006', code: 'M-002', name: '贴片电阻', specification: '10KΩ 0603', unit: '个', status: 1 },
+      { id: 'mat-007', code: 'M-003', name: '贴片电容', specification: '100μF 0805', unit: '个', status: 1 },
+      { id: 'mat-008', code: 'M-004', name: '螺丝', specification: 'M4x10', unit: '包', status: 1 }
+    ]));
+  }
+  if (!localStorage.getItem('erp_warehouses_cache')) {
+    localStorage.setItem('erp_warehouses_cache', JSON.stringify([
+      { id: 'wh-001', code: 'WH-001', name: '成品仓', status: 1 },
+      { id: 'wh-002', code: 'WH-002', name: '原料仓', status: 1 },
+      { id: 'wh-003', code: 'WH-003', name: '半成品仓', status: 1 },
+      { id: 'wh-004', code: 'WH-004', name: '辅料仓', status: 1 }
+    ]));
+  }
+}
+
+</script>
+
+
+
+
+
+<div class="lookup-modal" id="lookupModal">
+  <div class="lookup-dialog">
+    <div class="lookup-header">
+      <div class="lookup-title" id="lookupTitle">选择</div>
+      <button class="lookup-close" onclick="closeLookup()">×</button>
+    </div>
+    <div class="lookup-body">
+      <div class="lookup-search">
+        <input type="text" id="lookupKeyword" placeholder="请输入编码或名称搜索" onkeydown="if(event.key==='Enter')filterLookup()">
+        <button onclick="filterLookup()">搜索</button>
+      </div>
+      <table class="lookup-table">
+        <thead id="lookupTableHead"></thead>
+        <tbody id="lookupTableBody"></tbody>
+      </table>
+    </div>
+    <div class="lookup-footer">
+      <button class="btn btn-cancel" onclick="closeLookup()">取消</button>
+      <button class="btn btn-primary" onclick="confirmLookup()">确定</button>
+    </div>
+  </div>
+</div>
+
+</body>
+
+
+
+
+</html>

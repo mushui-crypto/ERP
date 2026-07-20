@@ -1,0 +1,31 @@
+安全库存设置
+
+字段说明：
+单据头：FBillHead 
+	 实体主键：FMATERIALID 
+	 使用组织：FUseOrgId 
+	 物料名称：FName 
+	 创建组织：FCreateOrgId 
+	 物料编码：FNumber 
+单据体：FEntity 
+	 实体主键：FENTRYID 
+	 仓库：FPlanStockId 
+	 BOM版本：FPlanBomId 
+	 计划跟踪号：FPlanMtoNo 
+	 项目编号：FPlanItemNo 
+	 辅助属性：FPlanAuxPty 
+	 安全库存量：FPlanSafeQty 
+	 计量单位：FUnitID 
+	 基本单位安全库存量：FBaseQty 
+	 基本计量单位：FBaseUnitId 
+	 表体物料编码：FMaterialIdKey 
+	 再订货点：FReOrderGood 
+	 经济订货批量：FEconReOrderQty 
+	 最大库存：FMaxStock 
+	 基本单位再订货点：FBaseReOrderGood 
+	 基本单位经济订货批量：FBaseEconReOrderQty 
+	 基本单位最大库存：FBaseMaxStock 
+	 原分录内码：FSrcEntryId 
+	 物料分组：FMaterialGroup 
+	 最小订货量：FMinPOQty 
+	 最小包装量：FIncreaseQty 

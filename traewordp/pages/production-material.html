@@ -1,0 +1,2797 @@
+<!DOCTYPE html>
+
+
+
+
+<html lang="zh-CN">
+
+
+
+
+<head>
+
+
+
+
+<meta charset="UTF-8">
+
+
+
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+
+
+
+<title>批量操作 删除 编辑</title>
+
+
+
+
+<link rel="stylesheet" href="../common.css">
+
+
+
+
+<script src="../common.js"></script>
+<script>
+</script>
+
+
+
+
+<script src="../doc-data-store.js">
+var currentLookupField = null;
+var currentLookupType = null;
+var lookupData = [];
+var lookupColumns = [];
+
+function openLookup(fieldId, type) {
+  currentLookupField = fieldId;
+  currentLookupType = type;
+  
+  if (type === 'org') {
+    lookupColumns = ['编码', '名称', '形态', '上级组织'];
+    lookupData = JSON.parse(localStorage.getItem('erp_orgs') || '[]');
+    document.getElementById('lookupTitle').textContent = '选择组织';
+  } else if (type === 'department') {
+    lookupColumns = ['编码', '名称'];
+    lookupData = JSON.parse(localStorage.getItem('erp_departments_cache') || '[]');
+    document.getElementById('lookupTitle').textContent = '选择部门';
+  } else if (type === 'employee') {
+    lookupColumns = ['编号', '姓名', '所属部门'];
+    lookupData = JSON.parse(localStorage.getItem('erp_employees_cache') || '[]');
+    document.getElementById('lookupTitle').textContent = '选择员工';
+  } else if (type === 'supplier') {
+    lookupColumns = ['编码', '名称'];
+    lookupData = JSON.parse(localStorage.getItem('erp_suppliers_cache') || '[]');
+    document.getElementById('lookupTitle').textContent = '选择供应商';
+  } else if (type === 'customer') {
+    lookupColumns = ['编码', '名称'];
+    lookupData = JSON.parse(localStorage.getItem('erp_customers_cache') || '[]');
+    document.getElementById('lookupTitle').textContent = '选择客户';
+  } else if (type === 'material') {
+    lookupColumns = ['物料编码', '物料名称', '规格型号', '基本单位'];
+    lookupData = JSON.parse(localStorage.getItem('erp_materials_cache') || '[]');
+    document.getElementById('lookupTitle').textContent = '选择物料';
+  } else if (type === 'warehouse') {
+    lookupColumns = ['编码', '名称'];
+    lookupData = JSON.parse(localStorage.getItem('erp_warehouses_cache') || '[]');
+    document.getElementById('lookupTitle').textContent = '选择仓库';
+  }
+  
+  renderLookupTable(lookupData);
+  document.getElementById('lookupModal').classList.add('show');
+}
+
+function closeLookup() {
+  document.getElementById('lookupModal').classList.remove('show');
+}
+
+function filterLookup() {
+  var keyword = document.getElementById('lookupKeyword').value.trim().toLowerCase();
+  var filtered = lookupData.filter(function(item) {
+    var code = item.code || '';
+    var name = item.name || '';
+    return code.toLowerCase().includes(keyword) || name.toLowerCase().includes(keyword);
+  });
+  renderLookupTable(filtered);
+}
+
+function renderLookupTable(data) {
+  var head = document.getElementById('lookupTableHead');
+  var body = document.getElementById('lookupTableBody');
+  
+  head.innerHTML = '<tr><th class="checkbox-cell"><input type="checkbox" onclick="selectAllLookup()"></th>' + lookupColumns.map(function(col) { return '<th>' + col + '</th>'; }).join('') + '</tr>';
+  
+  body.innerHTML = '';
+  data.forEach(function(item) {
+    var row = document.createElement('tr');
+    row.onclick = function() { selectLookupRow(this); };
+    var cells = ['<td class="checkbox-cell"><input type="checkbox" class="lookup-checkbox" value="' + item.id + '"></td>'];
+    if (currentLookupType === 'org') {
+      cells.push('<td>' + item.code + '</td><td>' + item.name + '</td><td>' + (item.form || '') + '</td><td>' + (item.parentName || '') + '</td>');
+    } else if (currentLookupType === 'department') {
+      cells.push('<td>' + item.code + '</td><td>' + item.name + '</td>');
+    } else if (currentLookupType === 'employee') {
+      cells.push('<td>' + item.code + '</td><td>' + item.name + '</td><td>' + (item.department || '') + '</td>');
+    } else if (currentLookupType === 'supplier' || currentLookupType === 'customer') {
+      cells.push('<td>' + item.code + '</td><td>' + item.name + '</td>');
+    } else if (currentLookupType === 'material') {
+      cells.push('<td>' + item.code + '</td><td>' + item.name + '</td><td>' + (item.specification || '') + '</td><td>' + (item.unit || '') + '</td>');
+    } else if (currentLookupType === 'warehouse') {
+      cells.push('<td>' + item.code + '</td><td>' + item.name + '</td>');
+    }
+    row.innerHTML = cells.join('');
+    body.appendChild(row);
+  });
+  
+  if (data.length === 0) {
+    body.innerHTML = '<tr><td colspan="' + (lookupColumns.length + 1) + '" style="text-align:center;padding:40px;color:#999;">暂无数据</td></tr>';
+  }
+}
+
+function selectAllLookup() {
+  var master = document.querySelector('.lookup-table th input');
+  var checkboxes = document.querySelectorAll('.lookup-checkbox');
+  checkboxes.forEach(function(cb) { cb.checked = master.checked; });
+}
+
+function selectLookupRow(row) {
+  var checkbox = row.querySelector('.lookup-checkbox');
+  checkbox.checked = !checkbox.checked;
+}
+
+function confirmLookup() {
+  var checkboxes = document.querySelectorAll('.lookup-checkbox:checked');
+  if (checkboxes.length === 0) {
+    showToast('请选择一条记录', 'warning');
+    return;
+  }
+  
+  var item = lookupData.find(function(d) { return d.id === checkboxes[0].value; });
+  if (item) {
+    var field = document.getElementById(currentLookupField);
+    if (field) {
+      field.value = item.name;
+      field.setAttribute('data-id', item.id);
+      field.setAttribute('data-code', item.code);
+      
+      if (currentLookupType === 'material') {
+        var row = field.closest('tr');
+        if (row) {
+          row.querySelector('.material-name').value = item.name;
+          row.querySelector('.material-spec').value = item.specification || '';
+          row.querySelector('.material-unit').value = item.unit || '';
+        }
+      }
+    }
+  }
+  
+  closeLookup();
+}
+
+function openMaterialLookup(btn) {
+  var field = btn.previousElementSibling;
+  field.id = 'lookupField_' + Date.now();
+  currentLookupField = field.id;
+  openLookup(field.id, 'material');
+}
+
+function openOrgLookup(btn) {
+  var field = btn.previousElementSibling;
+  field.id = 'lookupField_' + Date.now();
+  currentLookupField = field.id;
+  openLookup(field.id, 'org');
+}
+
+function openSupplierLookup(btn) {
+  var field = btn.previousElementSibling;
+  field.id = 'lookupField_' + Date.now();
+  currentLookupField = field.id;
+  openLookup(field.id, 'supplier');
+}
+
+function openWarehouseLookup(btn) {
+  var field = btn.previousElementSibling;
+  field.id = 'lookupField_' + Date.now();
+  currentLookupField = field.id;
+  openLookup(field.id, 'warehouse');
+}
+
+function initLookupData() {
+  if (!localStorage.getItem('erp_orgs')) {
+    localStorage.setItem('erp_orgs', JSON.stringify([
+      { id: 'org-001', code: 'ORG-HQ', name: '磐枢工业集团', form: '集团', parentName: '' },
+      { id: 'org-002', code: 'ORG-SM', name: '磐枢智能制造有限公司', form: '公司', parentName: '磐枢工业集团' },
+      { id: 'org-003', code: 'ORG-SM-PD', name: '生产制造部', form: '部门', parentName: '磐枢智能制造有限公司' },
+      { id: 'org-004', code: 'ORG-SM-FA', name: '财务部', form: '部门', parentName: '磐枢智能制造有限公司' },
+      { id: 'org-005', code: 'ORG-SM-SD', name: '销售部', form: '部门', parentName: '磐枢智能制造有限公司' }
+    ]));
+  }
+  if (!localStorage.getItem('erp_departments_cache')) {
+    localStorage.setItem('erp_departments_cache', JSON.stringify([
+      { id: 'dept-001', code: 'DEPT-PD', name: '生产制造部', status: 1 },
+      { id: 'dept-002', code: 'DEPT-FA', name: '财务部', status: 1 },
+      { id: 'dept-003', code: 'DEPT-SD', name: '销售部', status: 1 },
+      { id: 'dept-004', code: 'DEPT-AS', name: '装配车间', status: 1 },
+      { id: 'dept-005', code: 'DEPT-QC', name: '质检车间', status: 1 }
+    ]));
+  }
+  if (!localStorage.getItem('erp_employees_cache')) {
+    localStorage.setItem('erp_employees_cache', JSON.stringify([
+      { id: 'emp-001', code: 'EMP-001', name: '张三', department: '生产制造部', status: 1 },
+      { id: 'emp-002', code: 'EMP-002', name: '李四', department: '生产制造部', status: 1 },
+      { id: 'emp-003', code: 'EMP-003', name: '王五', department: '财务部', status: 1 },
+      { id: 'emp-004', code: 'EMP-004', name: '赵六', department: '销售部', status: 1 },
+      { id: 'emp-005', code: 'EMP-005', name: '钱七', department: '质检车间', status: 1 }
+    ]));
+  }
+  if (!localStorage.getItem('erp_suppliers_cache')) {
+    localStorage.setItem('erp_suppliers_cache', JSON.stringify([
+      { id: 'sup-001', code: 'S-001', name: '深圳电子元器件有限公司', status: 1 },
+      { id: 'sup-002', code: 'S-002', name: '杭州精密机械加工厂', status: 1 },
+      { id: 'sup-003', code: 'S-003', name: '上海材料科技有限公司', status: 1 },
+      { id: 'sup-004', code: 'S-004', name: '东莞五金制品厂', status: 1 }
+    ]));
+  }
+  if (!localStorage.getItem('erp_materials_cache')) {
+    localStorage.setItem('erp_materials_cache', JSON.stringify([
+      { id: 'mat-001', code: 'P-001', name: '高频传感器模块', specification: 'HT-2026', unit: '个', status: 1 },
+      { id: 'mat-002', code: 'P-002', name: '控制电路板', specification: 'CB-2026', unit: '块', status: 1 },
+      { id: 'mat-003', code: 'P-003', name: '智能控制器', specification: 'IC-V3', unit: '台', status: 1 },
+      { id: 'mat-004', code: 'P-004', name: '电源模块', specification: 'PM-500W', unit: '个', status: 1 },
+      { id: 'mat-005', code: 'M-001', name: 'PCB电路板', specification: 'FR-4双层', unit: '块', status: 1 },
+      { id: 'mat-006', code: 'M-002', name: '贴片电阻', specification: '10KΩ 0603', unit: '个', status: 1 },
+      { id: 'mat-007', code: 'M-003', name: '贴片电容', specification: '100μF 0805', unit: '个', status: 1 },
+      { id: 'mat-008', code: 'M-004', name: '螺丝', specification: 'M4x10', unit: '包', status: 1 }
+    ]));
+  }
+  if (!localStorage.getItem('erp_warehouses_cache')) {
+    localStorage.setItem('erp_warehouses_cache', JSON.stringify([
+      { id: 'wh-001', code: 'WH-001', name: '成品仓', status: 1 },
+      { id: 'wh-002', code: 'WH-002', name: '原料仓', status: 1 },
+      { id: 'wh-003', code: 'WH-003', name: '半成品仓', status: 1 },
+      { id: 'wh-004', code: 'WH-004', name: '辅料仓', status: 1 }
+    ]));
+  }
+}
+
+</script>
+
+
+
+
+<style>
+
+
+
+
+  /* ? */
+
+
+
+
+  .toast-container { position: fixed; top: 60px; right: 20px; z-index: 10000; display: flex; flex-direction: column; gap: 10px; }
+
+
+
+
+  .toast { display: flex; align-items: center; gap: 10px; padding: 12px 16px; border-radius: var(--radius-md); min-width: 280px; max-width: 420px; animation: toastSlide 0.3s ease; border: 1px solid #e8e8e8; box-shadow: 0 4px 16px rgba(0,0,0,0.4); }
+
+
+
+
+  @keyframes toastSlide { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+
+
+
+
+  .toast .toast-icon { font-size: 16px; flex-shrink: 0; }
+
+
+
+
+  .toast .toast-content { flex: 1; font-size: 13px; color: var(--text-primary); }
+
+
+
+
+  .toast .toast-title { font-weight: 600; margin-bottom: 2px; }
+
+
+
+
+  .toast .toast-message { font-size: 12px; color: var(--text-secondary); }
+
+
+
+
+  .toast-success { background: rgba(34,197,94,0.18); border-color: rgba(34,197,94,0.4); }
+
+
+
+
+  .toast-success .toast-title { color: var(--color-success); }
+
+
+
+
+  .toast-warning { background: rgba(234,179,8,0.18); border-color: rgba(234,179,8,0.4); }
+
+
+
+
+  .toast-warning .toast-title { color: var(--color-warning); }
+
+
+
+
+  .toast-error { background: rgba(239,68,68,0.18); border-color: rgba(239,68,68,0.4); }
+
+
+
+
+  .toast-error .toast-title { color: var(--color-error); }
+
+
+
+
+  .toast-info { background: rgba(6,182,212,0.18); border-color: rgba(6,182,212,0.4); }
+
+
+
+
+  .toast-info .toast-title { color: var(--color-info); }
+
+
+
+
+
+
+
+
+
+  .confirm-modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 2000; justify-content: center; align-items: center; }
+
+
+
+
+  .confirm-modal-overlay.show { display: flex; }
+
+
+
+
+  .confirm-modal-dialog { background: var(--bg-surface); border: 1px solid #e8e8e8; border-radius: var(--radius-md); width: 420px; overflow: hidden; box-shadow: 0 8px 24px rgba(0,0,0,0.5); }
+
+
+
+
+  .confirm-modal-header { padding: 14px 20px; border-bottom: 1px solid #e8e8e8; display: flex; align-items: center; gap: 10px; }
+
+
+
+
+  .confirm-modal-icon { font-size: 18px; }
+
+
+
+
+  .confirm-modal-title { font-size: 14px; font-weight: 600; color: var(--text-primary); }
+
+
+
+
+  .confirm-modal-body { padding: 20px; text-align: center; }
+
+
+
+
+  .confirm-modal-message { font-size: 13px; color: var(--text-secondary); line-height: 1.6; }
+
+
+
+
+  .confirm-modal-footer { display: flex; gap: 12px; justify-content: flex-end; padding: 12px 20px; border-top: 1px solid #e8e8e8; }
+
+
+
+
+  .confirm-modal-footer button { padding: 6px 16px; border-radius: var(--radius-sm); font-size: 13px; cursor: pointer; transition: all var(--transition); }
+
+
+
+
+  .confirm-modal-footer .btn-cancel { border: 1px solid #e8e8e8; background: var(--bg-inset); color: var(--text-secondary); }
+
+
+
+
+  .confirm-modal-footer .btn-cancel:hover { background: var(--bg-raised); color: var(--text-primary); }
+
+
+
+
+  .confirm-modal-footer .btn-confirm { border: none; background: var(--text-accent); color: #0a0e1a; font-weight: 500; }
+
+
+
+
+  .confirm-modal-footer .btn-confirm:hover { background: #7dd3fc; }
+
+
+
+
+
+
+
+
+
+  /* 批量操作 */
+
+
+
+
+  .select-order-modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 2500; justify-content: center; align-items: flex-start; padding-top: 40px; }
+
+
+
+
+  .select-order-modal.show { display: flex; }
+
+
+
+
+  .select-order-dialog { background: var(--bg-surface); border: 1px solid #e8e8e8; border-radius: var(--radius-md); width: 900px; max-height: 80vh; display: flex; flex-direction: column; box-shadow: 0 8px 24px rgba(0,0,0,0.5); }
+
+
+
+
+  .select-order-dialog .modal-header { background: var(--bg-surface); }
+
+
+
+
+  .select-order-dialog .modal-body { overflow-y: auto; padding: 12px 16px; }
+
+
+
+
+  .select-order-dialog .data-table th { background: var(--bg-inset); color: var(--text-secondary); }
+
+
+
+
+  .select-order-dialog .data-table td { color: var(--text-secondary); }
+
+
+
+
+
+
+
+
+
+  .badge-secondary { background: rgba(148,163,184,0.15); color: var(--text-tertiary); }
+
+
+
+
+  .badge-danger { background: rgba(239,68,68,0.15); color: var(--color-error); }
+
+
+
+
+
+.lookup-modal { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:2000; justify-content:center; align-items:center; }
+.lookup-modal.show { display:flex; }
+.lookup-dialog { background:#fff; border:1px solid #e8e8e8; border-radius:4px; width:720px; max-height:70vh; overflow:hidden; }
+.lookup-header { padding:14px 20px; border-bottom:1px solid #e8e8e8; display:flex; align-items:center; justify-content:space-between; }
+.lookup-title { font-size:15px; font-weight:600; color:#333; }
+.lookup-close { font-size:20px; color:#666; cursor:pointer; background:none; border:none; }
+.lookup-close:hover { color:#333; }
+.lookup-body { padding:16px; }
+.lookup-search { display:flex; gap:8px; margin-bottom:12px; }
+.lookup-search input { flex:1; padding:6px 10px; border:1px solid #e8e8e8; border-radius:4px; font-size:13px; }
+.lookup-search button { padding:6px 16px; background:#1890ff; color:#fff; border:none; border-radius:4px; cursor:pointer; }
+.lookup-table { width:100%; border-collapse:collapse; font-size:13px; }
+.lookup-table th, .lookup-table td { padding:10px 12px; text-align:left; border-bottom:1px solid #e8e8e8; }
+.lookup-table th { background:#fafafa; font-weight:600; color:#333; }
+.lookup-table tr:hover { background:#f5f5f5; }
+.lookup-table .checkbox-cell { width:40px; }
+.lookup-footer { padding:12px 20px; border-top:1px solid #e8e8e8; display:flex; justify-content:flex-end; gap:8px; }
+.lookup-field { display:flex; align-items:center; }
+.lookup-field input { flex:1; padding:6px 10px; border:1px solid #e8e8e8; border-radius:4px 0 0 4px; font-size:13px; }
+.lookup-field button { width:28px; height:28px; border:1px solid #e8e8e8; border-left:none; border-radius:0 4px 4px 0; background:#fff; cursor:pointer; display:flex; align-items:center; justify-content:center; }
+.lookup-field button:hover { background:#f5f5f5; }
+
+</style>
+
+
+
+
+</head>
+
+
+
+
+<body>
+
+
+
+
+<aside class="sidebar" id="sidebar">
+
+
+
+
+  <div class="sidebar-logo">
+
+
+
+
+    <img src="../images/LOGO.png" alt="编辑" style="width: 100%; max-width: 200px; margin-bottom: 8px;">
+
+
+
+
+    <h1 style="font-size: 16px; margin: 0;">编辑</h1>
+
+
+
+
+  </div>
+
+
+
+
+  <nav class="sidebar-menu"></nav>
+
+
+
+
+  <div class="sidebar-user"><div class="avatar">删除</div></div>
+
+
+
+
+</aside>
+
+
+
+
+
+
+
+
+
+<div class="main-content" id="mainContent">
+
+
+
+
+  <div class="page-header" style="position:sticky;top:0;z-index:100;">
+
+
+
+
+    <div>
+
+
+
+
+      <div class="flex items-center gap-8">
+
+
+
+
+        <button class="sidebar-toggle" onclick="toggleSidebar()">&#9776;</button>
+
+
+
+
+        <div>
+
+
+
+
+          <h2>批量操作</h2>
+
+
+
+
+          <div class="breadcrumb"><a href="../index.html">编辑</a><span>&gt;</span><span></span><span>&gt;</span><span></span><span>&gt;</span><span>批量操作</span></div></div>
+
+
+
+
+        </div>
+
+
+
+
+      </div>
+
+
+
+
+    </div>
+
+
+
+
+  </div>
+
+
+
+
+
+
+
+
+
+  <div class="list-page-body">
+
+
+
+
+    <!-- ? -->
+
+
+
+
+    <div class="list-action-bar">
+
+
+
+
+      <button class="action-btn" onclick="toggleFilter()">导入数据</button>
+
+
+
+
+      <button class="action-btn" onclick="renderTable()">编辑</button>
+
+
+
+
+      <span class="action-separator"></span>
+
+
+
+
+      <button class="action-btn primary-action" onclick="openSelectOrderModal()">+ 导入数据</button>
+
+
+
+
+      <button class="action-btn danger-action" onclick="deleteSelected()">编辑</button>
+
+
+
+
+      <button class="action-btn success-action" onclick="submitSelected()">删除</button>
+
+
+
+
+      <button class="action-btn success-action" onclick="approveSelected()">编辑</button>
+
+
+
+
+      <button class="action-btn" onclick="rejectSelected()">导入数据</button>
+
+
+
+
+      <span class="action-separator"></span>
+
+
+
+
+      <button class="action-btn" onclick="chainUpSelected()">编辑</button>
+
+
+
+
+      <button class="action-btn" onclick="chainDownSelected()">编辑</button>
+
+
+
+
+      <span class="action-separator"></span>
+
+
+
+
+      <button class="action-btn" onclick="exportData()">导入数据</button>
+
+
+
+
+      <button class="action-btn" onclick="printList()">编辑</button>
+
+
+
+
+      <span class="action-separator"></span>
+
+
+
+
+      <button class="action-btn" onclick="showToast('?', 'info')">导入数据?</button>
+
+
+
+
+      <button class="action-btn" onclick="showToast('批量操作', 'info')">编辑</button>
+
+
+
+
+      <button class="action-btn" onclick="showConfirm('导入数据?', 'warning', function(r, function() { if(r) window.location.href='../index.html'; });)">编辑</button>
+
+
+
+
+    </div>
+
+
+
+
+
+
+
+
+
+    <!-- 导入数据 -->
+
+
+
+
+    <div class="list-filter-section" id="filterSection">
+
+
+
+
+      <div class="list-filter-tabs">
+
+
+
+
+        <span class="filter-tab active" data-status="all">编辑</span>
+
+
+
+
+        <span class="filter-tab" data-status="0">编辑</span>
+
+
+
+
+        <span class="filter-tab" data-status="1">导入数据?</span>
+
+
+
+
+        <span class="filter-tab" data-status="2">导入数据?</span>
+
+
+
+
+        <span class="filter-tab" data-status="3">导入数据删除</span>
+
+
+
+
+        <span class="filter-tab" data-status="4">导入数据</span>
+
+
+
+
+      </div>
+
+
+
+
+      <div class="list-filter-row">
+
+
+
+
+        <div class="filter-field">
+
+
+
+
+          <label style="font-size:12px;color:var(--text-tertiary);padding:0 8px;white-space:nowrap;">导入数据删除</label>
+
+
+
+
+          <input type="text" id="f-docNo" placeholder="导入数据">
+
+
+
+
+        </div>
+
+
+
+
+        <div class="filter-field">
+
+
+
+
+          <label style="font-size:12px;color:var(--text-tertiary);padding:0 8px;white-space:nowrap;">批量操作</label>
+
+
+
+
+          <input type="text" id="f-product" placeholder="导入数据">
+
+
+
+
+        </div>
+
+
+
+
+        <div class="filter-field">
+
+
+
+
+          <label style="font-size:12px;color:var(--text-tertiary);padding:0 8px;white-space:nowrap;">导入数据?</label>
+
+
+
+
+          <input type="text" id="f-sourceNo" placeholder="删除">
+
+
+
+
+        </div>
+
+
+
+
+        <div class="filter-field">
+
+
+
+
+          <label style="font-size:12px;color:var(--text-tertiary);padding:0 8px;white-space:nowrap;">导入数据</label>
+
+
+
+
+          <input type="date" id="f-dateFrom">
+
+
+
+
+          <span style="color:var(--text-tertiary);padding:0 4px;">删除</span>
+
+
+
+
+          <input type="date" id="f-dateTo">
+
+
+
+
+        </div>
+
+
+
+
+        <div class="filter-field">
+
+
+
+
+          <label style="font-size:12px;color:var(--text-tertiary);padding:0 8px;white-space:nowrap;">删除</label>
+
+
+
+
+          <select id="f-status">
+
+
+
+
+            <option value="all">编辑</option>
+
+
+
+
+            <option value="0">编辑</option>
+
+
+
+
+            <option value="1">导入数据?</option>
+
+
+
+
+            <option value="2">导入数据?</option>
+
+
+
+
+            <option value="3">导入数据删除</option>
+
+
+
+
+            <option value="4">导入数据</option>
+
+
+
+
+          </select>
+
+
+
+
+        </div>
+
+
+
+
+        <div class="list-filter-btns">
+
+
+
+
+          <button class="btn-search" onclick="renderTable()">编辑</button>
+
+
+
+
+          <button class="btn-reset" onclick="resetFilter()">导入数据</button>
+
+
+
+
+        </div>
+
+
+
+
+      </div>
+
+
+
+
+    </div>
+
+
+
+
+
+
+
+
+
+    <!-- 导入数据删除 -->
+
+
+
+
+    <div class="list-table-area">
+
+
+
+
+      <table class="data-table">
+
+
+
+
+        <thead>
+
+
+
+
+          <tr>
+
+
+
+
+            <th><input type="checkbox" class="row-checkbox" id="selectAll" onchange="toggleAll(this)"></th>
+
+
+
+
+            <th>导入数据删除</th>
+
+
+
+
+            <th>导入数据?()</th>
+
+
+
+
+            <th>批量操作</th>
+
+
+
+
+            <th>批量操作</th>
+
+
+
+
+            <th style="text-align:right;">删除</th>
+
+
+
+
+            <th style="text-align:right;">删除</th>
+
+
+
+
+            <th style="text-align:right;">删除</th>
+
+
+
+
+            <th>删除</th>
+
+
+
+
+            <th></th>
+
+
+
+
+            <th>导入数据</th>
+
+
+
+
+          </tr>
+
+
+
+
+        </thead>
+
+
+
+
+        <tbody id="tableBody">
+
+
+
+
+          <tr><td colspan="11" style="text-align:center;color:var(--text-tertiary);padding:20px;"></td></tr>
+
+
+
+
+        </tbody>
+
+
+
+
+      </table>
+
+
+
+
+    </div>
+
+
+
+
+
+
+
+
+
+    <!-- 编辑 -->
+
+
+
+
+    <div class="list-pagination">
+
+
+
+
+      <span class="page-info" id="pageInfo">删除 0 ? 1/1 ?</span>
+
+
+
+
+      <div class="page-btns">
+
+
+
+
+        <button class="active">1</button>
+
+
+
+
+      </div>
+
+
+
+
+    </div>
+
+
+
+
+  </div>
+
+
+
+
+</div>
+
+
+
+
+
+
+
+
+
+<!-- 批量操作 -->
+
+
+
+
+<div class="select-order-modal" id="selectOrderModal">
+
+
+
+
+  <div class="select-order-dialog">
+
+
+
+
+    <div class="modal-header">
+
+
+
+
+      <h3>导入数据删除</h3>
+
+
+
+
+      <button class="modal-close" onclick="closeSelectOrderModal()">&#x2716;</button>
+
+
+
+
+    </div>
+
+
+
+
+    <div class="modal-body" id="selectOrderBody">
+
+
+
+
+      <div style="color:var(--text-tertiary);font-size:12px;margin-bottom:8px;">编辑</div>
+
+
+
+
+      <table class="data-table">
+
+
+
+
+        <thead>
+
+
+
+
+          <tr>
+
+
+
+
+            <th>编辑</th>
+
+
+
+
+            <th>删除</th>
+
+
+
+
+            <th>批量操作</th>
+
+
+
+
+            <th>批量操作</th>
+
+
+
+
+            <th style="text-align:right;"></th>
+
+
+
+
+            <th>删除</th>
+
+
+
+
+            <th></th>
+
+
+
+
+          </tr>
+
+
+
+
+        </thead>
+
+
+
+
+        <tbody id="orderTableBody"></tbody>
+
+
+
+
+      </table>
+
+
+
+
+    </div>
+
+
+
+
+    <div class="modal-footer">
+
+
+
+
+      <button class="btn btn-ghost btn-sm" onclick="closeSelectOrderModal()">编辑</button>
+
+
+
+
+      <button class="btn btn-primary btn-sm" onclick="confirmGenerate()">编辑</button>
+
+
+
+
+    </div>
+
+
+
+
+  </div>
+
+
+
+
+</div>
+
+
+
+
+
+
+
+
+
+<!-- 编辑 -->
+
+
+
+
+<div class="confirm-modal-overlay" id="chainModal" style="z-index:2500;">
+
+
+
+
+  <div class="confirm-modal-dialog" style="width:600px;max-height:70vh;display:flex;flex-direction:column;">
+
+
+
+
+    <div class="confirm-modal-header">
+
+
+
+
+      <span class="confirm-modal-icon">&#128269;</span>
+
+
+
+
+      <span class="confirm-modal-title" id="chainModalTitle">删除</span>
+
+
+
+
+      <span style="margin-left:auto;cursor:pointer;color:var(--text-tertiary);font-size:18px;" onclick="document.getElementById('chainModal').classList.remove('show')">&times;</span>
+
+
+
+
+    </div>
+
+
+
+
+    <div style="flex:1;overflow-y:auto;padding:16px;" id="chainModalBody"></div>
+
+
+
+
+    <div class="confirm-modal-footer">
+
+
+
+
+      <button class="btn-cancel" onclick="document.getElementById('chainModal').classList.remove('show')">编辑</button>
+
+
+
+
+    </div>
+
+
+
+
+  </div>
+
+
+
+
+</div>
+
+
+
+
+
+
+
+
+
+<script>
+
+
+
+
+var DOC_TYPE = 'material_list';
+
+
+
+
+var filterSectionVisible = true;
+
+
+
+
+
+
+
+
+
+function fmt(num) {
+
+
+
+
+  return (parseFloat(num) || 0).toLocaleString('zh-CN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+
+
+
+}
+
+
+
+
+
+
+
+
+
+function getStatusBadge(status) {
+
+
+
+
+  var labels = DocDataStore.STATUS_LABELS;
+
+
+
+
+  var cls = { 0: 'badge-warning', 1: 'badge-warning', 2: 'badge-success', 3: 'badge-info', 4: 'badge-danger', 5: 'badge-danger' };
+
+
+
+
+  return '<span class="badge ' + (cls[status] || 'badge-secondary') + '">' + (labels[status] || '编辑') + '</span>';
+
+
+
+
+}
+
+
+
+
+
+
+
+
+
+function calcDocSummary(doc) {
+
+
+
+
+  var totalReq = 0, totalReqQty = 0, totalReqQtyed = 0, totalUnReq = 0;
+
+
+
+
+  (doc.details || []).forEach(function(d) {
+
+
+
+
+    totalReqQty += parseFloat(d.requiredQty) || 0;
+
+
+
+
+    totalReqQtyed += parseFloat(d.requisitionedQty) || 0;
+
+
+
+
+    totalUnReq += parseFloat(d.unRequisitionedQty) || 0;
+
+
+
+
+  });
+
+
+
+
+  return { totalReq: totalReq, totalReqQty: totalReqQty, totalReqQtyed: totalReqQtyed, totalUnReq: totalUnReq };
+
+
+
+
+}
+
+
+
+
+
+
+
+
+
+function renderTable() {
+
+
+
+
+  var docs = DocDataStore.listDocs(DOC_TYPE);
+
+
+
+
+  // 删除
+
+
+
+
+  var fDocNo = (document.getElementById('f-docNo').value || '').trim();
+
+
+
+
+  var fProduct = (document.getElementById('f-product').value || '').trim();
+
+
+
+
+  var fSourceNo = (document.getElementById('f-sourceNo').value || '').trim();
+
+
+
+
+  var fDateFrom = document.getElementById('f-dateFrom').value;
+
+
+
+
+  var fDateTo = document.getElementById('f-dateTo').value;
+
+
+
+
+  var fStatus = document.getElementById('f-status').value;
+
+
+
+
+  var tabStatus = document.querySelector('.filter-tab.active').dataset.status;
+
+
+
+
+
+
+
+
+
+  docs = docs.filter(function(d) {
+
+
+
+
+    var h = d.header || {};
+
+
+
+
+    if (tabStatus !== 'all' && String(d.status) !== tabStatus) return false;
+
+
+
+
+    if (fStatus !== 'all' && String(d.status) !== fStatus) return false;
+
+
+
+
+    if (fDocNo && !(d.docNo || '').includes(fDocNo)) return false;
+
+
+
+
+    if (fProduct && !(h.productNames || '').includes(fProduct)) return false;
+
+
+
+
+    if (fSourceNo && !(h.sourceDocNo || '').includes(fSourceNo)) return false;
+
+
+
+
+    if (fDateFrom) {
+
+
+
+
+      var cd = (h.createDate || '').slice(0, 10);
+
+
+
+
+      if (cd < fDateFrom) return false;
+
+
+
+
+    }
+
+
+
+
+    if (fDateTo) {
+
+
+
+
+      var cd2 = (h.createDate || '').slice(0, 10);
+
+
+
+
+      if (cd2 > fDateTo) return false;
+
+
+
+
+    }
+
+
+
+
+    return true;
+
+
+
+
+  });
+
+
+
+
+
+
+
+
+
+  var tbody = document.getElementById('tableBody');
+
+
+
+
+  tbody.innerHTML = '';
+
+
+
+
+  if (docs.length === 0) {
+
+
+
+
+    tbody.innerHTML = '<tr><td colspan="11" style="text-align:center;color:var(--text-tertiary);padding:20px;"></td></tr>';
+
+
+
+
+  } else {
+
+
+
+
+    docs.forEach(function(doc) {
+
+
+
+
+      var h = doc.header || {};
+
+
+
+
+      var s = calcDocSummary(doc);
+
+
+
+
+      var tr = document.createElement('tr');
+
+
+
+
+      tr.innerHTML = '<td><input type="checkbox" class="row-checkbox" value="' + doc.id + '"></td>' +
+
+
+
+
+        '<td><a href="production-material-detail.html?id=' + doc.id + '">' + (doc.docNo || '') + '</a></td>' +
+
+
+
+
+        '<td>' + (h.sourceDocNo || '') + '</td>' +
+
+
+
+
+        '<td>' + (h.productNames || '') + '</td>' +
+
+
+
+
+        '<td style="text-align:center;">' + (doc.details ? doc.details.length : 0) + '</td>' +
+
+
+
+
+        '<td style="text-align:right;font-family:var(--font-mono);">' + fmt(s.totalReqQty) + '</td>' +
+
+
+
+
+        '<td style="text-align:right;font-family:var(--font-mono);color:var(--color-success);">' + fmt(s.totalReqQtyed) + '</td>' +
+
+
+
+
+        '<td style="text-align:right;font-family:var(--font-mono);color:var(--color-warning);">' + fmt(s.totalUnReq) + '</td>' +
+
+
+
+
+        '<td>' + getStatusBadge(doc.status) + '</td>' +
+
+
+
+
+        '<td>' + ((h.createDate || '').slice(0, 10)) + '</td>' +
+
+
+
+
+        '<td class="row-action-links">' +
+
+
+
+
+          '<a href="production-material-detail.html?id=' + doc.id + '">删除</a> ' +
+
+
+
+
+          '<a href="production-material-detail.html?id=' + doc.id + '">删除</a>' +
+
+
+
+
+        '</td>';
+
+
+
+
+      tbody.appendChild(tr);
+
+
+
+
+    });
+
+
+
+
+  }
+
+
+
+
+  document.getElementById('pageInfo').textContent = '删除 ' + docs.length + ' ? 1/1 ?';
+
+
+
+
+}
+
+
+
+
+
+
+
+
+
+function toggleAll(el) {
+
+
+
+
+  document.querySelectorAll('.row-checkbox').forEach(function(cb) {
+
+
+
+
+    if (cb.id !== 'selectAll') cb.checked = el.checked;
+
+
+
+
+  });
+
+
+
+
+}
+
+
+
+
+
+
+
+
+
+function getSelectedIds() {
+
+
+
+
+  var ids = [];
+
+
+
+
+  document.querySelectorAll('.row-checkbox:checked').forEach(function(cb) {
+
+
+
+
+    if (cb.value) ids.push(cb.value);
+
+
+
+
+  });
+
+
+
+
+  return ids;
+
+
+
+
+}
+
+
+
+
+
+
+
+
+
+function deleteSelected() {
+
+
+
+
+  var ids = getSelectedIds();
+
+
+
+
+  if (ids.length === 0) { showToast('', 'warning'); return; }
+
+
+
+
+  showConfirm('编辑 ' + ids.length + ' ', 'warning', function(r, function() {
+
+
+
+
+    if (r) {
+
+
+
+
+      var ok = 0, fail = 0;
+
+
+
+
+      ids.forEach(function(id) {
+
+
+
+
+        if (DocDataStore.deleteDoc(DOC_TYPE, id)) ok++; else fail++;
+
+
+
+
+      });
+
+
+
+
+      showToast('导入数据删除 ' + ok + ' 删除' + (fail > 0 ? '导入数据? ' + fail + ' 删除(批量操作)' : ''), 'success');
+
+
+
+
+      renderTable();
+
+
+
+
+    }
+
+
+
+
+  });
+
+
+
+
+}
+
+
+
+
+
+
+
+
+
+function submitSelected() {
+
+
+
+
+  var ids = getSelectedIds();
+
+
+
+
+  if (ids.length === 0) { showToast('批量操作', 'warning'); return; }
+
+
+
+
+  showConfirm('删除 ' + ids.length + ' 批量操作', 'warning', function(r, function() {
+
+
+
+
+    if (r) {
+
+
+
+
+      var ok = 0, fail = 0;
+
+
+
+
+      ids.forEach(function(id) {
+
+
+
+
+        try { DocDataStore.submitDoc(DOC_TYPE, id); ok++; }); catch (e) { fail++; }
+
+
+
+
+      });
+
+
+
+
+      showToast('导入数据? ' + ok + ' 删除' + (fail > 0 ? '导入数据? ' + fail + ' 删除' : ''), 'success');
+
+
+
+
+      renderTable();
+
+
+
+
+    }
+
+
+
+
+  });
+
+
+
+
+}
+
+
+
+
+
+
+
+
+
+function approveSelected() {
+
+
+
+
+  var ids = getSelectedIds();
+
+
+
+
+  if (ids.length === 0) { showToast('批量操作', 'warning'); return; }
+
+
+
+
+  showConfirm('编辑 ' + ids.length + ' 批量操作', 'warning', function(r, function() {
+
+
+
+
+    if (r) {
+
+
+
+
+      var ok = 0, fail = 0;
+
+
+
+
+      ids.forEach(function(id) {
+
+
+
+
+        try { DocDataStore.approveDoc(DOC_TYPE, id); ok++; }); catch (e) { fail++; }
+
+
+
+
+      });
+
+
+
+
+      showToast('导入数据? ' + ok + ' 删除' + (fail > 0 ? '导入数据? ' + fail + ' 删除' : ''), 'success');
+
+
+
+
+      renderTable();
+
+
+
+
+    }
+
+
+
+
+  });
+
+
+
+
+}
+
+
+
+
+
+
+
+
+
+function rejectSelected() {
+
+
+
+
+  var ids = getSelectedIds();
+
+
+
+
+  if (ids.length === 0) { showToast('', 'warning'); return; }
+
+
+
+
+  showConfirm('编辑 ' + ids.length + ' 批量操作', 'warning', function(r, function() {
+
+
+
+
+    if (r) {
+
+
+
+
+      var ok = 0, fail = 0;
+
+
+
+
+      ids.forEach(function(id) {
+
+
+
+
+        try { DocDataStore.rejectDoc(DOC_TYPE, id); ok++; }); catch (e) { fail++; }
+
+
+
+
+      });
+
+
+
+
+      showToast('导入数据删除 ' + ok + ' 删除' + (fail > 0 ? '导入数据? ' + fail + ' 删除' : ''), 'success');
+
+
+
+
+      renderTable();
+
+
+
+
+    }
+
+
+
+
+  });
+
+
+
+
+}
+
+
+
+
+
+
+
+
+
+function toggleFilter() {
+
+
+
+
+  filterSectionVisible = !filterSectionVisible;
+
+
+
+
+  document.getElementById('filterSection').style.display = filterSectionVisible ? '' : 'none';
+
+
+
+
+}
+
+
+
+
+
+
+
+
+
+function resetFilter() {
+
+
+
+
+  document.getElementById('f-docNo').value = '';
+
+
+
+
+  document.getElementById('f-product').value = '';
+
+
+
+
+  document.getElementById('f-sourceNo').value = '';
+
+
+
+
+  document.getElementById('f-dateFrom').value = '';
+
+
+
+
+  document.getElementById('f-dateTo').value = '';
+
+
+
+
+  document.getElementById('f-status').value = 'all';
+
+
+
+
+  renderTable();
+
+
+
+
+}
+
+
+
+
+
+
+
+
+
+function exportData() { showToast('导入数据?', 'info'); }
+
+
+
+
+function printList() { showToast('导入数据', 'info'); }
+
+
+
+
+
+
+
+
+
+// ===== 导入数据删除 =====
+
+
+
+
+function openSelectOrderModal() {
+
+
+
+
+  var orders = DocDataStore.listDocs('production_order');
+
+
+
+
+  // 导入数据?(导入数据2)批量操作
+
+
+
+
+  var existingMl = DocDataStore.listDocs('material_list');
+
+
+
+
+  var usedOrderIds = {};
+
+
+
+
+  existingMl.forEach(function(ml) {
+
+
+
+
+    if (ml.header && ml.header.sourceDocId) usedOrderIds[ml.header.sourceDocId] = true;
+
+
+
+
+  });
+
+
+
+
+  var validOrders = orders.filter(function(o) {
+
+
+
+
+    return o.status >= DocDataStore.STATUS.APPROVED && !usedOrderIds[o.id];
+
+
+
+
+  });
+
+
+
+
+
+
+
+
+
+  var tbody = document.getElementById('orderTableBody');
+
+
+
+
+  tbody.innerHTML = '';
+
+
+
+
+  if (validOrders.length === 0) {
+
+
+
+
+    tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:var(--text-tertiary);padding:20px;">批量操作</td></tr>';
+
+
+
+
+  } else {
+
+
+
+
+    validOrders.forEach(function(o) {
+
+
+
+
+      var firstDetail = (o.details && o.details[0]) || {};
+
+
+
+
+      var tr = document.createElement('tr');
+
+
+
+
+      tr.innerHTML = '<td style="text-align:center;"><input type="radio" name="orderRadio" value="' + o.id + '"></td>' +
+
+
+
+
+        '<td>' + (o.docNo || '') + '</td>' +
+
+
+
+
+        '<td>' + (firstDetail.materialCode || '') + '</td>' +
+
+
+
+
+        '<td>' + (firstDetail.materialName || '') + '</td>' +
+
+
+
+
+        '<td style="text-align:right;font-family:var(--font-mono);">' + fmt(firstDetail.qty) + '</td>' +
+
+
+
+
+        '<td>' + DocDataStore.getProdStatusLabel(o.status) + '</td>' +
+
+
+
+
+        '<td>' + ((o.header.orderDate || '').slice(0, 10)) + '</td>';
+
+
+
+
+      tbody.appendChild(tr);
+
+
+
+
+    });
+
+
+
+
+  }
+
+
+
+
+  document.getElementById('selectOrderModal').classList.add('show');
+
+
+
+
+}
+
+
+
+
+
+
+
+
+
+function closeSelectOrderModal() {
+
+
+
+
+  document.getElementById('selectOrderModal').classList.remove('show');
+
+
+
+
+}
+
+
+
+
+
+
+
+
+
+function confirmGenerate() {
+
+
+
+
+  var checked = document.querySelector('input[name="orderRadio"]:checked');
+
+
+
+
+  if (!checked) { showToast('', 'warning'); return; }
+
+
+
+
+  var orderId = checked.value;
+
+
+
+
+  try {
+
+
+
+
+    var mlDoc = DocDataStore.generateMaterialList(orderId);
+
+
+
+
+    showToast('批量操作' + mlDoc.docNo, 'success');
+
+
+
+
+    closeSelectOrderModal();
+
+
+
+
+    renderTable();
+
+
+
+
+  } catch (e) {
+
+
+
+
+    showToast('' + e.message, 'error');
+
+
+
+
+  }
+
+
+
+
+}
+
+
+
+
+
+
+
+
+
+// ===== 批量操作 =====
+
+
+
+
+function chainUpSelected() {
+
+
+
+
+  var ids = getSelectedIds();
+
+
+
+
+  if (ids.length === 0) { showToast('导入数据', 'warning'); return; }
+
+
+
+
+  showDocChain(ids[0], 'up');
+
+
+
+
+}
+
+
+
+
+function chainDownSelected() {
+
+
+
+
+  var ids = getSelectedIds();
+
+
+
+
+  if (ids.length === 0) { showToast('导入数据', 'warning'); return; }
+
+
+
+
+  showDocChain(ids[0], 'down');
+
+
+
+
+}
+
+
+
+
+
+
+
+
+
+function showDocChain(docId, direction) {
+
+
+
+
+  var body = document.getElementById('chainModalBody');
+
+
+
+
+  var doc = DocDataStore.getDoc(DOC_TYPE, docId);
+
+
+
+
+  if (!doc) { showToast('?', 'error'); return; }
+
+
+
+
+  document.getElementById('chainModalTitle').textContent = direction === 'up' ? '编辑 - ' : '编辑 - ';
+
+
+
+
+  var html = '<div style="margin-bottom:12px;font-weight:600;color:var(--text-primary);">' + doc.docNo + ' (' + DocDataStore.STATUS_LABELS[doc.status] + ')</div>';
+
+
+
+
+  var chain = DocDataStore.getDocChain(DOC_TYPE, docId, direction);
+
+
+
+
+  if (direction === 'up') {
+
+
+
+
+    html += '<div style="margin-bottom:8px;color:var(--text-tertiary);">?</div>';
+
+
+
+
+  } else {
+
+
+
+
+    html += '<div style="margin-bottom:8px;color:var(--text-tertiary);">?</div>';
+
+
+
+
+  }
+
+
+
+
+  if (chain.length > 0) {
+
+
+
+
+    chain.forEach(function(c) {
+
+
+
+
+      var docTypeName = DocDataStore.DOC_TYPES[c.docType] ? DocDataStore.DOC_TYPES[c.docType].name : c.docType;
+
+
+
+
+      html += '<div style="padding:8px 0;border-bottom:1px solid #e8e8e8;color:var(--text-secondary);">' + docTypeName + ' - ' + c.docNo + ' (' + c.statusLabel + ')</div>';
+
+
+
+
+    });
+
+
+
+
+  } else {
+
+
+
+
+    html += '<div style="color:var(--text-tertiary);padding:6px 0;">导入数据' + (direction === 'up' ? '导入数据' : '导入数据') + '导入数据</div>';
+
+
+
+
+  }
+
+
+
+
+  body.innerHTML = html;
+
+
+
+
+  document.getElementById('chainModal').classList.add('show');
+
+
+
+
+}
+
+
+
+
+
+
+
+
+
+// =====  =====
+
+
+
+
+document.querySelectorAll('.filter-tab').forEach(function(tab) {
+
+
+
+
+  tab.addEventListener('click', function() {
+
+
+
+
+    document.querySelectorAll('.filter-tab').forEach(function(t) { t.classList.remove('active'); });
+
+
+
+
+    this.classList.add('active');
+
+
+
+
+    renderTable();
+
+
+
+
+  });
+
+
+
+
+});
+
+
+
+
+
+
+
+
+
+document.addEventListener('DOMContentLoaded', function() {
+
+
+
+
+  if (typeof DocDataStore !== 'undefined') DocDataStore.initTestData();
+
+
+
+
+  renderTable();
+
+
+
+
+});
+
+
+
+
+
+</script>
+
+
+
+
+
+<div class="lookup-modal" id="lookupModal">
+  <div class="lookup-dialog">
+    <div class="lookup-header">
+      <div class="lookup-title" id="lookupTitle">选择</div>
+      <button class="lookup-close" onclick="closeLookup()">×</button>
+    </div>
+    <div class="lookup-body">
+      <div class="lookup-search">
+        <input type="text" id="lookupKeyword" placeholder="请输入编码或名称搜索" onkeydown="if(event.key==='Enter')filterLookup()">
+        <button onclick="filterLookup()">搜索</button>
+      </div>
+      <table class="lookup-table">
+        <thead id="lookupTableHead"></thead>
+        <tbody id="lookupTableBody"></tbody>
+      </table>
+    </div>
+    <div class="lookup-footer">
+      <button class="btn btn-cancel" onclick="closeLookup()">取消</button>
+      <button class="btn btn-primary" onclick="confirmLookup()">确定</button>
+    </div>
+  </div>
+</div>
+
+</body>
+
+
+
+
+</html>
+
+
+
+

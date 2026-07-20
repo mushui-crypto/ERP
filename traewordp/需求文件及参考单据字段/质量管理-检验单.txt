@@ -1,0 +1,289 @@
+检验单
+（属于质量管理模块功能，用于采购来料检、库存检、工序检、完工检、发货检；根据单据类型确定）
+字段说明：
+单据头：FBillHead 
+	 实体主键：FID 
+	 单据编号：FBillNo 
+	 单据状态：FDocumentStatus 
+	 审核人：FApproverId 
+	 审核日期：FApproveDate 
+	 修改人：FModifierId 
+	 创建日期：FCreateDate 
+	 创建人：FCreatorId 
+	 修改日期：FModifyDate 
+	 作废日期：FCancelDate 
+	 作废人：FCanceler 
+	 作废状态：FCancelStatus 
+	 描述：FDescription 
+	 单据类型：FBillTypeID  (必填项)
+	 来源组织：FSourceOrgId  (必填项)
+	 质检组织：FInspectOrgId  (必填项)
+	 检验部门：FInspectDepId 
+	 质检员：FInspectorId 
+	 业务类型：FBusinessType  (必填项)
+	 单据日期：FDate  (必填项)
+	 质检组：FInspectGroupId 
+	 扫描序列号：FDefScanBox 
+	 扫描序列号：FUpScanBox 
+	 抽检数量：FCheckQty 
+	 扫描序列号：FInspectValScanBox 
+	 是否已同步：FIsSynced 
+主表体：FEntity 
+	 实体主键：FEntryID 
+	 物料编码：FMaterialId  (必填项)
+	 物料名称：FMaterialName 
+	 规格型号：FMaterialModel 
+	 质检方案：FQCSchemeId 
+	 单位：FUnitID  (必填项)
+	 基本单位：FBaseUnitId 
+	 检验数量：FInspectQty 
+	 基本单位检验数量：FBaseInspectQty 
+	 供应商：FSupplierId 
+	 生产车间：FWorkshopId 
+	 仓库：FStockId 
+	 仓位：FStockLocId 
+	 货位：FF100001
+	 批号：FLot 
+	 检验次数：FInspectTimes 
+	 时间单位：FTimeUnit  (必填项)
+	 耗用时间：FConsumeTime 
+	 样本破坏承担方：FSampleDamageBearer  (必填项)
+	 合格数：FQualifiedQty 
+	 不合格数：FUnqualifiedQty 
+	 样本破坏数：FSampleDamageQty 
+	 基本单位合格数：FBaseQualifiedQty 
+	 基本单位不合格数：FBaseUnqualifiedQty 
+	 基本单位样本破坏数：FBaseSampleDamageQty 
+	 检验结果：FInspectResult  (必填项)
+	 抽样方案：FSampleSchemeId 
+	 质检开始日期：FInspectStartDate 
+	 质检结束日期：FInspectEndDate 
+	 抽样类型：FSSSampleType 
+	 检验水平：FSSInspectLevel 
+	 严格度：FSSStrictLevel 
+	 AQL：FSSAQL 
+	 允收数：FAcceptQty 
+	 拒收数：FRejectQty 
+	 样本不合格数：FSUnqualifiedQty 
+	 基本单位样本不合格数：FBaseSUnqualifiedQty 
+	 样本量：FSampleQty 
+	 备注：FMemo 
+	 质检状态：FQCStatus  (必填项)
+	 检验单关联标志：FIsRelated 
+	 源单类型：FSrcBillType0 
+	 源单编号：FSrcBillNo0 
+	 源单内码：FSrcInterId0 
+	 源单分录内码：FSrcEntryId0 
+	 源单行号：FSrcEntrySeq0 
+	 基本单位接收数量：FBaseAcceptQty 
+	 基本单位判退数量：FBaseRejectQty 
+	 基本单位不良数量：FBaseDefectQty 
+	 基本单位报废数量：FBaseScrapQty 
+	 基本单位返修数量：FBaseRepairQty 
+	 基本单位挑选数量：FBasePickQty 
+	 质检子单据标识：FQCFormId 
+	 质检子单据编号：FQCBillNo 
+	 质检业务类型：FQCBusinessType 
+	 业务流程：FBFLowId 
+	 基本单位料废数量：FBaseMtrlScrapQty 
+	 基本单位工废数量：FBaseProcScrapQty 
+	 工序号：FOperNumber 
+	 工序说明：FOperDescription 
+	 单位转换表头数量：FUnitTransHeadQty 
+	 单位转换工序数量：FUnitTransOperQty 
+	 生产单位：FPrdUnitId 
+	 辅助属性：FAuxPropId 
+	 基本单位让步接收数量：FBaseReAcceptQty 
+	 序列号单位：FSNUnitID 
+	 客户：FCustomerId 
+	 基本单位反写检验数量：FBaseWBInspectQty 
+	 首检：FIsFirstInspect 
+	 生产线：FProductLineId 
+	 工位/工序编码：FPrdLineLocation 
+	 工位/工序名称：FPrdLineLocName 
+	 基本单位不合格可销售数量：FBaseUnQuaSalQty 
+	 图片：FPicture 
+	 操作指导书：FAttachment 
+	 基本单位返工数量：FBaseReMadeQty 
+	 供应商批号：FSupplierLot 
+	 生产日期：FProduceDate 
+	 有效期至：FExpiryDate 
+	 新有效期至：FNewExpiryDate 
+	 保质期：FExpPeriod 
+	 保质期单位：FExpUnitId 
+	 基本单位报废品入库选单数量：FBaseStockInScrapSelQty 
+	 基本单位不合格品入库选单数量：FBaseStockInFailSelQty 
+	 基本单位合格品入库选单数量：FBaseStockInQuaSelQty 
+	 合格品入库选单数量：FStockInQuaSelQty 
+	 不合格品入库选单数量：FStockInFailSelQty 
+	 报废品入库选单数量：FStockInScrapSelQty 
+	 基本单位来料不良数量：FBaseIncDefectQty 
+	 基本单位作业不良数量：FBaseProDefectQty 
+	 币别：FCurrency 
+	 折让金额：FDiscountQty 
+	 是否拆分行：FIsSplitRow 
+	 当前严格度：FCurrentStringency  (必填项)
+	 货主类型：FOwnerTypeId 
+	 货主：FOwnerId 
+	 保管者类型：FKeeperTypeId 
+	 保管者：FKeeperId 
+	 BOM版本：FBomId 
+	 计划跟踪号：FMtoNo 
+	 库存组：FStockGroupId 
+	 仓管员：FStockerId 
+使用决策表体：FPolicyDetail 
+	 实体主键：FDetailID 
+	 状态：FPolicyStatus  (必填项)
+	 数量：FPolicyQty 
+	 基本单位数量：FBasePolicyQty 
+	 使用决策：FUsePolicy  (必填项)
+	 使用决策备注：FMemo1 
+	 辅助属性：FPolicyAuxPropId 
+	 物料：FPolicyMaterialId 
+	 序列号：FSerialId 
+	 不良处理：FIsDefectProcess 
+	 不良品关联标志：FIsRelatedDefect 
+	 判退：FIsReturn 
+	 MRB评审：FIsMRBReview 
+	 MRB评审状态：FMRBReviewStatus 
+	 MRB评审分录内码：FMRBEntryId 
+	 可销售：FCanSale 
+	 箱号：FBoxNumber 
+	 是否抽检：FIsCheck 
+	 不良品处理分录内码：FDefectEntryId 
+	 不良品处理状态：FDefectProStatus 
+	 入库关联标志：FInstockFlag  (必填项)
+	 检验单原始使用决策：FIBUsePolicy 
+缺陷记录表体：FDefectDetail 
+	 实体主键：FDetailID 
+	 缺陷类型：FDefectTypeId 
+	 缺陷数量：FDefectQty 
+	 基本单位缺陷数量：FBaseDefectQty1 
+	 缺陷原因：FDefectReasonId 
+	 缺陷等级：FDefectLevel  (必填项)
+	 缺陷后果：FDefectResultId 
+	 缺陷记录备注：FDefectMemo 
+	 序列号：FDSerialId 
+检验项目表体：FItemDetail 
+	 实体主键：FDetailID 
+	 检验项目：FInspectItemId 
+	 分析方法：FAnalysisMethod  (必填项)
+	 缺陷等级：FDefectlevel1  (必填项)
+	 破坏性检验：FDestructInspect 
+	 重点检查：FKeyInspect 
+	 质量标准：FQualityStdId 
+	 检验方法：FInspectMethodId 
+	 检验仪器：FInspectInstrumentId 
+	 检验依据：FInspectBasisId 
+	 抽样方案：FSampleSchemeId1 
+	 检验水平：FSSInspectLevel1 
+	 严格度：FSSStrictLevel1 
+	 AQL：FSSAQL1 
+	 单位：FUnitId2 
+	 比较符：FCompareSymbol  (必填项)
+	 状态：FItemStatus  (必填项)
+	 检验项目备注：FItemMemo 
+	 抽样类型：FSSSampleType1 
+	 允收数：FAcceptQty1 
+	 拒收数：FRejectQty1 
+	 样本破坏数：FSampleDamageQty1 
+	 基本单位样本破坏数：FBaseSampleDamageQty1 
+	 样本不合格数：FSUnqualifiedQty1 
+	 基本单位样本不合格数：FBaseSUnqualifiedQty1 
+	 样本量：FSampleQty1 
+	 检验结果：FInspectResult1  (必填项)
+	 检验值：FInspectVal 
+	 目标值：FTargetVal 
+	 上限值：FUpLimit 
+	 下限值：FDownLimit 
+	 上偏差：FUpOffset 
+	 下偏差：FDownOffset 
+	 检验值Key：FInspectValKey 
+	 目标值Key：FTargetValKey 
+	 上限值Key：FUpLimitKey 
+	 下限值Key：FDownLimitKey 
+	 上偏差Key：FUpOffsetKey 
+	 下偏差Key：FDownOffsetKey 
+	 检验值(定量)：FInspectValQ 
+	 目标值数量：FTargetValQ 
+	 上限值数量：FUpLimitQ 
+	 下限值数量：FDownLimitQ 
+	 上偏差数量：FUpOffsetQ 
+	 下偏差数量：FDownOffsetQ 
+	 检验值(定性)：FInspectValB 
+	 目标值基础资料：FTargetValB 
+	 上限值基础资料：FUpLimitB 
+	 下限值基础资料：FDownLimitB 
+	 上偏差基础资料：FUpOffsetB 
+	 下偏差基础资料：FDownOffsetB 
+	 检验值(其他)：FInspectValT 
+	 目标值文本：FTargetValT 
+	 上限值文本：FUpLimitT 
+	 下限值文本：FDownLimitT 
+	 上偏差文本：FUpOffsetT 
+	 下偏差文本：FDownOffsetT 
+	 启用样本检测值：FEnableQcValue 
+	 0值无效：FIsZeroNotValidate 
+参考表体：FReferDetail 
+	 实体主键：FDetailID 
+	 源单类型：FSrcBillType 
+	 源单编号：FSrcBillNo 
+	 源单内码：FSrcInterId 
+	 源单分录内码：FSrcEntryId 
+	 源单行号：FSrcEntrySeq 
+	 订单类型：FOrderType 
+	 订单编号：FOrderBillNo 
+	 订单内码：FOrderId 
+	 订单分录内码：FOrderEntryId 
+	 订单行号：FOrderEntrySeq 
+检测值表体：FValueGrid 
+	 实体主键：FGridId 
+	 检测值(定量)：FInspectValue 
+	 检验结果：FInspectResult2 
+	 检测值(定性)：FInspectValueB 
+	 检测值(其他)：FInspectValueT 
+	 序列号：FVSerialId 
+	 单位：FValueUnitID 
+关联关系表：FEntity_Link 
+	 实体主键：FLinkId 
+	 业务流程图：FEntity_Link_FFlowId 
+	 推进路线：FEntity_Link_FFlowLineId 
+	 转换规则：FEntity_Link_FRuleId 
+	 源单表内码：FEntity_Link_FSTableId 
+	 源单表：FEntity_Link_FSTableName 
+	 源单内码：FEntity_Link_FSBillId 
+	 源单分录内码：FEntity_Link_FSId 
+	 原始携带量：FEntity_Link_FBaseAcceptQtyOld 
+	 修改携带量：FEntity_Link_FBaseAcceptQty 
+	 原始携带量：FEntity_Link_FBaseRejectQtyOld 
+	 修改携带量：FEntity_Link_FBaseRejectQty 
+	 原始携带量：FEntity_Link_FBaseDefectQtyOld 
+	 修改携带量：FEntity_Link_FBaseDefectQty 
+	 原始携带量：FEntity_Link_FBaseScrapQtyOld 
+	 修改携带量：FEntity_Link_FBaseScrapQty 
+	 原始携带量：FEntity_Link_FBaseRepairQtyOld 
+	 修改携带量：FEntity_Link_FBaseRepairQty 
+	 原始携带量：FEntity_Link_FBasePickQtyOld 
+	 修改携带量：FEntity_Link_FBasePickQty 
+	 原始携带量：FEntity_Link_FBaseMtrlScrapQtyOld 
+	 修改携带量：FEntity_Link_FBaseMtrlScrapQty 
+	 原始携带量：FEntity_Link_FBaseProcScrapQtyOld 
+	 修改携带量：FEntity_Link_FBaseProcScrapQty 
+	 原始携带量：FEntity_Link_FBaseInspectQtyOld 
+	 修改携带量：FEntity_Link_FBaseInspectQty 
+	 原始携带量：FEntity_Link_FBaseSampleDamageQtyOld 
+	 修改携带量：FEntity_Link_FBaseSampleDamageQty 
+	 原始携带量：FEntity_Link_FBaseReAcceptQtyOld 
+	 修改携带量：FEntity_Link_FBaseReAcceptQty 
+	 原始携带量：FEntity_Link_FBaseWBInspectQtyOld 
+	 修改携带量：FEntity_Link_FBaseWBInspectQty 
+	 原始携带量：FEntity_Link_FBaseUnQuaSalQtyOld 
+	 修改携带量：FEntity_Link_FBaseUnQuaSalQty 
+	 原始携带量：FEntity_Link_FBaseReMadeQtyOld 
+	 修改携带量：FEntity_Link_FBaseReMadeQty 
+	 原始携带量：FEntity_Link_FBaseIncDefectQtyOld 
+	 修改携带量：FEntity_Link_FBaseIncDefectQty 
+	 原始携带量：FEntity_Link_FBaseProDefectQtyOld 
+	 修改携带量：FEntity_Link_FBaseProDefectQty 
+	 原始携带量：FEntity_Link_FInspectQtyOld 
+	 修改携带量：FEntity_Link_FInspectQty 

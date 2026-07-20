@@ -1,0 +1,809 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>采购检验单 — 磐枢工业智能平台</title>
+<link rel="stylesheet" href="../common.css">
+<script src="../common.js"></script>
+<script></script>
+<script src="../doc-data-store.js"></script>
+<script src="../doc-conversion.js"></script>
+<style>
+.doc-page{display:flex;height:100vh;background:#f0f2f5;}
+.doc-sidebar{width:200px;background:#001529;color:#fff;display:flex;flex-direction:column;}
+.doc-sidebar-title{padding:16px 20px;font-size:15px;font-weight:600;border-bottom:1px solid #002140;background:#001529;}
+.doc-sidebar-menu{list-style:none;padding:0;margin:0;flex:1;}
+.doc-sidebar-menu li a{display:flex;align-items:center;padding:12px 20px;color:#bfbfbf;text-decoration:none;font-size:13px;transition:all 0.3s;}
+.doc-sidebar-menu li a:hover{background:#002140;color:#fff;}
+.doc-sidebar-menu li a.active{background:#1890ff;color:#fff;}
+.doc-content{flex:1;display:flex;flex-direction:column;overflow:hidden;}
+.doc-header{position:sticky;top:0;z-index:100;background:#fff;border-bottom:1px solid #e8e8e8;padding:16px 20px;display:flex;justify-content:space-between;align-items:center;}
+.doc-header-title{font-size:20px;font-weight:600;color:#333;margin-bottom:4px;}
+.doc-header-subtitle{font-size:13px;color:#999;}
+.doc-toolbar{display:flex;gap:8px;flex-wrap:wrap;}
+.toolbar-btn{padding:6px 12px;border-radius:4px;font-size:13px;cursor:pointer;border:1px solid #d9d9d9;background:#fff;color:#666;display:flex;align-items:center;gap:6px;transition:all 0.3s;}
+.toolbar-btn:hover{border-color:#1890ff;color:#1890ff;}
+.toolbar-btn.primary{background:#1890ff;color:#fff;border-color:#1890ff;}
+.toolbar-btn.danger{background:#f5222d;color:#fff;border-color:#f5222d;}
+.doc-body{flex:1;padding:16px;overflow-y:auto;}
+.doc-card{background:#fff;border-radius:4px;box-shadow:0 1px 2px rgba(0,0,0,0.05);overflow:hidden;}
+.data-table{width:100%;border-collapse:collapse;}
+.data-table th{background:#fafafa;padding:12px 16px;text-align:left;font-weight:600;font-size:13px;color:#333;border-bottom:2px solid #e8e8e8;}
+.data-table td{padding:12px 16px;border-bottom:1px solid #e8e8e8;font-size:13px;color:#333;}
+.data-table tr:hover{background:#f5f5f5;}
+.pagination{padding:16px;display:flex;justify-content:center;align-items:center;gap:16px;border-top:1px solid #e8e8e8;}
+.lookup-modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:2000;justify-content:center;align-items:center;}
+.lookup-modal.show{display:flex;}
+.lookup-dialog{background:#fff;border:1px solid #d9d9d9;border-radius:8px;width:800px;min-width:600px;max-width:90vw;height:500px;min-height:400px;max-height:70vh;overflow:hidden;box-shadow:0 10px 30px rgba(0,0,0,0.15);position:relative;resize:both;}
+.lookup-header{padding:16px 20px;border-bottom:1px solid #f0f0f0;background:#fafafa;display:flex;align-items:center;justify-content:space-between;cursor:move;}
+.lookup-title{font-size:16px;font-weight:600;color:#333;}
+.lookup-close{font-size:20px;color:#999;cursor:pointer;border:none;background:none;width:28px;height:28px;display:flex;align-items:center;justify-content:center;border-radius:4px;transition:all 0.3s;cursor:pointer;}
+.lookup-close:hover{background:#f5f5f5;color:#666;}
+.lookup-search{display:flex;gap:8px;margin-bottom:12px;}
+.lookup-search input{flex:1;padding:8px 12px;border:1px solid #e8e8e8;border-radius:4px;font-size:13px;}
+.lookup-search button{padding:8px 16px;border:none;background:#1890ff;color:#fff;border-radius:4px;cursor:pointer;font-size:13px;}
+.lookup-table{width:100%;border-collapse:collapse;}
+.lookup-table th,.lookup-table td{padding:10px 12px;text-align:left;border-bottom:1px solid #e8e8e8;}
+.lookup-table th{background:#fafafa;font-weight:600;color:#333;}
+.column-modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:2000;justify-content:center;align-items:center;}
+.column-modal.show{display:flex;}
+.column-dialog{background:#fff;border:1px solid #d9d9d9;border-radius:8px;width:560px;min-width:400px;max-width:720px;height:420px;min-height:300px;max-height:70vh;overflow:hidden;box-shadow:0 10px 30px rgba(0,0,0,0.15);position:relative;resize:both;}
+.column-header{padding:16px 20px;border-bottom:1px solid #f0f0f0;background:#fafafa;display:flex;align-items:center;justify-content:space-between;cursor:move;}
+.column-title{font-size:16px;font-weight:600;color:#333;}
+.column-close{font-size:20px;color:#999;cursor:pointer;border:none;background:none;width:28px;height:28px;display:flex;align-items:center;justify-content:center;border-radius:4px;transition:all 0.3s;cursor:pointer;}
+.column-close:hover{background:#f5f5f5;color:#666;}
+.column-body{padding:20px;overflow-y:auto;height:calc(100% - 88px);background:#fff;}
+.column-footer{padding:14px 20px;border-top:1px solid #f0f0f0;display:flex;justify-content:flex-end;gap:12px;background:#fafafa;position:absolute;bottom:0;left:0;right:0;}
+.column-item{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:4px;transition:all 0.2s;}
+.column-item:hover{background:#f5f7fa;}
+.column-item input[type="checkbox"]{width:16px;height:16px;cursor:pointer;accent-color:#1890ff;}
+.column-item label{font-size:14px;color:#333;cursor:pointer;flex:1;}
+.filter-modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:2000;justify-content:center;align-items:center;}
+.filter-modal.show{display:flex;}
+.filter-dialog{background:#fff;border:1px solid #d9d9d9;border-radius:8px;width:560px;min-width:480px;max-width:720px;height:600px;overflow:hidden;box-shadow:0 10px 30px rgba(0,0,0,0.15);position:relative;resize:both;display:flex;flex-direction:column;}
+.filter-header{padding:16px 20px;border-bottom:1px solid #f0f0f0;background:#fafafa;display:flex;align-items:center;justify-content:space-between;cursor:move;flex-shrink:0;}
+.filter-footer{padding:14px 20px;border-top:1px solid #f0f0f0;display:flex;justify-content:space-between;align-items:center;background:#fafafa;flex-shrink:0;}
+.filter-body{padding:20px;overflow-y:auto;flex:1;}
+.column-item{display:flex;align-items:center;gap:8px;margin-bottom:8px;padding:4px 8px;border-radius:4px;transition:background 0.2s;}
+.column-item:hover{background:#f5f5f5;}
+.filter-footer-left{display:flex;gap:8px;}
+.filter-footer-right{display:flex;gap:8px;}
+.filter-tabs{display:flex;border-bottom:1px solid #e8e8e8;margin-bottom:16px;}
+.filter-tabs .tab-btn{padding:10px 20px;border:none;background:none;font-size:13px;color:#666;cursor:pointer;border-bottom:2px solid transparent;transition:all 0.3s;}
+.filter-tabs .tab-btn.active{color:#1890ff;border-bottom-color:#1890ff;font-weight:500;}
+.filter-tabs .tab-btn:hover{color:#1890ff;}
+.filter-tab-content{min-height:200px;}
+.filter-toolbar{display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;}
+.btn-sm{padding:4px 12px;font-size:12px;}
+.filter-table{width:100%;border-collapse:collapse;margin-bottom:12px;}
+.filter-table th, .filter-table td{border:1px solid #e8e8e8;padding:8px 12px;font-size:13px;text-align:center;}
+.filter-table th{background:#fafafa;font-weight:500;color:#666;}
+.filter-table td input, .filter-table td select{width:100%;padding:4px 8px;border:1px solid #d9d9d9;border-radius:4px;font-size:12px;}
+.filter-options{display:flex;gap:16px;font-size:13px;}
+.filter-options label{display:flex;align-items:center;gap:4px;}
+.filter-row-remove{color:#f5222d;cursor:pointer;font-size:14px;}
+.filter-header{padding:16px 20px;border-bottom:1px solid #f0f0f0;background:#fafafa;display:flex;align-items:center;justify-content:space-between;cursor:move;}
+.filter-title{font-size:16px;font-weight:600;color:#333;}
+.filter-close{font-size:20px;color:#999;cursor:pointer;border:none;background:none;width:28px;height:28px;display:flex;align-items:center;justify-content:center;border-radius:4px;transition:all 0.3s;cursor:pointer;}
+.filter-close:hover{background:#f5f5f5;color:#666;}
+.filter-body{padding:20px;overflow-y:auto;}
+.filter-footer{padding:14px 20px;border-top:1px solid #f0f0f0;display:flex;justify-content:flex-end;gap:12px;background:#fafafa;}
+.form-row{display:grid;grid-template-columns:repeat(3,1fr);gap:12px 16px;margin-bottom:12px;}
+.form-group label{font-size:13px;color:#666;display:block;margin-bottom:4px;}
+.form-group input,.form-group select{width:100%;padding:6px 10px;border:1px solid #e8e8e8;border-radius:4px;font-size:13px;box-sizing:border-box;}
+.btn{padding:6px 16px;border-radius:4px;font-size:13px;cursor:pointer;border:1px solid #d9d9d9;background:#fff;color:#666;transition:all 0.3s;}
+.btn:hover{border-color:#1890ff;color:#1890ff;}
+.btn-primary{background:#1890ff;color:#fff;border-color:#1890ff;}
+.btn-cancel{border-color:#d9d9d9;color:#666;}
+.badge{padding:2px 8px;border-radius:4px;font-size:12px;}
+.badge-success{background:#f6ffed;color:#52c41a;}
+.badge-warning{background:#fffbe6;color:#faad14;}
+.badge-danger{background:#fff2f0;color:#f5222d;}
+.toast{position:fixed;top:20px;right:20px;padding:12px 20px;border-radius:4px;color:#fff;font-size:13px;z-index:9999;}
+.toast-success{background:#52c41a;}
+.toast-warning{background:#faad14;}
+.toast-info{background:#1890ff;}
+.toast-error{background:#f5222d;}
+.confirm-modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:3000;justify-content:center;align-items:center;}
+.confirm-modal.show{display:flex;}
+.confirm-dialog{background:#fff;border:1px solid #e8e8e8;border-radius:4px;width:420px;overflow:hidden;}
+.confirm-header{padding:14px 20px;border-bottom:1px solid #e8e8e8;display:flex;align-items:center;justify-content:space-between;background:#fafafa;}
+.confirm-title{font-size:14px;font-weight:600;color:#333;}
+.confirm-close{font-size:18px;color:#999;cursor:pointer;border:none;background:none;}
+.confirm-body{padding:24px 20px;font-size:14px;color:#333;line-height:1.6;background:#fff;}
+.confirm-footer{padding:12px 20px;border-top:1px solid #e8e8e8;display:flex;justify-content:flex-end;gap:8px;background:#fafafa;}
+</style>
+</head>
+<body>
+<div class="doc-page">
+  <aside class="doc-sidebar">
+    <div class="doc-sidebar-title">业务导航</div>
+    <ul class="doc-sidebar-menu">
+      <li><a href="#" class="active"><span class="menu-icon">&#128203;</span> 采购检验单列表</a></li>
+      <li><a href="purchase-inspect-create.html"><span class="menu-icon">&#10010;</span> 采购检验单新增</a></li>
+    </ul>
+  </aside>
+  <div class="doc-content">
+    <header class="doc-header">
+      <div>
+        <div class="doc-header-title">采购检验单</div>
+        <div class="doc-header-subtitle">管理采购检验单信息</div>
+      </div>
+      <div class="doc-toolbar">
+        <button class="toolbar-btn" onclick="openFilterModal()"><span class="icon">🔍</span> 过滤</button>
+        <button class="toolbar-btn primary" onclick="location.href='purchase-inspect-create.html'"><span class="icon">+</span> 新增</button>
+        <button class="toolbar-btn" onclick="batchSubmit()"><span class="icon">✓</span> 批量提交</button>
+        <button class="toolbar-btn" onclick="batchApprove()"><span class="icon">✓</span> 批量审核</button>
+        <button class="toolbar-btn" onclick="batchReverseApprove()"><span class="icon">↩️</span> 批量反审核</button>
+        
+        <button class="toolbar-btn danger" onclick="batchDelete()"><span class="icon">🗑️</span> 批量删除</button>
+        <div style="width:1px;height:24px;background:#e8e8e8;margin:0 8px;"></div>
+        <button class="toolbar-btn" onclick="openColumnSettings()"><span class="icon">⚙️</span> 显示/隐藏列</button>
+        <button class="toolbar-btn" onclick="exitPage()"><span class="icon">✖️</span> 退出</button>
+      </div>
+    </header>
+    <div class="doc-body">
+      <div class="doc-card">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th><input type="checkbox" onclick="selectAll()"></th>
+<th>单据编号</th><th>日期</th><th>供应商</th><th>组织</th><th>检验部门</th><th>检验人员</th><th>合格数量</th><th>不合格数量</th><th>状态</th><th>创建时间</th>
+            </tr>
+          </thead>
+          <tbody id="dataBody"></tbody>
+        </table>
+        <div class="pagination">
+          <button class="btn" onclick="prevPage()">上一页</button>
+          <span id="pageInfo">第 1 页 / 共 0 页</span>
+          <button class="btn" onclick="nextPage()">下一页</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+<div class="lookup-modal" id="lookupModal">
+  <div class="lookup-dialog">
+    <div class="lookup-header">
+      <div class="lookup-title" id="lookupTitle">选择</div>
+      <button class="lookup-close" onclick="closeLookup()">×</button>
+    </div>
+    <div class="lookup-body">
+      <div class="lookup-search">
+        <input type="text" id="lookupKeyword" placeholder="请输入编码或名称搜索" onkeydown="if(event.key==='Enter')filterLookup()">
+        <button onclick="filterLookup()">搜索</button>
+      </div>
+      <table class="lookup-table">
+        <thead id="lookupTableHead"></thead>
+        <tbody id="lookupTableBody"></tbody>
+      </table>
+    </div>
+    <div class="lookup-footer">
+      <button class="btn btn-cancel" onclick="closeLookup()">取消</button>
+      <button class="btn btn-primary" onclick="confirmLookup()">确定</button>
+    </div>
+  </div>
+</div>
+<div class="column-modal" id="columnModal">
+  <div class="column-dialog">
+    <div class="column-header">
+      <div class="column-title">列设置</div>
+      <button class="column-close" onclick="closeColumnSettings()">×</button>
+    </div>
+    <div class="column-body">
+      <div id="columnCheckboxes"></div>
+    </div>
+    <div class="column-footer">
+      <button class="btn btn-cancel" onclick="closeColumnSettings()">取消</button>
+      <button class="btn btn-primary" onclick="saveColumnSettings()">确定</button>
+    </div>
+  </div>
+</div>
+
+<div class="filter-modal" id="filterModal">
+  <div class="filter-dialog" style="width:720px;">
+    <div class="filter-header">
+      <div class="filter-title">过滤条件</div>
+      <button class="filter-close" onclick="closeFilterModal()">×</button>
+    </div>
+    <div class="filter-body">
+      <div class="filter-tabs">
+        <button class="tab-btn active" onclick="switchFilterTab('conditions')">条件</button>
+        <button class="tab-btn" onclick="switchFilterTab('advanced')">高级</button>
+        <button class="tab-btn" onclick="switchFilterTab('order')">排序</button>
+        <button class="tab-btn" onclick="switchFilterTab('columns')">显示隐藏列</button>
+      </div>
+      <div id="filterTabConditions" class="filter-tab-content">
+        <div class="filter-toolbar">
+          <button class="btn btn-sm" onclick="addFilterRow()">新增行</button>
+          <button class="btn btn-sm" onclick="deleteFilterRow()">删除行</button>
+          <button class="btn btn-sm" onclick="deleteAllFilterRows()">全部删除</button>
+          <button class="btn btn-sm" onclick="insertFilterRow()">插入行</button>
+          <button class="btn btn-sm" onclick="copyFilterRow()">复制行</button>
+        </div>
+        <table class="filter-table">
+          <thead><tr><th>序号</th><th>字段</th><th>比较</th><th>值</th><th>逻辑</th><th>操作</th></tr></thead>
+          <tbody id="filterTableBody"></tbody>
+        </table>
+        <div class="filter-options">
+          <label><input type="checkbox" id="filterOptionMatchAll">完全匹配</label>
+        </div>
+      </div>
+      <div id="filterTabAdvanced" class="filter-tab-content" style="display:none;">
+        <div class="form-group"><label>查询方案</label>
+          <select id="filterPlanSelect" onchange="loadFilterPlan(this.value)"><option value="">请选择查询方案</option></select>
+        </div>
+        <div class="form-group"><label>方案名称</label><input type="text" id="filterPlanName" placeholder="请输入查询方案名称"></div>
+        <button class="btn btn-primary btn-sm" onclick="saveFilterPlan()">保存方案</button>
+        <button class="btn btn-sm" onclick="deleteFilterPlan()">删除方案</button>
+      </div>
+      <div id="filterTabOrder" class="filter-tab-content" style="display:none;">
+        <div class="form-group"><label>排序字段</label>
+          <select id="orderField">
+            <option value="docDate">日期</option>
+            <option value="docNo">单据号</option>
+            <option value="partnerName">供应商</option>
+            <option value="department">部门</option>
+            <option value="quantity">数量</option>
+            <option value="unitPrice">单价</option>
+            <option value="amount">金额</option>
+            <option value="createdAt">创建时间</option>
+          </select>
+        </div>
+        <div class="form-group"><label>排序方式</label>
+          <select id="orderDirection">
+            <option value="desc">降序</option>
+            <option value="asc">升序</option>
+          </select>
+        </div>
+      </div>
+      <div id="filterTabColumns" class="filter-tab-content" style="display:none;">
+        <div id="filterColumnCheckboxes"></div>
+      </div>
+    </div>
+    <div class="filter-footer">
+      <div class="filter-footer-left">
+        <button class="btn btn-sm" onclick="loadDefaultFilter()">默认方案</button>
+      </div>
+      <div class="filter-footer-right">
+        <button class="btn btn-cancel" onclick="closeFilterModal()">取消</button>
+        <button class="btn" onclick="resetFilter()">重置</button>
+        <button class="btn btn-primary" onclick="executeFilter()">确定</button>
+      </div>
+    </div>
+  </div>
+</div>
+      <button class="filter-close" onclick="closeFilterModal()">×</button>
+    </div>
+    <div class="filter-body">
+      <div class="form-row">
+        <div class="form-group"><label>单据编号</label><input type="text" id="filterDocNo" placeholder="请输入单据编号"></div>
+        <div class="form-group"><label>供应商</label><input type="text" id="filterPartner" placeholder="请输入供应商"></div>
+        <div class="form-group"><label>组织</label><input type="text" id="filterOrg" placeholder="请输入组织"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>状态</label><select id="filterStatus"><option value="">全部状态</option><option value="draft">草稿</option><option value="pending">待审核</option><option value="approved">已审核</option><option value="closed">已关闭</option></select></div>
+        <div class="form-group"><label>开始日期</label><input type="date" id="filterStartDate"></div>
+        <div class="form-group"><label>结束日期</label><input type="date" id="filterEndDate"></div>
+      </div>
+    </div>
+    <div class="filter-footer">
+      <button class="btn btn-cancel" onclick="closeFilterModal()">取消</button>
+      <button class="btn" onclick="resetFilter()">重置</button>
+      <button class="btn btn-primary" onclick="searchData()">确定</button>
+    </div>
+  </div>
+</div>
+<script>
+var docType = 'purchase_inspect';
+var docName = '采购检验单';
+var allColumns = ["\u5408\u683c\u7387", "\u89c4\u683c\u578b\u53f7", "\u5907\u6ce8", "\u91d1\u989d", "\u7269\u6599\u7f16\u7801", "\u68c0\u9a8c\u90e8\u95e8", "\u4e0d\u5408\u683c\u6570\u91cf", "\u72b6\u6001", "\u68c0\u9a8c\u4eba\u5458", "\u5355\u636e\u7f16\u53f7", "\u5355\u4f4d", "\u68c0\u9a8c\u7ed3\u679c", "\u7269\u6599\u540d\u79f0", "\u9001\u68c0\u6570\u91cf", "\u65e5\u671f", "\u7ec4\u7ec7", "\u4f9b\u5e94\u5546", "\u5408\u683c\u6570\u91cf", "\u521b\u5efa\u65f6\u95f4"];
+var defaultVisibleColumns = ["\u5355\u636e\u7f16\u53f7", "\u65e5\u671f", "\u4f9b\u5e94\u5546", "\u7ec4\u7ec7", "\u68c0\u9a8c\u90e8\u95e8", "\u68c0\u9a8c\u4eba\u5458", "\u5408\u683c\u6570\u91cf", "\u4e0d\u5408\u683c\u6570\u91cf", "\u72b6\u6001", "\u521b\u5efa\u65f6\u95f4"];
+var visibleColumns = JSON.parse(localStorage.getItem('visible_columns_' + docType) || JSON.stringify(defaultVisibleColumns));
+
+var filterFields = [
+  { label: '基本信息-单据编号', key: 'docNo', type: 'text' },
+  { label: '基本信息-日期', key: 'docDate', type: 'date' },
+  { label: '基本信息-供应商', key: 'partnerName', type: 'lookup', lookupType: 'supplier' },
+  { label: '基本信息-组织', key: 'orgName', type: 'lookup', lookupType: 'organization' },
+  { label: '基本信息-部门', key: 'department', type: 'lookup', lookupType: 'department' },
+  { label: '基本信息-人员', key: 'employee', type: 'lookup', lookupType: 'employee' },
+  { label: '基本信息-币别', key: 'currency', type: 'text' },
+  { label: '基本信息-汇率', key: 'exchangeRate', type: 'number' },
+  { label: '基本信息-金额', key: 'amount', type: 'number' },
+  { label: '基本信息-状态', key: 'status', type: 'select', options: ['draft', 'pending', 'approved', 'closed'] },
+  { label: '基本信息-创建时间', key: 'createdAt', type: 'date' },
+  { label: '明细信息-物料编码', key: 'materialCode', type: 'lookup', lookupType: 'material' },
+  { label: '明细信息-物料名称', key: 'materialName', type: 'text' },
+  { label: '明细信息-规格型号', key: 'specification', type: 'text' },
+  { label: '明细信息-数量', key: 'quantity', type: 'number' },
+  { label: '明细信息-单价', key: 'unitPrice', type: 'number' },
+  { label: '明细信息-税率', key: 'taxRate', type: 'number' }
+];
+var compareOperators = [
+  { value: '=', label: '等于' },
+  { value: '<>', label: '不等于' },
+  { value: 'like', label: '包含' },
+  { value: 'notlike', label: '不包含' },
+  { value: '>', label: '大于' },
+  { value: '>=', label: '大于等于' },
+  { value: '<', label: '小于' },
+  { value: '<=', label: '小于等于' },
+  { value: 'isnull', label: '为空' },
+  { value: 'isnotnull', label: '不为空' }
+];
+function init() { loadData(); initFilterTable(); }
+function initFilterTable() {
+  addFilterRow();
+  loadFilterPlans();
+}
+function addFilterRow() {
+  var tbody = document.getElementById('filterTableBody');
+  var row = tbody.insertRow();
+  var idx = tbody.rows.length;
+  var fieldOptions = filterFields.map(function(f) { return '<option value="' + f.key + '" data-type="' + f.type + '" data-lookup="' + (f.lookupType || '') + '">' + f.label + '</option>'; }).join('');
+  var operatorOptions = compareOperators.map(function(o) { return '<option value="' + o.value + '">' + o.label + '</option>'; }).join('');
+  row.innerHTML = '<td>' + idx + '</td>' +
+    '<td><select class="filter-field" onchange="updateFilterValueControl(this)"><option value="">请选择字段</option>' + fieldOptions + '</select></td>' +
+    '<td><select class="filter-operator" onchange="updateFilterValueControlByOperator(this)">' + operatorOptions + '</select></td>' +
+    '<td><div class="filter-value-container"><input type="text" class="filter-value" placeholder="请输入值"></div></td>' +
+    '<td><select class="filter-logic"><option value="and">并且</option><option value="or">或者</option></select></td>' +
+    '<td><span class="filter-row-remove" onclick="this.closest(\'tr\').remove();updateFilterRowNumbers();">×</span></td>';
+}
+function updateFilterValueControl(fieldSelect) {
+  var row = fieldSelect.closest('tr');
+  var container = row.querySelector('.filter-value-container');
+  var selectedOption = fieldSelect.options[fieldSelect.selectedIndex];
+  var fieldType = selectedOption.dataset.type || 'text';
+  var lookupType = selectedOption.dataset.lookup || '';
+  var field = filterFields.find(function(f) { return f.key === fieldSelect.value; });
+  var operator = row.querySelector('.filter-operator').value;
+  if (operator === 'isnull' || operator === 'isnotnull') {
+    container.style.display = 'none';
+    return;
+  }
+  container.style.display = '';
+  var valueHtml = '';
+  if (fieldType === 'date') {
+    valueHtml = '<input type="date" class="filter-value" style="width:100%;padding:4px 8px;border:1px solid #d9d9d9;border-radius:4px;font-size:12px;">';
+  } else if (fieldType === 'number') {
+    valueHtml = '<input type="number" class="filter-value" placeholder="请输入数值" style="width:100%;padding:4px 8px;border:1px solid #d9d9d9;border-radius:4px;font-size:12px;">';
+  } else if (fieldType === 'select' && field && field.options) {
+    var options = field.options.map(function(o) {
+      var label = { 'draft': '草稿', 'pending': '待审核', 'approved': '已审核', 'closed': '已关闭' }[o] || o;
+      return '<option value="' + o + '">' + label + '</option>';
+    }).join('');
+    valueHtml = '<select class="filter-value" style="width:100%;padding:4px 8px;border:1px solid #d9d9d9;border-radius:4px;font-size:12px;"><option value="">请选择</option>' + options + '</select>';
+  } else if (fieldType === 'lookup') {
+    valueHtml = '<div style="display:flex;gap:4px;"><input type="text" class="filter-value" placeholder="请选择" readonly style="flex:1;padding:4px 8px;border:1px solid #d9d9d9;border-radius:4px;font-size:12px;"><button type="button" class="btn btn-sm" onclick="openFilterLookup(\'' + lookupType + '\', this)">...</button></div>';
+  } else {
+    valueHtml = '<input type="text" class="filter-value" placeholder="请输入值" style="width:100%;padding:4px 8px;border:1px solid #d9d9d9;border-radius:4px;font-size:12px;">';
+  }
+  container.innerHTML = valueHtml;
+}
+function updateFilterValueControlByOperator(operatorSelect) {
+  var row = operatorSelect.closest('tr');
+  var container = row.querySelector('.filter-value-container');
+  var fieldSelect = row.querySelector('.filter-field');
+  if (operatorSelect.value === 'isnull' || operatorSelect.value === 'isnotnull') {
+    container.style.display = 'none';
+  } else {
+    container.style.display = '';
+    if (fieldSelect.value) {
+      var event = new Event('change');
+      fieldSelect.dispatchEvent(event);
+    }
+  }
+}
+function openFilterLookup(type, btn) {
+  var row = btn.closest('tr');
+  var input = row.querySelector('.filter-value');
+  var titles = { 'customer': '客户选择', 'organization': '组织选择', 'department': '部门选择', 'employee': '员工选择', 'material': '物料选择', 'supplier': '供应商选择' };
+  var dataKeys = { 'customer': 'erp_customers_cache', 'organization': 'erp_organizations_cache', 'department': 'erp_departments_cache', 'employee': 'erp_employees_cache', 'material': 'erp_materials_cache', 'supplier': 'erp_suppliers_cache' };
+  var displayFields = { 'customer': ['code', 'name'], 'organization': ['code', 'name'], 'department': ['code', 'name'], 'employee': ['code', 'name'], 'material': ['code', 'name'], 'supplier': ['code', 'name'] };
+  var data = JSON.parse(localStorage.getItem(dataKeys[type]) || '[]');
+  if (data.length === 0) {
+    showToast('无可用数据', 'warning');
+    return;
+  }
+  var html = '<div style="max-height:300px;overflow-y:auto;">';
+  data.forEach(function(item) {
+    var displayText = displayFields[type].map(function(f) { return item[f] || ''; }).join(' - ');
+    html += '<div class="lookup-item" style="padding:8px 12px;cursor:pointer;border-bottom:1px solid #f0f0f0;" data-value="' + displayText + '">' + displayText + '</div>';
+  });
+  html += '</div>';
+  showConfirm(titles[type], function() {});
+  var confirmBody = document.getElementById('confirmBody') || document.getElementById('confirmMessage');
+  if (confirmBody) {
+    confirmBody.innerHTML = html;
+    confirmBody.querySelectorAll('.lookup-item').forEach(function(item) {
+      item.onclick = function() {
+        input.value = this.dataset.value;
+        document.getElementById('confirmModal').classList.remove('show');
+      };
+    });
+  }
+}
+function deleteFilterRow() {
+  var tbody = document.getElementById('filterTableBody');
+  if (tbody.rows.length > 0) {
+    tbody.deleteRow(tbody.rows.length - 1);
+    updateFilterRowNumbers();
+  }
+}
+function deleteAllFilterRows() {
+  document.getElementById('filterTableBody').innerHTML = '';
+}
+function insertFilterRow() {
+  var tbody = document.getElementById('filterTableBody');
+  if (tbody.rows.length > 0) {
+    var row = tbody.insertRow(0);
+    var idx = tbody.rows.length;
+    var fieldOptions = filterFields.map(function(f) { return '<option value="' + f.key + '" data-type="' + f.type + '" data-lookup="' + (f.lookupType || '') + '">' + f.label + '</option>'; }).join('');
+    var operatorOptions = compareOperators.map(function(o) { return '<option value="' + o.value + '">' + o.label + '</option>'; }).join('');
+    row.innerHTML = '<td>' + idx + '</td>' +
+      '<td><select class="filter-field" onchange="updateFilterValueControl(this)"><option value="">请选择字段</option>' + fieldOptions + '</select></td>' +
+      '<td><select class="filter-operator" onchange="updateFilterValueControlByOperator(this)">' + operatorOptions + '</select></td>' +
+      '<td><div class="filter-value-container"><input type="text" class="filter-value" placeholder="请输入值"></div></td>' +
+      '<td><select class="filter-logic"><option value="and">并且</option><option value="or">或者</option></select></td>' +
+      '<td><span class="filter-row-remove" onclick="this.closest(\'tr\').remove();updateFilterRowNumbers();">×</span></td>';
+    updateFilterRowNumbers();
+  }
+}
+function copyFilterRow() {
+  var tbody = document.getElementById('filterTableBody');
+  if (tbody.rows.length > 0) {
+    var lastRow = tbody.rows[tbody.rows.length - 1];
+    var clone = lastRow.cloneNode(true);
+    clone.querySelector('.filter-row-remove').onclick = function() {
+      this.closest('tr').remove();
+      updateFilterRowNumbers();
+    };
+    var fieldSelect = clone.querySelector('.filter-field');
+    if (fieldSelect) {
+      fieldSelect.onchange = function() { updateFilterValueControl(this); };
+    }
+    var lookupBtns = clone.querySelectorAll('button.btn-sm');
+    lookupBtns.forEach(function(btn) {
+      var onclickStr = btn.getAttribute('onclick') || '';
+      var match = onclickStr.match(/openFilterLookup\('([^']+)', this\)/);
+      if (match) {
+        btn.onclick = function() { openFilterLookup(match[1], this); };
+      }
+    });
+    tbody.appendChild(clone);
+    updateFilterRowNumbers();
+  }
+}
+function updateFilterRowNumbers() {
+  var tbody = document.getElementById('filterTableBody');
+  for (var i = 0; i < tbody.rows.length; i++) {
+    tbody.rows[i].cells[0].textContent = i + 1;
+  }
+}
+function switchFilterTab(tab) {
+  document.querySelectorAll('.filter-tab-content').forEach(function(el) { el.style.display = 'none'; });
+  document.getElementById('filterTab' + tab.charAt(0).toUpperCase() + tab.slice(1)).style.display = 'block';
+  document.querySelectorAll('.filter-tabs .tab-btn').forEach(function(el) { el.classList.remove('active'); });
+  event.target.classList.add('active');
+  if (tab === 'columns') openColumnSettingsInModal();
+}
+function openColumnSettingsInModal() {
+  var container = document.getElementById('filterColumnCheckboxes');
+  container.innerHTML = '';
+  allColumns.forEach(function(col) {
+    var item = document.createElement('div');
+    item.className = 'column-item';
+    var checked = visibleColumns.includes(col) ? 'checked' : '';
+    item.innerHTML = '<input type="checkbox" ' + checked + ' value="' + col + '" onchange="toggleColumn(this)">' + '<label>' + col + '</label>';
+    container.appendChild(item);
+  });
+}
+function executeFilter() {
+  var list = JSON.parse(localStorage.getItem('erp_' + docType + '_list') || '[]');
+  var rows = document.querySelectorAll('#filterTableBody tr');
+  var matchAll = document.getElementById('filterOptionMatchAll').checked;
+  var filtered = list.filter(function(item) {
+    var result = true;
+    var prevLogic = 'and';
+    var hasValidCondition = false;
+    for (var i = 0; i < rows.length; i++) {
+      var field = rows[i].querySelector('.filter-field').value;
+      var operator = rows[i].querySelector('.filter-operator').value;
+      var value = rows[i].querySelector('.filter-value').value.trim();
+      var logic = rows[i].querySelector('.filter-logic').value;
+      if (!field) continue;
+      hasValidCondition = true;
+      var rowResult = applyFilterCondition(item, field, operator, value, matchAll);
+      if (i === 0) {
+        result = rowResult;
+      } else {
+        if (prevLogic === 'and') {
+          result = result && rowResult;
+        } else {
+          result = result || rowResult;
+        }
+      }
+      prevLogic = logic;
+    }
+    return hasValidCondition ? result : true;
+  });
+  var orderField = document.getElementById('orderField').value;
+  var orderDirection = document.getElementById('orderDirection').value;
+  filtered.sort(function(a, b) {
+    var valA = a[orderField] || '';
+    var valB = b[orderField] || '';
+    if (typeof valA === 'number' && typeof valB === 'number') {
+      return orderDirection === 'asc' ? valA - valB : valB - valA;
+    }
+    return orderDirection === 'asc' ? String(valA).localeCompare(valB) : String(valB).localeCompare(valA);
+  });
+  closeFilterModal();
+  renderTable(filtered);
+}
+function applyFilterCondition(item, field, operator, value, matchAll) {
+  var itemValue = item[field] || item[field.replace(/([A-Z])/g, '_$1').toLowerCase()] || '';
+  var itemStr = String(itemValue).toLowerCase();
+  var valueStr = String(value).toLowerCase();
+  switch (operator) {
+    case '=': return matchAll ? itemStr === valueStr : itemStr.includes(valueStr);
+    case '<>': return matchAll ? itemStr !== valueStr : !itemStr.includes(valueStr);
+    case 'like': return itemStr.includes(valueStr);
+    case 'notlike': return !itemStr.includes(valueStr);
+    case '>': return parseFloat(itemValue) > parseFloat(value);
+    case '>=': return parseFloat(itemValue) >= parseFloat(value);
+    case '<': return parseFloat(itemValue) < parseFloat(value);
+    case '<=': return parseFloat(itemValue) <= parseFloat(value);
+    case 'isnull': return itemValue === null || itemValue === undefined || itemValue === '';
+    case 'isnotnull': return itemValue !== null && itemValue !== undefined && itemValue !== '';
+    default: return true;
+  }
+}
+function saveFilterPlan() {
+  var name = document.getElementById('filterPlanName').value.trim();
+  if (!name) { showToast('请输入查询方案名称', 'warning'); return; }
+  var conditions = Array.from(document.querySelectorAll('#filterTableBody tr')).map(function(row) {
+    return {
+      field: row.querySelector('.filter-field').value,
+      operator: row.querySelector('.filter-operator').value,
+      value: row.querySelector('.filter-value').value,
+      logic: row.querySelector('.filter-logic').value
+    };
+  });
+  var plan = {
+    id: Date.now().toString(),
+    name: name,
+    conditions: conditions,
+    orderField: document.getElementById('orderField').value,
+    orderDirection: document.getElementById('orderDirection').value,
+    matchAll: document.getElementById('filterOptionMatchAll').checked,
+    docType: docType
+  };
+  var plans = JSON.parse(localStorage.getItem('filter_plans') || '[]');
+  plans.push(plan);
+  localStorage.setItem('filter_plans', JSON.stringify(plans));
+  showToast('查询方案已保存', 'success');
+  loadFilterPlans();
+}
+function loadFilterPlans() {
+  var plans = JSON.parse(localStorage.getItem('filter_plans') || '[]');
+  var select = document.getElementById('filterPlanSelect');
+  select.innerHTML = '<option value="">请选择查询方案</option>';
+  plans.forEach(function(p) {
+    if (p.docType === docType) {
+      var opt = document.createElement('option');
+      opt.value = p.id;
+      opt.textContent = p.name;
+      select.appendChild(opt);
+    }
+  });
+}
+function loadFilterPlan(id) {
+  if (!id) return;
+  var plans = JSON.parse(localStorage.getItem('filter_plans') || '[]');
+  var plan = plans.find(function(p) { return p.id === id; });
+  if (!plan) return;
+  var tbody = document.getElementById('filterTableBody');
+  tbody.innerHTML = '';
+  plan.conditions.forEach(function(c, i) {
+    var row = tbody.insertRow();
+    var fieldOptions = filterFields.map(function(f) {
+      var selected = f.key === c.field ? 'selected' : '';
+      return '<option value="' + f.key + '" data-type="' + f.type + '" data-lookup="' + (f.lookupType || '') + '" ' + selected + '>' + f.label + '</option>';
+    }).join('');
+    var operatorOptions = compareOperators.map(function(o) {
+      var selected = o.value === c.operator ? 'selected' : '';
+      return '<option value="' + o.value + '" ' + selected + '>' + o.label + '</option>';
+    }).join('');
+    var logicOptions = ['and', 'or'].map(function(l) {
+      var selected = l === c.logic ? 'selected' : '';
+      var label = l === 'and' ? '并且' : '或者';
+      return '<option value="' + l + '" ' + selected + '>' + label + '</option>';
+    }).join('');
+    row.innerHTML = '<td>' + (i + 1) + '</td>' +
+      '<td><select class="filter-field" onchange="updateFilterValueControl(this)">' + fieldOptions + '</select></td>' +
+      '<td><select class="filter-operator" onchange="updateFilterValueControlByOperator(this)">' + operatorOptions + '</select></td>' +
+      '<td><div class="filter-value-container"><input type="text" class="filter-value" value="' + c.value + '"></div></td>' +
+      '<td><select class="filter-logic">' + logicOptions + '</select></td>' +
+      '<td><span class="filter-row-remove" onclick="this.closest(\'tr\').remove();updateFilterRowNumbers();">×</span></td>';
+    if (c.field) {
+      var event = new Event('change');
+      row.querySelector('.filter-field').dispatchEvent(event);
+    }
+  });
+  document.getElementById('orderField').value = plan.orderField || 'docDate';
+  document.getElementById('orderDirection').value = plan.orderDirection || 'desc';
+  document.getElementById('filterOptionMatchAll').checked = plan.matchAll || false;
+}
+function deleteFilterPlan() {
+  var id = document.getElementById('filterPlanSelect').value;
+  if (!id) { showToast('请选择要删除的查询方案', 'warning'); return; }
+  showConfirm('确认删除该查询方案？', function() {
+    var plans = JSON.parse(localStorage.getItem('filter_plans') || '[]');
+    plans = plans.filter(function(p) { return p.id !== id; });
+    localStorage.setItem('filter_plans', JSON.stringify(plans));
+    showToast('查询方案已删除', 'success');
+    loadFilterPlans();
+    document.getElementById('filterPlanName').value = '';
+  });
+}
+function loadDefaultFilter() {
+  document.getElementById('filterTableBody').innerHTML = '';
+  addFilterRow();
+  document.getElementById('orderField').value = 'docDate';
+  document.getElementById('orderDirection').value = 'desc';
+  document.getElementById('filterOptionMatchAll').checked = false;
+}
+function openFilterModal() { document.getElementById('filterModal').classList.add('show'); }
+function closeFilterModal() { document.getElementById('filterModal').classList.remove('show'); }
+function resetFilter() { loadDefaultFilter(); }
+var pageSize = 10;
+function init() { loadData(); }
+function loadData() {
+  var list = JSON.parse(localStorage.getItem('erp_' + docType + '_list') || '[]');
+  if (list.length === 0) {
+    var now = new Date().toISOString();
+    list = [{ id: '1', docNo: 'PURCHASEINSPECT202607170001', partnerName: '深圳电子元器件有限公司', orgName: '磐枢工业集团', docDate: '2026-07-17', amount: 10000, status: 'approved', createdAt: now }];
+    localStorage.setItem('erp_' + docType + '_list', JSON.stringify(list));
+  }
+  renderTable(list);
+}
+function renderTable(list) {
+  var tbody = document.getElementById('dataBody');
+  tbody.innerHTML = '';
+  if (list.length === 0) { tbody.innerHTML = '<tr><td colspan="' + (visibleColumns.length + 1) + '" style="text-align:center;padding:40px;color:#999;">暂无数据</td></tr>'; return; }
+  var statusMap = { 'draft': '草稿', 'submitted': '待审核', 'approved': '已审核', 'closed': '已关闭' };
+  var statusClassMap = { 'draft': 'badge-warning', 'submitted': 'badge-warning', 'approved': 'badge-success', 'closed': 'badge-danger' };
+  var colKeys = {
+    '单据编号': 'docNo', '日期': 'docDate', '供应商': 'partnerName', '客户': 'partnerName',
+    '组织': 'orgName', '金额': 'amount', '状态': 'status', '创建时间': 'createdAt',
+    '销售部门': 'department', '销售人员': 'employee', '单价': 'unitPrice', '物料编码': 'materialCode', '物料名称': 'materialName', '规格型号': 'specification', '税率': 'taxRate', '税额': 'taxAmount', '币别': 'currency', '汇率': 'exchangeRate', '单位': 'unit', '备注': 'remark', '发货仓库': 'deliveryWarehouse', '发货人员': 'deliveryEmployee', '出库数量': 'outboundQty', '未出库数量': 'unoutboundQty'
+  };
+  list.forEach(function(item) {
+    var row = document.createElement('tr');
+    var cells = '<td><input type="checkbox" class="data-checkbox" value="' + item.id + '"></td>';
+    visibleColumns.forEach(function(col) {
+      var key = colKeys[col] || col;
+      var value = item[key] || '';
+      if (col === '状态') {
+        cells += '<td><span class="badge ' + statusClassMap[value] + '">'+ statusMap[value] + '</span></td>';
+      } else if (col === '金额') {
+        cells += '<td style="color:#f5222d;font-weight:600;">' + parseFloat(value).toFixed(2) + '</td>';
+      } else if (col === '创建时间') {
+        cells += '<td>' + (value ? new Date(value).toLocaleString() : '') + '</td>';
+      } else if (col === '单据编号') {
+        cells += '<td><a href="' + docType.replace(/_/g, '-') + '-create.html?id=' + item.id + '">'+ value + '</a></td>';
+      } else {
+        cells += '<td>' + value + '</td>';
+      }
+    });
+    row.innerHTML = cells;
+    tbody.appendChild(row);
+  });
+}
+function openFilterModal() { document.getElementById('filterModal').classList.add('show'); }
+function closeFilterModal() { document.getElementById('filterModal').classList.remove('show'); }
+function resetFilter() { document.getElementById('filterDocNo').value = ''; document.getElementById('filterPartner').value = ''; document.getElementById('filterOrg').value = ''; document.getElementById('filterStatus').value = ''; document.getElementById('filterStartDate').value = ''; document.getElementById('filterEndDate').value = ''; }
+function selectAll() { document.querySelectorAll('.data-checkbox').forEach(function(cb) { cb.checked = document.querySelector('.data-table th input').checked; }); }
+function getSelectedIds() { return Array.from(document.querySelectorAll('.data-checkbox:checked')).map(function(cb) { return cb.value; }); }
+function batchSubmit() {
+  var ids = getSelectedIds();
+  if (ids.length === 0) { showToast('请选择要提交的单据', 'warning'); return; }
+  showConfirm('确认提交选中的 ' + ids.length + ' 条单据？', function() {
+    var list = JSON.parse(localStorage.getItem('erp_' + docType + '_list') || '[]');
+    list.forEach(function(item) { if (ids.includes(item.id) && item.status === 'draft') item.status = 'submitted'; });
+    localStorage.setItem('erp_' + docType + '_list', JSON.stringify(list));
+    showToast('已提交 ' + ids.length + ' 条单据', 'success');
+    loadData();
+  });
+}
+function batchApprove() {
+  var ids = getSelectedIds();
+  if (ids.length === 0) { showToast('请选择要审核的单据', 'warning'); return; }
+  showConfirm('确认审核选中的 ' + ids.length + ' 条单据？', function() {
+    var list = JSON.parse(localStorage.getItem('erp_' + docType + '_list') || '[]');
+    list.forEach(function(item) { if (ids.includes(item.id) && item.status === 'submitted') item.status = 'approved'; });
+    localStorage.setItem('erp_' + docType + '_list', JSON.stringify(list));
+    showToast('已审核 ' + ids.length + ' 条单据', 'success');
+    loadData();
+  });
+}
+function batchReverseApprove() {
+  var ids = getSelectedIds();
+  if (ids.length === 0) { showToast('请选择要反审核的单据', 'warning'); return; }
+  showConfirm('确认反审核选中的 ' + ids.length + ' 条单据？', function() {
+    var list = JSON.parse(localStorage.getItem('erp_' + docType + '_list') || '[]');
+    list.forEach(function(item) { if (ids.includes(item.id) && item.status === 'approved') item.status = 'submitted'; });
+    localStorage.setItem('erp_' + docType + '_list', JSON.stringify(list));
+    showToast('已反审核 ' + ids.length + ' 条单据', 'success');
+    loadData();
+  });
+}
+function batchClose() {
+  var ids = getSelectedIds();
+  if (ids.length === 0) { showToast('请选择要关闭的单据', 'warning'); return; }
+  showConfirm('确认关闭选中的 ' + ids.length + ' 条单据？', function() {
+    var list = JSON.parse(localStorage.getItem('erp_' + docType + '_list') || '[]');
+    list.forEach(function(item) { if (ids.includes(item.id) && item.status === 'approved') item.status = 'closed'; });
+    localStorage.setItem('erp_' + docType + '_list', JSON.stringify(list));
+    showToast('已关闭 ' + ids.length + ' 条单据', 'success');
+    loadData();
+  });
+}
+function batchReverseClose() {
+  var ids = getSelectedIds();
+  if (ids.length === 0) { showToast('请选择要反关闭的单据', 'warning'); return; }
+  showConfirm('确认反关闭选中的 ' + ids.length + ' 条单据？', function() {
+    var list = JSON.parse(localStorage.getItem('erp_' + docType + '_list') || '[]');
+    list.forEach(function(item) { if (ids.includes(item.id) && item.status === 'closed') item.status = 'approved'; });
+    localStorage.setItem('erp_' + docType + '_list', JSON.stringify(list));
+    showToast('已反关闭 ' + ids.length + ' 条单据', 'success');
+    loadData();
+  });
+}
+function batchDelete() {
+  var ids = getSelectedIds();
+  if (ids.length === 0) { showToast('请选择要删除的单据', 'warning'); return; }
+  showConfirm('确认删除选中的 ' + ids.length + ' 条单据？', function() {
+    var list = JSON.parse(localStorage.getItem('erp_' + docType + '_list') || '[]');
+    list = list.filter(function(item) { return !ids.includes(item.id); });
+    localStorage.setItem('erp_' + docType + '_list', JSON.stringify(list));
+    showToast('已删除 ' + ids.length + ' 条单据', 'success');
+    loadData();
+  });
+}
+function openColumnSettings() {
+  var container = document.getElementById('columnCheckboxes');
+  container.innerHTML = '';
+  allColumns.forEach(function(col) {
+    var item = document.createElement('div');
+    item.className = 'column-item';
+    var checked = visibleColumns.includes(col) ? 'checked' : '';
+    item.innerHTML = '<input type="checkbox" ' + checked + ' value="' + col + '" onchange="toggleColumn(this)">' + '<label>' + col + '</label>';
+    container.appendChild(item);
+  });
+  document.getElementById('columnModal').classList.add('show');
+}
+function closeColumnSettings() { document.getElementById('columnModal').classList.remove('show'); }
+function toggleColumn(cb) {
+  var idx = visibleColumns.indexOf(cb.value);
+  if (cb.checked && idx === -1) visibleColumns.push(cb.value);
+  else if (!cb.checked && idx !== -1) visibleColumns.splice(idx, 1);
+}
+function saveColumnSettings() {
+  localStorage.setItem('visible_columns_' + docType, JSON.stringify(visibleColumns));
+  showToast('列设置已保存', 'success');
+  closeColumnSettings();
+  loadData();
+}
+function prevPage() { if (currentPage > 1) { currentPage--; loadData(); } }
+function nextPage() { loadData(); }
+function exitPage() { showConfirm("确认退出？", function() { window.location.href = "../index.html"; }); }
+document.addEventListener('DOMContentLoaded', init);
+</script>
+<script src="../purchase-p0-api.js"></script>
+</body>
+</html>

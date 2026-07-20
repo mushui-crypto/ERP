@@ -1,0 +1,1982 @@
+<!DOCTYPE html>
+
+
+
+<html lang="zh-CN">
+
+
+
+<head>
+
+
+
+<meta charset="UTF-8">
+
+
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+
+
+<title>设备统计 — 磐枢工业智能平台</title>
+
+
+
+<link rel="stylesheet" href="../common.css">
+
+
+
+<script src="../common.js"></script>
+<script>
+</script>
+
+
+
+<style>
+
+
+
+.stat-card-row { display: grid; grid-template-columns: repeat(6, 1fr); gap: 16px; margin-bottom: 20px; }
+
+
+
+.status-line { margin-bottom: 16px; }
+
+
+
+.status-line-title { font-size: 13px; font-weight: 600; color: var(--text-primary); margin-bottom: 8px; }
+
+
+
+.status-line-items { display: flex; gap: 8px; flex-wrap: wrap; }
+
+
+
+.status-line-item { display: flex; align-items: center; gap: 6px; padding: 8px 12px; background: var(--bg-surface); border: 1px solid var(--border-normal); border-radius: var(--radius-md); font-size: 12px; }
+
+
+
+.status-line-item .dot { width: 10px; height: 10px; border-radius: 50%; }
+
+
+
+.status-line-item .dot.green { background: var(--color-success); }
+
+
+
+.status-line-item .dot.yellow { background: var(--color-warning); }
+
+
+
+.status-line-item .dot.red { background: var(--color-error); }
+
+
+
+.status-line-item .name { color: var(--text-secondary); }
+
+
+
+.status-line-item .count { font-family: var(--font-mono); font-weight: 600; color: var(--text-primary); }
+
+
+
+@media (max-width: 1200px) { .stat-card-row { grid-template-columns: repeat(3, 1fr); } }
+
+
+
+@media (max-width: 768px) { .stat-card-row { grid-template-columns: repeat(2, 1fr); } }
+
+
+
+
+.lookup-modal { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:2000; justify-content:center; align-items:center; }
+.lookup-modal.show { display:flex; }
+.lookup-dialog { background:#fff; border:1px solid #e8e8e8; border-radius:4px; width:720px; max-height:70vh; overflow:hidden; }
+.lookup-header { padding:14px 20px; border-bottom:1px solid #e8e8e8; display:flex; align-items:center; justify-content:space-between; }
+.lookup-title { font-size:15px; font-weight:600; color:#333; }
+.lookup-close { font-size:20px; color:#666; cursor:pointer; background:none; border:none; }
+.lookup-close:hover { color:#333; }
+.lookup-body { padding:16px; }
+.lookup-search { display:flex; gap:8px; margin-bottom:12px; }
+.lookup-search input { flex:1; padding:6px 10px; border:1px solid #e8e8e8; border-radius:4px; font-size:13px; }
+.lookup-search button { padding:6px 16px; background:#1890ff; color:#fff; border:none; border-radius:4px; cursor:pointer; }
+.lookup-table { width:100%; border-collapse:collapse; font-size:13px; }
+.lookup-table th, .lookup-table td { padding:10px 12px; text-align:left; border-bottom:1px solid #e8e8e8; }
+.lookup-table th { background:#fafafa; font-weight:600; color:#333; }
+.lookup-table tr:hover { background:#f5f5f5; }
+.lookup-table .checkbox-cell { width:40px; }
+.lookup-footer { padding:12px 20px; border-top:1px solid #e8e8e8; display:flex; justify-content:flex-end; gap:8px; }
+.lookup-field { display:flex; align-items:center; }
+.lookup-field input { flex:1; padding:6px 10px; border:1px solid #e8e8e8; border-radius:4px 0 0 4px; font-size:13px; }
+.lookup-field button { width:28px; height:28px; border:1px solid #e8e8e8; border-left:none; border-radius:0 4px 4px 0; background:#fff; cursor:pointer; display:flex; align-items:center; justify-content:center; }
+.lookup-field button:hover { background:#f5f5f5; }
+
+.column-modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:2000;justify-content:center;align-items:center;}
+.column-modal.show{display:flex;}
+.column-dialog{background:#fff;border:1px solid #d9d9d9;border-radius:8px;width:560px;min-width:400px;max-width:720px;height:420px;min-height:300px;max-height:70vh;overflow:hidden;box-shadow:0 10px 30px rgba(0,0,0,0.15);position:relative;resize:both;}
+.column-header{padding:16px 20px;border-bottom:1px solid #f0f0f0;background:#fafafa;display:flex;align-items:center;justify-content:space-between;cursor:move;}
+.column-title{font-size:16px;font-weight:600;color:#333;}
+.column-close{font-size:20px;color:#999;cursor:pointer;border:none;background:none;width:28px;height:28px;display:flex;align-items:center;justify-content:center;border-radius:4px;transition:all 0.3s;cursor:pointer;}
+.column-close:hover{background:#f5f5f5;color:#666;}
+.column-body{padding:20px;overflow-y:auto;height:calc(100% - 88px);background:#fff;}
+.column-footer{padding:14px 20px;border-top:1px solid #f0f0f0;display:flex;justify-content:flex-end;gap:12px;background:#fafafa;position:absolute;bottom:0;left:0;right:0;}
+.column-item{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:4px;transition:all 0.2s;}
+.column-item:hover{background:#f5f7fa;}
+.column-item input[type="checkbox"]{width:16px;height:16px;cursor:pointer;accent-color:#1890ff;}
+.column-item label{font-size:14px;color:#333;cursor:pointer;flex:1;}
+
+</style>
+
+
+
+</head>
+
+
+
+<body>
+
+
+
+
+
+
+
+<!-- ===== SIDEBAR ===== -->
+
+
+
+<aside class="sidebar" id="sidebar">
+
+
+
+<div class="sidebar-logo">
+
+
+
+    <img src="../images/logo.png" alt="磐枢工业智能平台" style="width: 100%; max-width: 200px; margin-bottom: 8px;">
+
+
+
+    <h1 style="font-size: 16px; margin: 0;">磐枢工业智能平台</h1>
+
+
+
+  </div>
+
+
+
+  <nav class="sidebar-menu"></nav>
+
+
+
+<div class="sidebar-user">
+
+
+
+    <div class="avatar">管</div>
+
+
+
+</aside>
+
+
+
+
+
+
+
+<!-- ===== MAIN CONTENT ===== -->
+
+
+
+<div class="main-content" id="mainContent">
+
+
+
+  <div class="page-header" style="position:sticky;top:0;z-index:100;">
+
+
+
+    <div>
+
+
+
+      <div class="flex items-center gap-8">
+
+
+
+        <button class="sidebar-toggle" id="sidebarToggle" onclick="toggleSidebar()">&#9776;</button>
+
+
+
+        <div>
+
+
+
+          <h2 id="pageTitle">设备统计</h2>
+
+
+
+          <div class="breadcrumb" id="pageBreadcrumb">
+
+
+
+            <a href="../index.html">首页</a><span>/</span><a href="../index.html">设备管理</a><span>/</span><span>设备统计</span>
+
+
+
+          </div></div>
+
+
+
+        </div>
+
+
+
+      </div>
+
+
+
+    </div>
+
+
+
+    <div class="page-actions">
+
+
+
+      <button class="btn btn-ghost btn-sm">&#128276; 消息</button>
+
+
+
+      <button class="btn btn-ghost btn-sm" onclick="window.location.href='../login.html'">&#9211; 退出</button>
+
+      </div>
+
+
+
+  </div>
+
+  <div class="doc-header" style="background:#fff;border-bottom:1px solid #e8e8e8;padding:12px 20px;display:flex;justify-content:space-between;align-items:center;">
+    <div style="font-size:14px;color:#666;">快捷操作</div>
+    <div class="doc-toolbar" style="display:flex;gap:8px;flex-wrap:wrap;">
+      <button class="toolbar-btn" style="padding:6px 12px;border-radius:4px;font-size:13px;cursor:pointer;border:1px solid #d9d9d9;background:#fff;color:#666;display:flex;align-items:center;gap:6px;transition:all 0.3s;" onclick="showToast('刷新功能开发中...', 'info')"><span>🔄</span> 刷新</button>
+      <button class="toolbar-btn" style="padding:6px 12px;border-radius:4px;font-size:13px;cursor:pointer;border:1px solid #d9d9d9;background:#fff;color:#666;display:flex;align-items:center;gap:6px;transition:all 0.3s;" onclick="openColumnSettings()"><span>⚙️</span> 显示/隐藏列</button>
+      <button class="toolbar-btn" style="padding:6px 12px;border-radius:4px;font-size:13px;cursor:pointer;border:1px solid #d9d9d9;background:#fff;color:#666;display:flex;align-items:center;gap:6px;transition:all 0.3s;" onclick="showToast('导出功能开发中...', 'info')"><span>📤</span> 导出</button>
+      <button class="toolbar-btn danger" style="padding:6px 12px;border-radius:4px;font-size:13px;cursor:pointer;border:1px solid #f5222d;background:#f5222d;color:#fff;display:flex;align-items:center;gap:6px;transition:all 0.3s;" onclick="showConfirm('确认退出？', function() {location.href='../index.html';});"><span>✖️</span> 退出</button>
+    </div>
+  </div>
+
+  <div class="page-body">
+
+
+
+    <!-- ===== TABS ===== -->
+
+
+
+    <div class="tabs">
+
+
+
+      <div class="tab-item active" onclick="switchTab('overview')">设备概览</div>
+
+
+
+      <div class="tab-item" onclick="switchTab('status')">设备运行状态</div>
+
+
+
+      <div class="tab-item" onclick="switchTab('fault')">故障统计</div>
+
+
+
+      <div class="tab-item" onclick="switchTab('maintenance')">保养统计</div>
+
+
+
+      <div class="tab-item" onclick="switchTab('utilization')">设备利用率</div>
+
+
+
+    </div>
+
+
+
+
+
+
+
+    <!-- ===== TAB: 设备概览 ===== -->
+
+
+
+    <div class="tab-pane active" id="tab-overview">
+
+
+
+      <div class="stat-card-row">
+
+
+
+        <div class="stat-card">
+
+
+
+          <div class="stat-icon">&#128295;</div>
+
+
+
+          <div class="stat-value">56</div>
+
+
+
+          <div class="stat-label">设备总数</div>
+
+
+
+        </div>
+
+
+
+        <div class="stat-card" style="border-color:rgba(34,197,94,0.2);">
+
+
+
+          <div class="stat-icon" style="color:var(--color-success);">&#9989;</div>
+
+
+
+          <div class="stat-value" style="color:var(--color-success);">42</div>
+
+
+
+          <div class="stat-label">运行中</div>
+
+
+
+        </div>
+
+
+
+        <div class="stat-card" style="border-color:rgba(239,68,68,0.2);">
+
+
+
+          <div class="stat-icon" style="color:var(--color-error);">&#9888;</div>
+
+
+
+          <div class="stat-value" style="color:var(--color-error);">8</div>
+
+
+
+          <div class="stat-label">维修中</div>
+
+
+
+        </div>
+
+
+
+        <div class="stat-card" style="border-color:rgba(234,179,8,0.2);">
+
+
+
+          <div class="stat-icon" style="color:var(--color-warning);">&#9200;</div>
+
+
+
+          <div class="stat-value" style="color:var(--color-warning);">6</div>
+
+
+
+          <div class="stat-label">闲置</div>
+
+
+
+        </div>
+
+
+
+        <div class="stat-card" style="border-color:rgba(239,68,68,0.2);">
+
+
+
+          <div class="stat-icon" style="color:var(--color-error);">&#10060;</div>
+
+
+
+          <div class="stat-value" style="color:var(--color-error);">3.57</div>
+
+
+
+          <div class="stat-label">故障率(%)</div>
+
+
+
+        </div>
+
+
+
+        <div class="stat-card" style="border-color:rgba(34,197,94,0.2);">
+
+
+
+          <div class="stat-icon" style="color:var(--color-success);">&#9201;</div>
+
+
+
+          <div class="stat-value" style="color:var(--color-success);">28.50</div>
+
+
+
+          <div class="stat-label">平均故障间隔(天)</div>
+
+
+
+        </div>
+
+
+
+      </div>
+
+
+
+      <div class="card">
+
+
+
+        <div class="card-header">设备状态分布</div>
+
+
+
+        <div class="card-body">
+
+
+
+          <div style="display:flex;gap:16px;flex-wrap:wrap;">
+
+
+
+            <div style="flex:1;min-width:200px;">
+
+
+
+              <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
+
+
+
+                <div class="dot green"></div>
+
+
+
+                <span class="text-secondary">运行中</span>
+
+
+
+                <span class="text-mono" style="margin-left:auto;color:var(--color-success);">42</span>
+
+
+
+              </div>
+
+
+
+              <div class="progress-bar"><div class="fill fill-success" style="width:75%;"></div></div>
+
+
+
+            </div>
+
+
+
+            <div style="flex:1;min-width:200px;">
+
+
+
+              <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
+
+
+
+                <div class="dot yellow"></div>
+
+
+
+                <span class="text-secondary">维修中</span>
+
+
+
+                <span class="text-mono" style="margin-left:auto;color:var(--color-warning);">8</span>
+
+
+
+              </div>
+
+
+
+              <div class="progress-bar"><div class="fill fill-warning" style="width:14.29%;"></div></div>
+
+
+
+            </div>
+
+
+
+            <div style="flex:1;min-width:200px;">
+
+
+
+              <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
+
+
+
+                <div class="dot red"></div>
+
+
+
+                <span class="text-secondary">闲置</span>
+
+
+
+                <span class="text-mono" style="margin-left:auto;color:var(--color-error);">6</span>
+
+
+
+              </div>
+
+
+
+              <div class="progress-bar"><div class="fill fill-error" style="width:10.71%;"></div></div>
+
+
+
+            </div>
+
+
+
+          </div>
+
+
+
+        </div>
+
+
+
+      </div>
+
+
+
+    </div>
+
+
+
+
+
+
+
+    <!-- ===== TAB: 设备运行状态 ===== -->
+
+
+
+    <div class="tab-pane" id="tab-status">
+
+
+
+      <div class="status-line">
+
+
+
+        <div class="status-line-title">A工艺线</div>
+
+
+
+        <div class="status-line-items">
+
+
+
+          <div class="status-line-item"><div class="dot green"></div><span class="name">CNC-001</span><span class="count">运行</span></div>
+
+
+
+          <div class="status-line-item"><div class="dot green"></div><span class="name">CNC-002</span><span class="count">运行</span></div>
+
+
+
+          <div class="status-line-item"><div class="dot yellow"></div><span class="name">CNC-003</span><span class="count">待机</span></div>
+
+
+
+          <div class="status-line-item"><div class="dot red"></div><span class="name">LATHE-001</span><span class="count">维修</span></div>
+
+
+
+          <div class="status-line-item"><div class="dot green"></div><span class="name">MILL-001</span><span class="count">运行</span></div>
+
+
+
+        </div>
+
+
+
+      </div>
+
+
+
+      <div class="status-line">
+
+
+
+        <div class="status-line-title">B工艺线</div>
+
+
+
+        <div class="status-line-items">
+
+
+
+          <div class="status-line-item"><div class="dot green"></div><span class="name">CNC-004</span><span class="count">运行</span></div>
+
+
+
+          <div class="status-line-item"><div class="dot green"></div><span class="name">CNC-005</span><span class="count">运行</span></div>
+
+
+
+          <div class="status-line-item"><div class="dot green"></div><span class="name">GRIND-001</span><span class="count">运行</span></div>
+
+
+
+          <div class="status-line-item"><div class="dot yellow"></div><span class="name">DRILL-001</span><span class="count">换刀</span></div>
+
+
+
+          <div class="status-line-item"><div class="dot green"></div><span class="name">SAW-001</span><span class="count">运行</span></div>
+
+
+
+        </div>
+
+
+
+      </div>
+
+
+
+      <div class="status-line">
+
+
+
+        <div class="status-line-title">C工艺线</div>
+
+
+
+        <div class="status-line-items">
+
+
+
+          <div class="status-line-item"><div class="dot red"></div><span class="name">CMM-001</span><span class="count">停机</span></div>
+
+
+
+          <div class="status-line-item"><div class="dot green"></div><span class="name">WEIGH-001</span><span class="count">运行</span></div>
+
+
+
+          <div class="status-line-item"><div class="dot green"></div><span class="name">THERMO-001</span><span class="count">运行</span></div>
+
+
+
+          <div class="status-line-item"><div class="dot yellow"></div><span class="name">PACK-001</span><span class="count">待机</span></div>
+
+
+
+        </div>
+
+
+
+      </div>
+
+
+
+      <div class="status-line">
+
+
+
+        <div class="status-line-title">D工艺线</div>
+
+
+
+        <div class="status-line-items">
+
+
+
+          <div class="status-line-item"><div class="dot green"></div><span class="name">ROBOT-001</span><span class="count">运行</span></div>
+
+
+
+          <div class="status-line-item"><div class="dot green"></div><span class="name">ROBOT-002</span><span class="count">运行</span></div>
+
+
+
+          <div class="status-line-item"><div class="dot green"></div><span class="name">CONV-001</span><span class="count">运行</span></div>
+
+
+
+          <div class="status-line-item"><div class="dot green"></div><span class="name">CONV-002</span><span class="count">运行</span></div>
+
+
+
+          <div class="status-line-item"><div class="dot red"></div><span class="name">LIFT-001</span><span class="count">维修</span></div>
+
+
+
+        </div>
+
+
+
+      </div>
+
+
+
+      <div class="card" style="margin-top:20px;">
+
+
+
+        <div class="card-header">设备运行详情</div>
+
+
+
+        <div class="card-body">
+
+
+
+          <div class="table-wrapper">
+
+
+
+            <table class="data-table">
+
+
+
+              <thead>
+
+
+
+                <tr>
+                  <th data-column="workLine">工艺线</th>
+                  <th data-column="equipCode">设备编号</th>
+                  <th data-column="equipName">设备名称</th>
+                  <th data-column="runStatus">运行状态</th>
+                  <th data-column="runHours">运行时长(小时)</th>
+                  <th data-column="efficiency">效率(%)</th>
+                  <th data-column="action">操作</th>
+                </tr>
+
+
+
+              </thead>
+
+
+
+              <tbody>
+
+
+
+                <tr>
+                  <td data-column="workLine">A工艺线</td>
+                  <td data-column="equipCode">CNC-001</td>
+                  <td data-column="equipName">CNC加工中心A</td>
+                  <td data-column="runStatus"><span class="badge badge-success">运行中</span></td>
+                  <td data-column="runHours">6.50</td>
+                  <td data-column="efficiency">92.30</td>
+                  <td data-column="action" class="row-action-links"><a href="#" onclick="openModal('detailModal')">详情</a></td>
+                </tr>
+
+
+
+                <tr>
+                  <td data-column="workLine">A工艺线</td>
+                  <td data-column="equipCode">CNC-002</td>
+                  <td data-column="equipName">CNC加工中心B</td>
+                  <td data-column="runStatus"><span class="badge badge-success">运行中</span></td>
+                  <td data-column="runHours">7.20</td>
+                  <td data-column="efficiency">88.50</td>
+                  <td data-column="action" class="row-action-links"><a href="#" onclick="openModal('detailModal')">详情</a></td>
+                </tr>
+
+                <tr>
+                  <td data-column="workLine">A工艺线</td>
+                  <td data-column="equipCode">LATHE-001</td>
+                  <td data-column="equipName">车床A</td>
+                  <td data-column="runStatus"><span class="badge badge-error">维修中</span></td>
+                  <td data-column="runHours">0</td>
+                  <td data-column="efficiency">0</td>
+                  <td data-column="action" class="row-action-links"><a href="#" onclick="openModal('detailModal')">详情</a></td>
+                </tr>
+
+                <tr>
+                  <td data-column="workLine">B工艺线</td>
+                  <td data-column="equipCode">CNC-004</td>
+                  <td data-column="equipName">CNC加工中心D</td>
+                  <td data-column="runStatus"><span class="badge badge-success">运行中</span></td>
+                  <td data-column="runHours">8.00</td>
+                  <td data-column="efficiency">95.00</td>
+                  <td data-column="action" class="row-action-links"><a href="#" onclick="openModal('detailModal')">详情</a></td>
+                </tr>
+
+                <tr>
+                  <td data-column="workLine">C工艺线</td>
+                  <td data-column="equipCode">CMM-001</td>
+                  <td data-column="equipName">三坐标测量仪</td>
+                  <td data-column="runStatus"><span class="badge badge-error">停机</span></td>
+                  <td data-column="runHours">0</td>
+                  <td data-column="efficiency">0</td>
+                  <td data-column="action" class="row-action-links"><a href="#" onclick="openModal('detailModal')">详情</a></td>
+                </tr>
+
+
+
+              </tbody>
+
+
+
+            </table>
+
+
+
+          </div>
+
+
+
+        </div>
+
+
+
+      </div>
+
+
+
+    </div>
+
+
+
+
+
+
+
+    <!-- ===== TAB: 故障统计 ===== -->
+
+
+
+    <div class="tab-pane" id="tab-fault">
+
+
+
+      <div class="card">
+
+
+
+        <div class="card-header">故障统计列表</div>
+
+
+
+        <div class="card-body">
+
+
+
+          <div class="toolbar" style="margin-bottom:16px;">
+
+
+
+            <div class="toolbar-left">
+
+
+
+              <button class="btn btn-ghost btn-sm">&#128221; 编辑</button>
+
+
+
+            </div>
+
+
+
+            <div class="toolbar-right">
+
+
+
+              <div class="form-search" style="width:200px;">
+
+
+
+                <input type="text" class="form-input" placeholder="搜索故障类型">
+
+
+
+              </div>
+
+
+
+            </div>
+
+
+
+          </div>
+
+
+
+          <div class="table-wrapper">
+
+
+
+            <table class="data-table">
+
+
+
+              <thead>
+
+
+
+                <tr>
+                  <th data-column="faultType">故障类型</th>
+                  <th data-column="faultCount">故障次数</th>
+                  <th data-column="faultDowntime">累计停机时间(小时)</th>
+                  <th data-column="faultRatio">占比(%)</th>
+                  <th data-column="action">操作</th>
+                </tr>
+
+
+
+              </thead>
+
+
+
+              <tbody>
+
+
+
+                <tr>
+                  <td data-column="faultType">主轴故障</td>
+                  <td data-column="faultCount">8</td>
+                  <td data-column="faultDowntime">45.00</td>
+                  <td data-column="faultRatio">32.14</td>
+                  <td data-column="action" class="row-action-links"><a href="#" onclick="openModal('detailModal')">详情</a></td>
+                </tr>
+
+                <tr>
+                  <td data-column="faultType">电气故障</td>
+                  <td data-column="faultCount">6</td>
+                  <td data-column="faultDowntime">32.00</td>
+                  <td data-column="faultRatio">22.86</td>
+                  <td data-column="action" class="row-action-links"><a href="#" onclick="openModal('detailModal')">详情</a></td>
+                </tr>
+
+                <tr>
+                  <td data-column="faultType">液压故障</td>
+                  <td data-column="faultCount">5</td>
+                  <td data-column="faultDowntime">28.00</td>
+                  <td data-column="faultRatio">20.00</td>
+                  <td data-column="action" class="row-action-links"><a href="#" onclick="openModal('detailModal')">详情</a></td>
+                </tr>
+
+                <tr>
+                  <td data-column="faultType">机械故障</td>
+                  <td data-column="faultCount">4</td>
+                  <td data-column="faultDowntime">18.00</td>
+                  <td data-column="faultRatio">12.86</td>
+                  <td data-column="action" class="row-action-links"><a href="#" onclick="openModal('detailModal')">详情</a></td>
+                </tr>
+
+                <tr>
+                  <td data-column="faultType">软件故障</td>
+                  <td data-column="faultCount">3</td>
+                  <td data-column="faultDowntime">17.00</td>
+                  <td data-column="faultRatio">12.14</td>
+                  <td data-column="action" class="row-action-links"><a href="#" onclick="openModal('detailModal')">详情</a></td>
+                </tr>
+
+
+
+              </tbody>
+
+
+
+            </table>
+
+
+
+          </div>
+
+
+
+        </div>
+
+
+
+      </div>
+
+
+
+    </div>
+
+
+
+
+
+
+
+    <!-- ===== TAB: 保养统计 ===== -->
+
+
+
+    <div class="tab-pane" id="tab-maintenance">
+
+
+
+      <div class="card">
+
+
+
+        <div class="card-header">保养统计列表</div>
+
+
+
+        <div class="card-body">
+
+
+
+          <div class="toolbar" style="margin-bottom:16px;">
+
+
+
+            <div class="toolbar-left">
+
+
+
+              <button class="btn btn-ghost btn-sm">&#128221; 编辑</button>
+
+
+
+            </div>
+
+
+
+            <div class="toolbar-right">
+
+
+
+              <div class="form-search" style="width:200px;">
+
+
+
+                <input type="text" class="form-input" placeholder="搜索保养类型">
+
+
+
+              </div>
+
+
+
+            </div>
+
+
+
+          </div>
+
+
+
+          <div class="table-wrapper">
+
+
+
+            <table class="data-table">
+
+
+
+              <thead>
+
+
+
+                <tr>
+                  <th data-column="maintainType">保养类型</th>
+                  <th data-column="planCount">计划次数</th>
+                  <th data-column="completeCount">完成次数</th>
+                  <th data-column="completeRate">完成率(%)</th>
+                  <th data-column="action">操作</th>
+                </tr>
+
+
+
+              </thead>
+
+
+
+              <tbody>
+
+
+
+                <tr>
+                  <td data-column="maintainType">日常保养</td>
+                  <td data-column="planCount">120</td>
+                  <td data-column="completeCount">115</td>
+                  <td data-column="completeRate">95.83</td>
+                  <td data-column="action" class="row-action-links"><a href="#" onclick="openModal('detailModal')">详情</a></td>
+                </tr>
+
+                <tr>
+                  <td data-column="maintainType">定期保养</td>
+                  <td data-column="planCount">48</td>
+                  <td data-column="completeCount">42</td>
+                  <td data-column="completeRate">87.50</td>
+                  <td data-column="action" class="row-action-links"><a href="#" onclick="openModal('detailModal')">详情</a></td>
+                </tr>
+
+                <tr>
+                  <td data-column="maintainType">专项保养</td>
+                  <td data-column="planCount">12</td>
+                  <td data-column="completeCount">10</td>
+                  <td data-column="completeRate">83.33</td>
+                  <td data-column="action" class="row-action-links"><a href="#" onclick="openModal('detailModal')">详情</a></td>
+                </tr>
+
+                <tr>
+                  <td data-column="maintainType">紧急保养</td>
+                  <td data-column="planCount">5</td>
+                  <td data-column="completeCount">5</td>
+                  <td data-column="completeRate">100.00</td>
+                  <td data-column="action" class="row-action-links"><a href="#" onclick="openModal('detailModal')">详情</a></td>
+                </tr>
+
+
+
+              </tbody>
+
+
+
+            </table>
+
+
+
+          </div>
+
+
+
+        </div>
+
+
+
+      </div>
+
+
+
+    </div>
+
+
+
+
+
+
+
+    <!-- ===== TAB: 设备利用率 ===== -->
+
+
+
+    <div class="tab-pane" id="tab-utilization">
+
+
+
+      <div class="card">
+
+
+
+        <div class="card-header">设备利用率列表</div>
+
+
+
+        <div class="card-body">
+
+
+
+          <div class="toolbar" style="margin-bottom:16px;">
+
+
+
+            <div class="toolbar-left">
+
+
+
+              <button class="btn btn-ghost btn-sm">&#128221; 编辑</button>
+
+
+
+            </div>
+
+
+
+            <div class="toolbar-right">
+
+
+
+              <div class="form-search" style="width:200px;">
+
+
+
+                <input type="text" class="form-input" placeholder="搜索设备编号/名称">
+
+
+
+              </div>
+
+
+
+            </div>
+
+
+
+          </div>
+
+
+
+          <div class="table-wrapper">
+
+
+
+            <table class="data-table">
+
+
+
+              <thead>
+
+
+
+                <tr>
+                  <th data-column="equipCode">设备编号</th>
+                  <th data-column="equipName">设备名称</th>
+                  <th data-column="runHours">运行时长(小时)</th>
+                  <th data-column="stopHours">停机时长(小时)</th>
+                  <th data-column="utilization">利用率(%)</th>
+                  <th data-column="action">操作</th>
+                </tr>
+
+
+
+              </thead>
+
+
+
+              <tbody>
+
+
+
+                <tr>
+                  <td data-column="equipCode">CNC-001</td>
+                  <td data-column="equipName">CNC加工中心A</td>
+                  <td data-column="runHours">186.50</td>
+                  <td data-column="stopHours">23.50</td>
+                  <td data-column="utilization">88.75</td>
+                  <td data-column="action" class="row-action-links"><a href="#" onclick="openModal('detailModal')">详情</a></td>
+                </tr>
+
+                <tr>
+                  <td data-column="equipCode">CNC-002</td>
+                  <td data-column="equipName">CNC加工中心B</td>
+                  <td data-column="runHours">175.20</td>
+                  <td data-column="stopHours">34.80</td>
+                  <td data-column="utilization">83.43</td>
+                  <td data-column="action" class="row-action-links"><a href="#" onclick="openModal('detailModal')">详情</a></td>
+                </tr>
+
+                <tr>
+                  <td data-column="equipCode">CNC-004</td>
+                  <td data-column="equipName">CNC加工中心D</td>
+                  <td data-column="runHours">192.80</td>
+                  <td data-column="stopHours">17.20</td>
+                  <td data-column="utilization">91.81</td>
+                  <td data-column="action" class="row-action-links"><a href="#" onclick="openModal('detailModal')">详情</a></td>
+                </tr>
+
+                <tr>
+                  <td data-column="equipCode">LATHE-001</td>
+                  <td data-column="equipName">车床A</td>
+                  <td data-column="runHours">145.00</td>
+                  <td data-column="stopHours">65.00</td>
+                  <td data-column="utilization">68.92</td>
+                  <td data-column="action" class="row-action-links"><a href="#" onclick="openModal('detailModal')">详情</a></td>
+                </tr>
+
+                <tr>
+                  <td data-column="equipCode">MILL-001</td>
+                  <td data-column="equipName">铣床A</td>
+                  <td data-column="runHours">168.30</td>
+                  <td data-column="stopHours">41.70</td>
+                  <td data-column="utilization">80.14</td>
+                  <td data-column="action" class="row-action-links"><a href="#" onclick="openModal('detailModal')">详情</a></td>
+                </tr>
+
+
+
+              </tbody>
+
+
+
+            </table>
+
+
+
+          </div>
+
+
+
+          <div class="pagination" style="margin-top:16px;">
+
+
+
+            <div class="page-btn">上一页</div>
+
+
+
+            <div class="page-btn active">1</div>
+
+
+
+            <div class="page-btn">2</div>
+
+
+
+            <div class="page-btn">3</div>
+
+
+
+            <div class="page-btn">下一页</div>
+
+
+
+            <div class="page-info">共 56 条，显示 1-5 条</div>
+
+
+
+          </div>
+
+
+
+        </div>
+
+
+
+      </div>
+
+
+
+    </div>
+
+
+
+  </div>
+
+
+
+</div>
+
+
+
+
+
+
+
+<!-- ===== MODAL ===== -->
+
+
+
+<div class="modal-overlay" id="detailModal">
+
+
+
+  <div class="modal-dialog">
+
+
+
+    <div class="modal-header">
+
+
+
+      <h3>设备详情</h3>
+
+
+
+      <button class="modal-close" onclick="closeModal('detailModal')">&times;</button>
+
+
+
+    </div>
+
+
+
+    <div class="modal-body">
+
+
+
+      <div class="grid-2" style="gap:16px;">
+
+
+
+        <div class="form-group">
+
+
+
+          <label class="form-label">设备编号</label>
+
+
+
+          <input type="text" class="form-input" value="CNC-001" readonly>
+
+
+
+        </div>
+
+
+
+        <div class="form-group">
+
+
+
+          <label class="form-label">设备名称</label>
+
+
+
+          <input type="text" class="form-input" value="CNC加工中心A" readonly>
+
+
+
+        </div>
+
+
+
+        <div class="form-group">
+
+
+
+          <label class="form-label">运行状态</label>
+
+
+
+          <span class="badge badge-success">运行中</span>
+
+
+
+        </div>
+
+
+
+        <div class="form-group">
+
+
+
+          <label class="form-label">利用率</label>
+
+
+
+          <input type="text" class="form-input" value="88.75%" readonly>
+
+
+
+        </div>
+
+
+
+        <div class="form-group">
+
+
+
+          <label class="form-label">运行时长</label>
+
+
+
+          <input type="text" class="form-input" value="186.50 小时" readonly>
+
+
+
+        </div>
+
+
+
+        <div class="form-group">
+
+
+
+          <label class="form-label">停机时长</label>
+
+
+
+          <input type="text" class="form-input" value="23.50 小时" readonly>
+
+
+
+        </div>
+
+
+
+      </div>
+
+
+
+      <div class="form-group">
+
+
+
+        <label class="form-label">备注</label>
+
+
+
+        <textarea class="form-textarea" readonly>本月运行正常，无重大故障记录。建议安排下次定期保养。</textarea>
+
+
+
+      </div>
+
+
+
+    </div>
+
+
+
+    <div class="modal-footer">
+
+
+
+      <button class="btn btn-ghost btn-sm" onclick="closeModal('detailModal')">关闭</button>
+
+
+
+    </div>
+
+
+
+  </div>
+
+
+
+</div>
+
+
+
+
+
+
+
+<script>
+
+
+
+function switchTab(tabName) {
+
+
+
+  document.querySelectorAll('.tab-item').forEach(item => item.classList.remove('active'));
+
+
+
+  document.querySelectorAll('.tab-pane').forEach(pane => pane.classList.remove('active'));
+
+
+
+  event.target.classList.add('active');
+
+
+
+  document.getElementById('tab-' + tabName).classList.add('active');
+
+
+
+
+
+
+
+function openModal(modalId) {
+
+
+
+  document.getElementById(modalId).classList.add('show');
+
+
+
+
+
+
+
+function closeModal(modalId) {
+
+
+
+  document.getElementById(modalId).classList.remove('show');
+
+
+
+}
+
+
+
+
+
+
+
+document.querySelectorAll('.modal-overlay').forEach(overlay => {
+
+
+
+  overlay.addEventListener('click', function(e) {
+
+
+
+    if (e.target === this) this.classList.remove('show');
+
+
+
+  });
+
+
+
+});
+
+
+
+
+
+
+
+}
+
+
+
+}
+var currentLookupField = null;
+var currentLookupType = null;
+var lookupData = [];
+var lookupColumns = [];
+
+function openLookup(fieldId, type) {
+  currentLookupField = fieldId;
+  currentLookupType = type;
+  
+  if (type === 'org') {
+    lookupColumns = ['编码', '名称', '形态', '上级组织'];
+    lookupData = JSON.parse(localStorage.getItem('erp_orgs') || '[]');
+    document.getElementById('lookupTitle').textContent = '选择组织';
+  } else if (type === 'department') {
+    lookupColumns = ['编码', '名称'];
+    lookupData = JSON.parse(localStorage.getItem('erp_departments_cache') || '[]');
+    document.getElementById('lookupTitle').textContent = '选择部门';
+  } else if (type === 'employee') {
+    lookupColumns = ['编号', '姓名', '所属部门'];
+    lookupData = JSON.parse(localStorage.getItem('erp_employees_cache') || '[]');
+    document.getElementById('lookupTitle').textContent = '选择员工';
+  } else if (type === 'supplier') {
+    lookupColumns = ['编码', '名称'];
+    lookupData = JSON.parse(localStorage.getItem('erp_suppliers_cache') || '[]');
+    document.getElementById('lookupTitle').textContent = '选择供应商';
+  } else if (type === 'customer') {
+    lookupColumns = ['编码', '名称'];
+    lookupData = JSON.parse(localStorage.getItem('erp_customers_cache') || '[]');
+    document.getElementById('lookupTitle').textContent = '选择客户';
+  } else if (type === 'material') {
+    lookupColumns = ['物料编码', '物料名称', '规格型号', '基本单位'];
+    lookupData = JSON.parse(localStorage.getItem('erp_materials_cache') || '[]');
+    document.getElementById('lookupTitle').textContent = '选择物料';
+  } else if (type === 'warehouse') {
+    lookupColumns = ['编码', '名称'];
+    lookupData = JSON.parse(localStorage.getItem('erp_warehouses_cache') || '[]');
+    document.getElementById('lookupTitle').textContent = '选择仓库';
+  }
+  
+  renderLookupTable(lookupData);
+  document.getElementById('lookupModal').classList.add('show');
+}
+
+function closeLookup() {
+  document.getElementById('lookupModal').classList.remove('show');
+}
+
+function filterLookup() {
+  var keyword = document.getElementById('lookupKeyword').value.trim().toLowerCase();
+  var filtered = lookupData.filter(function(item) {
+    var code = item.code || '';
+    var name = item.name || '';
+    return code.toLowerCase().includes(keyword) || name.toLowerCase().includes(keyword);
+  });
+  renderLookupTable(filtered);
+}
+
+function renderLookupTable(data) {
+  var head = document.getElementById('lookupTableHead');
+  var body = document.getElementById('lookupTableBody');
+  
+  head.innerHTML = '<tr><th class="checkbox-cell"><input type="checkbox" onclick="selectAllLookup()"></th>' + lookupColumns.map(function(col) { return '<th>' + col + '</th>'; }).join('') + '</tr>';
+  
+  body.innerHTML = '';
+  data.forEach(function(item) {
+    var row = document.createElement('tr');
+    row.onclick = function() { selectLookupRow(this); };
+    var cells = ['<td class="checkbox-cell"><input type="checkbox" class="lookup-checkbox" value="' + item.id + '"></td>'];
+    if (currentLookupType === 'org') {
+      cells.push('<td>' + item.code + '</td><td>' + item.name + '</td><td>' + (item.form || '') + '</td><td>' + (item.parentName || '') + '</td>');
+    } else if (currentLookupType === 'department') {
+      cells.push('<td>' + item.code + '</td><td>' + item.name + '</td>');
+    } else if (currentLookupType === 'employee') {
+      cells.push('<td>' + item.code + '</td><td>' + item.name + '</td><td>' + (item.department || '') + '</td>');
+    } else if (currentLookupType === 'supplier' || currentLookupType === 'customer') {
+      cells.push('<td>' + item.code + '</td><td>' + item.name + '</td>');
+    } else if (currentLookupType === 'material') {
+      cells.push('<td>' + item.code + '</td><td>' + item.name + '</td><td>' + (item.specification || '') + '</td><td>' + (item.unit || '') + '</td>');
+    } else if (currentLookupType === 'warehouse') {
+      cells.push('<td>' + item.code + '</td><td>' + item.name + '</td>');
+    }
+    row.innerHTML = cells.join('');
+    body.appendChild(row);
+  });
+  
+  if (data.length === 0) {
+    body.innerHTML = '<tr><td colspan="' + (lookupColumns.length + 1) + '" style="text-align:center;padding:40px;color:#999;">暂无数据</td></tr>';
+  }
+}
+
+function selectAllLookup() {
+  var master = document.querySelector('.lookup-table th input');
+  var checkboxes = document.querySelectorAll('.lookup-checkbox');
+  checkboxes.forEach(function(cb) { cb.checked = master.checked; });
+}
+
+function selectLookupRow(row) {
+  var checkbox = row.querySelector('.lookup-checkbox');
+  checkbox.checked = !checkbox.checked;
+}
+
+function confirmLookup() {
+  var checkboxes = document.querySelectorAll('.lookup-checkbox:checked');
+  if (checkboxes.length === 0) {
+    showToast('请选择一条记录', 'warning');
+    return;
+  }
+  
+  var item = lookupData.find(function(d) { return d.id === checkboxes[0].value; });
+  if (item) {
+    var field = document.getElementById(currentLookupField);
+    if (field) {
+      field.value = item.name;
+      field.setAttribute('data-id', item.id);
+      field.setAttribute('data-code', item.code);
+      
+      if (currentLookupType === 'material') {
+        var row = field.closest('tr');
+        if (row) {
+          row.querySelector('.material-name').value = item.name;
+          row.querySelector('.material-spec').value = item.specification || '';
+          row.querySelector('.material-unit').value = item.unit || '';
+        }
+      }
+    }
+  }
+  
+  closeLookup();
+}
+
+function openMaterialLookup(btn) {
+  var field = btn.previousElementSibling;
+  field.id = 'lookupField_' + Date.now();
+  currentLookupField = field.id;
+  openLookup(field.id, 'material');
+}
+
+function openOrgLookup(btn) {
+  var field = btn.previousElementSibling;
+  field.id = 'lookupField_' + Date.now();
+  currentLookupField = field.id;
+  openLookup(field.id, 'org');
+}
+
+function openSupplierLookup(btn) {
+  var field = btn.previousElementSibling;
+  field.id = 'lookupField_' + Date.now();
+  currentLookupField = field.id;
+  openLookup(field.id, 'supplier');
+}
+
+function openWarehouseLookup(btn) {
+  var field = btn.previousElementSibling;
+  field.id = 'lookupField_' + Date.now();
+  currentLookupField = field.id;
+  openLookup(field.id, 'warehouse');
+}
+
+function initLookupData() {
+  if (!localStorage.getItem('erp_orgs')) {
+    localStorage.setItem('erp_orgs', JSON.stringify([
+      { id: 'org-001', code: 'ORG-HQ', name: '磐枢工业集团', form: '集团', parentName: '' },
+      { id: 'org-002', code: 'ORG-SM', name: '磐枢智能制造有限公司', form: '公司', parentName: '磐枢工业集团' },
+      { id: 'org-003', code: 'ORG-SM-PD', name: '生产制造部', form: '部门', parentName: '磐枢智能制造有限公司' },
+      { id: 'org-004', code: 'ORG-SM-FA', name: '财务部', form: '部门', parentName: '磐枢智能制造有限公司' },
+      { id: 'org-005', code: 'ORG-SM-SD', name: '销售部', form: '部门', parentName: '磐枢智能制造有限公司' }
+    ]));
+  }
+  if (!localStorage.getItem('erp_departments_cache')) {
+    localStorage.setItem('erp_departments_cache', JSON.stringify([
+      { id: 'dept-001', code: 'DEPT-PD', name: '生产制造部', status: 1 },
+      { id: 'dept-002', code: 'DEPT-FA', name: '财务部', status: 1 },
+      { id: 'dept-003', code: 'DEPT-SD', name: '销售部', status: 1 },
+      { id: 'dept-004', code: 'DEPT-AS', name: '装配车间', status: 1 },
+      { id: 'dept-005', code: 'DEPT-QC', name: '质检车间', status: 1 }
+    ]));
+  }
+  if (!localStorage.getItem('erp_employees_cache')) {
+    localStorage.setItem('erp_employees_cache', JSON.stringify([
+      { id: 'emp-001', code: 'EMP-001', name: '张三', department: '生产制造部', status: 1 },
+      { id: 'emp-002', code: 'EMP-002', name: '李四', department: '生产制造部', status: 1 },
+      { id: 'emp-003', code: 'EMP-003', name: '王五', department: '财务部', status: 1 },
+      { id: 'emp-004', code: 'EMP-004', name: '赵六', department: '销售部', status: 1 },
+      { id: 'emp-005', code: 'EMP-005', name: '钱七', department: '质检车间', status: 1 }
+    ]));
+  }
+  if (!localStorage.getItem('erp_suppliers_cache')) {
+    localStorage.setItem('erp_suppliers_cache', JSON.stringify([
+      { id: 'sup-001', code: 'S-001', name: '深圳电子元器件有限公司', status: 1 },
+      { id: 'sup-002', code: 'S-002', name: '杭州精密机械加工厂', status: 1 },
+      { id: 'sup-003', code: 'S-003', name: '上海材料科技有限公司', status: 1 },
+      { id: 'sup-004', code: 'S-004', name: '东莞五金制品厂', status: 1 }
+    ]));
+  }
+  if (!localStorage.getItem('erp_materials_cache')) {
+    localStorage.setItem('erp_materials_cache', JSON.stringify([
+      { id: 'mat-001', code: 'P-001', name: '高频传感器模块', specification: 'HT-2026', unit: '个', status: 1 },
+      { id: 'mat-002', code: 'P-002', name: '控制电路板', specification: 'CB-2026', unit: '块', status: 1 },
+      { id: 'mat-003', code: 'P-003', name: '智能控制器', specification: 'IC-V3', unit: '台', status: 1 },
+      { id: 'mat-004', code: 'P-004', name: '电源模块', specification: 'PM-500W', unit: '个', status: 1 },
+      { id: 'mat-005', code: 'M-001', name: 'PCB电路板', specification: 'FR-4双层', unit: '块', status: 1 },
+      { id: 'mat-006', code: 'M-002', name: '贴片电阻', specification: '10KΩ 0603', unit: '个', status: 1 },
+      { id: 'mat-007', code: 'M-003', name: '贴片电容', specification: '100μF 0805', unit: '个', status: 1 },
+      { id: 'mat-008', code: 'M-004', name: '螺丝', specification: 'M4x10', unit: '包', status: 1 }
+    ]));
+  }
+  if (!localStorage.getItem('erp_warehouses_cache')) {
+    localStorage.setItem('erp_warehouses_cache', JSON.stringify([
+      { id: 'wh-001', code: 'WH-001', name: '成品仓', status: 1 },
+      { id: 'wh-002', code: 'WH-002', name: '原料仓', status: 1 },
+      { id: 'wh-003', code: 'WH-003', name: '半成品仓', status: 1 },
+      { id: 'wh-004', code: 'WH-004', name: '辅料仓', status: 1 }
+    ]));
+  }
+}
+
+var allColumns = ['workLine', 'equipCode', 'equipName', 'runStatus', 'runHours', 'efficiency', 'stopHours', 'utilization', 'faultType', 'faultCount', 'faultDowntime', 'faultRatio', 'maintainType', 'planCount', 'completeCount', 'completeRate', 'action'];
+var visibleColumns = JSON.parse(localStorage.getItem('equipment_statistics_columns') || JSON.stringify(allColumns));
+
+function updateColumnVisibility() {
+  document.querySelectorAll('th[data-column], td[data-column]').forEach(function(el) {
+    var col = el.getAttribute('data-column');
+    el.style.display = visibleColumns.includes(col) ? '' : 'none';
+  });
+}
+
+function openColumnSettings() {
+  var container = document.getElementById('columnCheckboxes');
+  container.innerHTML = '';
+  var colNames = {
+    'workLine': '工艺线',
+    'equipCode': '设备编号',
+    'equipName': '设备名称',
+    'runStatus': '运行状态',
+    'runHours': '运行时长(小时)',
+    'efficiency': '效率(%)',
+    'stopHours': '停机时长(小时)',
+    'utilization': '利用率(%)',
+    'faultType': '故障类型',
+    'faultCount': '故障次数',
+    'faultDowntime': '累计停机时间(小时)',
+    'faultRatio': '占比(%)',
+    'maintainType': '保养类型',
+    'planCount': '计划次数',
+    'completeCount': '完成次数',
+    'completeRate': '完成率(%)',
+    'action': '操作'
+  };
+  allColumns.forEach(function(col) {
+    var item = document.createElement('div');
+    item.className = 'column-item';
+    item.innerHTML = '<input type="checkbox" id="col_' + col + '" ' + (visibleColumns.includes(col) ? 'checked' : '') + ' onchange="toggleColumn(this)">' +
+                     '<label for="col_' + col + '">' + colNames[col] + '</label>';
+    container.appendChild(item);
+  });
+  document.getElementById('columnModal').classList.add('show');
+}
+
+function closeColumnSettings() {
+  document.getElementById('columnModal').classList.remove('show');
+}
+
+function toggleColumn(cb) {
+  var col = cb.id.replace('col_', '');
+  if (cb.checked) {
+    if (!visibleColumns.includes(col)) {
+      visibleColumns.push(col);
+    }
+  } else {
+    var idx = visibleColumns.indexOf(col);
+    if (idx > -1) {
+      visibleColumns.splice(idx, 1);
+    }
+  }
+}
+
+function saveColumnSettings() {
+  localStorage.setItem('equipment_statistics_columns', JSON.stringify(visibleColumns));
+  updateColumnVisibility();
+  closeColumnSettings();
+}
+
+window.addEventListener('load', function() {
+  updateColumnVisibility();
+});
+
+</script>
+
+<div class="lookup-modal" id="lookupModal">
+  <div class="lookup-dialog">
+    <div class="lookup-header">
+      <div class="lookup-title" id="lookupTitle">选择</div>
+      <button class="lookup-close" onclick="closeLookup()">×</button>
+    </div>
+    <div class="lookup-body">
+      <div class="lookup-search">
+        <input type="text" id="lookupKeyword" placeholder="请输入编码或名称搜索" onkeydown="if(event.key==='Enter')filterLookup()">
+        <button onclick="filterLookup()">搜索</button>
+      </div>
+      <table class="lookup-table">
+        <thead id="lookupTableHead"></thead>
+        <tbody id="lookupTableBody"></tbody>
+      </table>
+    </div>
+    <div class="lookup-footer">
+      <button class="btn btn-cancel" onclick="closeLookup()">取消</button>
+      <button class="btn btn-primary" onclick="confirmLookup()">确定</button>
+    </div>
+  </div>
+</div>
+
+<div class="column-modal" id="columnModal">
+  <div class="column-dialog">
+    <div class="column-header">
+      <div class="column-title">列设置</div>
+      <button class="column-close" onclick="closeColumnSettings()">×</button>
+    </div>
+    <div class="column-body">
+      <div id="columnCheckboxes"></div>
+    </div>
+    <div class="column-footer">
+      <button class="btn btn-cancel" onclick="closeColumnSettings()">取消</button>
+      <button class="btn btn-primary" onclick="saveColumnSettings()">确定</button>
+    </div>
+  </div>
+</div>
+
+</body>
+
+
+
+</html>

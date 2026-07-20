@@ -1,0 +1,1636 @@
+<!DOCTYPE html>
+
+
+
+<html lang="zh-CN">
+
+
+
+<head>
+
+
+
+<meta charset="UTF-8">
+
+
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+
+
+<title>组织架构 - 磐枢工业智能平台</title>
+
+
+
+<link rel="stylesheet" href="../common.css">
+
+
+
+<script src="../common.js"></script>
+<script>
+</script>
+
+
+
+</head>
+
+
+
+<body>
+
+
+
+<aside class="sidebar" id="sidebar">
+
+
+
+<div class="sidebar-logo">
+
+
+
+    <img src="../images/logo.png" alt="磐枢工业智能平台" style="width: 100%; max-width: 200px; margin-bottom: 8px;">
+
+
+
+    <h1 style="font-size: 16px; margin: 0;">磐枢工业智能平台</h1>
+
+
+
+  </div>
+
+
+
+  <nav class="sidebar-menu"></nav>
+
+
+
+<div class="sidebar-user"><div class="avatar">管</div>
+
+
+
+</aside>
+
+
+
+<div class="main-content" id="mainContent">
+
+
+
+  <div class="page-header" style="position:sticky;top:0;z-index:100;">
+
+
+
+    <div>
+
+
+
+      <div class="flex items-center gap-8">
+
+
+
+        <button class="sidebar-toggle" onclick="toggleSidebar()">&#9776;</button>
+
+
+
+        <div>
+
+
+
+          <h2>组织架构</h2>
+
+
+
+          <div class="breadcrumb"><a href="../index.html">首页</a> <span>/</span> <span>HR人力</span></div></div>
+
+
+
+        </div>
+
+
+
+      </div>
+
+
+
+    </div>
+
+
+
+  </div>
+
+
+
+  <div class="page-body" style="height:calc(100vh - 56px);display:flex;padding:0;">
+
+
+
+    <div style="width:280px;border-right:1px solid var(--border-normal);background:var(--bg-surface);overflow-y:auto;">
+
+
+
+      <div style="padding:12px 16px;border-bottom:1px solid var(--border-normal);font-size:13px;font-weight:600;color:var(--text-primary);">组织架构树</div>
+
+
+
+      <div style="padding:8px 0;">
+
+
+
+        <div class="org-tree-item active" onclick="selectOrg('GRP001')">
+
+
+
+          <span class="tree-icon">▸</span> 观略智能集团
+
+
+
+        </div>
+
+
+
+        <div class="org-tree-item" style="padding-left:24px;" onclick="selectOrg('COM001')">
+
+
+
+          <span class="tree-icon">▸</span> 观略智能科技有限公司
+
+
+
+        </div>
+
+
+
+        <div class="org-tree-item" style="padding-left:48px;" onclick="selectOrg('DEP001')">
+
+
+
+          <span class="tree-icon">▸</span> 管理部门
+
+
+
+        </div>
+
+
+
+        <div class="org-tree-item" style="padding-left:72px;" onclick="selectOrg('GRP001')">
+
+
+
+          <span class="tree-icon">●</span> 总经理办公室
+
+
+
+        </div>
+
+
+
+        <div class="org-tree-item" style="padding-left:72px;" onclick="selectOrg('GRP002')">
+
+
+
+          <span class="tree-icon">●</span> 财务部
+
+
+
+        </div>
+
+
+
+        <div class="org-tree-item" style="padding-left:72px;" onclick="selectOrg('GRP003')">
+
+
+
+          <span class="tree-icon">●</span> 人力资源部
+
+
+
+        </div>
+
+
+
+        <div class="org-tree-item" style="padding-left:72px;" onclick="selectOrg('GRP004')">
+
+
+
+          <span class="tree-icon">●</span> 行政部
+
+
+
+        </div>
+
+
+
+        <div class="org-tree-item" style="padding-left:48px;" onclick="selectOrg('DEP002')">
+
+
+
+          <span class="tree-icon">▸</span> 基本生产部门
+
+
+
+        </div>
+
+
+
+        <div class="org-tree-item" style="padding-left:72px;" onclick="selectOrg('GRP005')">
+
+
+
+          <span class="tree-icon">●</span> 注塑车间
+
+
+
+        </div>
+
+
+
+        <div class="org-tree-item" style="padding-left:72px;" onclick="selectOrg('GRP006')">
+
+
+
+          <span class="tree-icon">●</span> 装配车间
+
+
+
+        </div>
+
+
+
+        <div class="org-tree-item" style="padding-left:72px;" onclick="selectOrg('GRP007')">
+
+
+
+          <span class="tree-icon">●</span> 冲压车间
+
+
+
+        </div>
+
+
+
+        <div class="org-tree-item" style="padding-left:48px;" onclick="selectOrg('DEP003')">
+
+
+
+          <span class="tree-icon">▸</span> 辅助生产部门
+
+
+
+        </div>
+
+
+
+        <div class="org-tree-item" style="padding-left:72px;" onclick="selectOrg('GRP008')">
+
+
+
+          <span class="tree-icon">●</span> 设备维护组
+
+
+
+        </div>
+
+
+
+        <div class="org-tree-item" style="padding-left:72px;" onclick="selectOrg('GRP009')">
+
+
+
+          <span class="tree-icon">●</span> 质量检验组
+
+
+
+        </div>
+
+
+
+        <div class="org-tree-item" style="padding-left:72px;" onclick="selectOrg('GRP010')">
+
+
+
+          <span class="tree-icon">●</span> 仓库管理组
+
+
+
+        </div>
+
+
+
+        <div class="org-tree-item" style="padding-left:24px;" onclick="selectOrg('COM002')">
+
+
+
+          <span class="tree-icon">▸</span> 观略智能设备有限公司
+
+
+
+        </div>
+
+
+
+        <div class="org-tree-item" style="padding-left:48px;" onclick="selectOrg('DEP006')">
+
+
+
+          <span class="tree-icon">●</span> 设备研发部
+
+
+
+        </div>
+
+
+
+        <div class="org-tree-item" style="padding-left:48px;" onclick="selectOrg('DEP007')">
+
+
+
+          <span class="tree-icon">●</span> 售后服务部
+
+
+
+        </div>
+
+
+
+      </div>
+
+
+
+    </div>
+
+
+
+    <div style="flex:1;display:flex;flex-direction:column;">
+
+
+
+      <div class="tabs" style="padding:0;">
+
+        <div class="tab-item active" onclick="switchOrgTab(this, 'basic')">基本信息</div>
+
+        <div class="tab-item" onclick="switchOrgTab(this, 'children')">下级组织</div>
+
+        <div class="tab-item" onclick="switchOrgTab(this, 'positions')">岗位体系</div>
+
+        <div class="tab-item" onclick="switchOrgTab(this, 'report')">汇报关系</div>
+
+        <div style="margin-left:auto;padding-right:16px;">
+          <button class="btn btn-sm btn-default" onclick="openColumnSettings()" style="margin-top:4px;">⚙️ 显示/隐藏列</button>
+        </div>
+
+      </div>
+
+
+
+      <div class="tab-content" style="flex:1;overflow-y:auto;padding:16px;">
+
+
+
+        <div class="tab-pane active" id="tab-basic">
+
+
+
+          <div class="card">
+
+
+
+            <div class="card-header">组织基本信息</div>
+
+
+
+            <div class="card-body">
+
+
+
+              <div class="grid-2" style="gap:16px;">
+
+
+
+                <div class="form-group">
+
+
+
+                  <label class="form-label">组织编码</label>
+
+
+
+                  <input type="text" class="form-input" value="DEP001" readonly>
+
+
+
+                </div>
+
+
+
+                <div class="form-group">
+
+
+
+                  <label class="form-label">组织名称</label>
+
+
+
+                  <input type="text" class="form-input" value="研发部">
+
+
+
+                </div>
+
+
+
+                <div class="form-group">
+
+
+
+                  <label class="form-label">组织类型</label>
+
+
+
+                  <select class="form-select">
+
+
+
+                    <option>部门</option>
+
+
+
+                    <option>集团</option>
+
+
+
+                    <option>公司</option>
+
+
+
+                    <option>班组</option>
+
+
+
+                  </select>
+
+
+
+                </div>
+
+
+
+                <div class="form-group">
+
+
+
+                  <label class="form-label">上级组织</label>
+
+
+
+                  <input type="text" class="form-input" value="测试组织" readonly>
+
+
+
+                </div>
+
+
+
+                <div class="form-group">
+
+
+
+                  <label class="form-label">负责人</label>
+
+
+
+                  <select class="form-select">
+
+
+
+                    <option>测试人员</option>
+
+
+
+                    <option>测试人员</option>
+
+
+
+                    <option>测试人员</option>
+
+
+
+                  </select>
+
+
+
+                </div>
+
+
+
+                <div class="form-group">
+
+
+
+                  <label class="form-label">启用状态</label>
+
+
+
+                  <select class="form-select">
+
+
+
+                    <option>启用</option>
+
+
+
+                    <option>禁用</option>
+
+
+
+                  </select>
+
+
+
+                </div>
+
+
+
+                <div class="form-group" style="grid-column:1/-1;">
+
+
+
+                  <label class="form-label">备注</label>
+
+
+
+                  <textarea class="form-textarea" placeholder="请输入备注信息"></textarea>
+
+
+
+                </div>
+
+
+
+              </div>
+
+
+
+              <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:16px;">
+
+
+
+                <button class="btn btn-ghost">取消</button>
+
+
+
+                <button class="btn btn-primary">保存</button>
+
+
+
+              </div>
+
+
+
+            </div>
+
+
+
+          </div>
+
+
+
+        </div>
+
+
+
+        <div class="tab-pane" id="tab-children">
+
+
+
+          <div class="card">
+
+
+
+            <div class="card-header">
+
+
+
+              <span>下级组织列表</span>
+
+
+
+              <button class="btn btn-sm btn-primary" onclick="openModal('addChildModal')">新增</button>
+
+
+
+            </div>
+
+
+
+            <div class="card-body">
+
+
+
+              <table class="data-table">
+
+
+
+                <thead>
+
+
+
+                  <tr><th data-column="code">组织编码</th><th data-column="name">组织名称</th><th data-column="form">形态</th><th data-column="parentName">上级组织</th><th data-column="manager">负责人</th><th data-column="status">状态</th><th>操作</th></tr>
+
+
+
+                </thead>
+
+
+
+                <tbody>
+
+
+
+                  <tr><td data-column="code">GRP001</td><td data-column="name">前端开发组</td><td data-column="form">班组</td><td data-column="parentName">研发部</td><td data-column="manager">周八</td><td data-column="status"><span class="badge badge-success">启用</span></td><td class="row-action-links"><a>编辑</a><a>删除</a></td></tr>
+
+                  <tr><td data-column="code">GRP002</td><td data-column="name">后端开发组</td><td data-column="form">班组</td><td data-column="parentName">研发部</td><td data-column="manager">刘十一</td><td data-column="status"><span class="badge badge-success">启用</span></td><td class="row-action-links"><a>编辑</a><a>删除</a></td></tr>
+
+                  <tr><td data-column="code">GRP003</td><td data-column="name">测试组</td><td data-column="form">班组</td><td data-column="parentName">研发部</td><td data-column="manager">林十五</td><td data-column="status"><span class="badge badge-success">启用</span></td><td class="row-action-links"><a>编辑</a><a>删除</a></td></tr>
+
+
+
+                </tbody>
+
+
+
+              </table>
+
+
+
+            </div>
+
+
+
+          </div>
+
+
+
+        </div>
+
+
+
+        <div class="tab-pane" id="tab-positions">
+
+
+
+          <div class="card">
+
+
+
+            <div class="card-header">
+
+
+
+              <span>岗位体系</span>
+
+
+
+              <button class="btn btn-sm btn-primary">新增岗位</button>
+
+
+
+            </div>
+
+
+
+            <div class="card-body">
+
+
+
+              <table class="data-table">
+
+
+
+                <thead>
+
+
+
+                  <tr><th>岗位编码</th><th>岗位名称</th><th>岗位等级</th><th>编制人数</th><th>在岗人数</th><th>操作</th></tr>
+
+
+
+                </thead>
+
+
+
+                <tbody>
+
+
+
+                  <tr><td>POS001</td><td>高级工程师</td><td>P3</td><td>2</td><td>1</td><td class="row-action-links"><a>查看</a><a>编辑</a></td></tr>
+
+
+
+                  <tr><td>POS002</td><td>前端工程师</td><td>P2</td><td>3</td><td>2</td><td class="row-action-links"><a>查看</a><a>编辑</a></td></tr>
+
+
+
+                  <tr><td>POS003</td><td>后端工程师</td><td>P2</td><td>3</td><td>2</td><td class="row-action-links"><a>查看</a><a>编辑</a></td></tr>
+
+
+
+                  <tr><td>POS004</td><td>测试工程师</td><td>P2</td><td>2</td><td>1</td><td class="row-action-links"><a>查看</a><a>编辑</a></td></tr>
+
+
+
+                </tbody>
+
+
+
+              </table>
+
+
+
+            </div>
+
+
+
+          </div>
+
+
+
+        </div>
+
+
+
+        <div class="tab-pane" id="tab-report">
+
+
+
+          <div class="card">
+
+
+
+            <div class="card-header">汇报关系</div>
+
+
+
+            <div class="card-body">
+
+
+
+              <table class="data-table">
+
+
+
+                <thead>
+
+
+
+                  <tr><th>岗位</th><th>汇报对象</th><th>汇报方式</th><th>汇报频率</th></tr>
+
+
+
+                </thead>
+
+
+
+                <tbody>
+
+
+
+                  <tr><td>高级工程师</td><td>技术总监</td><td>邮件/会议</td><td>每周</td></tr>
+
+
+
+                  <tr><td>前端工程师</td><td>高级工程师</td><td>日报/会议</td><td>每日</td></tr>
+
+
+
+                  <tr><td>后端工程师</td><td>高级工程师</td><td>日报/会议</td><td>每日</td></tr>
+
+
+
+                  <tr><td>测试工程师</td><td>高级工程师</td><td>邮件/会议</td><td>每周</td></tr>
+
+
+
+                </tbody>
+
+
+
+              </table>
+
+
+
+            </div>
+
+
+
+          </div>
+
+
+
+        </div>
+
+
+
+      </div>
+
+
+
+    </div>
+
+
+
+  </div>
+
+
+
+  <div class="modal-overlay" id="addChildModal">
+
+
+
+    <div class="modal">
+
+
+
+      <div class="modal-header">
+
+
+
+        <span>新增下级组织</span>
+
+
+
+        <button class="action-btn" onclick="closeModal('addChildModal')" style="float:right;font-size:16px;">×</button>
+
+
+
+      </div>
+
+
+
+      <div class="modal-body">
+
+
+
+        <div class="form-group">
+
+
+
+          <label class="form-label">组织编码</label>
+
+
+
+          <input type="text" class="form-input" placeholder="请输入组织编码">
+
+
+
+        </div>
+
+
+
+        <div class="form-group">
+
+
+
+          <label class="form-label">组织名称</label>
+
+
+
+          <input type="text" class="form-input" placeholder="请输入组织名称">
+
+
+
+        </div>
+
+
+
+        <div class="form-group">
+
+
+
+          <label class="form-label">组织类型</label>
+
+
+
+          <select class="form-select">
+
+
+
+            <option>部门</option>
+
+
+
+            <option>班组</option>
+
+
+
+          </select>
+
+
+
+        </div>
+
+
+
+        <div class="form-group">
+
+
+
+          <label class="form-label">负责人</label>
+
+
+
+          <select class="form-select">
+
+
+
+            <option>测试人员</option>
+
+
+
+            <option>测试人员</option>
+
+
+
+            <option>测试人员</option>
+
+
+
+          </select>
+
+
+
+        </div>
+
+
+
+        <div class="form-group">
+
+
+
+          <label class="form-label">备注</label>
+
+
+
+          <textarea class="form-textarea" placeholder="请输入备注信息"></textarea>
+
+
+
+        </div>
+
+
+
+      </div>
+
+
+
+      <div class="modal-footer">
+
+
+
+        <button class="btn btn-ghost" onclick="closeModal('addChildModal')">取消</button>
+
+
+
+        <button class="btn btn-primary" onclick="saveChildOrg()">保存</button>
+
+
+
+      </div>
+
+
+
+    </div>
+
+
+
+  </div>
+
+
+
+</div>
+
+
+
+<style>
+
+
+
+.org-tree-item {
+
+
+
+  padding: 6px 16px;
+
+
+
+  font-size: 12.5px;
+
+
+
+  color: var(--text-secondary);
+
+
+
+  cursor: pointer;
+
+
+
+  transition: all var(--transition);
+
+
+
+}
+
+
+
+.org-tree-item:hover {
+
+
+
+  background: rgba(56,189,248,0.06);
+
+
+
+  color: var(--text-primary);
+
+
+
+}
+
+
+
+.org-tree-item.active {
+
+
+
+  background: rgba(56,189,248,0.12);
+
+
+
+  color: var(--text-accent);
+
+
+
+}
+
+
+
+.tree-icon {
+
+
+
+  font-size: 10px;
+
+
+
+  margin-right: 4px;
+
+
+
+  color: var(--text-tertiary);
+
+
+
+}
+
+
+
+
+.lookup-modal { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:2000; justify-content:center; align-items:center; }
+.lookup-modal.show { display:flex; }
+.lookup-dialog { background:#fff; border:1px solid #e8e8e8; border-radius:4px; width:720px; max-height:70vh; overflow:hidden; }
+.lookup-header { padding:14px 20px; border-bottom:1px solid #e8e8e8; display:flex; align-items:center; justify-content:space-between; }
+.lookup-title { font-size:15px; font-weight:600; color:#333; }
+.lookup-close { font-size:20px; color:#666; cursor:pointer; background:none; border:none; }
+.lookup-close:hover { color:#333; }
+.lookup-body { padding:16px; }
+.lookup-search { display:flex; gap:8px; margin-bottom:12px; }
+.lookup-search input { flex:1; padding:6px 10px; border:1px solid #e8e8e8; border-radius:4px; font-size:13px; }
+.lookup-search button { padding:6px 16px; background:#1890ff; color:#fff; border:none; border-radius:4px; cursor:pointer; }
+.lookup-table { width:100%; border-collapse:collapse; font-size:13px; }
+.lookup-table th, .lookup-table td { padding:10px 12px; text-align:left; border-bottom:1px solid #e8e8e8; }
+.lookup-table th { background:#fafafa; font-weight:600; color:#333; }
+.lookup-table tr:hover { background:#f5f5f5; }
+.lookup-table .checkbox-cell { width:40px; }
+.lookup-footer { padding:12px 20px; border-top:1px solid #e8e8e8; display:flex; justify-content:flex-end; gap:8px; }
+.lookup-field { display:flex; align-items:center; }
+.lookup-field input { flex:1; padding:6px 10px; border:1px solid #e8e8e8; border-radius:4px 0 0 4px; font-size:13px; }
+.lookup-field button { width:28px; height:28px; border:1px solid #e8e8e8; border-left:none; border-radius:0 4px 4px 0; background:#fff; cursor:pointer; display:flex; align-items:center; justify-content:center; }
+.lookup-field button:hover { background:#f5f5f5; }
+
+.column-modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:2000;justify-content:center;align-items:center;}
+.column-modal.show{display:flex;}
+.column-dialog{background:#fff;border:1px solid #d9d9d9;border-radius:8px;width:560px;min-width:400px;max-width:720px;height:420px;min-height:300px;max-height:70vh;overflow:hidden;box-shadow:0 10px 30px rgba(0,0,0,0.15);position:relative;resize:both;}
+.column-header{padding:16px 20px;border-bottom:1px solid #f0f0f0;background:#fafafa;display:flex;align-items:center;justify-content:space-between;cursor:move;}
+.column-title{font-size:16px;font-weight:600;color:#333;}
+.column-close{font-size:20px;color:#999;cursor:pointer;border:none;background:none;width:28px;height:28px;display:flex;align-items:center;justify-content:center;border-radius:4px;transition:all 0.3s;cursor:pointer;}
+.column-close:hover{background:#f5f5f5;color:#666;}
+.column-body{padding:20px;overflow-y:auto;height:calc(100% - 88px);background:#fff;}
+.column-footer{padding:14px 20px;border-top:1px solid #f0f0f0;display:flex;justify-content:flex-end;gap:12px;background:#fafafa;position:absolute;bottom:0;left:0;right:0;}
+.column-item{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:4px;transition:all 0.2s;}
+.column-item:hover{background:#f5f7fa;}
+.column-item input[type="checkbox"]{width:16px;height:16px;cursor:pointer;accent-color:#1890ff;}
+.column-item label{font-size:14px;color:#333;cursor:pointer;flex:1;}
+
+</style>
+
+
+
+<script>
+var allColumns = ['code', 'name', 'form', 'parentName', 'manager', 'status'];
+var visibleColumns = JSON.parse(localStorage.getItem('hr_org_columns') || JSON.stringify(allColumns));
+
+function openModal(id) {
+
+
+
+  document.getElementById(id).classList.add('active');
+
+
+
+}
+
+
+
+function closeModal(id) {
+
+
+
+  document.getElementById(id).classList.remove('active');
+
+
+
+}
+
+
+
+function selectOrg(id) {
+
+
+
+  document.querySelectorAll('.org-tree-item').forEach(function(item) { item.classList.remove('active'); });
+
+
+
+  event.target.closest('.org-tree-item').classList.add('active');
+
+
+
+}
+
+
+
+function switchOrgTab(el, type) {
+
+
+
+  document.querySelectorAll('.tab-item').forEach(function(t) { t.classList.remove('active'); });
+
+
+
+  document.querySelectorAll('.tab-pane').forEach(function(p) { p.classList.remove('active'); });
+
+
+
+  el.classList.add('active');
+
+
+
+  document.getElementById('tab-' + type).classList.add('active');
+
+
+
+}
+
+
+
+function validateOrgForm() {
+
+
+
+  var name = document.querySelector('#addChildModal input[placeholder*="组织名称"]').value.trim();
+
+
+
+  var code = document.querySelector('#addChildModal input[placeholder*="组织编码"]').value.trim();
+
+
+
+  if (!name) {
+
+
+
+    showToast('请输入组织名称', 'info');
+
+
+
+    return false;
+
+
+
+  }
+
+
+
+  if (!code) {
+
+
+
+    showToast('请输入组织编码', 'info');
+
+
+
+    return false;
+
+
+
+  }
+
+
+
+  return true;
+
+
+
+}
+
+
+
+function saveChildOrg() {
+
+
+
+  if (!validateOrgForm()) return;
+
+
+
+  closeModal('addChildModal');
+
+
+
+  showToast('组织信息保存成功', 'info');
+
+
+
+}
+
+
+
+function viewOrg(id) {
+
+
+
+  showToast('查看组织详情', 'info');
+
+
+
+}
+
+
+
+function editOrg(id) {
+
+
+
+  showToast('编辑组织信息', 'info');
+
+
+
+}
+
+
+
+function deleteOrg(id) {
+
+
+
+  if (!showConfirm("确认退出？")) return;
+
+
+
+  showToast('删除成功', 'info');
+
+
+
+}
+
+
+
+function viewPositions(id) {
+
+
+
+  showToast('查看岗位列表', 'info');
+
+
+
+}
+
+
+
+function editPositions(id) {
+
+  showToast('编辑岗位列表', 'info');
+
+}
+
+function updateColumnVisibility() {
+  document.querySelectorAll('th[data-column], td[data-column]').forEach(function(el) {
+    var col = el.getAttribute('data-column');
+    el.style.display = visibleColumns.includes(col) ? '' : 'none';
+  });
+}
+
+function openColumnSettings() {
+  var container = document.getElementById('columnCheckboxes');
+  container.innerHTML = '';
+  var colLabels = { 'code': '组织编码', 'name': '组织名称', 'form': '形态', 'parentName': '上级组织', 'manager': '负责人', 'status': '状态' };
+  allColumns.forEach(function(col) {
+    var item = document.createElement('div');
+    item.className = 'column-item';
+    var checked = visibleColumns.includes(col) ? 'checked' : '';
+    item.innerHTML = '<input type="checkbox" ' + checked + ' value="' + col + '" onchange="toggleColumn(this)">' + '<label>' + (colLabels[col] || col) + '</label>';
+    container.appendChild(item);
+  });
+  document.getElementById('columnModal').classList.add('show');
+}
+
+function closeColumnSettings() { document.getElementById('columnModal').classList.remove('show'); }
+
+function toggleColumn(cb) {
+  var idx = visibleColumns.indexOf(cb.value);
+  if (cb.checked && idx === -1) visibleColumns.push(cb.value);
+  else if (!cb.checked && idx !== -1) visibleColumns.splice(idx, 1);
+}
+
+function saveColumnSettings() {
+  localStorage.setItem('hr_org_columns', JSON.stringify(visibleColumns));
+  showToast('列设置已保存', 'success');
+  closeColumnSettings();
+  updateColumnVisibility();
+}
+
+
+var currentLookupField = null;
+var currentLookupType = null;
+var lookupData = [];
+var lookupColumns = [];
+
+function openLookup(fieldId, type) {
+  currentLookupField = fieldId;
+  currentLookupType = type;
+  
+  if (type === 'org') {
+    lookupColumns = ['编码', '名称', '形态', '上级组织'];
+    lookupData = JSON.parse(localStorage.getItem('erp_orgs') || '[]');
+    document.getElementById('lookupTitle').textContent = '选择组织';
+  } else if (type === 'department') {
+    lookupColumns = ['编码', '名称'];
+    lookupData = JSON.parse(localStorage.getItem('erp_departments_cache') || '[]');
+    document.getElementById('lookupTitle').textContent = '选择部门';
+  } else if (type === 'employee') {
+    lookupColumns = ['编号', '姓名', '所属部门'];
+    lookupData = JSON.parse(localStorage.getItem('erp_employees_cache') || '[]');
+    document.getElementById('lookupTitle').textContent = '选择员工';
+  } else if (type === 'supplier') {
+    lookupColumns = ['编码', '名称'];
+    lookupData = JSON.parse(localStorage.getItem('erp_suppliers_cache') || '[]');
+    document.getElementById('lookupTitle').textContent = '选择供应商';
+  } else if (type === 'customer') {
+    lookupColumns = ['编码', '名称'];
+    lookupData = JSON.parse(localStorage.getItem('erp_customers_cache') || '[]');
+    document.getElementById('lookupTitle').textContent = '选择客户';
+  } else if (type === 'material') {
+    lookupColumns = ['物料编码', '物料名称', '规格型号', '基本单位'];
+    lookupData = JSON.parse(localStorage.getItem('erp_materials_cache') || '[]');
+    document.getElementById('lookupTitle').textContent = '选择物料';
+  } else if (type === 'warehouse') {
+    lookupColumns = ['编码', '名称'];
+    lookupData = JSON.parse(localStorage.getItem('erp_warehouses_cache') || '[]');
+    document.getElementById('lookupTitle').textContent = '选择仓库';
+  }
+  
+  renderLookupTable(lookupData);
+  document.getElementById('lookupModal').classList.add('show');
+}
+
+function closeLookup() {
+  document.getElementById('lookupModal').classList.remove('show');
+}
+
+function filterLookup() {
+  var keyword = document.getElementById('lookupKeyword').value.trim().toLowerCase();
+  var filtered = lookupData.filter(function(item) {
+    var code = item.code || '';
+    var name = item.name || '';
+    return code.toLowerCase().includes(keyword) || name.toLowerCase().includes(keyword);
+  });
+  renderLookupTable(filtered);
+}
+
+function renderLookupTable(data) {
+  var head = document.getElementById('lookupTableHead');
+  var body = document.getElementById('lookupTableBody');
+  
+  head.innerHTML = '<tr><th class="checkbox-cell"><input type="checkbox" onclick="selectAllLookup()"></th>' + lookupColumns.map(function(col) { return '<th>' + col + '</th>'; }).join('') + '</tr>';
+  
+  body.innerHTML = '';
+  data.forEach(function(item) {
+    var row = document.createElement('tr');
+    row.onclick = function() { selectLookupRow(this); };
+    var cells = ['<td class="checkbox-cell"><input type="checkbox" class="lookup-checkbox" value="' + item.id + '"></td>'];
+    if (currentLookupType === 'org') {
+      cells.push('<td>' + item.code + '</td><td>' + item.name + '</td><td>' + (item.form || '') + '</td><td>' + (item.parentName || '') + '</td>');
+    } else if (currentLookupType === 'department') {
+      cells.push('<td>' + item.code + '</td><td>' + item.name + '</td>');
+    } else if (currentLookupType === 'employee') {
+      cells.push('<td>' + item.code + '</td><td>' + item.name + '</td><td>' + (item.department || '') + '</td>');
+    } else if (currentLookupType === 'supplier' || currentLookupType === 'customer') {
+      cells.push('<td>' + item.code + '</td><td>' + item.name + '</td>');
+    } else if (currentLookupType === 'material') {
+      cells.push('<td>' + item.code + '</td><td>' + item.name + '</td><td>' + (item.specification || '') + '</td><td>' + (item.unit || '') + '</td>');
+    } else if (currentLookupType === 'warehouse') {
+      cells.push('<td>' + item.code + '</td><td>' + item.name + '</td>');
+    }
+    row.innerHTML = cells.join('');
+    body.appendChild(row);
+  });
+  
+  if (data.length === 0) {
+    body.innerHTML = '<tr><td colspan="' + (lookupColumns.length + 1) + '" style="text-align:center;padding:40px;color:#999;">暂无数据</td></tr>';
+  }
+}
+
+function selectAllLookup() {
+  var master = document.querySelector('.lookup-table th input');
+  var checkboxes = document.querySelectorAll('.lookup-checkbox');
+  checkboxes.forEach(function(cb) { cb.checked = master.checked; });
+}
+
+function selectLookupRow(row) {
+  var checkbox = row.querySelector('.lookup-checkbox');
+  checkbox.checked = !checkbox.checked;
+}
+
+function confirmLookup() {
+  var checkboxes = document.querySelectorAll('.lookup-checkbox:checked');
+  if (checkboxes.length === 0) {
+    showToast('请选择一条记录', 'warning');
+    return;
+  }
+  
+  var item = lookupData.find(function(d) { return d.id === checkboxes[0].value; });
+  if (item) {
+    var field = document.getElementById(currentLookupField);
+    if (field) {
+      field.value = item.name;
+      field.setAttribute('data-id', item.id);
+      field.setAttribute('data-code', item.code);
+      
+      if (currentLookupType === 'material') {
+        var row = field.closest('tr');
+        if (row) {
+          row.querySelector('.material-name').value = item.name;
+          row.querySelector('.material-spec').value = item.specification || '';
+          row.querySelector('.material-unit').value = item.unit || '';
+        }
+      }
+    }
+  }
+  
+  closeLookup();
+}
+
+function openMaterialLookup(btn) {
+  var field = btn.previousElementSibling;
+  field.id = 'lookupField_' + Date.now();
+  currentLookupField = field.id;
+  openLookup(field.id, 'material');
+}
+
+function openOrgLookup(btn) {
+  var field = btn.previousElementSibling;
+  field.id = 'lookupField_' + Date.now();
+  currentLookupField = field.id;
+  openLookup(field.id, 'org');
+}
+
+function openSupplierLookup(btn) {
+  var field = btn.previousElementSibling;
+  field.id = 'lookupField_' + Date.now();
+  currentLookupField = field.id;
+  openLookup(field.id, 'supplier');
+}
+
+function openWarehouseLookup(btn) {
+  var field = btn.previousElementSibling;
+  field.id = 'lookupField_' + Date.now();
+  currentLookupField = field.id;
+  openLookup(field.id, 'warehouse');
+}
+
+function initLookupData() {
+  if (!localStorage.getItem('erp_orgs')) {
+    localStorage.setItem('erp_orgs', JSON.stringify([
+      { id: 'org-001', code: 'ORG-HQ', name: '磐枢工业集团', form: '集团', parentName: '' },
+      { id: 'org-002', code: 'ORG-SM', name: '磐枢智能制造有限公司', form: '公司', parentName: '磐枢工业集团' },
+      { id: 'org-003', code: 'ORG-SM-PD', name: '生产制造部', form: '部门', parentName: '磐枢智能制造有限公司' },
+      { id: 'org-004', code: 'ORG-SM-FA', name: '财务部', form: '部门', parentName: '磐枢智能制造有限公司' },
+      { id: 'org-005', code: 'ORG-SM-SD', name: '销售部', form: '部门', parentName: '磐枢智能制造有限公司' }
+    ]));
+  }
+  if (!localStorage.getItem('erp_departments_cache')) {
+    localStorage.setItem('erp_departments_cache', JSON.stringify([
+      { id: 'dept-001', code: 'DEPT-PD', name: '生产制造部', status: 1 },
+      { id: 'dept-002', code: 'DEPT-FA', name: '财务部', status: 1 },
+      { id: 'dept-003', code: 'DEPT-SD', name: '销售部', status: 1 },
+      { id: 'dept-004', code: 'DEPT-AS', name: '装配车间', status: 1 },
+      { id: 'dept-005', code: 'DEPT-QC', name: '质检车间', status: 1 }
+    ]));
+  }
+  if (!localStorage.getItem('erp_employees_cache')) {
+    localStorage.setItem('erp_employees_cache', JSON.stringify([
+      { id: 'emp-001', code: 'EMP-001', name: '张三', department: '生产制造部', status: 1 },
+      { id: 'emp-002', code: 'EMP-002', name: '李四', department: '生产制造部', status: 1 },
+      { id: 'emp-003', code: 'EMP-003', name: '王五', department: '财务部', status: 1 },
+      { id: 'emp-004', code: 'EMP-004', name: '赵六', department: '销售部', status: 1 },
+      { id: 'emp-005', code: 'EMP-005', name: '钱七', department: '质检车间', status: 1 }
+    ]));
+  }
+  if (!localStorage.getItem('erp_suppliers_cache')) {
+    localStorage.setItem('erp_suppliers_cache', JSON.stringify([
+      { id: 'sup-001', code: 'S-001', name: '深圳电子元器件有限公司', status: 1 },
+      { id: 'sup-002', code: 'S-002', name: '杭州精密机械加工厂', status: 1 },
+      { id: 'sup-003', code: 'S-003', name: '上海材料科技有限公司', status: 1 },
+      { id: 'sup-004', code: 'S-004', name: '东莞五金制品厂', status: 1 }
+    ]));
+  }
+  if (!localStorage.getItem('erp_materials_cache')) {
+    localStorage.setItem('erp_materials_cache', JSON.stringify([
+      { id: 'mat-001', code: 'P-001', name: '高频传感器模块', specification: 'HT-2026', unit: '个', status: 1 },
+      { id: 'mat-002', code: 'P-002', name: '控制电路板', specification: 'CB-2026', unit: '块', status: 1 },
+      { id: 'mat-003', code: 'P-003', name: '智能控制器', specification: 'IC-V3', unit: '台', status: 1 },
+      { id: 'mat-004', code: 'P-004', name: '电源模块', specification: 'PM-500W', unit: '个', status: 1 },
+      { id: 'mat-005', code: 'M-001', name: 'PCB电路板', specification: 'FR-4双层', unit: '块', status: 1 },
+      { id: 'mat-006', code: 'M-002', name: '贴片电阻', specification: '10KΩ 0603', unit: '个', status: 1 },
+      { id: 'mat-007', code: 'M-003', name: '贴片电容', specification: '100μF 0805', unit: '个', status: 1 },
+      { id: 'mat-008', code: 'M-004', name: '螺丝', specification: 'M4x10', unit: '包', status: 1 }
+    ]));
+  }
+  if (!localStorage.getItem('erp_warehouses_cache')) {
+    localStorage.setItem('erp_warehouses_cache', JSON.stringify([
+      { id: 'wh-001', code: 'WH-001', name: '成品仓', status: 1 },
+      { id: 'wh-002', code: 'WH-002', name: '原料仓', status: 1 },
+      { id: 'wh-003', code: 'WH-003', name: '半成品仓', status: 1 },
+      { id: 'wh-004', code: 'WH-004', name: '辅料仓', status: 1 }
+    ]));
+  }
+}
+
+</script>
+
+
+
+
+<div class="lookup-modal" id="lookupModal">
+  <div class="lookup-dialog">
+    <div class="lookup-header">
+      <div class="lookup-title" id="lookupTitle">选择</div>
+      <button class="lookup-close" onclick="closeLookup()">×</button>
+    </div>
+    <div class="lookup-body">
+      <div class="lookup-search">
+        <input type="text" id="lookupKeyword" placeholder="请输入编码或名称搜索" onkeydown="if(event.key==='Enter')filterLookup()">
+        <button onclick="filterLookup()">搜索</button>
+      </div>
+      <table class="lookup-table">
+        <thead id="lookupTableHead"></thead>
+        <tbody id="lookupTableBody"></tbody>
+      </table>
+    </div>
+    <div class="lookup-footer">
+      <button class="btn btn-cancel" onclick="closeLookup()">取消</button>
+      <button class="btn btn-primary" onclick="confirmLookup()">确定</button>
+    </div>
+  </div>
+</div>
+<div class="column-modal" id="columnModal">
+  <div class="column-dialog">
+    <div class="column-header">
+      <div class="column-title">列设置</div>
+      <button class="column-close" onclick="closeColumnSettings()">×</button>
+    </div>
+    <div class="column-body">
+      <div id="columnCheckboxes"></div>
+    </div>
+    <div class="column-footer">
+      <button class="btn btn-cancel" onclick="closeColumnSettings()">取消</button>
+      <button class="btn btn-primary" onclick="saveColumnSettings()">确定</button>
+    </div>
+  </div>
+</div>
+
+</body>
+
+
+
+</html>

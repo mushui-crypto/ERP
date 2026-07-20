@@ -1,0 +1,1613 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>首页工作台 — 磐枢工业智能平台</title>
+<link rel="stylesheet" href="common.css">
+<script src="common.js"></script>
+<style>
+/* Dashboard specific tweaks */
+.stat-card .stat-icon {
+  font-size: 20px; margin-bottom: 8px; opacity: 0.6;
+}
+.stat-card .stat-change {
+  font-size: 11px; margin-top: 4px; font-family: var(--font-mono);
+}
+.stat-card .stat-change.up { color: var(--color-success); }
+.stat-card .stat-change.down { color: var(--color-error); }
+
+.dashboard-section-title {
+  font-size: 13px; font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 12px;
+  display: flex; align-items: center; gap: 8px;
+}
+.dashboard-section-title .dot {
+  width: 3px; height: 14px; border-radius: 1px;
+  background: var(--text-accent);
+}
+
+.quick-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+}
+
+.todo-list { max-height: 340px; overflow-y: auto; }
+.alert-list { max-height: 260px; overflow-y: auto; }
+.announce-list { max-height: 260px; overflow-y: auto; }
+
+/* Card with subtle glow */
+.card-glow { box-shadow: 0 0 20px rgba(56,189,248,0.04); }
+
+/* Module panel visibility */
+.module-panel { display: none; }
+.module-panel.active { display: block; }
+</style>
+</head>
+<body>
+
+<!-- ===== SIDEBAR ===== -->
+<aside class="sidebar" id="sidebar">
+<div class="sidebar-logo">
+    <img src="images/logo.png" alt="磐枢工业智能平台" style="width: 100%; max-width: 200px; margin-bottom: 8px;">
+    <h1 style="font-size: 16px; margin: 0;">磐枢工业智能平台</h1>
+  </div>
+  <nav class="sidebar-menu"></nav>
+<div class="sidebar-user">
+    <div class="avatar">管</div>
+</aside>
+
+<!-- ===== MAIN CONTENT ===== -->
+<div class="main-content" id="mainContent">
+
+  <!-- Page Header -->
+  <div class="page-header">
+    <div>
+      <div class="flex items-center gap-8">
+        <button class="sidebar-toggle" id="sidebarToggle" onclick="toggleSidebar()">&#9776;</button>
+        <div>
+          <h2 id="pageTitle">首页工作台</h2>
+          <div class="breadcrumb" id="pageBreadcrumb">
+            <a href="index.html">首页</a><span>/</span><span>工作台</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="page-actions">
+      <div class="flex items-center gap-4" id="sessionInfo" style="font-size:12px;color:var(--text-tertiary);margin-right:16px;">
+        <span id="dcInfo" style="display:none;">数据中心: <span id="dcName" style="color:var(--text-accent);"></span></span>
+        <span id="orgInfo" style="display:none;"> | 组织: <span id="orgName" style="color:var(--text-accent);"></span></span>
+      </div>
+      <button class="btn btn-ghost btn-sm">&#128276; 消息 <span class="notification-dot" style="display:inline-block;vertical-align:middle;margin-left:4px;"></span></button>
+      <button class="btn btn-ghost btn-sm" onclick="logout()">&#9211; 退出</button>
+    </div>
+  </div>
+
+  <!-- ========================================== -->
+  <!-- MODULE: HOME (Dashboard) -->
+  <!-- ========================================== -->
+  <div class="module-panel active" id="mod-home">
+    <div class="page-body">
+      <!-- Row 1: Stats -->
+      <div class="content-row content-row-7" id="appStatsContainer">
+        <div class="stat-card">
+          <div class="stat-icon">&#128196;</div>
+          <div class="stat-value" id="statOrders">--</div>
+          <div class="stat-label">今日订单</div>
+          <div class="stat-change" id="statOrdersChange">--</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">&#128203;</div>
+          <div class="stat-value" id="statApprovals">--</div>
+          <div class="stat-label">待审批</div>
+          <div class="stat-change" id="statApprovalsChange">--</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">&#127981;</div>
+          <div class="stat-value" id="statProduction">--</div>
+          <div class="stat-label">生产中</div>
+          <div class="stat-change" id="statProductionChange">--</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">&#9888;</div>
+          <div class="stat-value" id="statInventory">--</div>
+          <div class="stat-label">库存预警</div>
+          <div class="stat-change" id="statInventoryChange">--</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">&#128176;</div>
+          <div class="stat-value text-mono" id="statReceivable">--</div>
+          <div class="stat-label">未回款</div>
+          <div class="stat-change" id="statReceivableChange">--</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">&#128200;</div>
+          <div class="stat-value text-mono" id="statSales">--</div>
+          <div class="stat-label">本月销售</div>
+          <div class="stat-change" id="statSalesChange">--</div>
+        </div>
+        <div class="stat-card" style="border-color:rgba(239,68,68,0.25);">
+          <div class="stat-icon" style="color:var(--color-error);">&#9888;</div>
+          <div class="stat-value" style="color:var(--color-error);" id="statAlerts">--</div>
+          <div class="stat-label">风险预警</div>
+          <div style="font-size:11px;margin-top:4px;color:var(--text-tertiary);font-family:var(--font-mono);" id="statAlertsDetail">--</div>
+        </div>
+      </div>
+
+      <!-- Row 2: Quick Access + TODO -->
+      <div class="content-row content-row-3-2">
+        <div class="card card-glow">
+          <div class="card-header">
+            <span>&#128640; 常用功能</span>
+            <a href="javascript:void(0)" style="font-size:12px;">管理</a>
+          </div>
+          <div class="card-body">
+            <div class="quick-grid">
+              <a class="quick-entry" href="pages/purchase-order.html">
+                <span class="qe-icon">&#128230;</span><span>采购订单</span>
+              </a>
+              <a class="quick-entry" href="pages/sales-order.html">
+                <span class="qe-icon">&#128722;</span><span>销售订单</span>
+              </a>
+              <a class="quick-entry" href="pages/production-order.html">
+                <span class="qe-icon">&#127981;</span><span>生产工单</span>
+              </a>
+              <a class="quick-entry" href="pages/inventory-stock.html">
+                <span class="qe-icon">&#128230;</span><span>库存查询</span>
+              </a>
+              <a class="quick-entry" href="pages/mes-report.html">
+                <span class="qe-icon">&#128221;</span><span>工序报工</span>
+              </a>
+              <a class="quick-entry" href="pages/quality.html">
+                <span class="qe-icon">&#9989;</span><span>质量检验</span>
+              </a>
+              <a class="quick-entry" href="pages/finance-receivable.html">
+                <span class="qe-icon">&#128176;</span><span>应收查询</span>
+              </a>
+              <a class="quick-entry" href="pages/bom.html">
+                <span class="qe-icon">&#128209;</span><span>BOM查询</span>
+              </a>
+              <a class="quick-entry" href="pages/service-request.html">
+                <span class="qe-icon">&#128230;</span><span>售后申请</span>
+              </a>
+              <a class="quick-entry" href="pages/barcode-scan.html">
+                <span class="qe-icon">&#128189;</span><span>扫码作业</span>
+              </a>
+              <a class="quick-entry" href="pages/decision-sales.html">
+                <span class="qe-icon">&#128200;</span><span>决策分析</span>
+              </a>
+              <a class="quick-entry" href="pages/bi-dashboard.html">
+                <span class="qe-icon">&#128202;</span><span>BI看板</span>
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <div class="card card-glow">
+          <div class="card-header">
+            <span>&#128203; 待办事项</span>
+            <span class="badge badge-error" id="todoCount">0</span>
+          </div>
+          <div class="todo-list" id="todoList" style="padding:0;">
+            <div class="todo-item" style="text-align:center;padding:20px;color:var(--text-tertiary);">暂无待办事项</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Row 3: Alerts + Announcements -->
+      <div class="content-row content-row-1-1">
+        <div class="card">
+          <div class="card-header">
+            <span>&#128680; 最新动态</span>
+            <a href="javascript:void(0)" style="font-size:12px;">查看全部</a>
+          </div>
+          <div class="alert-list" id="alertList" style="padding:0;">
+            <div class="alert-item" style="text-align:center;padding:20px;color:var(--text-tertiary);">暂无动态</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header">
+            <span>&#128227; 系统公告</span>
+            <a href="javascript:void(0)" style="font-size:12px;">更多</a>
+          </div>
+          <div class="announce-list" id="announceList" style="padding:0;">
+            <div class="announce-item" style="text-align:center;padding:20px;color:var(--text-tertiary);">暂无公告</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================== -->
+  <!-- MODULE: DASHBOARD -->
+  <!-- ========================================== -->
+  <div class="module-panel func-grid-container" id="mod-dashboard">
+    <div class="func-grid-title">驾驶舱</div>
+    <div class="func-grid-subtitle">企业全景数据分析与可视化监控</div>
+    <div class="func-grid-section">
+      <div class="func-grid-section-header"><span class="section-icon"></span>驾驶舱</div>
+      <div class="func-grid-items">
+        <a class="func-card" href="pages/dashboard.html">
+          <div class="func-card-icon">&#128202;</div>
+          <div class="func-card-text">企业全景驾驶舱</div>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================== -->
+  <!-- MODULE: PURCHASE (采购管理) -->
+  <!-- ========================================== -->
+  <div class="module-panel func-grid-container" id="mod-purchase">
+    <div class="func-grid-title">采购管理</div>
+    <div class="func-grid-subtitle">管理采购全流程，从申请、订单到收料退料结算</div>
+    <div class="func-grid-section">
+      <div class="func-grid-section-header"><span class="section-icon"></span>采购申请</div>
+      <div class="func-grid-items">
+        <a class="func-card" href="pages/purchase-request.html"><div class="func-card-icon">&#128196;</div><div class="func-card-text">采购申请单</div></a>
+      </div>
+    </div>
+    <div class="func-grid-section">
+      <div class="func-grid-section-header"><span class="section-icon"></span>订单管理</div>
+      <div class="func-grid-items">
+        <a class="func-card" href="pages/purchase-order.html"><div class="func-card-icon">&#128196;</div><div class="func-card-text">采购订单</div></a>
+        <a class="func-card" href="pages/purchase-order-detail.html"><div class="func-card-icon">&#128196;</div><div class="func-card-text">采购订单详情</div></a>
+        <a class="func-card" href="pages/purchase-order-change.html"><div class="func-card-icon">&#128196;</div><div class="func-card-text">采购订单变更单</div></a>
+      </div>
+    </div>
+    <div class="func-grid-section">
+      <div class="func-grid-section-header"><span class="section-icon"></span>收料管理</div>
+      <div class="func-grid-items">
+        <a class="func-card" href="pages/purchase-inbound.html"><div class="func-card-icon">&#128196;</div><div class="func-card-text">采购入库单</div></a>
+        <a class="func-card" href="pages/purchase-inspect.html"><div class="func-card-icon">&#128196;</div><div class="func-card-text">收料请检通知单</div></a>
+        <a class="func-card" href="pages/purchase-receive-inspect.html"><div class="func-card-icon">&#128196;</div><div class="func-card-text">收料请检单</div></a>
+        <a class="func-card" href="pages/purchase-receive-inspect-list.html"><div class="func-card-icon">&#128196;</div><div class="func-card-text">收料请检列表</div></a>
+      </div>
+    </div>
+    <div class="func-grid-section">
+      <div class="func-grid-section-header"><span class="section-icon"></span>退料管理</div>
+      <div class="func-grid-items">
+        <a class="func-card" href="pages/purchase-return-request.html"><div class="func-card-icon">&#128196;</div><div class="func-card-text">退料申请单</div></a>
+        <a class="func-card" href="pages/purchase-return.html"><div class="func-card-icon">&#128196;</div><div class="func-card-text">退料单</div></a>
+      </div>
+    </div>
+    <div class="func-grid-section">
+      <div class="func-grid-section-header"><span class="section-icon"></span>结算对账</div>
+      <div class="func-grid-items">
+        <a class="func-card" href="pages/purchase-reconcile.html"><div class="func-card-icon">&#128196;</div><div class="func-card-text">对账单</div></a>
+        <a class="func-card" href="pages/purchase-reconcile-scheme.html"><div class="func-card-icon">&#128196;</div><div class="func-card-text">对账方案</div></a>
+        <a class="func-card" href="pages/purchase-reconcile-detail.html"><div class="func-card-icon">&#128196;</div><div class="func-card-text">对账明细</div></a>
+        <a class="func-card" href="pages/purchase-supply-quota.html"><div class="func-card-icon">&#128196;</div><div class="func-card-text">供应商配额</div></a>
+        <a class="func-card" href="pages/purchase-supply-quota-table.html"><div class="func-card-icon">&#128196;</div><div class="func-card-text">供应商配额表</div></a>
+      </div>
+    </div>
+    <div class="func-grid-section">
+      <div class="func-grid-section-header"><span class="section-icon"></span>报表分析</div>
+      <div class="func-grid-items">
+        <a class="func-card" href="pages/purchase-report.html"><div class="func-card-icon">&#128200;</div><div class="func-card-text">采购报表分析</div></a>
+        <a class="func-card" href="pages/purchase-order-exec-summary.html"><div class="func-card-icon">&#128200;</div><div class="func-card-text">订单执行汇总表</div></a>
+        <a class="func-card" href="pages/purchase-order-exec-detail.html"><div class="func-card-icon">&#128200;</div><div class="func-card-text">订单执行明细表</div></a>
+        <a class="func-card" href="pages/purchase-consume-summary.html"><div class="func-card-icon">&#128200;</div><div class="func-card-text">采购消耗汇总表</div></a>
+      </div>
+    </div>
+    <div class="func-grid-section">
+      <div class="func-grid-section-header"><span class="section-icon"></span>基础设置</div>
+      <div class="func-grid-items">
+        <a class="func-card" href="pages/purchase-price-list.html"><div class="func-card-icon">&#128209;</div><div class="func-card-text">采购价目表</div></a>
+        <a class="func-card" href="pages/purchase-init.html"><div class="func-card-icon">&#9881;</div><div class="func-card-text">初始化</div></a>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================== -->
+  <!-- MODULE: SALES (销售管理) -->
+  <!-- ========================================== -->
+  <div class="module-panel func-grid-container" id="mod-sales">
+    <div class="func-grid-title">销售管理</div>
+    <div class="func-grid-subtitle">管理销售全流程，从报价、合同、订单、发货到退货</div>
+    <div class="func-grid-section">
+      <div class="func-grid-section-header"><span class="section-icon"></span>报价管理</div>
+      <div class="func-grid-items">
+        <a class="func-card" href="pages/sales-quotation-create.html"><div class="func-card-icon">&#128196;</div><div class="func-card-text">销售报价单</div></a>
+        <a class="func-card" href="pages/sales-quotation-list.html"><div class="func-card-icon">&#128196;</div><div class="func-card-text">报价单列表</div></a>
+      </div>
+    </div>
+    <div class="func-grid-section">
+      <div class="func-grid-section-header"><span class="section-icon"></span>合同管理</div>
+      <div class="func-grid-items">
+        <a class="func-card" href="pages/sales-contract-create.html"><div class="func-card-icon">&#128196;</div><div class="func-card-text">销售合同</div></a>
+        <a class="func-card" href="pages/sales-contract-list.html"><div class="func-card-icon">&#128196;</div><div class="func-card-text">合同列表</div></a>
+        <a class="func-card" href="pages/sales-contract-exec-summary.html"><div class="func-card-icon">&#128200;</div><div class="func-card-text">合同执行汇总表</div></a>
+      </div>
+    </div>
+    <div class="func-grid-section">
+      <div class="func-grid-section-header"><span class="section-icon"></span>订单管理</div>
+      <div class="func-grid-items">
+        <a class="func-card" href="pages/sales-order-create.html"><div class="func-card-icon">&#128196;</div><div class="func-card-text">销售订单</div></a>
+        <a class="func-card" href="pages/sales-order.html"><div class="func-card-icon">&#128196;</div><div class="func-card-text">订单列表</div></a>
+        <a class="func-card" href="pages/sales-order-change.html"><div class="func-card-icon">&#128196;</div><div class="func-card-text">订单变更单</div></a>
+      </div>
+    </div>
+    <div class="func-grid-section">
+      <div class="func-grid-section-header"><span class="section-icon"></span>发货管理</div>
+      <div class="func-grid-items">
+        <a class="func-card" href="pages/sales-delivery.html"><div class="func-card-icon">&#128196;</div><div class="func-card-text">发货通知单</div></a>
+        <a class="func-card" href="pages/sales-disassembly-shipment-create.html"><div class="func-card-icon">&#128196;</div><div class="func-card-text">拆件发货单</div></a>
+        <a class="func-card" href="pages/sales-disassembly-shipment.html"><div class="func-card-icon">&#128196;</div><div class="func-card-text">拆件发货列表</div></a>
+        <a class="func-card" href="pages/sales-outbound.html"><div class="func-card-icon">&#128196;</div><div class="func-card-text">销售出库单</div></a>
+      </div>
+    </div>
+    <div class="func-grid-section">
+      <div class="func-grid-section-header"><span class="section-icon"></span>退货管理</div>
+      <div class="func-grid-items">
+        <a class="func-card" href="pages/sales-return-notice.html"><div class="func-card-icon">&#128196;</div><div class="func-card-text">退货通知单</div></a>
+        <a class="func-card" href="pages/sales-return.html"><div class="func-card-icon">&#128196;</div><div class="func-card-text">销售退货单</div></a>
+      </div>
+    </div>
+    <div class="func-grid-section">
+      <div class="func-grid-section-header"><span class="section-icon"></span>报表分析</div>
+      <div class="func-grid-items">
+        <a class="func-card" href="pages/sales-report.html"><div class="func-card-icon">&#128200;</div><div class="func-card-text">销售报表分析</div></a>
+        <a class="func-card" href="pages/sales-order-exec-summary.html"><div class="func-card-icon">&#128200;</div><div class="func-card-text">订单执行汇总表</div></a>
+        <a class="func-card" href="pages/sales-order-exec-detail.html"><div class="func-card-icon">&#128200;</div><div class="func-card-text">订单执行明细表</div></a>
+        <a class="func-card" href="pages/sales-profit-order.html"><div class="func-card-icon">&#128200;</div><div class="func-card-text">订单利润分析</div></a>
+        <a class="func-card" href="pages/sales-profit-outbound.html"><div class="func-card-icon">&#128200;</div><div class="func-card-text">出货利润分析</div></a>
+        <a class="func-card" href="pages/sales-price-analysis.html"><div class="func-card-icon">&#128200;</div><div class="func-card-text">价格分析</div></a>
+        <a class="func-card" href="pages/sales-ranking.html"><div class="func-card-icon">&#128200;</div><div class="func-card-text">销售排名</div></a>
+      </div>
+    </div>
+    <div class="func-grid-section">
+      <div class="func-grid-section-header"><span class="section-icon"></span>基础设置</div>
+      <div class="func-grid-items">
+        <a class="func-card" href="pages/sales-price-list.html"><div class="func-card-icon">&#128209;</div><div class="func-card-text">价目表</div></a>
+        <a class="func-card" href="pages/sales-init.html"><div class="func-card-icon">&#9881;</div><div class="func-card-text">初始化</div></a>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================== -->
+  <!-- MODULE: INVENTORY (库存管理) -->
+  <!-- ========================================== -->
+  <div class="module-panel func-grid-container" id="mod-inventory">
+    <div class="func-grid-title">库存管理</div>
+    <div class="func-grid-subtitle">管理物料出入库、调拨、盘点等日常库存作业</div>
+    <div class="func-grid-section">
+      <div class="func-grid-section-header"><span class="section-icon"></span>申请管理</div>
+      <div class="func-grid-items">
+        <a class="func-card" href="pages/inventory-out-request.html"><div class="func-card-icon">&#128196;</div><div class="func-card-text">出库申请单</div></a>
+        <a class="func-card" href="pages/inventory-out-request-list.html"><div class="func-card-icon">&#128196;</div><div class="func-card-text">出库申请列表</div></a>
+        <a class="func-card" href="pages/inventory-in-request.html"><div class="func-card-icon">&#128196;</div><div class="func-card-text">入库申请单</div></a>
+        <a class="func-card" href="pages/inventory-in-request-list.html"><div class="func-card-icon">&#128196;</div><div class="func-card-text">入库申请列表</div></a>
+      </div>
+    </div>
+    <div class="func-grid-section">
+      <div class="func-grid-section-header"><span class="section-icon"></span>入库管理</div>
+      <div class="func-grid-items">
+        <a class="func-card" href="pages/inventory-in.html"><div class="func-card-icon">&#128196;</div><div class="func-card-text">其他入库单</div></a>
+        <a class="func-card" href="pages/inventory-assemble.html"><div class="func-card-icon">&#128196;</div><div class="func-card-text">组装拆卸单</div></a>
+      </div>
+    </div>
+    <div class="func-grid-section">
+      <div class="func-grid-section-header"><span class="section-icon"></span>出库管理</div>
+      <div class="func-grid-items">
+        <a class="func-card" href="pages/inventory-out.html"><div class="func-card-icon">&#128196;</div><div class="func-card-text">其他出库单</div></a>
+      </div>
+    </div>
+    <div class="func-grid-section">
+      <div class="func-grid-section-header"><span class="section-icon"></span>库存调整</div>
+      <div class="func-grid-items">
+        <a class="func-card" href="pages/inventory-transfer.html"><div class="func-card-icon">&#128196;</div><div class="func-card-text">直接调拨单</div></a>
+        <a class="func-card" href="pages/inventory-direct-transfer.html"><div class="func-card-icon">&#128196;</div><div class="func-card-text">直接调拨</div></a>
+        <a class="func-card" href="pages/inventory-direct-transfer-list.html"><div class="func-card-icon">&#128196;</div><div class="func-card-text">直接调拨列表</div></a>
+        <a class="func-card" href="pages/inventory-transfer-request.html"><div class="func-card-icon">&#128196;</div><div class="func-card-text">调拨申请</div></a>
+        <a class="func-card" href="pages/inventory-set-pick.html"><div class="func-card-icon">&#128196;</div><div class="func-card-text">配套领料</div></a>
+        <a class="func-card" href="pages/inventory-set-pick-list.html"><div class="func-card-icon">&#128196;</div><div class="func-card-text">配套领料列表</div></a>
+        <a class="func-card" href="pages/inventory-set-supplement.html"><div class="func-card-icon">&#128196;</div><div class="func-card-text">配套补料</div></a>
+        <a class="func-card" href="pages/inventory-set-supplement-list.html"><div class="func-card-icon">&#128196;</div><div class="func-card-text">配套补料列表</div></a>
+        <a class="func-card" href="pages/inventory-batch-adjust.html"><div class="func-card-icon">&#128196;</div><div class="func-card-text">批号调整单</div></a>
+        <a class="func-card" href="pages/inventory-batch-adjust-list.html"><div class="func-card-icon">&#128196;</div><div class="func-card-text">批号调整列表</div></a>
+      </div>
+    </div>
+    <div class="func-grid-section">
+      <div class="func-grid-section-header"><span class="section-icon"></span>盘点管理</div>
+      <div class="func-grid-items">
+        <a class="func-card" href="pages/inventory-count-plan.html"><div class="func-card-icon">&#128196;</div><div class="func-card-text">盘点方案</div></a>
+        <a class="func-card" href="pages/inventory-count-scheme-list.html"><div class="func-card-icon">&#128196;</div><div class="func-card-text">盘点方案列表</div></a>
+        <a class="func-card" href="pages/inventory-count-work.html"><div class="func-card-icon">&#128196;</div><div class="func-card-text">盘点作业</div></a>
+        <a class="func-card" href="pages/inventory-count-gain.html"><div class="func-card-icon">&#128196;</div><div class="func-card-text">盘盈单</div></a>
+        <a class="func-card" href="pages/inventory-count-loss.html"><div class="func-card-icon">&#128196;</div><div class="func-card-text">盘亏单</div></a>
+      </div>
+    </div>
+    <div class="func-grid-section">
+      <div class="func-grid-section-header"><span class="section-icon"></span>报表分析</div>
+      <div class="func-grid-items">
+        <a class="func-card" href="pages/inventory-stock.html"><div class="func-card-icon">&#128200;</div><div class="func-card-text">库存查询</div></a>
+        <a class="func-card" href="pages/inventory-instant-stock.html"><div class="func-card-icon">&#128200;</div><div class="func-card-text">即时库存</div></a>
+        <a class="func-card" href="pages/inventory-report.html"><div class="func-card-icon">&#128200;</div><div class="func-card-text">报表分析</div></a>
+        <a class="func-card" href="pages/inventory-safety-warning.html"><div class="func-card-icon">&#9888;</div><div class="func-card-text">安全库存预警</div></a>
+        <a class="func-card" href="pages/inventory-aging.html"><div class="func-card-icon">&#128200;</div><div class="func-card-text">库龄分析</div></a>
+        <a class="func-card" href="pages/inventory-dead-stock.html"><div class="func-card-icon">&#128200;</div><div class="func-card-text">呆滞料分析</div></a>
+        <a class="func-card" href="pages/inventory-abc-analysis.html"><div class="func-card-icon">&#128200;</div><div class="func-card-text">ABC分析</div></a>
+        <a class="func-card" href="pages/inventory-shelf-life.html"><div class="func-card-icon">&#128200;</div><div class="func-card-text">保质期分析</div></a>
+      </div>
+    </div>
+    <div class="func-grid-section">
+      <div class="func-grid-section-header"><span class="section-icon"></span>初始化</div>
+      <div class="func-grid-items">
+        <a class="func-card" href="pages/inventory-init.html"><div class="func-card-icon">&#9881;</div><div class="func-card-text">库存初始化</div></a>
+        <a class="func-card" href="pages/inventory-init-list.html"><div class="func-card-icon">&#9881;</div><div class="func-card-text">初始化列表</div></a>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================== -->
+  <!-- MODULE: PLANNING (计划管理) -->
+  <!-- ========================================== -->
+  <div class="module-panel func-grid-container" id="mod-planning">
+    <div class="func-grid-title">计划管理</div>
+    <div class="func-grid-subtitle">需求预测、MRP计算与生产计划管理</div>
+    <div class="func-grid-section">
+      <div class="func-grid-section-header"><span class="section-icon"></span>计划执行</div>
+      <div class="func-grid-items">
+        <a class="func-card" href="pages/plan-forecast.html"><div class="func-card-icon">&#128196;</div><div class="func-card-text">预测单</div></a>
+        <a class="func-card" href="pages/plan-scheme.html"><div class="func-card-icon">&#128196;</div><div class="func-card-text">计划方案</div></a>
+        <a class="func-card" href="pages/plan-order.html"><div class="func-card-icon">&#128196;</div><div class="func-card-text">计划订单</div></a>
+        <a class="func-card" href="pages/plan-calc-summary.html"><div class="func-card-icon">&#128196;</div><div class="func-card-text">MRP计算汇总</div></a>
+        <a class="func-card" href="pages/plan-calc-detail.html"><div class="func-card-icon">&#128196;</div><div class="func-card-text">MRP计算明细</div></a>
+        <a class="func-card" href="pages/plan-calc-log.html"><div class="func-card-icon">&#128196;</div><div class="func-card-text">计算日志</div></a>
+        <a class="func-card" href="pages/plan-substitute.html"><div class="func-card-icon">&#128256;</div><div class="func-card-text">替代料管理</div></a>
+      </div>
+    </div>
+    <div class="func-grid-section">
+      <div class="func-grid-section-header"><span class="section-icon"></span>计划查询</div>
+      <div class="func-grid-items">
+        <a class="func-card" href="pages/plan-demand-summary.html"><div class="func-card-icon">&#128200;</div><div class="func-card-text">需求汇总</div></a>
+        <a class="func-card" href="pages/plan-demand-detail.html"><div class="func-card-icon">&#128200;</div><div class="func-card-text">需求明细</div></a>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================== -->
+  <!-- MODULE: ENGINEERING (工程数据) -->
+  <!-- ========================================== -->
+  <div class="module-panel func-grid-container" id="mod-engineering">
+    <div class="func-grid-title">工程数据</div>
+    <div class="func-grid-subtitle">BOM、工艺路线、工作中心等生产工程基础数据</div>
+    <div class="func-grid-section">
+      <div class="func-grid-section-header"><span class="section-icon"></span>物料清单管理</div>
+      <div class="func-grid-items">
+        <a class="func-card" href="pages/bom.html"><div class="func-card-icon">&#128209;</div><div class="func-card-text">BOM管理</div></a>
+        <a class="func-card" href="pages/bom-detail.html"><div class="func-card-icon">&#128209;</div><div class="func-card-text">BOM详情</div></a>
+        <a class="func-card" href="pages/engineering-bom-tree.html"><div class="func-card-icon">&#128209;</div><div class="func-card-text">BOM树查询</div></a>
+        <a class="func-card" href="pages/engineering-bom-forward.html"><div class="func-card-icon">&#128209;</div><div class="func-card-text">BOM正查</div></a>
+        <a class="func-card" href="pages/engineering-bom-reverse.html"><div class="func-card-icon">&#128209;</div><div class="func-card-text">BOM反查</div></a>
+        <a class="func-card" href="pages/engineering-bom-summary.html"><div class="func-card-icon">&#128209;</div><div class="func-card-text">BOM汇总</div></a>
+        <a class="func-card" href="pages/engineering-bom-cost.html"><div class="func-card-icon">&#128209;</div><div class="func-card-text">BOM成本分析</div></a>
+        <a class="func-card" href="pages/engineering-bom-batch.html"><div class="func-card-icon">&#128209;</div><div class="func-card-text">BOM批量修改</div></a>
+      </div>
+    </div>
+    <div class="func-grid-section">
+      <div class="func-grid-section-header"><span class="section-icon"></span>物料清单查询</div>
+      <div class="func-grid-items">
+        <a class="func-card" href="pages/engineering-query.html"><div class="func-card-icon">&#128200;</div><div class="func-card-text">查询分析</div></a>
+      </div>
+    </div>
+    <div class="func-grid-section">
+      <div class="func-grid-section-header"><span class="section-icon"></span>替代方案</div>
+      <div class="func-grid-items">
+        <a class="func-card" href="pages/engineering-alternative.html"><div class="func-card-icon">&#128256;</div><div class="func-card-text">替代方案</div></a>
+        <a class="func-card" href="pages/plan-substitute.html"><div class="func-card-icon">&#128256;</div><div class="func-card-text">替代料管理</div></a>
+      </div>
+    </div>
+    <div class="func-grid-section">
+      <div class="func-grid-section-header"><span class="section-icon"></span>工程变更</div>
+      <div class="func-grid-items">
+        <a class="func-card" href="pages/engineering-ecn.html"><div class="func-card-icon">&#128196;</div><div class="func-card-text">工程变更</div></a>
+        <a class="func-card" href="pages/engineering-ecr.html"><div class="func-card-icon">&#128196;</div><div class="func-card-text">工程变更申请单</div></a>
+      </div>
+    </div>
+    <div class="func-grid-section">
+      <div class="func-grid-section-header"><span class="section-icon"></span>基础设置</div>
+      <div class="func-grid-items">
+        <a class="func-card" href="pages/production-routing.html"><div class="func-card-icon">&#128209;</div><div class="func-card-text">工艺路线</div></a>
+        <a class="func-card" href="pages/engineering-workcenter.html"><div class="func-card-icon">&#127981;</div><div class="func-card-text">工作中心</div></a>
+        <a class="func-card" href="pages/engineering-opcode.html"><div class="func-card-icon">&#9881;</div><div class="func-card-text">工序控制码</div></a>
+        <a class="func-card" href="pages/engineering-operation.html"><div class="func-card-icon">&#128295;</div><div class="func-card-text">加工作业</div></a>
+        <a class="func-card" href="pages/engineering-line.html"><div class="func-card-icon">&#128268;</div><div class="func-card-text">生产线</div></a>
+        <a class="func-card" href="pages/engineering-shift.html"><div class="func-card-icon">&#128336;</div><div class="func-card-text">班次</div></a>
+        <a class="func-card" href="pages/engineering-resource.html"><div class="func-card-icon">&#128268;</div><div class="func-card-text">资源</div></a>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================== -->
+  <!-- MODULE: PRODUCTION (生产管理) -->
+  <!-- ========================================== -->
+  <div class="module-panel func-grid-container" id="mod-production">
+    <div class="func-grid-title">生产管理</div>
+    <div class="func-grid-subtitle">管理生产订单、领料、入库及生产报表</div>
+    <div class="func-grid-section">
+      <div class="func-grid-section-header"><span class="section-icon"></span>订单管理</div>
+      <div class="func-grid-items">
+        <a class="func-card" href="pages/production-order.html"><div class="func-card-icon">&#128196;</div><div class="func-card-text">生产订单</div></a>
+        <a class="func-card" href="pages/production-order-detail.html"><div class="func-card-icon">&#128196;</div><div class="func-card-text">生产订单详情</div></a>
+        <a class="func-card" href="pages/production-order-change.html"><div class="func-card-icon">&#128196;</div><div class="func-card-text">生产订单变更单</div></a>
+        <a class="func-card" href="pages/production-order-bom-list.html"><div class="func-card-icon">&#128209;</div><div class="func-card-text">生产订单BOM列表</div></a>
+      </div>
+    </div>
+    <div class="func-grid-section">
+      <div class="func-grid-section-header"><span class="section-icon"></span>生产领料</div>
+      <div class="func-grid-items">
+        <a class="func-card" href="pages/production-material-request.html"><div class="func-card-icon">&#128196;</div><div class="func-card-text">生产领料申请单</div></a>
+        <a class="func-card" href="pages/production-material.html"><div class="func-card-icon">&#128196;</div><div class="func-card-text">生产领料单</div></a>
+        <a class="func-card" href="pages/production-material-return.html"><div class="func-card-icon">&#128196;</div><div class="func-card-text">生产退料单</div></a>
+        <a class="func-card" href="pages/production-material-reverse.html"><div class="func-card-icon">&#128196;</div><div class="func-card-text">生产退料冲回</div></a>
+        <a class="func-card" href="pages/production-supplement.html"><div class="func-card-icon">&#128196;</div><div class="func-card-text">生产补料单</div></a>
+        <a class="func-card" href="pages/production-material-issue.html"><div class="func-card-icon">&#128196;</div><div class="func-card-text">生产发料通知单</div></a>
+        <a class="func-card" href="pages/production-material-issue-list.html"><div class="func-card-icon">&#128196;</div><div class="func-card-text">发料通知列表</div></a>
+        <a class="func-card" href="pages/production-material-set-pick.html"><div class="func-card-icon">&#128196;</div><div class="func-card-text">配套领料</div></a>
+        <a class="func-card" href="pages/production-material-set-pick-list.html"><div class="func-card-icon">&#128196;</div><div class="func-card-text">配套领料列表</div></a>
+        <a class="func-card" href="pages/production-material-set-return.html"><div class="func-card-icon">&#128196;</div><div class="func-card-text">配套退料</div></a>
+        <a class="func-card" href="pages/production-material-set-return-list.html"><div class="func-card-icon">&#128196;</div><div class="func-card-text">配套退料列表</div></a>
+        <a class="func-card" href="pages/production-material-set-supplement.html"><div class="func-card-icon">&#128196;</div><div class="func-card-text">配套补料</div></a>
+        <a class="func-card" href="pages/production-material-set-supplement-list.html"><div class="func-card-icon">&#128196;</div><div class="func-card-text">配套补料列表</div></a>
+      </div>
+    </div>
+    <div class="func-grid-section">
+      <div class="func-grid-section-header"><span class="section-icon"></span>完工管理</div>
+      <div class="func-grid-items">
+        <a class="func-card" href="pages/production-inbound.html"><div class="func-card-icon">&#128196;</div><div class="func-card-text">生产入库单</div></a>
+        <a class="func-card" href="pages/production-inbound-return.html"><div class="func-card-icon">&#128196;</div><div class="func-card-text">生产退库单</div></a>
+        <a class="func-card" href="pages/production-issue-notice.html"><div class="func-card-icon">&#128196;</div><div class="func-card-text">生产发料通知单</div></a>
+        <a class="func-card" href="pages/production-inspect-request.html"><div class="func-card-icon">&#128196;</div><div class="func-card-text">生产汇报请检单</div></a>
+        <a class="func-card" href="pages/production-report-inspect.html"><div class="func-card-icon">&#128196;</div><div class="func-card-text">生产汇报请检</div></a>
+        <a class="func-card" href="pages/production-report-inspect-list.html"><div class="func-card-icon">&#128196;</div><div class="func-card-text">生产汇报请检列表</div></a>
+        <a class="func-card" href="pages/production-shortage.html"><div class="func-card-icon">&#128196;</div><div class="func-card-text">缺料分析单</div></a>
+      </div>
+    </div>
+    <div class="func-grid-section">
+      <div class="func-grid-section-header"><span class="section-icon"></span>报表分析</div>
+      <div class="func-grid-items">
+        <a class="func-card" href="pages/production-exec-summary.html"><div class="func-card-icon">&#128200;</div><div class="func-card-text">生产订单执行汇总表</div></a>
+        <a class="func-card" href="pages/production-exec-detail.html"><div class="func-card-icon">&#128200;</div><div class="func-card-text">生产订单执行明细表</div></a>
+        <a class="func-card" href="pages/production-order-exec-summary.html"><div class="func-card-icon">&#128200;</div><div class="func-card-text">订单执行汇总表</div></a>
+        <a class="func-card" href="pages/production-order-exec-detail.html"><div class="func-card-icon">&#128200;</div><div class="func-card-text">订单执行明细表</div></a>
+        <a class="func-card" href="pages/production-material-summary.html"><div class="func-card-icon">&#128200;</div><div class="func-card-text">领料汇总表</div></a>
+        <a class="func-card" href="pages/production-material-detail.html"><div class="func-card-icon">&#128200;</div><div class="func-card-text">领料明细表</div></a>
+        <a class="func-card" href="pages/production-pick-summary.html"><div class="func-card-icon">&#128200;</div><div class="func-card-text">领料汇总分析</div></a>
+        <a class="func-card" href="pages/production-pick-detail.html"><div class="func-card-icon">&#128200;</div><div class="func-card-text">领料明细分析</div></a>
+        <a class="func-card" href="pages/production-pick-diff.html"><div class="func-card-icon">&#128200;</div><div class="func-card-text">领料差异分析</div></a>
+        <a class="func-card" href="pages/production-stock-picked.html"><div class="func-card-icon">&#128200;</div><div class="func-card-text">已领料明细</div></a>
+        <a class="func-card" href="pages/production-material-monthly.html"><div class="func-card-icon">&#128200;</div><div class="func-card-text">生产领料月报表</div></a>
+        <a class="func-card" href="pages/production-inbound-monthly.html"><div class="func-card-icon">&#128200;</div><div class="func-card-text">生产入库月报表</div></a>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================== -->
+  <!-- MODULE: OUTSOURCE (委外管理) -->
+  <!-- ========================================== -->
+  <div class="module-panel func-grid-container" id="mod-outsource">
+    <div class="func-grid-title">委外管理</div>
+    <div class="func-grid-subtitle">管理委外加工订单、领料、收货与报表</div>
+    <div class="func-grid-section">
+      <div class="func-grid-section-header"><span class="section-icon"></span>订单管理</div>
+      <div class="func-grid-items">
+        <a class="func-card" href="pages/outsource-order.html"><div class="func-card-icon">&#128196;</div><div class="func-card-text">委外订单</div></a>
+        <a class="func-card" href="pages/outsource-order-change.html"><div class="func-card-icon">&#128196;</div><div class="func-card-text">委外订单变更单</div></a>
+        <a class="func-card" href="pages/outsource-bom-list.html"><div class="func-card-icon">&#128209;</div><div class="func-card-text">委外BOM列表</div></a>
+        <a class="func-card" href="pages/outsource-bom-change-list.html"><div class="func-card-icon">&#128209;</div><div class="func-card-text">委外BOM变更列表</div></a>
+      </div>
+    </div>
+    <div class="func-grid-section">
+      <div class="func-grid-section-header"><span class="section-icon"></span>领料管理</div>
+      <div class="func-grid-items">
+        <a class="func-card" href="pages/outsource-pick.html"><div class="func-card-icon">&#128196;</div><div class="func-card-text">委外领料单</div></a>
+        <a class="func-card" href="pages/outsource-pick-list.html"><div class="func-card-icon">&#128196;</div><div class="func-card-text">委外领料列表</div></a>
+        <a class="func-card" href="pages/outsource-pick-summary.html"><div class="func-card-icon">&#128200;</div><div class="func-card-text">领料汇总表</div></a>
+        <a class="func-card" href="pages/outsource-pick-monthly.html"><div class="func-card-icon">&#128200;</div><div class="func-card-text">领料月报表</div></a>
+        <a class="func-card" href="pages/outsource-supplement.html"><div class="func-card-icon">&#128196;</div><div class="func-card-text">委外补料单</div></a>
+        <a class="func-card" href="pages/outsource-supplement-list.html"><div class="func-card-icon">&#128196;</div><div class="func-card-text">委外补料列表</div></a>
+        <a class="func-card" href="pages/outsource-return.html"><div class="func-card-icon">&#128196;</div><div class="func-card-text">委外退料单</div></a>
+        <a class="func-card" href="pages/outsource-return-list.html"><div class="func-card-icon">&#128196;</div><div class="func-card-text">委外退料列表</div></a>
+        <a class="func-card" href="pages/outsource-overuse.html"><div class="func-card-icon">&#128196;</div><div class="func-card-text">委外超领单</div></a>
+        <a class="func-card" href="pages/outsource-overuse-list.html"><div class="func-card-icon">&#128196;</div><div class="func-card-text">委外超领列表</div></a>
+      </div>
+    </div>
+    <div class="func-grid-section">
+      <div class="func-grid-section-header"><span class="section-icon"></span>委外收货</div>
+      <div class="func-grid-items">
+        <a class="func-card" href="pages/outsource-receive-notice.html"><div class="func-card-icon">&#128196;</div><div class="func-card-text">委外收货通知单</div></a>
+        <a class="func-card" href="pages/outsource-receive-notice-list.html"><div class="func-card-icon">&#128196;</div><div class="func-card-text">委外收货通知列表</div></a>
+        <a class="func-card" href="pages/outsource-inbound-pick-detail.html"><div class="func-card-icon">&#128196;</div><div class="func-card-text">委外入库明细</div></a>
+      </div>
+    </div>
+    <div class="func-grid-section">
+      <div class="func-grid-section-header"><span class="section-icon"></span>报表分析</div>
+      <div class="func-grid-items">
+        <a class="func-card" href="pages/outsource-exec-summary.html"><div class="func-card-icon">&#128200;</div><div class="func-card-text">委外执行汇总表</div></a>
+        <a class="func-card" href="pages/outsource-inbound-monthly.html"><div class="func-card-icon">&#128200;</div><div class="func-card-text">委外入库月报表</div></a>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================== -->
+  <!-- MODULE: MES (智慧车间) -->
+  <!-- ========================================== -->
+  <div class="module-panel func-grid-container" id="mod-mes">
+    <div class="func-grid-title">智慧车间</div>
+    <div class="func-grid-subtitle">车间作业计划、报工执行、异常返修、工序委外、物料追溯与电子看板</div>
+
+    <div class="func-grid-section">
+      <div class="func-grid-section-header"><span class="section-icon"></span>车间作业计划</div>
+      <div class="func-grid-items">
+        <a class="func-card" href="pages/mes-plan-list.html"><div class="func-card-icon">&#128196;</div><div class="func-card-text">工序计划列表</div></a>
+        <a class="func-card" href="pages/mes-dispatch.html"><div class="func-card-icon">&#128187;</div><div class="func-card-text">车间调度工作台</div></a>
+        <a class="func-card" href="pages/mes-assign.html"><div class="func-card-icon">&#128187;</div><div class="func-card-text">派工工作台</div></a>
+        <a class="func-card" href="pages/mes-assign-detail.html"><div class="func-card-icon">&#128196;</div><div class="func-card-text">派工明细列表</div></a>
+        <a class="func-card" href="pages/mes-schedule-model.html"><div class="func-card-icon">&#128197;</div><div class="func-card-text">排程模型</div></a>
+        <a class="func-card" href="pages/mes-schedule-model-list.html"><div class="func-card-icon">&#128196;</div><div class="func-card-text">排程模型列表</div></a>
+        <a class="func-card" href="pages/mes-schedule-log.html"><div class="func-card-icon">&#128196;</div><div class="func-card-text">工序排程日志查询</div></a>
+      </div>
+    </div>
+
+    <div class="func-grid-section">
+      <div class="func-grid-section-header"><span class="section-icon"></span>车间报工执行</div>
+      <div class="func-grid-items">
+        <a class="func-card" href="pages/mes-report.html"><div class="func-card-icon">&#128196;</div><div class="func-card-text">工序汇报</div></a>
+        <a class="func-card" href="pages/mes-report-list.html"><div class="func-card-icon">&#128196;</div><div class="func-card-text">工序汇报列表</div></a>
+        <a class="func-card" href="pages/mes-transfer.html"><div class="func-card-icon">&#128196;</div><div class="func-card-text">工序转移单</div></a>
+        <a class="func-card" href="pages/mes-transfer-nonout.html"><div class="func-card-icon">&#128196;</div><div class="func-card-text">工序转移单非委外列表</div></a>
+        <a class="func-card" href="pages/mes-auxiliary-hours.html"><div class="func-card-icon">&#128196;</div><div class="func-card-text">辅助工时</div></a>
+        <a class="func-card" href="pages/mes-auxiliary-hours-list.html"><div class="func-card-icon">&#128196;</div><div class="func-card-text">辅助工时列表</div></a>
+      </div>
+    </div>
+
+    <div class="func-grid-section">
+      <div class="func-grid-section-header"><span class="section-icon"></span>车间异常返修</div>
+      <div class="func-grid-items">
+        <a class="func-card" href="pages/mes-defect.html"><div class="func-card-icon">&#128196;</div><div class="func-card-text">工序不良品明细</div></a>
+        <a class="func-card" href="pages/mes-defect-list.html"><div class="func-card-icon">&#128196;</div><div class="func-card-text">工序不良品明细列表</div></a>
+        <a class="func-card" href="pages/mes-rework.html"><div class="func-card-icon">&#128187;</div><div class="func-card-text">返修工作台</div></a>
+        <a class="func-card" href="pages/mes-rework-change.html"><div class="func-card-icon">&#128196;</div><div class="func-card-text">单件返修变更</div></a>
+      </div>
+    </div>
+
+    <div class="func-grid-section">
+      <div class="func-grid-section-header"><span class="section-icon"></span>工序委外</div>
+      <div class="func-grid-items">
+        <a class="func-card" href="pages/mes-outsource-send.html"><div class="func-card-icon">&#128196;</div><div class="func-card-text">委外发出列表</div></a>
+        <a class="func-card" href="pages/mes-outsource-receive.html"><div class="func-card-icon">&#128196;</div><div class="func-card-text">委外接收列表</div></a>
+        <a class="func-card" href="pages/mes-outsource-batch-send.html"><div class="func-card-icon">&#128196;</div><div class="func-card-text">委外集中发出</div></a>
+        <a class="func-card" href="pages/mes-outsource-batch-receive.html"><div class="func-card-icon">&#128196;</div><div class="func-card-text">委外集中接收</div></a>
+        <a class="func-card" href="pages/mes-outsource-settle.html"><div class="func-card-icon">&#128196;</div><div class="func-card-text">工序加工结算单</div></a>
+        <a class="func-card" href="pages/mes-outsource-settle-list.html"><div class="func-card-icon">&#128196;</div><div class="func-card-text">工序加工结算单列表</div></a>
+      </div>
+    </div>
+
+    <div class="func-grid-section">
+      <div class="func-grid-section-header"><span class="section-icon"></span>车间现场物料</div>
+      <div class="func-grid-items">
+        <a class="func-card" href="pages/mes-wip-count.html"><div class="func-card-icon">&#128196;</div><div class="func-card-text">工序在制盘点单</div></a>
+        <a class="func-card" href="pages/mes-wip-count-list.html"><div class="func-card-icon">&#128196;</div><div class="func-card-text">工序在制盘点单列表</div></a>
+        <a class="func-card" href="pages/mes-input-material.html"><div class="func-card-icon">&#128196;</div><div class="func-card-text">工序投入物料</div></a>
+        <a class="func-card" href="pages/mes-station-material.html"><div class="func-card-icon">&#128196;</div><div class="func-card-text">工位上料剩余数量</div></a>
+      </div>
+    </div>
+
+    <div class="func-grid-section">
+      <div class="func-grid-section-header"><span class="section-icon"></span>加工过程追溯</div>
+      <div class="func-grid-items">
+        <a class="func-card" href="pages/mes-trace.html"><div class="func-card-icon">&#128196;</div><div class="func-card-text">单件产品加工过程追溯</div></a>
+      </div>
+    </div>
+
+    <div class="func-grid-section">
+      <div class="func-grid-section-header"><span class="section-icon"></span>电子看板</div>
+      <div class="func-grid-items">
+        <a class="func-card" href="pages/mes-kanban-def.html"><div class="func-card-icon">&#128196;</div><div class="func-card-text">看板定义</div></a>
+        <a class="func-card" href="pages/mes-kanban-def-list.html"><div class="func-card-icon">&#128196;</div><div class="func-card-text">看板定义列表</div></a>
+        <a class="func-card" href="pages/mes-kanban-plan.html"><div class="func-card-icon">&#128196;</div><div class="func-card-text">看板方案</div></a>
+        <a class="func-card" href="pages/mes-kanban-plan-list.html"><div class="func-card-icon">&#128196;</div><div class="func-card-text">看板方案列表</div></a>
+        <a class="func-card" href="pages/mes-kanban-whitelist.html"><div class="func-card-icon">&#128196;</div><div class="func-card-text">看板盒子白名单</div></a>
+      </div>
+    </div>
+
+    <div class="func-grid-section">
+      <div class="func-grid-section-header"><span class="section-icon"></span>过程及检测记录</div>
+      <div class="func-grid-items">
+        <a class="func-card" href="pages/mes-inspect-item.html"><div class="func-card-icon">&#128196;</div><div class="func-card-text">过程控制检测项目</div></a>
+        <a class="func-card" href="pages/mes-inspect-item-list.html"><div class="func-card-icon">&#128196;</div><div class="func-card-text">过程控制检测项目列表</div></a>
+        <a class="func-card" href="pages/mes-inspect-plan.html"><div class="func-card-icon">&#128196;</div><div class="func-card-text">过程控制检测方案</div></a>
+        <a class="func-card" href="pages/mes-inspect-plan-list.html"><div class="func-card-icon">&#128196;</div><div class="func-card-text">过程控制检测方案列表</div></a>
+        <a class="func-card" href="pages/mes-import-config.html"><div class="func-card-icon">&#128196;</div><div class="func-card-text">文件导入配置方案</div></a>
+        <a class="func-card" href="pages/mes-import-config-list.html"><div class="func-card-icon">&#128196;</div><div class="func-card-text">文件导入配置方案列表</div></a>
+        <a class="func-card" href="pages/mes-inspect-result-list.html"><div class="func-card-icon">&#128196;</div><div class="func-card-text">检测结果记录列表</div></a>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================== -->
+  <!-- MODULE: MES-EQUIPMENT (设备云) -->
+  <!-- ========================================== -->
+  <div class="module-panel func-grid-container" id="mod-mes-equipment">
+    <div class="func-grid-title">设备云</div>
+    <div class="func-grid-subtitle">设备档案管理与采集数据监控</div>
+    <div class="func-grid-section">
+      <div class="func-grid-section-header"><span class="section-icon"></span>设备云</div>
+      <div class="func-grid-items">
+        <a class="func-card" href="pages/mes-equipment-archive.html"><div class="func-card-icon">&#128295;</div><div class="func-card-text">设备档案</div></a>
+        <a class="func-card" href="pages/mes-equipment-data.html"><div class="func-card-icon">&#128202;</div><div class="func-card-text">设备采集数据</div></a>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================== -->
+  <!-- MODULE: QUALITY (日常检验) -->
+  <!-- ========================================== -->
+  <div class="module-panel func-grid-container" id="mod-quality">
+    <div class="func-grid-title">日常检验</div>
+    <div class="func-grid-subtitle">来料检验、过程检验、成品检验、出货检验等日常检验管理</div>
+    <div class="func-grid-section">
+      <div class="func-grid-section-header"><span class="section-icon"></span>日常检验</div>
+      <div class="func-grid-items">
+        <a class="func-card" href="pages/quality.html"><div class="func-card-icon">&#9989;</div><div class="func-card-text">检验单</div></a>
+        <a class="func-card" href="pages/quality-detail.html"><div class="func-card-icon">&#128196;</div><div class="func-card-text">检验单详情</div></a>
+        <a class="func-card" href="pages/quality-inspect-list.html"><div class="func-card-icon">&#128196;</div><div class="func-card-text">检验单列表</div></a>
+        <a class="func-card" href="pages/quality-scheme.html"><div class="func-card-icon">&#128209;</div><div class="func-card-text">质检方案</div></a>
+        <a class="func-card" href="pages/quality-sample.html"><div class="func-card-icon">&#128209;</div><div class="func-card-text">抽样方案</div></a>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================== -->
+  <!-- MODULE: QUALITY-NCR (不良品处理) -->
+  <!-- ========================================== -->
+  <div class="module-panel func-grid-container" id="mod-quality-ncr">
+    <div class="func-grid-title">不良品处理</div>
+    <div class="func-grid-subtitle">不合格品记录与处理</div>
+    <div class="func-grid-section">
+      <div class="func-grid-section-header"><span class="section-icon"></span>不良品处理</div>
+      <div class="func-grid-items">
+        <a class="func-card" href="pages/quality-ncr.html"><div class="func-card-icon">&#128196;</div><div class="func-card-text">不良品处理单</div></a>
+        <a class="func-card" href="pages/quality-ncr-list.html"><div class="func-card-icon">&#128196;</div><div class="func-card-text">不良品处理列表</div></a>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================== -->
+  <!-- MODULE: QUALITY-MRB (MRB评审) -->
+  <!-- ========================================== -->
+  <div class="module-panel func-grid-container" id="mod-quality-mrb">
+    <div class="func-grid-title">MRB评审</div>
+    <div class="func-grid-subtitle">不合格品评审与处置决策</div>
+    <div class="func-grid-section">
+      <div class="func-grid-section-header"><span class="section-icon"></span>MRB评审</div>
+      <div class="func-grid-items">
+        <a class="func-card" href="pages/quality-mrb.html"><div class="func-card-icon">&#128196;</div><div class="func-card-text">MRB评审单</div></a>
+        <a class="func-card" href="pages/quality-mrb-list.html"><div class="func-card-icon">&#128196;</div><div class="func-card-text">MRB评审列表</div></a>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================== -->
+  <!-- MODULE: QUALITY-INSPECT (请检管理) -->
+  <!-- ========================================== -->
+  <div class="module-panel func-grid-container" id="mod-quality-inspect">
+    <div class="func-grid-title">请检管理</div>
+    <div class="func-grid-subtitle">来料请检、生产完工请检、委外收货请检、库存复检、其他请检</div>
+    <div class="func-grid-section">
+      <div class="func-grid-section-header"><span class="section-icon"></span>请检管理</div>
+      <div class="func-grid-items">
+        <a class="func-card" href="pages/quality-stock-inspect.html"><div class="func-card-icon">&#128196;</div><div class="func-card-text">库存请检单</div></a>
+        <a class="func-card" href="pages/quality-stock-inspect-list.html"><div class="func-card-icon">&#128196;</div><div class="func-card-text">库存请检列表</div></a>
+        <a class="func-card" href="pages/quality-stock-reinspect-query.html"><div class="func-card-icon">&#128196;</div><div class="func-card-text">库存复检查询</div></a>
+        <a class="func-card" href="pages/quality-prod-return-inspect.html"><div class="func-card-icon">&#128196;</div><div class="func-card-text">生产退料请检单</div></a>
+        <a class="func-card" href="pages/quality-prod-return-inspect-list.html"><div class="func-card-icon">&#128196;</div><div class="func-card-text">生产退料请检列表</div></a>
+        <a class="func-card" href="pages/quality-outsource-return-inspect.html"><div class="func-card-icon">&#128196;</div><div class="func-card-text">委外退料请检单</div></a>
+        <a class="func-card" href="pages/quality-outsource-return-inspect-list.html"><div class="func-card-icon">&#128196;</div><div class="func-card-text">委外退料请检列表</div></a>
+        <a class="func-card" href="pages/quality-other-inspect.html"><div class="func-card-icon">&#128196;</div><div class="func-card-text">其他请检单</div></a>
+        <a class="func-card" href="pages/quality-other-inspect-list.html"><div class="func-card-icon">&#128196;</div><div class="func-card-text">其他请检列表</div></a>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================== -->
+  <!-- MODULE: QUALITY-REPORT (质量报表) -->
+  <!-- ========================================== -->
+  <div class="module-panel func-grid-container" id="mod-quality-report">
+    <div class="func-grid-title">质量报表</div>
+    <div class="func-grid-subtitle">供应商质量、车间质量、销售质量等质量分析报表</div>
+    <div class="func-grid-section">
+      <div class="func-grid-section-header"><span class="section-icon"></span>质量报表</div>
+      <div class="func-grid-items">
+        <a class="func-card" href="pages/quality-rpt-supplier.html"><div class="func-card-icon">&#128200;</div><div class="func-card-text">供应商质量报表</div></a>
+        <a class="func-card" href="pages/quality-rpt-supplier-control.html"><div class="func-card-icon">&#128200;</div><div class="func-card-text">供应商控制图</div></a>
+        <a class="func-card" href="pages/quality-rpt-workshop.html"><div class="func-card-icon">&#128200;</div><div class="func-card-text">车间质量报表</div></a>
+        <a class="func-card" href="pages/quality-rpt-workshop-control.html"><div class="func-card-icon">&#128200;</div><div class="func-card-text">车间控制图</div></a>
+        <a class="func-card" href="pages/quality-rpt-process.html"><div class="func-card-icon">&#128200;</div><div class="func-card-text">过程质量报表</div></a>
+        <a class="func-card" href="pages/quality-rpt-line-yield.html"><div class="func-card-icon">&#128200;</div><div class="func-card-text">产线良率报表</div></a>
+        <a class="func-card" href="pages/quality-rpt-stock.html"><div class="func-card-icon">&#128200;</div><div class="func-card-text">库存质量报表</div></a>
+        <a class="func-card" href="pages/quality-rpt-sales.html"><div class="func-card-icon">&#128200;</div><div class="func-card-text">销售质量报表</div></a>
+        <a class="func-card" href="pages/quality-rpt-defect-cause.html"><div class="func-card-icon">&#128200;</div><div class="func-card-text">缺陷原因分析</div></a>
+        <a class="func-card" href="pages/quality-rpt-severity-convert.html"><div class="func-card-icon">&#128200;</div><div class="func-card-text">严重度转换报表</div></a>
+        <a class="func-card" href="pages/quality-rpt-pending.html"><div class="func-card-icon">&#128200;</div><div class="func-card-text">待处理报表</div></a>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================== -->
+  <!-- MODULE: QUALITY-MASTER (基础资料) -->
+  <!-- ========================================== -->
+  <div class="module-panel func-grid-container" id="mod-quality-master">
+    <div class="func-grid-title">质量基础资料</div>
+    <div class="func-grid-subtitle">检验标准、缺陷类型、检测项目、检测仪器等基础数据</div>
+    <div class="func-grid-section">
+      <div class="func-grid-section-header"><span class="section-icon"></span>基础资料</div>
+      <div class="func-grid-items">
+        <a class="func-card" href="pages/quality-master-standard.html"><div class="func-card-icon">&#128209;</div><div class="func-card-text">检验标准</div></a>
+        <a class="func-card" href="pages/quality-master-method.html"><div class="func-card-icon">&#128209;</div><div class="func-card-text">检验方法</div></a>
+        <a class="func-card" href="pages/quality-master-inspect-item.html"><div class="func-card-icon">&#128209;</div><div class="func-card-text">检测项目</div></a>
+        <a class="func-card" href="pages/quality-master-sample-plan.html"><div class="func-card-icon">&#128209;</div><div class="func-card-text">抽样方案</div></a>
+        <a class="func-card" href="pages/quality-master-instrument.html"><div class="func-card-icon">&#128295;</div><div class="func-card-text">检测仪器</div></a>
+        <a class="func-card" href="pages/quality-master-defect-type.html"><div class="func-card-icon">&#128209;</div><div class="func-card-text">缺陷类型</div></a>
+        <a class="func-card" href="pages/quality-master-defect-cause.html"><div class="func-card-icon">&#128209;</div><div class="func-card-text">缺陷原因</div></a>
+        <a class="func-card" href="pages/quality-master-defect-result.html"><div class="func-card-icon">&#128209;</div><div class="func-card-text">缺陷结果</div></a>
+        <a class="func-card" href="pages/quality-master-severity-rule.html"><div class="func-card-icon">&#128209;</div><div class="func-card-text">严重度规则</div></a>
+        <a class="func-card" href="pages/quality-master-source-rule.html"><div class="func-card-icon">&#128209;</div><div class="func-card-text">来源规则</div></a>
+        <a class="func-card" href="pages/quality-master-stock-ctrl-code.html"><div class="func-card-icon">&#128209;</div><div class="func-card-text">库存控制码</div></a>
+        <a class="func-card" href="pages/quality-master-value.html"><div class="func-card-icon">&#128209;</div><div class="func-card-text">检验值</div></a>
+        <a class="func-card" href="pages/quality-master-reference.html"><div class="func-card-icon">&#128209;</div><div class="func-card-text">参照标准</div></a>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================== -->
+  <!-- MODULE: QUALITY-STD (国标资料) -->
+  <!-- ========================================== -->
+  <div class="module-panel func-grid-container" id="mod-quality-std">
+    <div class="func-grid-title">国标资料</div>
+    <div class="func-grid-subtitle">国家标准AQL与抽样方案代码</div>
+    <div class="func-grid-section">
+      <div class="func-grid-section-header"><span class="section-icon"></span>国标资料</div>
+      <div class="func-grid-items">
+        <a class="func-card" href="pages/quality-std-aql.html"><div class="func-card-icon">&#128209;</div><div class="func-card-text">AQL标准</div></a>
+        <a class="func-card" href="pages/quality-std-sampling-plan.html"><div class="func-card-icon">&#128209;</div><div class="func-card-text">抽样方案标准</div></a>
+        <a class="func-card" href="pages/quality-std-sample-code.html"><div class="func-card-icon">&#128209;</div><div class="func-card-text">样本量字码</div></a>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================== -->
+  <!-- MODULE: QUALITY-PARAM (参数设置) -->
+  <!-- ========================================== -->
+  <div class="module-panel func-grid-container" id="mod-quality-param">
+    <div class="func-grid-title">质量参数设置</div>
+    <div class="func-grid-subtitle">质量模块参数配置</div>
+    <div class="func-grid-section">
+      <div class="func-grid-section-header"><span class="section-icon"></span>参数设置</div>
+      <div class="func-grid-items">
+        <a class="func-card" href="pages/quality-param.html"><div class="func-card-icon">&#9881;</div><div class="func-card-text">质量参数设置</div></a>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================== -->
+  <!-- MODULE: FINANCE-GL (总账) -->
+  <!-- ========================================== -->
+  <div class="module-panel func-grid-container" id="mod-finance-gl">
+    <div class="func-grid-title">总账</div>
+    <div class="func-grid-subtitle">凭证管理、账簿报表与期末处理</div>
+    <div class="func-grid-section">
+      <div class="func-grid-section-header"><span class="section-icon"></span>凭证管理</div>
+      <div class="func-grid-items">
+        <a class="func-card" href="pages/finance-voucher-entry.html"><div class="func-card-icon">&#128196;</div><div class="func-card-text">凭证录入</div></a>
+        <a class="func-card" href="pages/finance-voucher.html"><div class="func-card-icon">&#128196;</div><div class="func-card-text">凭证管理</div></a>
+        <a class="func-card" href="pages/finance-voucher-query.html"><div class="func-card-icon">&#128196;</div><div class="func-card-text">凭证查询</div></a>
+        <a class="func-card" href="pages/finance-voucher-audit.html"><div class="func-card-icon">&#128196;</div><div class="func-card-text">凭证审核</div></a>
+        <a class="func-card" href="pages/finance-voucher-post.html"><div class="func-card-icon">&#128196;</div><div class="func-card-text">凭证过账</div></a>
+        <a class="func-card" href="pages/finance-voucher-summary.html"><div class="func-card-icon">&#128196;</div><div class="func-card-text">凭证汇总</div></a>
+      </div>
+    </div>
+    <div class="func-grid-section">
+      <div class="func-grid-section-header"><span class="section-icon"></span>账簿报表</div>
+      <div class="func-grid-items">
+        <a class="func-card" href="pages/finance-ledger.html"><div class="func-card-icon">&#128200;</div><div class="func-card-text">账簿报表</div></a>
+        <a class="func-card" href="pages/finance-gl-general-ledger.html"><div class="func-card-icon">&#128200;</div><div class="func-card-text">总分类账</div></a>
+        <a class="func-card" href="pages/finance-gl-sub-ledger.html"><div class="func-card-icon">&#128200;</div><div class="func-card-text">明细分类账</div></a>
+        <a class="func-card" href="pages/finance-gl-multi-col-ledger.html"><div class="func-card-icon">&#128200;</div><div class="func-card-text">多栏式明细账</div></a>
+        <a class="func-card" href="pages/finance-gl-dimension-ledger.html"><div class="func-card-icon">&#128200;</div><div class="func-card-text">维度明细账</div></a>
+        <a class="func-card" href="pages/finance-gl-balance.html"><div class="func-card-icon">&#128200;</div><div class="func-card-text">科目余额表</div></a>
+        <a class="func-card" href="pages/finance-gl-trial-balance.html"><div class="func-card-icon">&#128200;</div><div class="func-card-text">试算平衡表</div></a>
+        <a class="func-card" href="pages/finance-gl-dimension-balance.html"><div class="func-card-icon">&#128200;</div><div class="func-card-text">维度余额表</div></a>
+      </div>
+    </div>
+    <div class="func-grid-section">
+      <div class="func-grid-section-header"><span class="section-icon"></span>初始化与期末</div>
+      <div class="func-grid-items">
+        <a class="func-card" href="pages/finance-gl-init.html"><div class="func-card-icon">&#9881;</div><div class="func-card-text">初始化</div></a>
+        <a class="func-card" href="pages/finance-gl-subject-init.html"><div class="func-card-icon">&#9881;</div><div class="func-card-text">科目初始化</div></a>
+        <a class="func-card" href="pages/finance-gl-period-close.html"><div class="func-card-icon">&#9881;</div><div class="func-card-text">期末结账</div></a>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================== -->
+  <!-- MODULE: FINANCE-AR (应收管理) -->
+  <!-- ========================================== -->
+  <div class="module-panel func-grid-container" id="mod-finance-ar">
+    <div class="func-grid-title">应收管理</div>
+    <div class="func-grid-subtitle">应收单、收款、核销、坏账与对账</div>
+    <div class="func-grid-section">
+      <div class="func-grid-section-header"><span class="section-icon"></span>应收管理</div>
+      <div class="func-grid-items">
+        <a class="func-card" href="pages/finance-receivable.html"><div class="func-card-icon">&#128196;</div><div class="func-card-text">应收单</div></a>
+        <a class="func-card" href="pages/finance-receipt.html"><div class="func-card-icon">&#128196;</div><div class="func-card-text">收款单</div></a>
+        <a class="func-card" href="pages/finance-receipt-writeoff.html"><div class="func-card-icon">&#128196;</div><div class="func-card-text">收款核销</div></a>
+        <a class="func-card" href="pages/finance-baddebt.html"><div class="func-card-icon">&#128196;</div><div class="func-card-text">坏账处理</div></a>
+        <a class="func-card" href="pages/finance-ar-transfer.html"><div class="func-card-icon">&#128196;</div><div class="func-card-text">应收转销</div></a>
+        <a class="func-card" href="pages/finance-ar-refund.html"><div class="func-card-icon">&#128196;</div><div class="func-card-text">退款单</div></a>
+        <a class="func-card" href="pages/finance-ar-other.html"><div class="func-card-icon">&#128196;</div><div class="func-card-text">其他应收单</div></a>
+        <a class="func-card" href="pages/finance-ar-customer-stmt.html"><div class="func-card-icon">&#128196;</div><div class="func-card-text">客户对账单</div></a>
+      </div>
+    </div>
+    <div class="func-grid-section">
+      <div class="func-grid-section-header"><span class="section-icon"></span>报表分析</div>
+      <div class="func-grid-items">
+        <a class="func-card" href="pages/finance-ar-report.html"><div class="func-card-icon">&#128200;</div><div class="func-card-text">应收报表</div></a>
+        <a class="func-card" href="pages/finance-ar-due-debt.html"><div class="func-card-icon">&#128200;</div><div class="func-card-text">到期债务分析</div></a>
+        <a class="func-card" href="pages/finance-ar-aging.html"><div class="func-card-icon">&#128200;</div><div class="func-card-text">账龄分析</div></a>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================== -->
+  <!-- MODULE: FINANCE-AP (应付管理) -->
+  <!-- ========================================== -->
+  <div class="module-panel func-grid-container" id="mod-finance-ap">
+    <div class="func-grid-title">应付管理</div>
+    <div class="func-grid-subtitle">应付单、付款申请、付款核销与供应商对账</div>
+    <div class="func-grid-section">
+      <div class="func-grid-section-header"><span class="section-icon"></span>应付管理</div>
+      <div class="func-grid-items">
+        <a class="func-card" href="pages/finance-payable.html"><div class="func-card-icon">&#128196;</div><div class="func-card-text">应付单</div></a>
+        <a class="func-card" href="pages/finance-payment-request.html"><div class="func-card-icon">&#128196;</div><div class="func-card-text">付款申请单</div></a>
+        <a class="func-card" href="pages/finance-payment.html"><div class="func-card-icon">&#128196;</div><div class="func-card-text">付款单</div></a>
+        <a class="func-card" href="pages/finance-payment-writeoff.html"><div class="func-card-icon">&#128196;</div><div class="func-card-text">付款核销</div></a>
+        <a class="func-card" href="pages/finance-ap-transfer.html"><div class="func-card-icon">&#128196;</div><div class="func-card-text">应付转销</div></a>
+        <a class="func-card" href="pages/finance-ap-refund.html"><div class="func-card-icon">&#128196;</div><div class="func-card-text">退款单</div></a>
+        <a class="func-card" href="pages/finance-ap-other.html"><div class="func-card-icon">&#128196;</div><div class="func-card-text">其他应付单</div></a>
+      </div>
+    </div>
+    <div class="func-grid-section">
+      <div class="func-grid-section-header"><span class="section-icon"></span>报表分析</div>
+      <div class="func-grid-items">
+        <a class="func-card" href="pages/finance-ap-report.html"><div class="func-card-icon">&#128200;</div><div class="func-card-text">应付报表</div></a>
+        <a class="func-card" href="pages/finance-ap-due-debt.html"><div class="func-card-icon">&#128200;</div><div class="func-card-text">到期债务分析</div></a>
+        <a class="func-card" href="pages/finance-ap-aging.html"><div class="func-card-icon">&#128200;</div><div class="func-card-text">账龄分析</div></a>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================== -->
+  <!-- MODULE: FINANCE-CASHIER (出纳管理) -->
+  <!-- ========================================== -->
+  <div class="module-panel func-grid-container" id="mod-finance-cashier">
+    <div class="func-grid-title">出纳管理</div>
+    <div class="func-grid-subtitle">日常处理、日记账、银行对账与出纳报表</div>
+    <div class="func-grid-section">
+      <div class="func-grid-section-header"><span class="section-icon"></span>日常处理</div>
+      <div class="func-grid-items">
+        <a class="func-card" href="pages/finance-cashier-daily.html"><div class="func-card-icon">&#128196;</div><div class="func-card-text">日常处理</div></a>
+        <a class="func-card" href="pages/finance-cashier-deposit.html"><div class="func-card-icon">&#128196;</div><div class="func-card-text">存款</div></a>
+        <a class="func-card" href="pages/finance-cashier-transfer.html"><div class="func-card-icon">&#128196;</div><div class="func-card-text">转账</div></a>
+        <a class="func-card" href="pages/finance-cashier-count.html"><div class="func-card-icon">&#128196;</div><div class="func-card-text">盘点</div></a>
+        <a class="func-card" href="pages/finance-cashier-balance-adj.html"><div class="func-card-icon">&#128196;</div><div class="func-card-text">余额调整</div></a>
+        <a class="func-card" href="pages/finance-cashier-manual-journal.html"><div class="func-card-icon">&#128196;</div><div class="func-card-text">手工日记账</div></a>
+      </div>
+    </div>
+    <div class="func-grid-section">
+      <div class="func-grid-section-header"><span class="section-icon"></span>日记账与对账</div>
+      <div class="func-grid-items">
+        <a class="func-card" href="pages/finance-cashier-journal.html"><div class="func-card-icon">&#128200;</div><div class="func-card-text">日记账</div></a>
+        <a class="func-card" href="pages/finance-cashier-bank-stmt.html"><div class="func-card-icon">&#128196;</div><div class="func-card-text">银行对账单</div></a>
+        <a class="func-card" href="pages/finance-cashier-bank-reconcile.html"><div class="func-card-icon">&#128196;</div><div class="func-card-text">银行对账</div></a>
+      </div>
+    </div>
+    <div class="func-grid-section">
+      <div class="func-grid-section-header"><span class="section-icon"></span>报表</div>
+      <div class="func-grid-items">
+        <a class="func-card" href="pages/finance-cashier-report.html"><div class="func-card-icon">&#128200;</div><div class="func-card-text">出纳报表</div></a>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================== -->
+  <!-- MODULE: FINANCE-EXPENSE (费用管理) -->
+  <!-- ========================================== -->
+  <div class="module-panel func-grid-container" id="mod-finance-expense">
+    <div class="func-grid-title">费用管理</div>
+    <div class="func-grid-subtitle">费用申请、出差申请与报销</div>
+    <div class="func-grid-section">
+      <div class="func-grid-section-header"><span class="section-icon"></span>费用管理</div>
+      <div class="func-grid-items">
+        <a class="func-card" href="pages/finance-expense-request.html"><div class="func-card-icon">&#128196;</div><div class="func-card-text">费用申请单</div></a>
+        <a class="func-card" href="pages/finance-travel-request.html"><div class="func-card-icon">&#128196;</div><div class="func-card-text">出差申请单</div></a>
+        <a class="func-card" href="pages/finance-expense-travel-std.html"><div class="func-card-icon">&#128209;</div><div class="func-card-text">出差标准</div></a>
+        <a class="func-card" href="pages/finance-expense-reimburse.html"><div class="func-card-icon">&#128196;</div><div class="func-card-text">费用报销单</div></a>
+        <a class="func-card" href="pages/finance-expense-loan.html"><div class="func-card-icon">&#128196;</div><div class="func-card-text">借款单</div></a>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================== -->
+  <!-- MODULE: FINANCE-INVENTORY (存货核算) -->
+  <!-- ========================================== -->
+  <div class="module-panel func-grid-container" id="mod-finance-inventory">
+    <div class="func-grid-title">存货核算</div>
+    <div class="func-grid-subtitle">库存成本核算与报表分析</div>
+    <div class="func-grid-section">
+      <div class="func-grid-section-header"><span class="section-icon"></span>成本核算</div>
+      <div class="func-grid-items">
+        <a class="func-card" href="pages/finance-inventory-calc.html"><div class="func-card-icon">&#128196;</div><div class="func-card-text">库存核算</div></a>
+        <a class="func-card" href="pages/finance-inventory-purchase-cost.html"><div class="func-card-icon">&#128196;</div><div class="func-card-text">采购入库核算</div></a>
+        <a class="func-card" href="pages/finance-inventory-purchase-calc.html"><div class="func-card-icon">&#128196;</div><div class="func-card-text">采购入库计算</div></a>
+        <a class="func-card" href="pages/finance-inventory-outbound-cost.html"><div class="func-card-icon">&#128196;</div><div class="func-card-text">销售出库核算</div></a>
+        <a class="func-card" href="pages/finance-inventory-outbound-calc.html"><div class="func-card-icon">&#128196;</div><div class="func-card-text">销售出库计算</div></a>
+        <a class="func-card" href="pages/finance-inventory-inbound-cost.html"><div class="func-card-icon">&#128196;</div><div class="func-card-text">其他入库核算</div></a>
+        <a class="func-card" href="pages/finance-inventory-period-adj.html"><div class="func-card-icon">&#128196;</div><div class="func-card-text">期末调整</div></a>
+      </div>
+    </div>
+    <div class="func-grid-section">
+      <div class="func-grid-section-header"><span class="section-icon"></span>报表分析</div>
+      <div class="func-grid-items">
+        <a class="func-card" href="pages/finance-inventory-report.html"><div class="func-card-icon">&#128200;</div><div class="func-card-text">报表分析</div></a>
+        <a class="func-card" href="pages/finance-inventory-rpt-summary.html"><div class="func-card-icon">&#128200;</div><div class="func-card-text">收发存汇总表</div></a>
+        <a class="func-card" href="pages/finance-inventory-rpt-detail.html"><div class="func-card-icon">&#128200;</div><div class="func-card-text">收发存明细表</div></a>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================== -->
+  <!-- MODULE: FINANCE-COST (成本核算) -->
+  <!-- ========================================== -->
+  <div class="module-panel func-grid-container" id="mod-finance-cost">
+    <div class="func-grid-title">成本核算</div>
+    <div class="func-grid-subtitle">生产成本核算与报表分析</div>
+    <div class="func-grid-section">
+      <div class="func-grid-section-header"><span class="section-icon"></span>成本核算</div>
+      <div class="func-grid-items">
+        <a class="func-card" href="pages/finance-cost.html"><div class="func-card-icon">&#128196;</div><div class="func-card-text">成本核算</div></a>
+        <a class="func-card" href="pages/finance-cost-order.html"><div class="func-card-icon">&#128196;</div><div class="func-card-text">成本订单</div></a>
+        <a class="func-card" href="pages/finance-cost-calculate.html"><div class="func-card-icon">&#128196;</div><div class="func-card-text">成本计算</div></a>
+        <a class="func-card" href="pages/finance-cost-std-define.html"><div class="func-card-icon">&#128209;</div><div class="func-card-text">标准成本定义</div></a>
+        <a class="func-card" href="pages/finance-cost-data-collect.html"><div class="func-card-icon">&#128196;</div><div class="func-card-text">成本数据采集</div></a>
+      </div>
+    </div>
+    <div class="func-grid-section">
+      <div class="func-grid-section-header"><span class="section-icon"></span>报表分析</div>
+      <div class="func-grid-items">
+        <a class="func-card" href="pages/finance-cost-report.html"><div class="func-card-icon">&#128200;</div><div class="func-card-text">报表分析</div></a>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================== -->
+  <!-- MODULE: FINANCE-REPORT (报表) -->
+  <!-- ========================================== -->
+  <div class="module-panel func-grid-container" id="mod-finance-report">
+    <div class="func-grid-title">财务报表</div>
+    <div class="func-grid-subtitle">资产负债表、利润表、现金流量表等法定财务报表</div>
+    <div class="func-grid-section">
+      <div class="func-grid-section-header"><span class="section-icon"></span>财务报表</div>
+      <div class="func-grid-items">
+        <a class="func-card" href="pages/finance-balance-sheet.html"><div class="func-card-icon">&#128200;</div><div class="func-card-text">资产负债表</div></a>
+        <a class="func-card" href="pages/finance-income-statement.html"><div class="func-card-icon">&#128200;</div><div class="func-card-text">利润表</div></a>
+        <a class="func-card" href="pages/finance-cashflow-statement.html"><div class="func-card-icon">&#128200;</div><div class="func-card-text">现金流量表</div></a>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================== -->
+  <!-- MODULE: FINANCE-MERGE (合并报表) -->
+  <!-- ========================================== -->
+  <div class="module-panel func-grid-container" id="mod-finance-merge">
+    <div class="func-grid-title">合并报表</div>
+    <div class="func-grid-subtitle">集团合并报表管理，含抵销分录与权益调整</div>
+    <div class="func-grid-section">
+      <div class="func-grid-section-header"><span class="section-icon"></span>合并报表</div>
+      <div class="func-grid-items">
+        <a class="func-card" href="pages/finance-merge-scheme.html"><div class="func-card-icon">&#128196;</div><div class="func-card-text">合并方案</div></a>
+        <a class="func-card" href="pages/finance-merge-progress.html"><div class="func-card-icon">&#128196;</div><div class="func-card-text">合并进度</div></a>
+        <a class="func-card" href="pages/finance-merge-equity.html"><div class="func-card-icon">&#128196;</div><div class="func-card-text">权益调整</div></a>
+        <a class="func-card" href="pages/finance-merge-elim-entry.html"><div class="func-card-icon">&#128196;</div><div class="func-card-text">抵销分录</div></a>
+        <a class="func-card" href="pages/finance-merge-adj-entry.html"><div class="func-card-icon">&#128196;</div><div class="func-card-text">调整分录</div></a>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================== -->
+  <!-- MODULE: FINANCE-FA (固定资产) -->
+  <!-- ========================================== -->
+  <div class="module-panel func-grid-container" id="mod-finance-fa">
+    <div class="func-grid-title">固定资产</div>
+    <div class="func-grid-subtitle">固定资产卡片、折旧、变更与盘点管理</div>
+    <div class="func-grid-section">
+      <div class="func-grid-section-header"><span class="section-icon"></span>固定资产管理</div>
+      <div class="func-grid-items">
+        <a class="func-card" href="pages/finance-fa-card.html"><div class="func-card-icon">&#128196;</div><div class="func-card-text">固定资产卡片</div></a>
+        <a class="func-card" href="pages/finance-fa-category.html"><div class="func-card-icon">&#128209;</div><div class="func-card-text">固定资产类别</div></a>
+        <a class="func-card" href="pages/finance-fa-change.html"><div class="func-card-icon">&#128196;</div><div class="func-card-text">固定资产变动</div></a>
+        <a class="func-card" href="pages/finance-fa-depreciation.html"><div class="func-card-icon">&#128196;</div><div class="func-card-text">折旧管理</div></a>
+        <a class="func-card" href="pages/finance-fa-disposal.html"><div class="func-card-icon">&#128196;</div><div class="func-card-text">固定资产处置</div></a>
+        <a class="func-card" href="pages/finance-fa-inventory.html"><div class="func-card-icon">&#128196;</div><div class="func-card-text">固定资产盘点</div></a>
+        <a class="func-card" href="pages/finance-fa-inventory-plan.html"><div class="func-card-icon">&#128196;</div><div class="func-card-text">盘点方案</div></a>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================== -->
+  <!-- MODULE: FINANCE-PLATFORM (会计平台) -->
+  <!-- ========================================== -->
+  <div class="module-panel func-grid-container" id="mod-finance-platform">
+    <div class="func-grid-title">会计平台</div>
+    <div class="func-grid-subtitle">业务单据自动生成凭证的会计处理平台</div>
+    <div class="func-grid-section">
+      <div class="func-grid-section-header"><span class="section-icon"></span>会计平台</div>
+      <div class="func-grid-items">
+        <a class="func-card" href="pages/finance-platform-voucher-gen.html"><div class="func-card-icon">&#128196;</div><div class="func-card-text">凭证生成</div></a>
+        <a class="func-card" href="pages/finance-platform-reconcile.html"><div class="func-card-icon">&#128196;</div><div class="func-card-text">对账管理</div></a>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================== -->
+  <!-- MODULE: PLM (PLM管理) -->
+  <!-- ========================================== -->
+  <div class="module-panel func-grid-container" id="mod-plm">
+    <div class="func-grid-title">PLM管理</div>
+    <div class="func-grid-subtitle">物料主数据、BOM、工艺路线、工程变更与图文档管理</div>
+    <div class="func-grid-section">
+      <div class="func-grid-section-header"><span class="section-icon"></span>产品数据</div>
+      <div class="func-grid-items">
+        <a class="func-card" href="pages/master-material.html"><div class="func-card-icon">&#128209;</div><div class="func-card-text">物料主数据</div></a>
+        <a class="func-card" href="pages/bom.html"><div class="func-card-icon">&#128209;</div><div class="func-card-text">BOM管理</div></a>
+        <a class="func-card" href="pages/bom-detail.html"><div class="func-card-icon">&#128209;</div><div class="func-card-text">BOM详情</div></a>
+        <a class="func-card" href="pages/production-routing.html"><div class="func-card-icon">&#128209;</div><div class="func-card-text">工艺路线</div></a>
+        <a class="func-card" href="pages/plm-ecr.html"><div class="func-card-icon">&#128196;</div><div class="func-card-text">工程变更申请单</div></a>
+        <a class="func-card" href="pages/plm-document.html"><div class="func-card-icon">&#128196;</div><div class="func-card-text">图文档管理</div></a>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================== -->
+  <!-- MODULE: HR (HR人力) -->
+  <!-- ========================================== -->
+  <div class="module-panel func-grid-container" id="mod-hr">
+    <div class="func-grid-title">HR人力</div>
+    <div class="func-grid-subtitle">员工管理、组织架构、考勤与绩效</div>
+    <div class="func-grid-section">
+      <div class="func-grid-section-header"><span class="section-icon"></span>HR人力</div>
+      <div class="func-grid-items">
+        <a class="func-card" href="pages/hr-employee.html"><div class="func-card-icon">&#128101;</div><div class="func-card-text">员工管理</div></a>
+        <a class="func-card" href="pages/hr-org.html"><div class="func-card-icon">&#127970;</div><div class="func-card-text">组织架构</div></a>
+        <a class="func-card" href="pages/hr-attendance.html"><div class="func-card-icon">&#128336;</div><div class="func-card-text">考勤管理</div></a>
+        <a class="func-card" href="pages/hr-performance.html"><div class="func-card-icon">&#127942;</div><div class="func-card-text">绩效考核</div></a>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================== -->
+  <!-- MODULE: EQUIPMENT (设备管理) -->
+  <!-- ========================================== -->
+  <div class="module-panel func-grid-container" id="mod-equipment">
+    <div class="func-grid-title">设备管理</div>
+    <div class="func-grid-subtitle">设备档案与采集数据管理</div>
+    <div class="func-grid-section">
+      <div class="func-grid-section-header"><span class="section-icon"></span>设备管理</div>
+      <div class="func-grid-items">
+        <a class="func-card" href="pages/equip-archive.html"><div class="func-card-icon">&#128295;</div><div class="func-card-text">设备档案</div></a>
+        <a class="func-card" href="pages/equip-data.html"><div class="func-card-icon">&#128202;</div><div class="func-card-text">设备采集数据</div></a>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================== -->
+  <!-- MODULE: CRM (CRM客户) -->
+  <!-- ========================================== -->
+  <div class="module-panel func-grid-container" id="mod-crm">
+    <div class="func-grid-title">CRM客户</div>
+    <div class="func-grid-subtitle">客户管理、供应商管理与商机管理</div>
+    <div class="func-grid-section">
+      <div class="func-grid-section-header"><span class="section-icon"></span>CRM客户</div>
+      <div class="func-grid-items">
+        <a class="func-card" href="pages/master-customer.html"><div class="func-card-icon">&#128101;</div><div class="func-card-text">客户管理</div></a>
+        <a class="func-card" href="pages/master-supplier.html"><div class="func-card-icon">&#128101;</div><div class="func-card-text">供应商管理</div></a>
+        <a class="func-card" href="pages/crm-opportunity.html"><div class="func-card-icon">&#127919;</div><div class="func-card-text">商机管理</div></a>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================== -->
+  <!-- MODULE: MASTER-DATA (基础资料) -->
+  <!-- ========================================== -->
+  <div class="module-panel func-grid-container" id="mod-master-data">
+    <div class="func-grid-title">基础资料</div>
+    <div class="func-grid-subtitle">物料、客户、供应商、部门、员工等基础数据维护</div>
+    <div class="func-grid-section">
+      <div class="func-grid-section-header"><span class="section-icon"></span>主数据</div>
+      <div class="func-grid-items">
+        <a class="func-card" href="pages/master-material.html"><div class="func-card-icon">&#128209;</div><div class="func-card-text">物料</div></a>
+        <a class="func-card" href="pages/base-material-template.html"><div class="func-card-icon">&#128209;</div><div class="func-card-text">物料模板</div></a>
+      </div>
+    </div>
+    <div class="func-grid-section">
+      <div class="func-grid-section-header"><span class="section-icon"></span>公共资料</div>
+      <div class="func-grid-items">
+        <a class="func-card" href="pages/master-customer.html"><div class="func-card-icon">&#128101;</div><div class="func-card-text">客户</div></a>
+        <a class="func-card" href="pages/master-supplier.html"><div class="func-card-icon">&#128101;</div><div class="func-card-text">供应商</div></a>
+        <a class="func-card" href="pages/base-department.html"><div class="func-card-icon">&#127970;</div><div class="func-card-text">部门</div></a>
+        <a class="func-card" href="pages/base-employee.html"><div class="func-card-icon">&#128100;</div><div class="func-card-text">员工</div></a>
+        <a class="func-card" href="pages/base-org.html"><div class="func-card-icon">&#127970;</div><div class="func-card-text">组织机构</div></a>
+        <a class="func-card" href="pages/base-salesperson.html"><div class="func-card-icon">&#128100;</div><div class="func-card-text">业务员</div></a>
+        <a class="func-card" href="pages/base-contact.html"><div class="func-card-icon">&#128100;</div><div class="func-card-text">联系人</div></a>
+      </div>
+    </div>
+    <div class="func-grid-section">
+      <div class="func-grid-section-header"><span class="section-icon"></span>单据类型</div>
+      <div class="func-grid-items">
+        <a class="func-card" href="pages/base-doc-type.html"><div class="func-card-icon">&#128194;</div><div class="func-card-text">单据类型</div></a>
+        <a class="func-card" href="pages/base-doc-type-list.html"><div class="func-card-icon">&#128194;</div><div class="func-card-text">单据类型列表</div></a>
+      </div>
+    </div>
+    <div class="func-grid-section">
+      <div class="func-grid-section-header"><span class="section-icon"></span>编码规则</div>
+      <div class="func-grid-items">
+        <a class="func-card" href="pages/base-code-rule.html"><div class="func-card-icon">&#128194;</div><div class="func-card-text">编码规则</div></a>
+        <a class="func-card" href="pages/base-code-rule-list.html"><div class="func-card-icon">&#128194;</div><div class="func-card-text">编码规则列表</div></a>
+      </div>
+    </div>
+    <div class="func-grid-section">
+      <div class="func-grid-section-header"><span class="section-icon"></span>财务会计</div>
+      <div class="func-grid-items">
+        <a class="func-card" href="pages/base-payment-term.html"><div class="func-card-icon">&#128176;</div><div class="func-card-text">付款条件</div></a>
+        <a class="func-card" href="pages/base-receipt-term.html"><div class="func-card-icon">&#128176;</div><div class="func-card-text">收款条件</div></a>
+        <a class="func-card" href="pages/base-tax-rule.html"><div class="func-card-icon">&#128176;</div><div class="func-card-text">税务规则</div></a>
+        <a class="func-card" href="pages/base-bank.html"><div class="func-card-icon">&#127974;</div><div class="func-card-text">银行</div></a>
+        <a class="func-card" href="pages/base-bank-account.html"><div class="func-card-icon">&#127974;</div><div class="func-card-text">银行账户</div></a>
+        <a class="func-card" href="pages/base-currency.html"><div class="func-card-icon">&#128176;</div><div class="func-card-text">币种</div></a>
+        <a class="func-card" href="pages/base-exchange-rate.html"><div class="func-card-icon">&#128176;</div><div class="func-card-text">汇率</div></a>
+        <a class="func-card" href="pages/base-cost-center.html"><div class="func-card-icon">&#128176;</div><div class="func-card-text">成本中心</div></a>
+      </div>
+    </div>
+    <div class="func-grid-section">
+      <div class="func-grid-section-header"><span class="section-icon"></span>税务管理</div>
+      <div class="func-grid-items">
+        <a class="func-card" href="pages/base-tax-rate.html"><div class="func-card-icon">&#128176;</div><div class="func-card-text">税率设置</div></a>
+        <a class="func-card" href="pages/base-tax-type.html"><div class="func-card-icon">&#128176;</div><div class="func-card-text">税种管理</div></a>
+      </div>
+    </div>
+    <div class="func-grid-section">
+      <div class="func-grid-section-header"><span class="section-icon"></span>其他资料</div>
+      <div class="func-grid-items">
+        <a class="func-card" href="pages/base-category.html"><div class="func-card-icon">&#128194;</div><div class="func-card-text">存货类别</div></a>
+        <a class="func-card" href="pages/base-inventory-category.html"><div class="func-card-icon">&#128194;</div><div class="func-card-text">库存类别</div></a>
+        <a class="func-card" href="pages/base-unit.html"><div class="func-card-icon">&#128207;</div><div class="func-card-text">计量单位</div></a>
+        <a class="func-card" href="pages/base-unit-convert.html"><div class="func-card-icon">&#128207;</div><div class="func-card-text">计量单位换算</div></a>
+        <a class="func-card" href="pages/base-safety-stock.html"><div class="func-card-icon">&#9888;</div><div class="func-card-text">安全库存设置</div></a>
+        <a class="func-card" href="pages/base-position.html"><div class="func-card-icon">&#128188;</div><div class="func-card-text">岗位信息</div></a>
+        <a class="func-card" href="pages/base-position-system.html"><div class="func-card-icon">&#128188;</div><div class="func-card-text">岗位体系</div></a>
+        <a class="func-card" href="pages/base-emp-position.html"><div class="func-card-icon">&#128188;</div><div class="func-card-text">员工岗位</div></a>
+        <a class="func-card" href="pages/base-sales-group.html"><div class="func-card-icon">&#128100;</div><div class="func-card-text">销售组</div></a>
+        <a class="func-card" href="pages/base-work-calendar.html"><div class="func-card-icon">&#128197;</div><div class="func-card-text">工作日历</div></a>
+        <a class="func-card" href="pages/base-work-calendar-template.html"><div class="func-card-icon">&#128197;</div><div class="func-card-text">工作日历模板</div></a>
+        <a class="func-card" href="pages/base-shift.html"><div class="func-card-icon">&#128336;</div><div class="func-card-text">班次</div></a>
+        <a class="func-card" href="pages/base-shift-system.html"><div class="func-card-icon">&#128336;</div><div class="func-card-text">班次体系</div></a>
+        <a class="func-card" href="pages/base-calendar.html"><div class="func-card-icon">&#128197;</div><div class="func-card-text">日历</div></a>
+        <a class="func-card" href="pages/base-expense-item.html"><div class="func-card-icon">&#128176;</div><div class="func-card-text">费用项目</div></a>
+        <a class="func-card" href="pages/base-salary.html"><div class="func-card-icon">&#128176;</div><div class="func-card-text">薪资</div></a>
+        <a class="func-card" href="pages/base-salary-item.html"><div class="func-card-icon">&#128176;</div><div class="func-card-text">薪资项目</div></a>
+        <a class="func-card" href="pages/base-salary-summary.html"><div class="func-card-icon">&#128176;</div><div class="func-card-text">薪资汇总</div></a>
+        <a class="func-card" href="pages/base-position-report.html"><div class="func-card-icon">&#128188;</div><div class="func-card-text">汇报关系</div></a>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================== -->
+  <!-- MODULE: BUSINESS-RULE (业务规则) -->
+  <!-- ========================================== -->
+  <div class="module-panel func-grid-container" id="mod-business-rule">
+    <div class="func-grid-title">业务规则</div>
+    <div class="func-grid-subtitle">审批流、业务逻辑与规则配置</div>
+    <div class="func-grid-section">
+      <div class="func-grid-section-header"><span class="section-icon"></span>业务规则</div>
+      <div class="func-grid-items">
+        <a class="func-card" href="pages/base-settlement.html"><div class="func-card-icon">&#128209;</div><div class="func-card-text">结算方式</div></a>
+        <a class="func-card" href="pages/base-other-contact.html"><div class="func-card-icon">&#128209;</div><div class="func-card-text">往来单位</div></a>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================== -->
+  <!-- MODULE: AUX-DATA (辅助资料) -->
+  <!-- ========================================== -->
+  <div class="module-panel func-grid-container" id="mod-aux-data">
+    <div class="func-grid-title">辅助资料</div>
+    <div class="func-grid-subtitle">辅助核算资料管理</div>
+    <div class="func-grid-section">
+      <div class="func-grid-section-header"><span class="section-icon"></span>辅助资料</div>
+      <div class="func-grid-items">
+        <a class="func-card" href="pages/aux-payment-method.html"><div class="func-card-icon">&#128209;</div><div class="func-card-text">付款方式</div></a>
+        <a class="func-card" href="pages/aux-delivery-method.html"><div class="func-card-icon">&#128209;</div><div class="func-card-text">交货方式</div></a>
+        <a class="func-card" href="pages/aux-gender.html"><div class="func-card-icon">&#128209;</div><div class="func-card-text">性别</div></a>
+        <a class="func-card" href="pages/aux-region.html"><div class="func-card-icon">&#128209;</div><div class="func-card-text">地区</div></a>
+        <a class="func-card" href="pages/aux-province-city.html"><div class="func-card-icon">&#128209;</div><div class="func-card-text">省市</div></a>
+        <a class="func-card" href="pages/aux-company-type.html"><div class="func-card-icon">&#128209;</div><div class="func-card-text">单位性质</div></a>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================== -->
+  <!-- MODULE: AI (AI智能助手) -->
+  <!-- ========================================== -->
+  <div class="module-panel func-grid-container" id="mod-ai">
+    <div class="func-grid-title">AI智能助手</div>
+    <div class="func-grid-subtitle">企业级AI问答助手，智能分析业务数据</div>
+    <div class="func-grid-section">
+      <div class="func-grid-section-header"><span class="section-icon"></span>AI智能助手</div>
+      <div class="func-grid-items">
+        <a class="func-card" href="pages/ai-assistant.html">
+          <div class="func-card-icon">&#129302;</div>
+          <div class="func-card-text">AI问答中心</div>
+        </a>
+        <a class="func-card" href="pages/ai-analysis.html">
+          <div class="func-card-icon">&#128200;</div>
+          <div class="func-card-text">智能分析中心</div>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================== -->
+  <!-- MODULE: AI-ANALYSIS (智能分析中心) -->
+  <!-- ========================================== -->
+  <div class="module-panel func-grid-container" id="mod-ai-analysis">
+    <div class="func-grid-title">智能分析中心</div>
+    <div class="func-grid-subtitle">自动汇总多系统数据，输出智能分析报告</div>
+    <div class="func-grid-section">
+      <div class="func-grid-section-header"><span class="section-icon"></span>智能分析中心</div>
+      <div class="func-grid-items">
+        <a class="func-card" href="pages/ai-analysis.html">
+          <div class="func-card-icon">&#128200;</div>
+          <div class="func-card-text">智能分析中心</div>
+        </a>
+        <a class="func-card" href="pages/ai-assistant.html">
+          <div class="func-card-icon">&#129302;</div>
+          <div class="func-card-text">AI问答中心</div>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================== -->
+  <!-- MODULE: SETTINGS (系统设置) -->
+  <!-- ========================================== -->
+  <div class="module-panel func-grid-container" id="mod-settings">
+    <div class="func-grid-title">系统设置</div>
+    <div class="func-grid-subtitle">菜单权限、角色管理与低代码配置平台</div>
+    <div class="func-grid-section">
+      <div class="func-grid-section-header"><span class="section-icon"></span>系统设置</div>
+      <div class="func-grid-items">
+        <a class="func-card" href="pages/settings-menu.html"><div class="func-card-icon">&#128274;</div><div class="func-card-text">菜单权限</div></a>
+        <a class="func-card" href="pages/settings-role.html"><div class="func-card-icon">&#128101;</div><div class="func-card-text">角色管理</div></a>
+        <a class="func-card" href="pages/settings-lowcode.html"><div class="func-card-icon">&#128187;</div><div class="func-card-text">低代码配置平台</div></a>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- Mobile sidebar overlay -->
+<div id="sidebarOverlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:99;" onclick="toggleSidebar()"></div>
+
+<iframe src="components/ai-chat-widget.html" id="aiChatIframe" style="position:fixed;right:24px;bottom:24px;width:56px;height:56px;border:none;z-index:1000;border-radius:50%;overflow:hidden;transition:all 250ms ease;background:transparent;" allowtransparency="true"></iframe>
+
+<script>
+// Module title and breadcrumb mapping
+var moduleInfo = {
+  'home':       { title: '首页工作台', bc: '工作台' },
+  'dashboard':  { title: '驾驶舱', bc: '驾驶舱' },
+  'purchase':   { title: '采购管理', bc: '供应链 / 采购管理' },
+  'sales':      { title: '销售管理', bc: '供应链 / 销售管理' },
+  'inventory':  { title: '库存管理', bc: '供应链 / 库存管理' },
+  'planning':   { title: '计划管理', bc: '供应链 / 计划管理' },
+  'engineering':{ title: '工程数据', bc: '生产制造 / 工程数据' },
+  'production': { title: '生产管理', bc: '生产制造 / 生产管理' },
+  'outsource':  { title: '委外管理', bc: '生产制造 / 委外管理' },
+  'mes':        { title: '智慧车间', bc: 'MES执行 / 智慧车间' },
+  'mes-equipment': { title: '设备云', bc: 'MES执行 / 设备云' },
+  'quality':    { title: '日常检验', bc: '质量管理 / 日常检验' },
+  'quality-ncr':    { title: '不良品处理', bc: '质量管理 / 不良品处理' },
+  'quality-mrb':    { title: 'MRB评审', bc: '质量管理 / MRB评审' },
+  'quality-inspect': { title: '请检管理', bc: '质量管理 / 请检管理' },
+  'quality-report':  { title: '质量报表', bc: '质量管理 / 质量报表' },
+  'quality-master':  { title: '基础资料', bc: '质量管理 / 基础资料' },
+  'quality-std':     { title: '国标资料', bc: '质量管理 / 国标资料' },
+  'quality-param':   { title: '参数设置', bc: '质量管理 / 参数设置' },
+  'finance-gl': { title: '总账', bc: '财务会计 / 总账' },
+  'finance-report': { title: '财务报表', bc: '财务会计 / 报表' },
+  'finance-ar': { title: '应收管理', bc: '财务会计 / 应收管理' },
+  'finance-ap': { title: '应付管理', bc: '财务会计 / 应付管理' },
+  'finance-cashier': { title: '出纳管理', bc: '财务会计 / 出纳管理' },
+  'finance-expense': { title: '费用管理', bc: '财务会计 / 费用管理' },
+  'finance-merge': { title: '合并报表', bc: '财务会计 / 合并报表' },
+  'finance-inventory': { title: '存货核算', bc: '财务会计 / 存货核算' },
+  'finance-cost': { title: '成本核算', bc: '财务会计 / 成本核算' },
+  'finance-fa': { title: '固定资产', bc: '财务会计 / 固定资产' },
+  'finance-platform': { title: '会计平台', bc: '财务会计 / 会计平台' },
+  'plm':        { title: 'PLM管理', bc: 'PLM管理 / 产品数据' },
+  'hr':         { title: 'HR人力', bc: 'HR人力' },
+  'equipment':  { title: '设备管理', bc: '设备管理' },
+  'crm':        { title: 'CRM客户', bc: 'CRM客户' },
+  'master-data':{ title: '基础资料', bc: '基础数据 / 基础资料' },
+  'business-rule':{ title: '业务规则', bc: '基础数据 / 业务规则' },
+  'aux-data':   { title: '辅助资料', bc: '基础数据 / 辅助资料' },
+  'settings':   { title: '系统设置', bc: '系统设置' },
+  'ai':         { title: 'AI智能助手', bc: 'AI智能助手' },
+  'ai-analysis':{ title: '智能分析中心', bc: '智能分析中心' }
+};
+
+function showModule(moduleId) {
+  document.querySelectorAll('.module-panel').forEach(function(panel) {
+    panel.classList.remove('active');
+  });
+
+  var target = document.getElementById('mod-' + moduleId);
+  if (target) {
+    target.classList.add('active');
+  }
+
+  var info = moduleInfo[moduleId];
+  if (info) {
+    document.getElementById('pageTitle').textContent = info.title;
+    document.getElementById('pageBreadcrumb').innerHTML = '<a href="index.html">首页</a><span>/</span><span>' + info.bc + '</span>';
+  }
+
+  document.querySelectorAll('.sidebar-menu-item').forEach(function(item) {
+    item.classList.remove('active');
+  });
+  var activeItem = document.querySelector('.sidebar-menu-item[data-module="' + moduleId + '"]');
+  if (activeItem) {
+    activeItem.classList.add('active');
+  }
+
+  var parentGroup = activeItem ? activeItem.closest('.sidebar-menu-group') : null;
+  if (parentGroup && !parentGroup.classList.contains('open')) {
+    parentGroup.classList.add('open');
+    var arrow = parentGroup.querySelector('.arrow');
+    if (arrow) {
+      arrow.textContent = '\u25BC';
+    }
+  }
+
+  if (history.replaceState) {
+    history.replaceState(null, '', '#module=' + moduleId);
+  }
+}
+
+// Sidebar toggle for mobile
+
+// On page load, check URL hash
+(function() {
+  var hash = window.location.hash;
+  if (hash && hash.indexOf('#module=') === 0) {
+    showModule(hash.replace('#module=', ''));
+  }
+  // Also check ?module= query param (for redirects from placeholder pages)
+  var params = new URLSearchParams(window.location.search);
+  var modParam = params.get('module');
+  if (modParam) {
+    showModule(modParam);
+    // Clean the URL
+    if (history.replaceState) {
+      history.replaceState(null, '', '#module=' + modParam);
+    }
+  }
+})();
+
+// Handle resize
+window.addEventListener('resize', function() {
+  var sidebar = document.getElementById('sidebar');
+  var overlay = document.getElementById('sidebarOverlay');
+  if (window.innerWidth > 768) {
+    sidebar.classList.remove('mobile-open');
+    overlay.style.display = 'none';
+  }
+});
+
+var API_BASE = 'http://localhost:3001/api';
+
+function getAccessToken() {
+  return localStorage.getItem('accessToken');
+}
+
+function checkLogin() {
+  var token = getAccessToken();
+  if (!token) {
+    localStorage.setItem('accessToken', 'offline_' + Date.now());
+  }
+  var dcId = localStorage.getItem('dataCenterId');
+  var orgId = localStorage.getItem('orgId');
+  if (!dcId) {
+    dcId = 'dc-001';
+    localStorage.setItem('dataCenterId', dcId);
+    localStorage.setItem('dataCenter', JSON.stringify({ id: dcId, name: '默认数据中心', dbType: 'sqlite' }));
+    localStorage.setItem('currentDataCenterId', dcId);
+    localStorage.setItem('currentDataCenter', JSON.stringify({ id: dcId, name: '默认数据中心', dbType: 'sqlite' }));
+  }
+  if (!orgId) {
+    orgId = 'org-001';
+    localStorage.setItem('orgId', orgId);
+    localStorage.setItem('org', JSON.stringify({ id: orgId, name: '磐枢工业集团(总部)', code: 'PS-HQ' }));
+    localStorage.setItem('currentOrgId', orgId);
+    localStorage.setItem('currentOrg', JSON.stringify({ id: orgId, name: '磐枢工业集团(总部)', code: 'PS-HQ' }));
+  }
+  return true;
+}
+
+function logout() {
+  localStorage.clear();
+  window.location.href = 'login.html';
+}
+
+function showSessionInfo() {
+  var dc = localStorage.getItem('dataCenter');
+  var org = localStorage.getItem('org');
+  
+  if (dc) {
+    try {
+      dc = JSON.parse(dc);
+      document.getElementById('dcName').textContent = dc.name || dc.code;
+      document.getElementById('dcInfo').style.display = 'inline';
+    } catch (e) {}
+  }
+  
+  if (org) {
+    try {
+      org = JSON.parse(org);
+      document.getElementById('orgName').textContent = org.name;
+      document.getElementById('orgInfo').style.display = 'inline';
+    } catch (e) {}
+  }
+}
+
+function loadAppStats() {
+  if (!checkLogin()) return;
+  
+  document.getElementById('statOrders').textContent = '0';
+  document.getElementById('statOrdersChange').textContent = '--';
+  document.getElementById('statApprovals').textContent = '0';
+  document.getElementById('statApprovalsChange').textContent = '--';
+  document.getElementById('statProduction').textContent = '0';
+  document.getElementById('statProductionChange').textContent = '--';
+  document.getElementById('statInventory').textContent = '0';
+  document.getElementById('statInventoryChange').textContent = '--';
+  document.getElementById('statReceivable').textContent = '--';
+  document.getElementById('statReceivableChange').textContent = '--';
+  document.getElementById('statSales').textContent = '--';
+  document.getElementById('statSalesChange').textContent = '--';
+  document.getElementById('statAlerts').textContent = '0';
+  document.getElementById('statAlertsDetail').textContent = '--';
+}
+
+window.addEventListener('DOMContentLoaded', function() {
+  checkLogin();
+  showSessionInfo();
+  loadAppStats();
+  
+});
+</script>
+</body>
+</html>

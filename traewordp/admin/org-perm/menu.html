@@ -1,0 +1,1181 @@
+﻿﻿﻿﻿﻿﻿<!DOCTYPE html>
+
+<html lang="zh-CN">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>菜单管理 — 磐枢工业智能平台(管理端)</title>
+
+<link rel="stylesheet" href="../common-admin.css">
+
+<script src="../../common.js"></script>
+
+<style>
+
+.menu-layout { display: grid; grid-template-columns: 1fr 420px; gap: 0; height: calc(100vh - 56px); overflow: hidden; }
+
+.menu-tree-panel { overflow-y: auto; }
+
+.menu-detail-panel { background: var(--bg-surface); border-left: 1px solid #e8e8e8; overflow-y: auto; padding: 16px; }
+
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+
+
+
+/* 表格文字清晰可见 */
+
+.menu-tree-panel .data-table td { color: var(--text-secondary); }
+
+.menu-tree-panel .data-table .menu-text { color: var(--text-primary); }
+
+.menu-tree-panel .data-table .dir-row .menu-text { font-weight: 600; }
+
+
+
+/* 层级树符号 */
+
+.tree-sym {
+
+  font-family: var(--font-mono);
+
+  color: var(--text-tertiary);
+
+  white-space: pre;
+
+  margin-right: 4px;
+
+  font-size: 12px;
+
+  user-select: none;
+
+}
+
+.menu-name-cell { display: flex; align-items: center; }
+
+.menu-name-cell .menu-icon { margin-right: 6px; font-size: 13px; flex-shrink: 0; }
+
+
+
+/* 菜单类型 badge */
+
+.menu-type-badge {
+
+  display: inline-block; padding: 2px 8px;
+
+  border-radius: 10px; font-size: 11px; font-weight: 500;
+
+  white-space: nowrap;
+
+}
+
+.menu-type-badge.type-dir { background: var(--admin-accent-light); color: var(--admin-accent); border: 1px solid rgba(245,158,11,0.25); }
+
+.menu-type-badge.type-menu { background: rgba(6,182,212,0.12); color: var(--color-info); border: 1px solid rgba(6,182,212,0.25); }
+
+.menu-type-badge.type-btn { background: rgba(234,179,8,0.12); color: var(--color-warning); border: 1px solid rgba(234,179,8,0.25); }
+
+
+
+/* 类型说明 */
+
+.type-desc {
+
+  font-size: 12px; color: var(--text-tertiary);
+
+  background: var(--bg-inset);
+
+  border: 1px solid #e8e8e8;
+
+  border-radius: var(--radius-sm);
+
+  padding: 8px 12px;
+
+  line-height: 1.6;
+
+}
+
+
+
+/* 开关 switch */
+
+.switch { position: relative; display: inline-block; width: 38px; height: 20px; flex-shrink: 0; vertical-align: middle; }
+
+.switch input { opacity: 0; width: 0; height: 0; position: absolute; }
+
+.switch .slider {
+
+  position: absolute; cursor: pointer; inset: 0;
+
+  background: var(--bg-inset);
+
+  border: 1px solid #e8e8e8;
+
+  border-radius: 20px;
+
+  transition: var(--transition);
+
+}
+
+.switch .slider::before {
+
+  position: absolute; content: '';
+
+  height: 14px; width: 14px; left: 2px; top: 2px;
+
+  background: var(--text-tertiary);
+
+  border-radius: 50%;
+
+  transition: var(--transition);
+
+}
+
+.switch input:checked + .slider { background: var(--admin-accent-light); border-color: var(--admin-accent); }
+
+.switch input:checked + .slider::before { transform: translateX(18px); background: var(--admin-accent); }
+
+.switch-row { display: flex; align-items: center; gap: 10px; }
+
+.switch-row .switch-label { font-size: 12px; color: var(--text-secondary); }
+
+.linked-input { margin-top: 8px; }
+
+
+
+/* 文件路径选择器 */
+
+.path-field { display: flex; gap: 8px; }
+
+.path-field .form-input { flex: 1; }
+
+.path-field .btn-browse {
+
+  flex-shrink: 0; white-space: nowrap;
+
+  background: var(--bg-raised);
+
+  border: 1px solid #e8e8e8;
+
+  color: var(--text-secondary);
+
+  padding: 8px 12px;
+
+  border-radius: var(--radius-sm);
+
+  cursor: pointer;
+
+  font-size: 12px;
+
+  transition: all var(--transition);
+
+}
+
+.path-field .btn-browse:hover { border-color: var(--admin-accent); color: var(--admin-accent); }
+
+
+
+/* 弹窗（预览窗口） */
+.modal-overlay {
+  display: none; position: fixed; inset: 0;
+  background: rgba(0,0,0,0.5); z-index: 1000;
+  justify-content: center; align-items: flex-start;
+  padding-top: 60px;
+  opacity: 1; pointer-events: none;
+}
+.modal-overlay.show { display: flex; pointer-events: all; }
+.modal-dialog {
+  background: #fff;
+  border: 1px solid #e8e8e8;
+  border-radius: var(--radius-md);
+  width: 420px; max-height: 80vh; overflow-y: auto;
+}
+.modal-header {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 14px 18px; border-bottom: 1px solid #e8e8e8;
+  background: #fafafa;
+}
+.modal-header .modal-title { font-size: 13px; font-weight: 600; color: #333; }
+.modal-header .modal-close {
+  background: none; border: none; color: #999;
+  font-size: 18px; cursor: pointer; line-height: 1; padding: 2px 6px;
+  border-radius: 4px; transition: all var(--transition);
+}
+.modal-header .modal-close:hover { color: #f5222d; background: #f5f5f5; }
+.modal-body { padding: 16px 18px; color: #333; }
+
+
+
+/* 预览窗口内的模拟侧边栏 */
+
+.preview-frame {
+
+  border: 1px solid #e8e8e8;
+
+  border-radius: var(--radius-sm);
+
+  background: var(--bg-base);
+
+  overflow: hidden;
+
+}
+
+.preview-titlebar {
+
+  padding: 8px 12px;
+
+  background: var(--bg-surface);
+
+  border-bottom: 1px solid #e8e8e8;
+
+  font-size: 12px; color: var(--text-tertiary);
+
+  display: flex; align-items: center; gap: 6px;
+
+}
+
+.preview-titlebar .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--admin-accent); }
+
+.preview-sidebar { padding: 8px 0; }
+
+.preview-group-title { padding: 8px 12px 4px; font-size: 10px; color: var(--text-tertiary); text-transform: uppercase; letter-spacing: 1px; }
+
+.preview-item { padding: 5px 12px 5px 24px; font-size: 12px; color: var(--text-secondary); display: flex; align-items: center; gap: 6px; }
+
+.preview-item.active { color: var(--admin-accent); background: var(--admin-accent-light); border-left: 2px solid var(--admin-accent); padding-left: 22px; }
+
+.preview-item .pi-icon { font-size: 12px; }
+
+.preview-item.sub { padding-left: 36px; font-size: 11.5px; color: var(--text-tertiary); }
+
+
+
+/* 操作栏导入导出按钮强调 */
+
+.menu-tree-panel .action-btn.import-action { color: var(--color-info); }
+
+.menu-tree-panel .action-btn.export-action { color: var(--color-success); }
+
+
+
+/* 详情面板底部按钮区 */
+
+.detail-footer-btns { display: flex; gap: 8px; margin-top: 16px; flex-wrap: wrap; }
+
+.detail-footer-btns .btn-preview {
+
+  background: var(--admin-accent-light); color: var(--admin-accent);
+
+  border: 1px solid rgba(245,158,11,0.3);
+
+}
+
+.detail-footer-btns .btn-preview:hover { background: rgba(245,158,11,0.2); border-color: var(--admin-accent); }
+
+
+
+/* ===== Toast 提示框 ===== */
+.toast-container { position: fixed; top: 20px; right: 20px; z-index: 10000; display: flex; flex-direction: column; gap: 10px; }
+.toast { display: flex; align-items: center; gap: 10px; padding: 14px 18px; border-radius: var(--radius-md); background: #fff; border: 1px solid #e8e8e8; box-shadow: 0 4px 16px rgba(0,0,0,0.15); min-width: 280px; max-width: 420px; animation: slideIn 0.3s ease; }
+@keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+.toast .toast-icon { font-size: 18px; flex-shrink: 0; }
+.toast .toast-content { flex: 1; font-size: 13px; }
+.toast .toast-title { font-weight: 600; margin-bottom: 2px; color: #333; }
+.toast .toast-message { color: #666; font-size: 12px; }
+.toast-success { border-color: #b7eb8f; background: #f6ffed; }
+.toast-success .toast-title { color: #52c41a; }
+.toast-success .toast-message { color: #52c41a; }
+.toast-warning { border-color: #ffe58f; background: #fffbe6; }
+.toast-warning .toast-title { color: #faad14; }
+.toast-warning .toast-message { color: #faad14; }
+.toast-error { border-color: #ffccc7; background: #fff2f0; }
+.toast-error .toast-title { color: #f5222d; }
+.toast-error .toast-message { color: #f5222d; }
+.toast-info { border-color: #91d5ff; background: #e6f7ff; }
+.toast-info .toast-title { color: #1890ff; }
+.toast-info .toast-message { color: #1890ff; }
+
+/* ===== 确认对话框 ===== */
+.confirm-modal-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:2000; justify-content:center; align-items:center; }
+.confirm-modal-overlay.show { display:flex; }
+.confirm-modal-dialog { background:#fff; border:1px solid #e8e8e8; border-radius:4px; width:420px; overflow:hidden; }
+.confirm-modal-header { padding:16px 20px; border-bottom:1px solid #e8e8e8; display:flex; align-items:center; gap:10px; background:#fafafa; }
+.confirm-modal-icon { font-size:20px; }
+.confirm-modal-title { font-size:15px; font-weight:600; color:#333; }
+.confirm-modal-body { padding:20px; text-align:center; }
+.confirm-modal-message { font-size:14px; color:#666; line-height:1.6; }
+.confirm-modal-footer { display:flex; gap:12px; justify-content:flex-end; padding:16px 20px; border-top:1px solid #e8e8e8; background:#fafafa; }
+
+</style>
+
+</head>
+
+<body>
+
+<aside class="sidebar admin-sidebar" id="sidebar">
+
+    <div class="sidebar-logo">
+
+    <img src="../../images/LOGO.png" alt="磐枢工业智能平台" style="width: 100%; max-width: 200px; margin-bottom: 8px;">
+
+    <h1 style="font-size: 16px; margin: 0;">磐枢工业智能平台</h1>
+
+  </div>
+
+  <nav class="sidebar-menu">
+
+    <div class="sidebar-menu-group"><div class="sidebar-menu-item" onclick="toggleGroup(this)"><span class="icon">&#128451;</span> 数据中心管理<span class="arrow">&#9654;</span></div><div class="sub-menu"><a class="sidebar-menu-item" href="../data-center/index.html">数据中心总览</a><a class="sidebar-menu-item" href="../data-center/new.html">新建数据中心</a><a class="sidebar-menu-item" href="../data-center/backup.html">备份管理</a></div></div>
+
+    <div class="sidebar-menu-group open"><div class="sidebar-menu-item" onclick="toggleGroup(this)"><span class="icon">&#128101;</span> 组织与权限<span class="arrow">&#9660;</span></div><div class="sub-menu"><a class="sidebar-menu-item" href="org.html">组织架构</a><a class="sidebar-menu-item" href="user.html">用户管理</a><a class="sidebar-menu-item" href="role.html">角色管理</a><a class="sidebar-menu-item active" href="menu.html">菜单管理</a></div></div>
+
+
+
+    <div class="sidebar-menu-group"><div class="sidebar-menu-item" onclick="toggleGroup(this)"><span class="icon">&#128187;</span> 开发设计<span class="arrow">&#9654;</span></div><div class="sub-menu"><a class="sidebar-menu-item" href="../dev-design/lowcode.html">低代码开发中心</a><a class="sidebar-menu-item" href="../dev-design/form-designer.html">表单设计器</a><a class="sidebar-menu-item" href="../dev-design/doc-flow.html">单据转换配置</a><a class="sidebar-menu-item" href="../dev-design/print-template.html">套打模板设计</a><a class="sidebar-menu-item" href="../dev-design/workflow.html">流程配置</a></div></div>
+
+
+
+    <div class="sidebar-menu-group"><div class="sidebar-menu-item" onclick="toggleGroup(this)"><span class="icon">&#129302;</span> 智能应用<span class="arrow">&#9654;</span></div><div class="sub-menu"><a class="sidebar-menu-item" href="../ai-config/api-manage.html">API管理</a><a class="sidebar-menu-item" href="../ai-config/nl-training.html">自然语言训练</a><a class="sidebar-menu-item" href="../ai-config/data-analysis.html">数据分析训练</a><a class="sidebar-menu-item" href="../ai-config/agent-config.html">Agent配置</a></div></div>
+
+
+
+    <div class="sidebar-menu-item" onclick="window.location.href='../../index.html'"><span class="icon">&#8592;</span> 返回应用端</div>
+
+  </nav>
+
+  <div class="sidebar-user"><div class="avatar" style="background:var(--admin-accent-light);color:var(--admin-accent);">管</div><div><div class="user-name">系统管理员</div><div class="user-role">超级管理员</div></div></div>
+
+</aside>
+
+<div class="main-content" id="mainContent">
+
+  <div class="page-header">
+
+    <div><div class="flex items-center gap-8"><button class="sidebar-toggle" onclick="toggleSidebar()">&#9776;</button><div><h2>菜单管理</h2><div class="breadcrumb"><a href="../../index.html">首页</a><span>/</span><a href="../index.html">管理端</a><span>/</span><a href="../index.html">组织与权限</a><span>/</span><span>菜单管理</span></div></div></div></div>
+
+    <div class="page-actions"><button class="btn btn-primary btn-sm" style="background:var(--admin-accent);border-color:var(--admin-accent);color:#0a0e1a;">+ 新建菜单</button><button class="btn btn-ghost btn-sm">&#8635; 刷新菜单缓存</button></div>
+
+  </div>
+
+  <div class="menu-layout">
+
+    <div class="menu-tree-panel">
+
+      <div class="list-page-body" style="height:100%;">
+
+        <div class="list-action-bar">
+
+          <button class="action-btn primary-action">&#128194; 新建菜单</button>
+
+          <div class="action-separator"></div>
+
+          <button class="action-btn import-action">&#128229; 导入菜单</button>
+
+          <button class="action-btn export-action">&#128228; 导出菜单</button>
+
+          <div style="flex:1;"></div>
+
+          <button class="action-btn">&#128196; 展开/折叠</button>
+
+          <button class="action-btn">&#8635; 刷新</button>
+
+        </div>
+
+        <div class="list-table-area">
+
+          <table class="data-table">
+
+            <thead><tr><th style="width:36px;"><input type="checkbox" class="row-checkbox"></th><th>菜单名称</th><th>菜单类型</th><th>图标</th><th>路径</th><th>排序</th><th>显示</th><th>权限标识</th><th>操作</th></tr></thead>
+
+            <tbody><tr><td colspan="100%" style="text-align:center;color:#999;padding:20px;">暂无数据</td></tr></tbody>
+
+          </table>
+
+        </div>
+
+      </div>
+
+    </div>
+
+    <div class="menu-detail-panel">
+
+      <h3 style="font-size:14px;font-weight:600;" class="mb-12">菜单详情编辑</h3>
+
+      <div class="card">
+
+        <div class="card-header">基本信息</div>
+
+        <div class="card-body">
+
+          <div class="form-group">
+
+            <label class="form-label">上级菜单</label>
+
+            <select class="form-select" id="menuParentId"><option value="">顶级菜单</option><option value="">供应链</option><option value="">生产制造</option><option value="">财务会计</option></select>
+
+          </div>
+
+          <div class="form-group">
+
+            <label class="form-label">菜单类型</label>
+
+            <select class="form-select" id="menuType" onchange="updateTypeDesc()"><option value="目录">目录</option><option value="菜单" selected>菜单</option><option value="按钮">按钮</option></select>
+
+          </div>
+
+          <div class="form-group">
+
+            <label class="form-label">菜单类型说明</label>
+
+            <div class="type-desc" id="menuTypeDesc">菜单：业务功能页面，可配置路由路径与权限标识，支持关联前端文件，在侧边栏中可点击进入。</div>
+
+          </div>
+
+          <div class="form-group">
+
+            <label class="form-label">菜单名称</label>
+
+            <input type="text" class="form-input" id="menuName" placeholder="请输入菜单名称">
+
+          </div>
+
+          <div class="form-row">
+
+            <div class="form-group"><label class="form-label">菜单图标</label><input type="text" class="form-input" id="menuIcon" placeholder="&#128196;"></div>
+
+            <div class="form-group"><label class="form-label">排序号</label><input type="number" class="form-input" id="menuSort" value="10"></div>
+
+          </div>
+
+          <div class="form-group">
+
+            <label class="form-label">路由路径</label>
+
+            <input type="text" class="form-input" id="menuPath" placeholder="/purchase/order">
+
+          </div>
+
+          <div class="form-group">
+
+            <label class="form-label">关联页面路径（文件路径）</label>
+
+            <div class="path-field">
+
+              <input type="text" class="form-input" value="traewordp/supply-chain/purchase/order.html" placeholder="如 traewordp/supply-chain/purchase/order.html">
+
+              <button class="btn-browse" onclick="showToast('请选择前端文件', 'warning')">选择文件</button>
+
+            </div>
+
+          </div>
+
+          <div class="form-group">
+
+            <label class="form-label">权限标识</label>
+
+            <input type="text" class="form-input" id="menuPermKey" placeholder="purchase:order:view">
+
+          </div>
+
+          <div class="form-group">
+
+            <label class="form-label">是否显示</label>
+
+            <select class="form-select" id="menuVisible"><option value="1">显示</option><option value="0">隐藏</option></select>
+
+          </div>
+
+          <div class="form-group">
+
+            <label class="form-label">缓存与外链</label>
+
+            <div class="switch-row" style="margin-bottom:10px;">
+
+              <label class="switch"><input type="checkbox" checked><span class="slider"></span></label>
+
+              <span class="switch-label">是否缓存（开启后页面切换保留状态）</span>
+
+            </div>
+
+            <div class="switch-row" id="extLinkRow">
+
+              <label class="switch"><input type="checkbox" id="extLinkSwitch" onchange="toggleExtLink()"><span class="slider"></span></label>
+
+              <span class="switch-label">是否外链（开启后点击在新窗口打开外部地址）</span>
+
+            </div>
+
+            <div class="linked-input" id="extLinkInput" style="display:none;">
+
+              <input type="text" class="form-input" placeholder="请输入外链URL，如 https://example.com">
+
+            </div>
+
+          </div>
+
+          <div class="detail-footer-btns">
+
+            <button class="btn btn-primary btn-sm" style="background:var(--admin-accent);border-color:var(--admin-accent);color:#0a0e1a;">保存</button>
+
+            <button class="btn btn-ghost btn-sm">取消</button>
+
+            <button class="btn btn-sm btn-preview" onclick="openPreviewModal()">&#128065; 预览效果</button>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
+
+
+
+<!-- 菜单新增/编辑弹窗 -->
+
+<div class="modal-overlay" id="menuModal">
+
+  <div class="modal-dialog">
+
+    <div class="modal-header">
+
+      <span class="modal-title" id="menuModalTitle">新建菜单</span>
+
+      <button class="modal-close" onclick="closeMenuModal()">&times;</button>
+
+    </div>
+
+    <div class="modal-body">
+
+      <div class="form-group">
+
+        <label class="form-label">上级菜单</label>
+
+        <select class="form-select" id="menuParentId"><option value="">顶级菜单</option></select>
+
+      </div>
+
+      <div class="form-group">
+
+        <label class="form-label">菜单类型</label>
+
+        <select class="form-select" id="menuType" onchange="updateTypeDesc()"><option value="目录">目录</option><option value="菜单">菜单</option><option value="按钮">按钮</option></select>
+
+      </div>
+
+      <div class="form-group">
+
+        <label class="form-label">菜单类型说明</label>
+
+        <div class="type-desc" id="menuTypeDesc">目录：用于聚合一组下级菜单，本身不对应业务页面，常作为侧边栏分组标题，无需配置路由与权限标识。</div>
+
+      </div>
+
+      <div class="form-group">
+
+        <label class="form-label">菜单名称</label>
+
+        <input type="text" class="form-input" id="menuName" placeholder="请输入菜单名称">
+
+      </div>
+
+      <div class="form-row">
+
+        <div class="form-group"><label class="form-label">菜单图标</label><input type="text" class="form-input" id="menuIcon" placeholder="&#128196;"></div>
+
+        <div class="form-group"><label class="form-label">排序号</label><input type="number" class="form-input" id="menuSort" value="10"></div>
+
+      </div>
+
+      <div class="form-group">
+
+        <label class="form-label">路由路径</label>
+
+        <input type="text" class="form-input" id="menuPath" placeholder="/purchase/order">
+
+      </div>
+
+      <div class="form-group">
+
+        <label class="form-label">权限标识</label>
+
+        <input type="text" class="form-input" id="menuPermKey" placeholder="purchase:order:view">
+
+      </div>
+
+      <div class="form-group">
+
+        <label class="form-label">是否显示</label>
+
+        <select class="form-select" id="menuVisible"><option value="1">显示</option><option value="0">隐藏</option></select>
+
+      </div>
+
+    </div>
+
+    <div class="modal-footer">
+
+      <button class="btn btn-sm btn-cancel" onclick="closeMenuModal()">取消</button>
+
+      <button class="btn btn-sm btn-save" onclick="saveMenu()">保存</button>
+
+    </div>
+
+  </div>
+
+</div>
+
+
+
+<!-- 菜单预览弹窗 -->
+
+<div class="modal-overlay" id="previewModal">
+
+  <div class="modal-dialog">
+
+    <div class="modal-header">
+
+      <span class="modal-title">菜单预览效果</span>
+
+      <button class="modal-close" onclick="closePreviewModal()">&times;</button>
+
+    </div>
+
+    <div class="modal-body">
+
+      <div class="preview-frame">
+
+        <div class="preview-titlebar"><span class="dot"></span>磐枢工业智能平台 — 侧边栏预览</div>
+
+        <div class="preview-sidebar">
+
+          <div class="preview-group-title">主菜单</div>
+
+          <div class="preview-item"><span class="pi-icon">&#128202;</span>首页工作台</div>
+
+          <div class="preview-item"><span class="pi-icon">&#128230;</span>供应链</div>
+
+          <div class="preview-item active"><span class="pi-icon">&#128196;</span>采购管理</div>
+
+          <div class="preview-item sub">├─ 采购订单</div>
+
+          <div class="preview-item sub">├─ 采购入库单</div>
+
+          <div class="preview-item sub">└─ 采购退货单</div>
+
+          <div class="preview-item"><span class="pi-icon">&#127981;</span>生产制造</div>
+
+          <div class="preview-item"><span class="pi-icon">&#9989;</span>MES执行</div>
+
+          <div class="preview-item"><span class="pi-icon">&#128737;</span>质量管理</div>
+
+          <div class="preview-item"><span class="pi-icon">&#128176;</span>财务会计</div>
+
+          <div class="preview-item"><span class="pi-icon">&#128218;</span>基础数据</div>
+
+          <div class="preview-item"><span class="pi-icon">&#9881;</span>系统设置</div>
+
+        </div>
+
+      </div>
+
+      <p class="text-muted text-sm" style="margin-top:10px;">提示：以上为当前菜单配置在应用端侧边栏的渲染效果预览，实际显示受角色权限影响。</p>
+
+    </div>
+
+  </div>
+
+</div>
+
+
+
+<div id="sidebarOverlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:99;" onclick="toggleSidebar()"></div>
+
+<script>
+
+var confirmCallback = null;
+
+function showToast(message, type) {
+
+  var container = document.getElementById('toastContainer');
+
+  var icons = { success: '&#9989;', warning: '&#9888;', error: '&#10060;', info: '&#9432;' };
+
+  var titles = { success: '操作成功', warning: '温馨提示', error: '系统提示', info: '系统提示' };
+
+  var t = type || 'info';
+
+  var toast = document.createElement('div');
+
+  toast.className = 'toast toast-' + t;
+
+  toast.innerHTML = '<div class="toast-icon">' + icons[t] + '</div><div class="toast-content"><div class="toast-title">' + titles[t] + '</div><div class="toast-message">' + message + '</div></div>';
+
+  container.appendChild(toast);
+
+  setTimeout(function() { toast.style.opacity = '0'; toast.style.transform = 'translateX(100%)'; setTimeout(function() { toast.remove(); }, 300); }, 3000);
+
+}
+
+function showConfirm(message, type, callback) {
+
+  document.getElementById('confirmMessage').textContent = message;
+
+  document.getElementById('confirmTitle').textContent = (type === 'warning') ? '温馨提示' : '系统提示';
+
+  document.getElementById('confirmIcon').innerHTML = (type === 'warning') ? '&#9888;' : '&#10060;';
+
+  confirmCallback = callback;
+
+  document.getElementById('confirmModal').classList.add('show');
+
+}
+
+function closeConfirmModal(result) {
+
+  document.getElementById('confirmModal').classList.remove('show');
+
+  if (confirmCallback) { confirmCallback(result); confirmCallback = null; }
+
+}
+
+
+
+
+
+
+
+var typeDescMap={
+
+  '目录':'目录：用于聚合一组下级菜单，本身不对应业务页面，常作为侧边栏分组标题，无需配置路由与权限标识。',
+
+  '菜单':'菜单：业务功能页面，可配置路由路径与权限标识，支持关联前端文件，在侧边栏中可点击进入。',
+
+  '按钮':'按钮：页面内的操作权限点（如新增/编辑/删除），不显示在侧边栏，仅用于控制页面按钮的可见性。'
+
+};
+
+function updateTypeDesc(){var sel=document.getElementById('menuType');var desc=document.getElementById('menuTypeDesc');if(sel&&desc&&typeDescMap[sel.value])desc.textContent=typeDescMap[sel.value];}
+
+function toggleExtLink(){var sw=document.getElementById('extLinkSwitch');var inp=document.getElementById('extLinkInput');if(sw&&inp)inp.style.display=sw.checked?'block':'none';}
+
+function openPreviewModal(){var m=document.getElementById('previewModal');m.classList.add('show');}
+
+function closePreviewModal(){var m=document.getElementById('previewModal');m.classList.remove('show');}
+
+document.addEventListener('keydown',function(e){if(e.key==='Escape'){closePreviewModal();}});
+
+document.getElementById('previewModal').addEventListener('click',function(e){if(e.target===this)closePreviewModal();});
+
+
+
+var API_BASE='http://localhost:3001/api';
+
+var token=localStorage.getItem('accessToken');
+
+var menuList=[];
+
+
+
+async function loadMenus(){
+
+  try{
+
+    var res=await fetch(API_BASE+'/menus?page=1&pageSize=500',{headers:{'Authorization':'Bearer '+token}});
+
+    var data=await res.json();
+
+    if(data.code===200&&data.data){
+
+      menuList=data.data.list||[];
+
+      renderMenuTable();
+
+      populateParentMenuSelect();
+
+    }
+
+  }catch(e){
+
+    console.error('加载菜单失败:',e);
+
+    showToast('加载菜单失败: '+e.message,'error');
+
+  }
+
+}
+
+
+
+function populateParentMenuSelect(){
+
+  var select=document.getElementById('menuParentId');
+
+  if(!select)return;
+
+  select.innerHTML='<option value="">顶级菜单</option>'+menuList.map(function(m){
+
+    return '<option value="'+m.id+'">'+escapeHtml(m.name)+'</option>';
+
+  }).join('');
+
+}
+
+
+
+function renderMenuTable(){
+
+  var tbody=document.querySelector('.menu-tree-panel .data-table tbody');
+
+  if(menuList.length===0){
+
+    tbody.innerHTML='<tr><td colspan="100%" style="text-align:center;color:#999;padding:20px;">暂无数据</td></tr>';
+
+    return;
+
+  }
+
+  var typeMap={
+
+    1:'目录',
+
+    2:'菜单',
+
+    3:'按钮'
+
+  };
+
+  tbody.innerHTML=menuList.map(function(m){
+
+    var icon=m.icon||'';
+
+    var showBadge=m.isVisible===1?'<span class="badge badge-success">显示</span>':'<span class="badge badge-warning">隐藏</span>';
+
+    var menuType=typeMap[m.menuType]||m.menuType||'未知';
+
+    return '<tr data-id="'+m.id+'">'+
+
+      '<td><input type="checkbox" class="row-checkbox"></td>'+
+
+      '<td>'+(m.level>1?'&nbsp;&nbsp;&nbsp;'.repeat(m.level-1):'')+escapeHtml(m.name)+'</td>'+
+
+      '<td><span class="data-scope-badge">'+escapeHtml(menuType)+'</span></td>'+
+
+      '<td>'+icon+'</td>'+
+
+      '<td class="text-muted text-sm">'+escapeHtml(m.path||'')+'</td>'+
+
+      '<td>'+(m.sortOrder||0)+'</td>'+
+
+      '<td>'+showBadge+'</td>'+
+
+      '<td class="text-muted text-sm">'+escapeHtml(m.permission||'')+'</td>'+
+
+      '<td class="row-action-links"><a onclick="editMenu(\''+m.id+'\')">编辑</a><a onclick="deleteMenu(\''+m.id+'\',\''+escapeHtml(m.name)+'\')">删除</a></td>'+
+
+    '</tr>';
+
+  }).join('');
+
+}
+
+
+
+function escapeHtml(s){if(!s)return '';return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+
+
+
+var editingMenuId=null;
+
+
+
+function openMenuModal(){
+
+  editingMenuId=null;
+
+  document.getElementById('menuName').value='';
+
+  document.getElementById('menuType').value='目录';
+
+  document.getElementById('menuIcon').value='';
+
+  document.getElementById('menuPath').value='';
+
+  document.getElementById('menuSort').value='10';
+
+  document.getElementById('menuVisible').value='1';
+
+  document.getElementById('menuPermKey').value='';
+
+  document.getElementById('menuParentId').value='';
+
+  updateTypeDesc();
+
+  document.getElementById('menuModal').classList.add('show');
+
+}
+
+
+
+function editMenu(id){
+
+  editingMenuId=id;
+
+  var menu=menuList.find(function(m){return m.id===id;});
+
+  if(!menu)return;
+
+  var typeMap={
+
+    1:'目录',
+
+    2:'菜单',
+
+    3:'按钮'
+
+  };
+
+  document.getElementById('menuName').value=menu.name||'';
+
+  document.getElementById('menuType').value=typeMap[menu.menuType]||'目录';
+
+  document.getElementById('menuIcon').value=menu.icon||'';
+
+  document.getElementById('menuPath').value=menu.path||'';
+
+  document.getElementById('menuSort').value=menu.sortOrder||'10';
+
+  document.getElementById('menuVisible').value=menu.isVisible===1?'1':'0';
+
+  document.getElementById('menuPermKey').value=menu.permission||'';
+
+  document.getElementById('menuParentId').value=menu.parentId||'';
+
+  updateTypeDesc();
+
+  document.getElementById('menuModal').classList.add('show');
+
+}
+
+
+
+function closeMenuModal(){
+
+  document.getElementById('menuModal').classList.remove('show');
+
+}
+
+
+
+async function saveMenu(){
+
+  var name=document.getElementById('menuName').value.trim();
+
+  var type=document.getElementById('menuType').value;
+
+  if(!name){showToast('请填写菜单名称','warning');return;}
+
+  
+
+  var typeMap={
+
+    '目录':1,
+
+    '菜单':2,
+
+    '按钮':3
+
+  };
+
+  
+
+  var data={
+
+    name:name,
+
+    menuType:typeMap[type]||1,
+
+    icon:document.getElementById('menuIcon').value.trim(),
+
+    path:document.getElementById('menuPath').value.trim(),
+
+    sortOrder:parseInt(document.getElementById('menuSort').value)||10,
+
+    isVisible:parseInt(document.getElementById('menuVisible').value)||1,
+
+    permission:document.getElementById('menuPermKey').value.trim(),
+
+    parentId:document.getElementById('menuParentId').value||null
+
+  };
+
+  
+
+  try{
+
+    var url=editingMenuId?API_BASE+'/menus/'+editingMenuId:API_BASE+'/menus';
+
+    var method=editingMenuId?'PUT':'POST';
+
+    var res=await fetch(url,{method:method,headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},body:JSON.stringify(data)});
+
+    var result=await res.json();
+
+    if(result.code===200){
+
+      showToast('保存成功','success');
+
+      closeMenuModal();
+
+      await loadMenus();
+
+    }else{
+
+      showToast('保存失败: '+(result.message||'未知错误'),'error');
+
+    }
+
+  }catch(e){showToast('保存失败: '+e.message,'error');}
+
+}
+
+
+
+async function deleteMenu(id,name){
+
+  showConfirm('确定要删除菜单 "'+name+'" 吗？','warning',async function(result){
+
+    if(!result)return;
+
+    try{
+
+      var res=await fetch(API_BASE+'/menus/'+id,{method:'DELETE',headers:{'Authorization':'Bearer '+token}});
+
+      var data=await res.json();
+
+      if(data.code===200){
+
+        showToast('删除成功','success');
+
+        await loadMenus();
+
+      }else{
+
+        showToast('删除失败: '+(data.message||'未知错误'),'error');
+
+      }
+
+    }catch(e){showToast('删除失败: '+e.message,'error');}
+
+  });
+
+}
+
+
+
+async function refreshMenuCache(){
+
+  try{
+
+    var res=await fetch(API_BASE+'/menus/cache/refresh',{method:'POST',headers:{'Authorization':'Bearer '+token}});
+
+    var data=await res.json();
+
+    if(data.code===200){
+
+      showToast('菜单缓存刷新成功','success');
+
+    }else{
+
+      showToast('刷新失败: '+(data.message||'未知错误'),'error');
+
+    }
+
+  }catch(e){showToast('刷新失败: '+e.message,'error');}
+
+}
+
+
+
+document.addEventListener('DOMContentLoaded',function(){
+
+  loadMenus();
+
+  document.querySelectorAll('.page-actions button.btn-primary').forEach(function(btn){
+
+    btn.onclick=openMenuModal;
+
+  });
+
+  document.querySelectorAll('.list-action-bar .action-btn.primary-action').forEach(function(btn){
+
+    btn.onclick=openMenuModal;
+
+  });
+
+  document.querySelectorAll('.page-actions button:nth-child(2)').forEach(function(btn){
+
+    btn.onclick=refreshMenuCache;
+
+  });
+
+  document.querySelectorAll('.detail-footer-btns button.btn-primary').forEach(function(btn){
+
+    btn.onclick=saveMenu;
+
+  });
+
+  document.querySelectorAll('.detail-footer-btns button.btn-ghost').forEach(function(btn){
+
+    btn.onclick=closeMenuModal;
+
+  });
+
+});
+
+</script>
+
+
+
+<div class="toast-container" id="toastContainer"></div>
+
+<div class="confirm-modal-overlay" id="confirmModal">
+
+  <div class="confirm-modal-dialog">
+
+    <div class="confirm-modal-header">
+
+      <span class="confirm-modal-icon" id="confirmIcon">&#9888;</span>
+
+      <span class="confirm-modal-title" id="confirmTitle">温馨提示</span>
+
+    </div>
+
+    <div class="confirm-modal-body">
+
+      <div class="confirm-modal-message" id="confirmMessage"></div>
+
+    </div>
+
+    <div class="confirm-modal-footer">
+
+      <button class="btn btn-sm btn-cancel" onclick="closeConfirmModal(false)">取消</button>
+
+      <button class="btn btn-sm btn-primary" style="background:var(--admin-accent);border-color:var(--admin-accent);color:#0a0e1a;" onclick="closeConfirmModal(true)">确定</button>
+
+    </div>
+
+  </div>
+
+</div>
+
+</body>
+
+</html>
+

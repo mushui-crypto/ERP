@@ -1,0 +1,175 @@
+委外订单
+（委外管理功能）
+字段说明：
+单据头：FBillHead 
+	 实体主键：FID 
+	 单据编号：FBillNo 
+	 单据状态：FDocumentStatus 
+	 审核人：FApproverId 
+	 审核日期：FApproveDate 
+	 修改人：FModifierId 
+	 创建日期：FCreateDate 
+	 创建人：FCreatorId 
+	 修改日期：FModifyDate 
+	 作废日期：FCancelDate 
+	 作废人：FCanceler 
+	 作废状态：FCancelStatus 
+	 备注：FDescription 
+	 委外组织：FSubOrgId  (必填项)
+	 货主类型：FOwnerTypeId  (必填项)
+	 货主：FOwnerId 
+	 计划员：FPlannerID 
+	 单据日期：FDATE  (必填项)
+	 单据类型：FBillType  (必填项)
+	 计划组：FWorkGroupId 
+	 是否返工：FIsRework 
+	 期初委外订单：FIsQCSub 
+	 用料清单展开：FPPBOMType 
+明细：FTreeEntity 
+	 实体主键：FEntryId 
+	 父级行主键：FParentRowId 
+	 行展开类型：FRowExpandType 
+	 行标识：FRowId 
+	 物料编码：FMaterialId  (必填项)
+	 产品类型：FProductType  (必填项)
+	 物料名称：FMaterialName 
+	 规格型号：FSpecification 
+	 单位：FUnitID  (必填项)
+	 数量：FQty 
+	 计划开工时间：FPlanStartDate  (必填项)
+	 计划完工时间：FPlanFinishDate  (必填项)
+	 BOM版本：FBomId 
+	 供应商：FSupplierId 
+	 业务状态：FStatus  (必填项)
+	 需求组织：FRequestOrgId 
+	 工艺路线：FRoutingId 
+	 成品率(%)：FYieldRate 
+	 入库上限：FStockInLimitH 
+	 入库下限：FStockInLimitL 
+	 仓库：FStockID 
+	 仓位：FStockLOCID 
+	 货位：FF100001
+	 辅助属性：FAuxPropID 
+	 计划跟踪号：FMTONO 
+	 项目编号：FProjectNo 
+	 产出工序：FOperId 
+	 产出作业编码：FProcessId 
+	 成本权重：FCostRate 
+	 备注：FDescription1 
+	 计划确认日期：FPlanConfirmDate 
+	 下达日期：FConveyDate 
+	 完工日期：FFinishDate 
+	 结案日期：FCloseDate 
+	 结算日期：FCostDate 
+	 入库数量：FStockInQty 
+	 采购选单数量：FPurSelQty 
+	 采购执行数量：FPurQty 
+	 生成方式：FCreateType  (必填项)
+	 组号：FGroup 
+	 来源单据ID：FSrcBillId 
+	 源单分录行号：FSrcBillEntrySeq 
+	 来源单据分录内码：FSrcBillEntryId 
+	 销售订单ID：FSaleOrderId 
+	 需求单据：FSALEORDERNO 
+	 需求单据行号：FSaleOrderEntrySeq 
+	 销售订单分录内码：FSaleOrderEntryId 
+	 采购订单ID：FPurOrderId 
+	 采购订单：FPurOrderNo 
+	 采购订单行号：FPurOrderEntrySeq 
+	 基本单位：FBaseUnitId 
+	 入库组织：FStockInOrgId  (必填项)
+	 采购订单分录内码：FPurOrderEntryId 
+	 基本单位数量：FBaseUnitQty 
+	 基本单位入库上限：FBaseStockInLimitH 
+	 基本单位入库下限：FBaseStockInLimitL 
+	 基本单位入库数量：FBaseStockInQty 
+	 基本单位采购选单数量：FBasePurSelQty 
+	 源单类型：FSrcBillType 
+	 源单编号：FSrcBillNo 
+	 批号：FLot 
+	 采购组织：FPurorgId 
+	 联副产品分录内码：FCopyEntryId 
+	 基本单位采购执行数量：FBasePurQty 
+	 业务流程：FBFLowId 
+	 需求优先级：FPriority 
+	 结算组织：FSettleOrgId 
+	 入库货主类型：FInStockOwnerTypeId 
+	 入库货主：FInStockOwnerId 
+	 基本单位成品数量：FBaseYieldQty 
+	 成品数量：FYieldQty 
+	 样本破坏数量：FSampleDamageQty 
+	 基本单位样本破坏数量：FBaseSampleDamageQty 
+	 已备料数量：FStockReadyqty 
+	 基本单位已备料数量：FBaseStockReadyqty 
+	 需求来源：FReqSrc 
+	 基本单位未入库数量：FBaseNoStockInQty 
+	 未入库数量：FNoStockInQty 
+	 挂起状态：FIsSuspend 
+	 基本单位领补套数：FBasePickMtlQty 
+	 领补套数：FPickMtlQty 
+	 是否手工新增联副产品：FISNEWLC 
+	 领料状态：FPickMtrlStatus 
+	 源拆分订单编号：FSrcSplitBillNo 
+	 源拆分订单行号：FSrcSplitSeq 
+	 源拆分订单分录内码：FSrcSplitEntryId 
+	 源拆分生产订单内码：FSrcSplitId 
+	 结案人：FFORCECLOSERID 
+	 结案类型：FCloseType 
+	 上级BOM展开分录内码：FSrcBomEntryId 
+	 强制结案原因：FCloseReason 
+	 计划确认人：FConfirmId 
+	 下达人：FReleaseId 
+	 完工人：FFinishId 
+	 已预留：FIsMRP 
+	 BOM展开路径：FPathEntryId 
+	 用料清单分录内码：FPPBOMENTRYID 
+	 BOM分录内码：FBOMENTRYID 
+	 用料清单类型：FSrcFormID 
+	 基本单位已排产数量：FBaseScheduledQtySum 
+	 已排产数量：FScheduledQtySum 
+	 启用日排产：FISENABLESCHEDULE 
+	 排产状态：FScheduleStatus  (必填项)
+	 预计齐套数：FMatchQty 
+	 库存齐套数：FINVMatchQty 
+	 预计齐套日期：FMatchDate 
+	 齐套状况：FCompleteCon 
+	 跟进备注：FRemarks 
+	 已计划运算：FISMRPCAL 
+	 生成下级订单标志：FIsGenerateOrder 
+	 齐套优先级：FANALYSEPRIORITY 
+排产明细表体：FScheduledEntity 
+	 实体主键：FEntryID 
+	 委外订单分录内码：FSubENTRYID 
+	 订单行号：FSUBSEQ 
+	 物料编码：FDetailMaterialId 
+	 物料名称：FDetailMaterialName 
+	 规格型号：FSpecificationSd 
+	 日产量：FDAILYOUTPUTQTY 
+	 基本单位日产量：FBASEDAILYOUTPUTQTY 
+	 单位：FDetailUnitID 
+	 基本单位：FBaseUnitIdDetail 
+	 采购执行数量：FPurExeQty 
+	 基本单位采购执行数量：FBasePurExeQty 
+	 基本单位排产数量：FBASESCHEDULEDQTY 
+	 产线：FPRODUCTIONLINEID 
+	 排产数量：FSCHEDULEDQTY 
+	 差异数：FDIFFERQTY 
+	 上线数量：FFINISHEDQTY 
+	 排产日期：FPlanStartDateD 
+	 排产结束：FPlanFinishDateD 
+	 锁定：FISLOCKED 
+	 排产标识：FSchDtlRowId 
+	 基本单位差异数：FBASEDIFFERQTY 
+	 基本单位上线数量：FBASEFINISHEDQTY 
+关联关系表：FTreeEntity_Link 
+	 实体主键：FLinkId 
+	 业务流程图：FTreeEntity_Link_FFlowId 
+	 推进路线：FTreeEntity_Link_FFlowLineId 
+	 转换规则：FTreeEntity_Link_FRuleId 
+	 源单表内码：FTreeEntity_Link_FSTableId 
+	 源单表：FTreeEntity_Link_FSTableName 
+	 源单内码：FTreeEntity_Link_FSBillId 
+	 源单分录内码：FTreeEntity_Link_FSId 
+	 原始携带量：FTreeEntity_Link_FBaseUnitQtyOld 
+	 修改携带量：FTreeEntity_Link_FBaseUnitQty 
+

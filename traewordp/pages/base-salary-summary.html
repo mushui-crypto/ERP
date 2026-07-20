@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+
+
+
+<html lang="zh-CN">
+
+
+
+<head>
+
+
+
+<meta charset="UTF-8">
+
+
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+
+
+<title>薪资汇总 - 磐枢工业智能平台</title>
+
+
+
+<link rel="stylesheet" href="../common.css">
+
+
+
+<script src="../common.js"></script>
+<script></script>
+
+
+
+</head>
+
+
+
+<body>
+
+
+
+<aside class="sidebar" id="sidebar">
+
+
+
+<div class="sidebar-logo">
+
+
+
+    <img src="../images/logo.png" alt="磐枢工业智能平台" style="width: 100%; max-width: 200px; margin-bottom: 8px;">
+
+
+
+    <h1 style="font-size: 16px; margin: 0;">磐枢工业智能平台</h1>
+
+
+
+  </div>
+
+
+
+  <nav class="sidebar-menu"></nav>
+
+
+
+<div class="sidebar-user"><div class="avatar">管</div>
+
+
+
+</aside>
+
+
+
+<div class="main-content" id="mainContent">
+
+
+
+  <div class="page-header" style="position:sticky;top:0;z-index:100;">
+
+
+
+    <div>
+
+
+
+      <div class="flex items-center gap-8">
+
+
+
+        <button class="sidebar-toggle" onclick="toggleSidebar()">☰</button>
+
+
+
+        <div>
+
+
+
+          <h2>薪资汇总</h2>
+
+
+
+          <div class="breadcrumb"><a href="../index.html">首页</a><span>></span><span>基础管理</span><span>></span><span>公共资料</span><span>></span><span>薪资汇总</span></div></div>
+
+
+
+        </div>
+
+
+
+      </div>
+
+
+
+    </div>
+
+
+
+    <div class="page-actions">
+
+
+
+      <button class="btn btn-ghost btn-sm">&#128276; 消息</button>
+      </div>
+
+
+
+  </div>
+
+
+
+  <div class="page-body" style="padding:20px 24px;overflow-y:auto;height:calc(100vh - 56px);">
+
+
+
+    <div class="grid-4" style="gap:16px;margin-bottom:20px;">
+
+
+
+      <div class="stat-card">
+
+
+
+        <div class="stat-value">10</div>
+
+
+
+        <div class="stat-label">员工总数</div>
+
+
+
+      </div>
+
+
+
+      <div class="stat-card">
+
+
+
+        <div class="stat-value">110,800.00</div>
+
+
+
+        <div class="stat-label">应发总额</div>
+
+
+
+      </div>
+
+
+
+      <div class="stat-card">
+
+
+
+        <div class="stat-value">96,300.00</div>
+
+
+
+        <div class="stat-label">实发总额</div>
+
+
+
+      </div>
+
+
+
+      <div class="stat-card">
+
+
+
+        <div class="stat-value">9,630.00</div>
+
+
+
+        <div class="stat-label">平均薪资</div>
+
+
+
+      </div>
+
+
+
+    </div>
+
+
+
+    <div class="card">
+
+
+
+      <div class="card-header">
+
+
+
+        <span>薪资汇总表</span>
+
+
+
+        <div style="display:flex;gap:8px;">
+
+
+
+          <button class="btn btn-sm btn-ghost" onclick="exportData()">导出</button>
+
+
+
+          <button class="btn btn-sm btn-ghost" onclick="refreshData()">刷新</button>
+
+
+
+        </div>
+
+
+
+      </div>
+
+
+
+      <div class="card-body">
+
+
+
+        <div class="list-filter-row" style="margin-bottom:16px;">
+
+
+
+          <div class="filter-field">
+
+
+
+            <select>
+
+
+
+              <option>薪资月份</option>
+
+
+
+              <option>2026-07</option>
+
+
+
+              <option>2026-06</option>
+
+
+
+              <option>2026-05</option>
+
+
+
+            </select>
+
+
+
+          </div>
+
+
+
+          <div class="filter-field">
+
+
+
+            <select>
+
+
+
+              <option>部门</option>
+
+
+
+              <option>全部部门</option>
+
+
+
+              <option>研发部</option>
+
+
+
+              <option>测试部门</option>
+
+
+
+              <option>测试部门</option>
+
+
+
+              <option>测试部门</option>
+
+
+
+              <option>测试部门</option>
+
+
+
+            </select>
+
+
+
+          </div>
+
+
+
+          <div class="list-filter-btns">
+
+
+
+            <button class="btn-search">查询</button>
+
+
+
+            <button class="btn-reset">重置</button>
+
+
+
+          </div>
+
+
+
+        </div>
+
+
+
+        <div class="table-wrapper">
+
+
+
+          <table class="data-table">
+
+
+
+            <thead>
+
+
+
+              <tr>
+
+
+
+                <th>部门</th>
+
+
+
+                <th>员工数</th>
+
+
+
+                <th>基本工资</th>
+
+
+
+                <th>岗位工资</th>
+
+
+
+                <th>绩效工资</th>
+
+
+
+                <th>应发合计</th>
+
+
+
+                <th>扣款</th>
+
+
+
+                <th>实发金额</th>
+
+
+
+                <th>平均薪资</th>
+
+
+
+                <th>操作</th>
+
+
+
+              </tr>
+
+
+
+            </thead>
+
+
+
+            <tbody>
+
+
+
+              <tr><td>研发部</td><td>4</td><td>35000.00</td><td>13500.00</td><td>8500.00</td><td>57000.00</td><td>5600.00</td><td>51400.00</td><td>12850.00</td><td class="row-action-links"><a>查看明细</a></td></tr>
+
+
+
+              <tr><td>测试部门</td><td>2</td><td>10500.00</td><td>3000.00</td><td>2300.00</td><td>15800.00</td><td>1800.00</td><td>14000.00</td><td>7000.00</td><td class="row-action-links"><a>查看明细</a></td></tr>
+
+
+
+              <tr><td>测试部门</td><td>2</td><td>10000.00</td><td>5500.00</td><td>13000.00</td><td>28500.00</td><td>3500.00</td><td>25000.00</td><td>12500.00</td><td class="row-action-links"><a>查看明细</a></td></tr>
+
+
+
+              <tr><td>测试部门</td><td>1</td><td>7000.00</td><td>2500.00</td><td>2000.00</td><td>11500.00</td><td>1300.00</td><td>10200.00</td><td>10200.00</td><td class="row-action-links"><a>查看明细</a></td></tr>
+
+
+
+              <tr><td>测试部门</td><td>1</td><td>5000.00</td><td>1500.00</td><td>1000.00</td><td>7500.00</td><td>800.00</td><td>6700.00</td><td>6700.00</td><td class="row-action-links"><a>查看明细</a></td></tr>
+
+
+
+              <tr><td>合计</td><td>10</td><td>67500.00</td><td>26000.00</td><td>17300.00</td><td>110800.00</td><td>14500.00</td><td>96300.00</td><td>9630.00</td><td></td></tr>
+
+
+
+            </tbody>
+
+
+
+          </table>
+
+
+
+        </div>
+
+
+
+      </div>
+
+
+
+    </div>
+
+
+
+  </div>
+
+
+
+</div>
+
+
+
+<script>
+
+
+
+document.querySelectorAll('.filter-tab').forEach(function(tab){tab.addEventListener('click',function(){this.parentElement.querySelectorAll('.filter-tab').forEach(function(t){t.classList.remove('active');});this.classList.add('active');});});
+
+
+
+function exportData() {}
+
+
+
+function refreshData() {}
+
+
+
+</script>
+
+
+
+</body>
+
+
+
+</html>

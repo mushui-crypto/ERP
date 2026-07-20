@@ -1,0 +1,100 @@
+岗位信息
+
+
+字段说明：
+岗位信息：FBillHead 
+	 实体主键：FPOSTID 
+	 编码：FNumber 
+	 名称：FName  (必填项)
+	 创建人：FCreatorId 
+	 创建日期：FCreateDate 
+	 修改人：FModifierId 
+	 修改日期：FModifyDate 
+	 审核人：FAuditorID 
+	 审核日期：FAuditDate 
+	 禁用人：FForbidderId 
+	 禁用日期：FForbidDate 
+	 数据状态：FDocumentStatus 
+	 禁用状态：FForbidStatus 
+	 创建组织：FCreateOrgId  (必填项)
+	 使用组织：FUseOrgId  (必填项)
+	 助记码：FHelpCode 
+	 生效日期：FEffectDate  (必填项)
+	 失效日期：FLapseDate  (必填项)
+	 所属部门：FDept  (必填项)
+	 描述：FDESCRIPTIONS 
+	 HR岗位：FISHR 
+	 部门名称：FDepartmentName 
+	 部门全称：FFullName 
+	 来源于s-HR：FIsSHR 
+	 来源shr的Api数据：FSourceShrApi 
+岗位对应角色：FPostRoleEntitys 
+	 实体主键：FPOSTROLEID 
+	 角色编码：FPostRole  (必填项)
+	 角色类型：FRoleType 
+	 所属业务组织：FRoleOrg 
+	 禁用状态：FRoleStatus 
+	 角色名称：FRoleName 
+	 是否默认角色：FIsDefault 
+	 是否有效：FIsRoleValid 
+	 关系描述：FRoleDiscription 
+	 创建人：FRoleCreatorId 
+	 创建日期：FRoleCreateDate 
+	 修改人：FRoleModifierId 
+	 修改日期：FRoleModifyDate 
+	 生效日期：FRoleStime 
+	 失效日期：FRoleETime 
+	 是否HR创建：FIsHrCreateRole 
+	 来源于hr数据：FSourceShrApiDetl 
+下级汇报关系：FSubReportEntity 
+	 实体主键： 
+	 序号：FSubNumber 
+	 汇报类型：FSubReportType 
+	 下级岗位：FSubPost 
+	 所属业务组织：FSubOrg 
+	 所属部门：FSubDept 
+	 创建组织：FSubCreateOrg 
+	 使用组织：FSubUseOrg 
+	 是否有效：FSubIsValid 
+	 岗位名称：FSubPostName 
+	 禁用状态：FSubForbid 
+	 创建人：FSubCreatorID 
+	 修改人：FSubModifierID 
+	 创建日期：FSubCreateDate 
+	 修改日期：FSubModifyDate 
+	 关系描述：FSubDiscription 
+	 生效日期：FSubStime 
+	 失效日期：FSubEtime 
+	 岗位全称：FSubFullName 
+上级汇报关系：FReportEntitys 
+	 实体主键：FPOSTREPORTID 
+	 汇报类型：FSuperiorReportType  (必填项)
+	 岗位编码：FSuperiorPost  (必填项)
+	 岗位名称：FSuperiorPostName 
+	 所属业务组织：FSuperiorOrg 
+	 所属部门：FSuperiorDept 
+	 岗位全称：FSuperiorFullName 
+	 是否有效：FSupiorIsValid 
+	 关系描述：FSuperiorDescaription 
+	 生效日期：FSuperiorStime 
+	 失效日期：FSuperiorEtime 
+	 创建组织：FSuperiorCreateOrg 
+	 使用组织：FSuperiorUserOrg 
+	 禁用状态：FSuperiorForBid 
+	 创建人：FSuperiorCreatorId 
+	 创建日期：FSuperiorCreateDate 
+	 修改人：FSuperiorModifierId 
+	 修改日期：FSuperiorModifyDate 
+	 是否Hr创建：FIsHrCreate 
+	 来源于HR（上级）：FIsSHREntry 
+职位子单据头：FHRPostSubHead 
+	 实体主键：FHRPOSTID 
+	 负责人岗位：FLEADERPOST 
+	 所属组织单元：FOrgUnit 
+	 所属业务组织：FAffiliatedOrgID 
+HR映射实体：FSHRMapEntity 
+	 实体主键：FMAPID 
+	 编码：FSHRNumber 
+	 SHR内码：FShrId 
+	 名称：FSHRName 
+	 状态：FSHRStatus 

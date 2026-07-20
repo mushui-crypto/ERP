@@ -1,0 +1,89 @@
+员工任岗信息
+
+字段说明：
+员工信息：FBillHead 
+	 实体主键：FSTAFFID 
+	 员工编码：FNumber 
+	 员工名称：FName 
+	 创建人：FCreatorId 
+	 创建日期：FCreateDate 
+	 修改人：FModifierId 
+	 修改日期：FModifyDate 
+	 审核人：FAuditorID 
+	 审核日期：FAuditDate 
+	 禁用人：FForbidderId 
+	 禁用日期：FForbidDate 
+	 数据状态：FDocumentStatus 
+	 禁用状态：FForbidStatus 
+	 创建组织：FCreateOrgId  (必填项)
+	 使用组织：FUseOrgId  (必填项)
+	 任岗开始日期：FStartDate  (必填项)
+	 照片：FPhoto 
+	 就任岗位：FPosition  (必填项)
+	 HR职员任职：FIsHR 
+	 主证件：FFirstCardID 
+	 人员：FPerson 
+	 所属部门：FDept  (必填项)
+	 描述：FDescription 
+	 人事管理中心：FMgrCenterID 
+	 国籍：FPNationalityId 
+	 民族：FPEthnicityId 
+	 移动电话：FPMobile 
+	 固定电话：FPTel 
+	 电子邮箱：FPEmail 
+	 最高学历：FPHighestEduId 
+	 联系地址：FPAddress 
+	 性别：FPGender 
+	 员工任岗编码：FStaffNumber 
+	 出生日期：FPDateBirth 
+	 婚姻状况：FPMaritalStatus 
+	 参加工作日期：FFStartWorkDate 
+	 HR业务组织：FHrBoId 
+	 员工：FEmpInfoId  (必填项)
+	 任岗结束日期：FEndDate 
+	 年龄：FAge 
+	 员工临时表Id：FTempStaffId 
+	 来源于s-HR：FIsSHR 
+	 业务员类型：FOperatorType 
+	 组织部门：FORGDEPTGROUP 
+	 负责人岗位：FLeadPost 
+角色信息：FStaffRole 
+	 实体主键：FSTAFFROLEID 
+	 是否员工角色：FIsStaffRole 
+	 序号：FSeq 
+	 角色名称：FStaffRoleName 
+	 是否有效：FRoleEnable 
+	 是否岗位默认角色：FIsDefaultRole 
+	 对应岗位：FStaffPositionName 
+	 员工内码：FRoleStaffID 
+岗位信息单据体：FPostEntity 
+	 实体主键： 
+	 序号：FPostSeq 
+	 就任岗位：FPost 
+	 任岗开始日期：FStaffStartDate 
+	  数据状态：FStaffDocumentStatus 
+	  禁用状态：FStaffForbidStatus 
+	 所属部门：FPostDept 
+	 业务员类型：FOperaType 
+任职信息：FPOSTBILLEntity 
+	 实体主键：FENTRYID 
+	 任职单编号：FPostBillNo 
+	 任职类型：FPostType 
+	 任职状态：FPostStatus 
+	 是否主岗位：FIsFirstPost 
+	 在职状态：FJobStatus 
+	 职务：FJobId 
+	 职级：FJobLevelId 
+	 职等：FGradeId 
+	 任职单ID：FPostBillId 
+其他信息：FOtherEntity 
+	 实体主键：FENTRYID 
+	 异动生效日期：FInTranEffectDate 
+	 异动状态：FInTranStatus 
+	 异动内码：FInTranId 
+SHR映射实体：FSHRMapEntity 
+	 实体主键：FMAPID 
+	 编码：FSHRNumber 
+	 HR内码：FShrId 
+	 名称：FSHRName 
+	 状态：FSHRStatus 

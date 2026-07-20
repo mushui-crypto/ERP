@@ -1,0 +1,109 @@
+其他入库单
+
+库存管理
+
+字段说明：
+基本信息：FBillHead 
+	 实体主键：FID 
+	 单据编号：FBillNo 
+	 单据状态：FDocumentStatus 
+	 库存组织：FStockOrgId  (必填项)
+	 日期：FDate  (必填项)
+	 单据类型：FBillTypeID  (必填项)
+	 货主类型：FOwnerTypeIdHead  (必填项)
+	 货主：FOwnerIdHead 
+	 库存方向：FStockDirect  (必填项)
+	 供应商：FSUPPLIERID 
+	 部门：FDEPTID 
+	 验收员：FACCEPTANCE 
+	 仓管员：FSTOCKERID 
+	 库存组：FSTOCKERGROUPID 
+	 备注：FNOTE 
+	 本位币：FBaseCurrId 
+	 创建人：FCreatorId 
+	 创建日期：FCreateDate 
+	 最后修改人：FModifierId 
+	 最后修改日期：FModifyDate 
+	 作废状态：FCANCELSTATUS 
+	 作废人：FCANCELLERID 
+	 作废日期：FCANCELDATE 
+	 审核人：FAPPROVERID 
+	 审核日期：FAPPROVEDATE 
+	 序列号上传：FScanBox 
+明细信息：FEntity 
+	 实体主键：FEntryID 
+	 物料编码：FMATERIALID  (必填项)
+	 物料名称：FMATERIALNAME 
+	 收货仓库：FSTOCKID  (必填项)
+	 单位：FUnitID  (必填项)
+	 实收数量：FQty 
+	 成本价：FPrice 
+	 总成本：FAmount 
+	 BOM版本：FBOMID 
+	 生产日期：FPRODUCEDATE 
+	 有效期至：FEXPIRYDATE 
+	 计划跟踪号：FMTONO 
+	 项目编号：FProjectNo 
+	 库存状态：FSTOCKSTATUSID  (必填项)
+	 基本单位：FBASEUNITID 
+	 实收数量(基本单位)：FBASEQTY 
+	 库存辅单位：FSecUNITID 
+	 实收数量(库存辅单位)：FSecQTY 
+	 货主类型：FOWNERTYPEID  (必填项)
+	 货主：FOWNERID  (必填项)
+	 保管者类型：FKEEPERTYPEID  (必填项)
+	 保管者：FKEEPERID  (必填项)
+	 库存更新标志：FSTOCKFLAG 
+	 规格型号：FModel 
+	 关联数量：FJoinQty 
+	 关联数量(基本单位)：FJoinBaseQty 
+	 保质期：FExpperiod 
+	 保质期单位：FExpUnit 
+	 源单类型：FSRCBILLTYPEID 
+	 源单编号：FSRCBILLNO 
+	 批号：FLOT 
+	 备注：FEntryNote 
+	 辅助属性：FAuxPropId 
+	 仓位：FStockLocId 
+	 货位：FF100001
+	 序列号单位：FSNUnitID 
+	 序列号单位数量：FSNQty 
+	 关联数量（辅单位）：FJOINSECQTY 
+	 辅单位：FExtAuxUnitId 
+	 实收数量（辅单位）：FExtAuxUnitQty 
+	 零售条形码：FCMKBarCode 
+	 入库类型：FInStockType 
+	 即时库存：FInvQty 
+	 参考实收数量：FREFQTY 
+	 参考实收数量(基本单位)：FREFBASEQTY 
+	 参考实收数量(辅单位)：FREFEXTAUXUNITQTY 
+	 参考实收数量(库存辅单位)：FREFSECQTY 
+	 参考总成本：FREFAMOUNT 
+	 源单录入序列号标识：FQMSERIALFLAG 
+	 入库日期：FInstockDate 
+序列号子单据体：FSerialSubEntity 
+	 实体主键：FDetailID 
+	 序列号：FSerialNo 
+	 序列号：FSerialId 
+	 备注：FSerialNote 
+	 SN：FSN 
+	 IMEI1：FIMEI1 
+	 IMEI2：FIMEI2 
+	 MEID：FIMEI3 
+关联关系表：FEntity_Link 
+	 实体主键：FLinkId 
+	 业务流程图：FEntity_Link_FFlowId 
+	 推进路线：FEntity_Link_FFlowLineId 
+	 转换规则：FEntity_Link_FRuleId 
+	 源单表内码：FEntity_Link_FSTableId 
+	 源单表：FEntity_Link_FSTableName 
+	 源单内码：FEntity_Link_FSBillId 
+	 源单分录内码：FEntity_Link_FSId 
+	 原始携带量：FEntity_Link_FBASEQTYOld 
+	 修改携带量：FEntity_Link_FBASEQTY 
+	 迁移图：FEntity_Link_FLnkTrackerId 
+	 上游状态：FEntity_Link_FLnkSState 
+	 数量FLnk：FEntity_Link_FLnkAmount 
+	 迁移图：FEntity_Link_FLnk1TrackerId 
+	 上游状态：FEntity_Link_FLnk1SState 
+	 数量FLnk1：FEntity_Link_FLnk1Amount 

@@ -1,0 +1,50 @@
+生产制造-工程数据-生产线 
+
+字段说明：
+单据头：FBillHead 
+	 实体主键：FID 
+	 数据状态：FDocumentStatus 
+	 禁用状态：FForbidStatus 
+	 名称：FName  (必填项)
+	 编码：FNumber 
+	 描述：FDescription 
+	 创建组织：FCreateOrgId  (必填项)
+	 使用组织：FUseOrgId  (必填项)
+	 创建人：FCreatorId 
+	 修改人：FModifierId 
+	 创建日期：FCreateDate 
+	 修改日期：FModifyDate 
+	 禁用人：FForbidderId 
+	 审核人：FApproverId 
+	 禁用日期：FForbidDate 
+	 审核日期：FApproveDate 
+	 所属部门：FDeptID  (必填项)
+	 生效日期：FEffectDate  (必填项)
+	 失效日期：FExpireDate  (必填项)
+	 工作中心组：FGroup  (必填项)
+	 已设置工作日历：FIsSetWorkCal 
+	 生产类型：FWorkCenterType 
+	 排产能力方式：FScheduleType  (必填项)
+	 生产批量：FProductionLot 
+	 生产批量单位：FProductionLotUnit  (必填项)
+	 批量时间单位：FLotTimeUnit  (必填项)
+	 批量时间：FLotTime 
+	 产出周期：FOutputCycle 
+	 产出周期单位：FOutputCycleUnit  (必填项)
+	 日产量单位：FDailyOutputUnit 
+	 日产量：FDailyOutput 
+	 换产时间单位：FChangeoverUnit 
+	 换产时间：FChangeover 
+	 计划编制天数：FPlanningDays 
+	 完工入库仓库：FStockId 
+	 完工入库仓位：FStockLocId 
+	 货位：FF100001
+	 更换物料：FChangeMaterial 
+	 更换BOM：FChangeBOM 
+	 更换批号：FChangeLotNo 
+	 更换辅助属性：FChangeAssistAttr 
+	 主线标识：FMainLineType 
+	 入库组织：FInLabOrgId 
+	 投料方式：FFeedingType 
+	 计划到班次：FPlanToShift 
+	 按班次匹配计划：FMatchPlanByShift 

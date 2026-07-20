@@ -1,0 +1,191 @@
+生产制造-工程数据-工艺路线
+
+字段说明：
+单据头：FBillHead 
+	 实体主键：FID 
+	 数据状态：FDocumentStatus 
+	 禁用状态：FForbidStatus 
+	 工艺路线名称：FName  (必填项)
+	 工艺路线编码：FNumber 
+	 描述：FDescription 
+	 创建组织：FCreateOrgId  (必填项)
+	 使用组织：FUseOrgId  (必填项)
+	 创建人：FCreatorId 
+	 修改人：FModifierId 
+	 创建日期：FCreateDate 
+	 修改日期：FModifyDate 
+	 禁用人：FForbidderId 
+	 审核人：FApproverId 
+	 禁用日期：FForbidDate 
+	 审核日期：FApproveDate 
+	 物料编码：FMATERIALID 
+	 物料名称：FMATERIALNAME 
+	 规格型号：FMODEL 
+	 生效日期：FEFFECTDATE  (必填项)
+	 失效日期：FExpireDate  (必填项)
+	 系统预设：FIsSystemSet 
+	 工艺类型：FProcessType  (必填项)
+	 工艺路线分组：FRouteGroupId 
+	 生产车间：FProDepartmentId 
+	 变更单号：FAlterNumber 
+	 批量从：FBatchFrom 
+	 到批量：FBatchTo 
+	 单位：FUnitID  (必填项)
+	 物料分组：FMaterialGroupId 
+	 PLM内码：FPLMRouteId 
+	 数据来源：FRouteSrc 
+	 生产类型：FProduceType  (必填项)
+	 BOM版本：FBomId 
+	 辅助属性：FAuxPropId 
+	 入库点序：FAutoInStore  (必填项)
+	 检测方案(过程记录)：FProcessCheckSchemaId 
+	 检测方案(过程检测)：FInspectCheckSchemaId 
+	 中间工序废品：FFailAutoInStore  (必填项)
+	 损耗数量可入库：FIsWastageInStock 
+工序序列：FEntity 
+	 实体主键：FENTRYID 
+	 序列号：FSeqNumber  (必填项)
+	 序列名称：FSeqName  (必填项)
+	 序列类型：FSeqType  (必填项)
+	 对齐方式：FSeqAlignment 
+	 参照序列：FSeqRefer 
+	 备注：FSeqRemark 
+	 转出工序：FSeqOut 
+	 转入工序：FSeqIn 
+工序列表：FSubEntity 
+	 实体主键：FDetailID 
+	 工作中心：FWorkCenterId 
+	 作业：FProcessId 
+	 工序说明：FOperDescription  (必填项)
+	 工序控制码：FOptCtrlCodeId  (必填项)
+	 工序活动一：FActivity1Id 
+	 活动一名称：FActivity1Name 
+	 活动一数量：FActivity1Qty 
+	 工序活动二：FActivity2Id 
+	 活动二名称：FActivity2Name 
+	 活动二数量：FActivity2Qty 
+	 工序活动三：FActivity3Id 
+	 活动三名称：FActivity3Name 
+	 活动三数量：FActivity3Qty 
+	 工序活动四：FActivity4Id 
+	 活动四名称：FActivity4Name 
+	 活动四数量：FActivity4Qty 
+	 工序活动五：FActivity5Id 
+	 活动五名称：FActivity5Name 
+	 活动五数量：FActivity5Qty 
+	 工序活动六：FActivity6Id 
+	 活动六名称：FActivity6Name 
+	 活动六数量：FActivity6Qty 
+	 基本批量：FBaseBatch 
+	 工序单位：FOperUnitID  (必填项)
+	 单位转换表头数量：FUnitTransHeadQty 
+	 单位转换工序数量：FUnitTransOperQty 
+	 关键工序：FKeyOper  (必填项)
+	 提前期：FLeadTime 
+	 偏置时间：FOffsetTime 
+	 是否拆分排程：FIsSplitSchedule 
+	 建议拆分数：FAdviceSplitQty 
+	 最小加工时间单位：FSplitMinWorkTimeUnit  (必填项)
+	 最小加工时间：FSplitMinWorkTime 
+	 是否工序重叠：FIsIteration 
+	 重叠最小时间：FIterationMinTime 
+	 重叠最小时间单位：FIterationMinTimeUnit 
+	 重叠批量：FIterationMinBatch 
+	 拆卸与等待同时发生：FIsSameTime 
+	 标准排队时间：FStdQueueTime 
+	 标准排队时间单位：FStdQueueTimeUnit 
+	 最小排队时间：FMinQueueTime 
+	 最小排队时间单位：FMinQueueTimeUnit 
+	 标准等待时间：FStdWaitTime 
+	 标准等待时间单位：FStdWaitTimeUnit 
+	 最小等待时间：FMinWaitTime 
+	 最小等待时间单位：FMinWaitTimeUnit 
+	 标准移动时间：FStdMoveTime 
+	 标准移动时间单位：FStdMoveTimeUnit 
+	 最小移动时间：FMinMoveTime 
+	 最小移动时间单位：FMinMoveTimeUnit 
+	 采购组织：FPurchaseOrgId 
+	 采购组：FPurchaseGroupId 
+	 委外提前期：FOutSrcLeadTime 
+	 供应商：FSupplier 
+	 委外单价：FOutSrcPrice 
+	 委外币别：FOutSrcCurrency 
+	 计价批量：FValuationQty 
+	 计价单位：FValuationUnitID 
+	 单位转换率工序数量：FRateOperQty 
+	 单位转换率计价数量：FRateValQty 
+	 变更单号：FOperAlterNumber 
+	 创建人：FOperCreatorId 
+	 创建日期：FOperCreateDate 
+	 修改人：FOperModifierId 
+	 修改日期：FOperModifyDate 
+	 废品率：FRejectionRate 
+	 加工组织：FProOrgId  (必填项)
+	 活动一单位：FActivity1UnitID 
+	 活动二单位：FActivity2UnitID 
+	 活动三单位：FActivity3UnitID 
+	 活动四单位：FActivity4UnitID 
+	 活动五单位：FActivity5UnitID 
+	 活动六单位：FActivity6UnitID 
+	 工序号：FOperNumber 
+	 脏标记：FIsDirty 
+	 加工车间：FDepartmentId 
+	 工废单价：FScrapPrice 
+	 料废单价：FMatScrapPrice 
+	 质检方案：FQCSchemeId 
+	 税率%：FTaxRate 
+	 PLM分录内码：FPLMRouteEntryId 
+	 数据分录来源：FRouteDetailSrc 
+	 首检：FIsFirstPieceInspect 
+	 联动排程：FIsLinkageSchedule 
+	 排程触发时机：FScheduleTime  (必填项)
+	 排程资源：FScheduleResourceId 
+	 活动一活动量公式：FActivity1FormulaId 
+	 活动一活动汇报量公式：FActivity1RepFormulaId 
+	 活动二活动量公式：FActivity2FormulaId 
+	 活动二活动汇报量公式：FActivity2RepFormulaId 
+	 活动三活动量公式：FActivity3FormulaId 
+	 活动三活动汇报量公式：FActivity3RepFormulaId 
+	 活动四活动量公式：FActivity4FormulaId 
+	 活动四活动汇报量公式：FActivity4RepFormulaId 
+	 活动五活动量公式：FActivity5FormulaId 
+	 活动五活动汇报量公式：FActivity5RepFormulaId 
+	 活动六活动量公式：FActivity6FormulaId 
+	 活动六活动汇报量公式：FActivity6RepFormulaId 
+	 数据采集顺序：FDataAcOrder 
+	 扫描特征码：FScanFeatureCode  (必填项)
+	 工序阶段：FOperPhase 
+	 单位转换率生产数量：FRateProQty 
+	 换算类型：FConvertType 
+	 委外含税单价：FOutSrcTaxPrice 
+	 工废含税单价：FScrapTaxPrice 
+	 料废含税单价：FMatScrapTaxPrice 
+	 IoT下任务选择：FSelMoType  (必填项)
+	 不良返修方式：FDefectReworkMode 
+	 触摸屏录入不良启用位置号：FEnableLocationNo 
+	 首检控制方式：FFirstInspectControl 
+	 汇报上限比例（%）：FReportCeilRatio 
+	 汇报下限比例（%）：FReportFloorRatio 
+	 启用派工明细：FIsDiscreteOperDispDetail 
+	 过程记录工位：FIsProcessRecordStation 
+	 质量检测工位：FIsQualityInspectStation 
+	 检测方案明细(过程记录)：FProcessCheckSchemaEntryId 
+	 检测方案明细(过程检测)：FInspectCheckSchemaEntryId 
+	 扫描时校验前序过程记录有效性：FIsCheckProcessRecord 
+	 扫描时校验前序检测记录有效性：FIsCheckProcessInspect 
+	 作业名称：FProcessProperty 
+	 手动提交报工：FIsManualReport 
+	 报工时校验本序过程记录有效性：FIsRptCheckProcessRecord 
+	 报工时校验本序检测记录有效性：FIsRptCheckProcessInspect 
+	 工时采集：FIsWorkTime 
+	 工时采集控制：FWorkTimeColect  (必填项)
+	 工价：F_QEIO_Price_GJ 
+成本资源：FSubEntityCost 
+	 实体主键：FGridId 
+	 资源：FResourceId  (必填项)
+	 使用比例：FUseRate 
+	 资源需求数量：FResourceReqNum 
+	 数量单位：FQtyUnit 
+	 操作时长(分)：FAllocateWorkTime 
+	 工时录入：FIsInputWorkTime 
+	 总工时(分)：FTotalWorkTime 

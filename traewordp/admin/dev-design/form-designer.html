@@ -1,0 +1,1416 @@
+﻿<!DOCTYPE html>
+
+<html lang="zh-CN">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>表单设计器 — 磐枢工业智能平台(管理端)</title>
+
+<link rel="stylesheet" href="../common-admin.css">
+
+<script src="../../common.js"></script>
+
+<style>
+
+/* ===== 组件库分组 ===== */
+
+.comp-group { margin-bottom: 14px; }
+
+.comp-group-title {
+
+  font-size: 11px;
+
+  font-weight: 600;
+
+  color: #1890ff;
+
+  margin: 10px 4px 8px;
+
+  text-transform: uppercase;
+
+  letter-spacing: 1px;
+
+  display: flex;
+
+  align-items: center;
+
+  gap: 6px;
+
+}
+
+.comp-group-title::before {
+
+  content: '';
+
+  width: 3px;
+
+  height: 12px;
+
+  background: #1890ff;
+
+  border-radius: 2px;
+
+}
+
+.comp-grid {
+
+  display: grid;
+
+  grid-template-columns: 1fr 1fr;
+
+  gap: 6px;
+
+}
+
+.comp-grid .component-item {
+
+  margin-bottom: 0;
+
+  justify-content: center;
+
+  text-align: center;
+
+  flex-direction: column;
+
+  padding: 8px 4px;
+
+  gap: 4px;
+
+  font-size: 11px;
+
+}
+
+.comp-grid .component-item .comp-icon { font-size: 16px; width: auto; }
+
+
+
+/* ===== 画布工具栏 ===== */
+
+.canvas-toolbar {
+
+  display: flex;
+
+  align-items: center;
+
+  gap: 4px;
+
+  padding: 8px 12px;
+
+  background: #fff;
+
+  border: 1px solid var(--border-normal);
+
+  border-radius: var(--radius-sm);
+
+  margin-bottom: 12px;
+
+  flex-wrap: wrap;
+
+}
+
+.canvas-toolbar .ct-btn {
+
+  display: inline-flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  width: 28px;
+
+  height: 28px;
+
+  background: var(--bg-raised);
+
+  border: 1px solid var(--border-normal);
+
+  border-radius: var(--radius-sm);
+
+  color: #666;
+
+  font-size: 13px;
+
+  cursor: pointer;
+
+  transition: all var(--transition);
+
+}
+
+.canvas-toolbar .ct-btn:hover {
+
+  border-color: #1890ff;
+
+  color: #1890ff;
+
+}
+
+.canvas-toolbar .ct-btn.disabled {
+
+  opacity: 0.4;
+
+  cursor: not-allowed;
+
+}
+
+.canvas-toolbar .ct-btn.disabled:hover {
+
+  border-color: #e8e8e8;
+
+  color: #666;
+
+}
+
+.canvas-toolbar .ct-sep {
+
+  width: 1px;
+
+  height: 18px;
+
+  background: var(--border-normal);
+
+  margin: 0 4px;
+
+}
+
+.canvas-toolbar .ct-select {
+
+  padding: 4px 8px;
+
+  background: var(--bg-raised);
+
+  border: 1px solid var(--border-normal);
+
+  border-radius: var(--radius-sm);
+
+  color: #666;
+
+  font-size: 12px;
+
+  outline: none;
+
+  appearance: none;
+
+}
+
+.canvas-toolbar .ct-label {
+
+  font-size: 11px;
+
+  color: #999;
+
+  margin: 0 2px 0 6px;
+
+}
+
+
+
+/* ===== 分组面板组件 ===== */
+
+.canvas-group-panel {
+
+  border: 1px solid var(--border-strong);
+
+  border-radius: var(--radius-md);
+
+  margin-bottom: 12px;
+
+  overflow: hidden;
+
+  background: #f5f5f5;
+
+}
+
+.canvas-group-panel .gp-header {
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: space-between;
+
+  padding: 8px 12px;
+
+  background: var(--bg-raised);
+
+  border-bottom: 1px solid var(--border-normal);
+
+  font-size: 13px;
+
+  font-weight: 600;
+
+  color: #1890ff;
+
+}
+
+.canvas-group-panel .gp-header .gp-actions {
+
+  display: flex;
+
+  gap: 6px;
+
+}
+
+.canvas-group-panel .gp-header .gp-actions span {
+
+  font-size: 11px;
+
+  color: #999;
+
+  cursor: pointer;
+
+}
+
+.canvas-group-panel .gp-body {
+
+  padding: 12px;
+
+}
+
+.canvas-group-panel .gp-sub-title {
+
+  font-size: 12px;
+
+  font-weight: 600;
+
+  color: #333;
+
+  margin: 6px 0 8px;
+
+  padding-left: 8px;
+
+  border-left: 2px solid var(--admin-accent);
+
+}
+
+
+
+/* ===== 属性面板 Tab ===== */
+
+.prop-tabs {
+
+  display: flex;
+
+  border-bottom: 1px solid var(--border-normal);
+
+  margin: -12px -12px 12px;
+
+  background: #f5f5f5;
+
+  position: sticky;
+
+  top: -12px;
+
+  z-index: 5;
+
+}
+
+.prop-tab {
+
+  flex: 1;
+
+  padding: 10px 4px;
+
+  text-align: center;
+
+  cursor: pointer;
+
+  color: #999;
+
+  font-size: 12px;
+
+  font-weight: 500;
+
+  border-bottom: 2px solid transparent;
+
+  transition: all var(--transition);
+
+}
+
+.prop-tab:hover { color: #333; }
+
+.prop-tab.active {
+
+  color: #1890ff;
+
+  border-bottom-color: #1890ff;
+
+}
+
+.prop-pane { display: none; }
+
+.prop-pane.active { display: block; }
+
+
+
+/* 宽度选择按钮组 */
+
+.width-options {
+
+  display: grid;
+
+  grid-template-columns: repeat(5, 1fr);
+
+  gap: 4px;
+
+}
+
+.width-options .wopt {
+
+  padding: 5px 0;
+
+  text-align: center;
+
+  background: #f5f5f5;
+
+  border: 1px solid var(--border-normal);
+
+  border-radius: var(--radius-sm);
+
+  color: #999;
+
+  font-size: 11px;
+
+  cursor: pointer;
+
+  transition: all var(--transition);
+
+}
+
+.width-options .wopt:hover { border-color: #91d5ff; color: #333; }
+
+.width-options .wopt.active {
+
+  background: #e6f7ff;
+
+  border-color: #1890ff;
+
+  color: #1890ff;
+
+  font-weight: 600;
+
+}
+
+
+
+/* 规则条件列表 */
+
+.rule-list {
+
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 8px;
+
+  margin-top: 10px;
+
+}
+
+.rule-item {
+
+  background: #f5f5f5;
+
+  border: 1px solid var(--border-normal);
+
+  border-radius: var(--radius-sm);
+
+  padding: 8px 10px;
+
+  font-size: 11.5px;
+
+  color: #666;
+
+  line-height: 1.6;
+
+}
+
+.rule-item .ri-head {
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: space-between;
+
+  margin-bottom: 4px;
+
+}
+
+.rule-item .ri-tag {
+
+  font-size: 10px;
+
+  padding: 1px 6px;
+
+  border-radius: 8px;
+
+  font-weight: 500;
+
+}
+
+.ri-tag.show { background: rgba(34,197,94,0.15); color: #52c41a; }
+
+.ri-tag.hide { background: rgba(239,68,68,0.15); color: #f5222d; }
+
+.ri-tag.link { background: rgba(56,189,248,0.15); color: #1890ff; }
+
+.rule-item .ri-del {
+
+  color: #f5222d;
+
+  font-size: 12px;
+
+  cursor: pointer;
+
+}
+
+.rule-item .ri-formula {
+
+  font-family: var(--font-mono);
+
+  font-size: 11px;
+
+  color: #999;
+
+  word-break: break-all;
+
+}
+
+.rule-add-btn {
+
+  display: block;
+
+  width: 100%;
+
+  padding: 7px;
+
+  margin-top: 8px;
+
+  background: transparent;
+
+  border: 1px dashed var(--border-strong);
+
+  border-radius: var(--radius-sm);
+
+  color: #999;
+
+  font-size: 12px;
+
+  cursor: pointer;
+
+  transition: all var(--transition);
+
+}
+
+.rule-add-btn:hover {
+
+  border-color: #1890ff;
+
+  color: #1890ff;
+
+}
+
+
+
+/* 联动目标项 */
+
+.linkage-target {
+
+  display: flex;
+
+  align-items: center;
+
+  gap: 6px;
+
+  font-size: 11px;
+
+  color: #999;
+
+  padding: 3px 0;
+
+}
+
+.linkage-target .lt-arrow { color: #1890ff; }
+
+.linkage-target .lt-field { color: #1890ff; font-family: var(--font-mono); }
+
+
+
+/* 条件构建行 */
+
+.cond-row {
+
+  display: flex;
+
+  align-items: center;
+
+  gap: 4px;
+
+  margin-bottom: 6px;
+
+}
+
+.cond-row select,
+
+.cond-row input {
+
+  flex: 1;
+
+  min-width: 0;
+
+  padding: 4px 6px;
+
+  background: #f5f5f5;
+
+  border: 1px solid var(--border-normal);
+
+  border-radius: var(--radius-sm);
+
+  color: #333;
+
+  font-size: 11px;
+
+  outline: none;
+
+  appearance: none;
+
+}
+
+.cond-row select:focus,
+
+.cond-row input:focus { border-color: #1890ff; }
+
+.cond-row .cond-fixed { flex: 0 0 auto; font-size: 10px; color: #999; }
+
+</style>
+
+</head>
+
+<body>
+
+<aside class="sidebar admin-sidebar" id="sidebar">
+
+    <div class="sidebar-logo">
+
+    <img src="../../images/LOGO.png" alt="磐枢工业智能平台" style="width: 100%; max-width: 200px; margin-bottom: 8px;">
+
+    <h1 style="font-size: 16px; margin: 0;">磐枢工业智能平台</h1>
+
+  </div>
+
+  <nav class="sidebar-menu">
+
+    <div class="sidebar-menu-group"><div class="sidebar-menu-item" onclick="toggleGroup(this)"><span class="icon">&#128451;</span> 数据中心管理<span class="arrow">&#9654;</span></div><div class="sub-menu"><a class="sidebar-menu-item" href="../data-center/index.html">数据中心总览</a><a class="sidebar-menu-item" href="../data-center/new.html">新建数据中心</a><a class="sidebar-menu-item" href="../data-center/backup.html">备份管理</a></div></div>
+
+    <div class="sidebar-menu-group"><div class="sidebar-menu-item" onclick="toggleGroup(this)"><span class="icon">&#128101;</span> 组织与权限<span class="arrow">&#9654;</span></div><div class="sub-menu"><a class="sidebar-menu-item" href="../org-perm/org.html">组织架构</a><a class="sidebar-menu-item" href="../org-perm/user.html">用户管理</a><a class="sidebar-menu-item" href="../org-perm/role.html">角色管理</a><a class="sidebar-menu-item" href="../org-perm/menu.html">菜单管理</a></div></div>
+
+
+
+    <div class="sidebar-menu-group"><div class="sidebar-menu-item" onclick="toggleGroup(this)"><span class="icon">&#128187;</span> 开发设计<span class="arrow">&#9660;</span></div><div class="sub-menu"><a class="sidebar-menu-item" href="lowcode.html">低代码开发中心</a><a class="sidebar-menu-item active" href="form-designer.html">表单设计器</a><a class="sidebar-menu-item" href="doc-flow.html">单据转换配置</a><a class="sidebar-menu-item" href="print-template.html">套打模板设计</a><a class="sidebar-menu-item" href="workflow.html">流程配置</a></div></div>
+
+
+
+    <div class="sidebar-menu-group"><div class="sidebar-menu-item" onclick="toggleGroup(this)"><span class="icon">&#129302;</span> 智能应用<span class="arrow">&#9654;</span></div><div class="sub-menu"><a class="sidebar-menu-item" href="../ai-config/api-manage.html">API管理</a><a class="sidebar-menu-item" href="../ai-config/nl-training.html">自然语言训练</a><a class="sidebar-menu-item" href="../ai-config/data-analysis.html">数据分析训练</a><a class="sidebar-menu-item" href="../ai-config/agent-config.html">Agent配置</a></div></div>
+
+
+
+    <div class="sidebar-menu-item" onclick="window.location.href='../../index.html'"><span class="icon">&#8592;</span> 返回应用端</div>
+
+  </nav>
+
+  <div class="sidebar-user"><div class="avatar" style="background: #e6f7ff;color: #1890ff;">管</div><div><div class="user-name">系统管理员</div><div class="user-role">超级管理员</div></div></div>
+
+</aside>
+
+<div class="main-content" id="mainContent">
+
+  <div class="page-header">
+
+    <div><div class="flex items-center gap-8"><button class="sidebar-toggle" onclick="toggleSidebar()">&#9776;</button><div><h2>表单设计器</h2><div class="breadcrumb"><a href="../../index.html">首页</a><span>/</span><a href="../index.html">管理端</a><span>/</span><span>开发设计 / 表单设计器</span></div></div></div></div>
+
+    <div class="page-actions">
+
+      <button class="btn btn-ghost btn-sm">&#128190; 保存模板</button>
+
+      <button class="btn btn-primary btn-sm">&#128190; 保存</button>
+
+      <button class="btn btn-ghost btn-sm">&#9654; 预览</button>
+
+    </div>
+
+  </div>
+
+
+
+  <div class="designer-layout">
+
+    <!-- Left: Component Panel -->
+
+    <div class="designer-panel-left">
+
+      <div class="comp-group">
+
+        <div class="comp-group-title">基础组件</div>
+
+        <div class="comp-grid">
+
+          <div class="component-item"><span class="comp-icon">T</span> 单行文本</div>
+
+          <div class="component-item"><span class="comp-icon">&#9776;</span> 多行文本</div>
+
+          <div class="component-item"><span class="comp-icon">#</span> 数字</div>
+
+          <div class="component-item"><span class="comp-icon">&#128197;</span> 日期</div>
+
+          <div class="component-item"><span class="comp-icon">&#128336;</span> 时间</div>
+
+          <div class="component-item"><span class="comp-icon">&#9662;</span> 下拉框</div>
+
+          <div class="component-item"><span class="comp-icon">&#9679;</span> 单选框</div>
+
+          <div class="component-item"><span class="comp-icon">&#9745;</span> 复选框</div>
+
+          <div class="component-item"><span class="comp-icon">&#9673;</span> 开关</div>
+
+          <div class="component-item"><span class="comp-icon">&#127912;</span> 颜色选择器</div>
+
+        </div>
+
+      </div>
+
+      <div class="comp-group">
+
+        <div class="comp-group-title">高级组件</div>
+
+        <div class="comp-grid">
+
+          <div class="component-item"><span class="comp-icon">&#128203;</span> 子表格</div>
+
+          <div class="component-item"><span class="comp-icon">&#128279;</span> 关联选择器</div>
+
+          <div class="component-item"><span class="comp-icon">&#128206;</span> 附件上传</div>
+
+          <div class="component-item"><span class="comp-icon">&#128247;</span> 图片上传</div>
+
+          <div class="component-item"><span class="comp-icon">&#9999;</span> 富文本编辑器</div>
+
+          <div class="component-item"><span class="comp-icon">&#9641;</span> 二维码</div>
+
+          <div class="component-item"><span class="comp-icon">&#9474;</span> 条形码</div>
+
+          <div class="component-item"><span class="comp-icon">&#9733;</span> 评分</div>
+
+        </div>
+
+      </div>
+
+      <div class="comp-group">
+
+        <div class="comp-group-title">布局组件</div>
+
+        <div class="comp-grid">
+
+          <div class="component-item"><span class="comp-icon">&#9638;</span> 分组面板</div>
+
+          <div class="component-item"><span class="comp-icon">&#128209;</span> Tab页签</div>
+
+          <div class="component-item"><span class="comp-icon">&#9472;</span> 分割线</div>
+
+          <div class="component-item"><span class="comp-icon">&#9637;</span> 栅格布局</div>
+
+        </div>
+
+      </div>
+
+      <div class="comp-group">
+
+        <div class="comp-group-title">业务组件</div>
+
+        <div class="comp-grid">
+
+          <div class="component-item"><span class="comp-icon">&#128230;</span> 物料选择器</div>
+
+          <div class="component-item"><span class="comp-icon">&#128100;</span> 客户选择器</div>
+
+          <div class="component-item"><span class="comp-icon">&#127981;</span> 供应商选择器</div>
+
+          <div class="component-item"><span class="comp-icon">&#127970;</span> 组织选择器</div>
+
+          <div class="component-item"><span class="comp-icon">&#128113;</span> 人员选择器</div>
+
+          <div class="component-item"><span class="comp-icon">&#127963;</span> 仓库选择器</div>
+
+        </div>
+
+      </div>
+
+      <div class="comp-group">
+
+        <div class="comp-group-title">操作组件</div>
+
+        <div class="comp-grid">
+
+          <div class="component-item"><span class="comp-icon">&#10003;</span> 提交按钮</div>
+
+          <div class="component-item"><span class="comp-icon">&#128190;</span> 保存按钮</div>
+
+          <div class="component-item"><span class="comp-icon">&#9989;</span> 审核按钮</div>
+
+          <div class="component-item"><span class="comp-icon">&#10007;</span> 驳回按钮</div>
+
+          <div class="component-item"><span class="comp-icon">&#128424;</span> 打印按钮</div>
+
+          <div class="component-item"><span class="comp-icon">&#8681;</span> 导出按钮</div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+
+
+    <!-- Center: Canvas -->
+
+    <div class="designer-center">
+
+      <div class="flex-between mb-12">
+
+        <div>
+
+          <span style="font-weight:600;">采购申请单</span>
+
+          <span class="text-muted text-sm ml-8">-- 表单设计</span>
+
+        </div>
+
+        <div class="flex gap-8">
+
+          <button class="btn btn-sm btn-ghost">&#8593; 上移</button>
+
+          <button class="btn btn-sm btn-ghost">&#8595; 下移</button>
+
+          <button class="btn btn-sm btn-ghost" style="color: #f5222d;">&#128465; 删除</button>
+
+        </div>
+
+      </div>
+
+      <!-- 画布工具栏 -->
+
+      <div class="canvas-toolbar">
+
+        <button class="ct-btn disabled" title="撤销">&#8630;</button>
+
+        <button class="ct-btn" title="重做">&#8631;</button>
+
+        <span class="ct-sep"></span>
+
+        <span class="ct-label">对齐</span>
+
+        <button class="ct-btn" title="左对齐">&#8801;</button>
+
+        <button class="ct-btn" title="居中">&#8801;</button>
+
+        <button class="ct-btn" title="右对齐">&#8801;</button>
+
+        <span class="ct-sep"></span>
+
+        <span class="ct-label">间距</span>
+
+        <select class="ct-select" title="间距">
+
+          <option>8px</option>
+
+          <option>12px</option>
+
+          <option selected>16px</option>
+
+          <option>24px</option>
+
+        </select>
+
+        <span class="ct-sep"></span>
+
+        <span class="ct-label">字号</span>
+
+        <select class="ct-select" title="字体大小">
+
+          <option>12px</option>
+
+          <option selected>13px</option>
+
+          <option>14px</option>
+
+          <option>16px</option>
+
+        </select>
+
+        <span class="ct-sep"></span>
+
+        <button class="ct-btn" title="预览">&#9654;</button>
+
+      </div>
+
+      <div class="designer-canvas" style="min-height:550px;">
+
+        <!-- 分组面板组件演示 -->
+
+        <div class="canvas-group-panel">
+
+          <div class="gp-header">
+
+            <span>&#9638; 分组面板</span>
+
+            <div class="gp-actions"><span>折叠</span><span>设置</span></div>
+
+          </div>
+
+          <div class="gp-body">
+
+            <div class="gp-sub-title">基本信息</div>
+
+            <div class="design-field">
+
+              <span class="field-label">申请单号</span>
+
+              <span class="field-input-mock">PR-2026-0078</span>
+
+              <span class="text-muted text-sm">自动编号</span>
+
+            </div>
+
+            <div class="design-field">
+
+              <span class="field-label">申请部门</span>
+
+              <span class="field-input-mock">[组织选择]</span>
+
+              <span class="badge badge-error" style="font-size:10px;">必填</span>
+
+            </div>
+
+            <div class="design-field">
+
+              <span class="field-label">申请人</span>
+
+              <span class="field-input-mock">[人员选择]</span>
+
+              <span class="badge badge-error" style="font-size:10px;">必填</span>
+
+            </div>
+
+            <div class="design-field">
+
+              <span class="field-label">申请日期</span>
+
+              <span class="field-input-mock">2026-07-09</span>
+
+              <span class="badge badge-error" style="font-size:10px;">必填</span>
+
+            </div>
+
+            <div class="design-field">
+
+              <span class="field-label">采购类型</span>
+
+              <span class="field-input-mock">[下拉: 标准采购 / 紧急采购 / 项目采购]</span>
+
+            </div>
+
+            <div class="design-field">
+
+              <span class="field-label">备注说明</span>
+
+              <span class="field-input-mock" style="height:40px;">[文本域]</span>
+
+            </div>
+
+
+
+            <div class="gp-sub-title" style="margin-top:14px;">采购明细</div>
+
+            <div class="flex-between mb-8">
+
+              <span style="font-weight:600;font-size:13px;color: #1890ff;">&#128203; 采购明细（子表）</span>
+
+              <button class="btn btn-sm btn-ghost">+ 添加行</button>
+
+            </div>
+
+            <div class="design-field">
+
+              <span class="field-label">物料编码</span>
+
+              <span class="field-input-mock">[物料选择]</span>
+
+            </div>
+
+            <div class="design-field">
+
+              <span class="field-label">需求数量</span>
+
+              <span class="field-input-mock">[数字]</span>
+
+            </div>
+
+            <div class="design-field">
+
+              <span class="field-label">需求日期</span>
+
+              <span class="field-input-mock">[日期]</span>
+
+            </div>
+
+            <div class="design-field">
+
+              <span class="field-label">备注</span>
+
+              <span class="field-input-mock">[文本]</span>
+
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+
+
+    <!-- Right: Property Panel -->
+
+    <div class="designer-panel-right">
+
+      <div class="prop-tabs">
+
+        <div class="prop-tab active" onclick="switchPropTab(this,'prop-pane-field')">字段属性</div>
+
+        <div class="prop-tab" onclick="switchPropTab(this,'prop-pane-valid')">校验规则</div>
+
+        <div class="prop-tab" onclick="switchPropTab(this,'prop-pane-show')">显隐规则</div>
+
+        <div class="prop-tab" onclick="switchPropTab(this,'prop-pane-link')">联动规则</div>
+
+      </div>
+
+
+
+      <!-- 字段属性 Tab -->
+
+      <div class="prop-pane active" id="prop-pane-field">
+
+        <div class="prop-group">
+
+          <div class="prop-group-title">基本属性</div>
+
+          <div class="prop-field">
+
+            <div class="prop-label">字段名称</div>
+
+            <input type="text" class="prop-input" value="申请单号">
+
+          </div>
+
+          <div class="prop-field">
+
+            <div class="prop-label">字段标识</div>
+
+            <input type="text" class="prop-input" value="apply_no">
+
+          </div>
+
+          <div class="prop-field">
+
+            <div class="prop-label">字段类型</div>
+
+            <select class="prop-input" style="appearance:none;"><option>自动编号</option><option>文本框</option><option>数字</option><option>日期</option><option>下拉</option></select>
+
+          </div>
+
+          <div class="prop-field">
+
+            <div class="prop-label">默认值</div>
+
+            <input type="text" class="prop-input" placeholder="可设置默认值">
+
+          </div>
+
+          <div class="prop-field">
+
+            <div class="prop-label">提示文字</div>
+
+            <input type="text" class="prop-input" placeholder="输入框提示信息">
+
+          </div>
+
+        </div>
+
+        <div class="prop-group">
+
+          <div class="prop-group-title">显示设置</div>
+
+          <div class="prop-field">
+
+            <div class="prop-label">占列宽度</div>
+
+            <div class="width-options">
+
+              <div class="wopt">1/2</div>
+
+              <div class="wopt">1/3</div>
+
+              <div class="wopt">2/3</div>
+
+              <div class="wopt">1/4</div>
+
+              <div class="wopt">3/4</div>
+
+              <div class="wopt active">整行</div>
+
+              <div class="wopt">1/1</div>
+
+              <div class="wopt">1/6</div>
+
+              <div class="wopt">5/6</div>
+
+              <div class="wopt">自适应</div>
+
+            </div>
+
+          </div>
+
+          <div class="prop-field">
+
+            <div class="prop-label">标签宽度</div>
+
+            <select class="prop-input" style="appearance:none;"><option>80px（默认）</option><option>60px</option><option>100px</option><option>120px</option><option>自定义</option></select>
+
+          </div>
+
+          <div class="prop-field">
+
+            <div class="prop-label">组件尺寸</div>
+
+            <select class="prop-input" style="appearance:none;"><option>默认</option><option>紧凑</option><option>大型</option></select>
+
+          </div>
+
+        </div>
+
+      </div>
+
+
+
+      <!-- 校验规则 Tab -->
+
+      <div class="prop-pane" id="prop-pane-valid">
+
+        <div class="prop-group">
+
+          <div class="prop-group-title">基础校验</div>
+
+          <div class="prop-field">
+
+            <div class="prop-label">是否必填</div>
+
+            <select class="prop-input" style="appearance:none;"><option>是</option><option>否</option></select>
+
+          </div>
+
+          <div class="prop-field">
+
+            <div class="prop-label">是否唯一</div>
+
+            <select class="prop-input" style="appearance:none;"><option>否</option><option>是</option></select>
+
+          </div>
+
+          <div class="prop-field">
+
+            <div class="prop-label">最大长度</div>
+
+            <input type="text" class="prop-input" value="32">
+
+          </div>
+
+          <div class="prop-field">
+
+            <div class="prop-label">最小长度</div>
+
+            <input type="text" class="prop-input" placeholder="不限">
+
+          </div>
+
+        </div>
+
+        <div class="prop-group">
+
+          <div class="prop-group-title">高级校验</div>
+
+          <div class="prop-field">
+
+            <div class="prop-label">正则校验</div>
+
+            <input type="text" class="prop-input" placeholder="如：^[A-Z]{2}-\d{4}$" style="font-family:var(--font-mono);">
+
+          </div>
+
+          <div class="prop-field">
+
+            <div class="prop-label">校验提示语</div>
+
+            <input type="text" class="prop-input" placeholder="校验失败时的提示信息">
+
+          </div>
+
+          <div class="prop-field">
+
+            <div class="prop-label">自定义校验公式</div>
+
+            <input type="text" class="prop-input" placeholder="如：value > 0 && value < 9999" style="font-family:var(--font-mono);">
+
+          </div>
+
+        </div>
+
+      </div>
+
+
+
+      <!-- 显隐规则 Tab -->
+
+      <div class="prop-pane" id="prop-pane-show">
+
+        <div class="prop-group">
+
+          <div class="prop-group-title">显隐条件配置</div>
+
+          <div class="prop-field">
+
+            <div class="prop-label">触发字段</div>
+
+            <select class="prop-input" style="appearance:none;"><option>采购类型</option><option>申请部门</option><option>申请人</option><option>申请日期</option></select>
+
+          </div>
+
+          <div class="prop-field">
+
+            <div class="prop-label">条件关系</div>
+
+            <select class="prop-input" style="appearance:none;"><option>等于</option><option>不等于</option><option>包含</option><option>为空</option><option>不为空</option></select>
+
+          </div>
+
+          <div class="prop-field">
+
+            <div class="prop-label">条件值</div>
+
+            <input type="text" class="prop-input" placeholder="如：紧急采购">
+
+          </div>
+
+          <div class="prop-field">
+
+            <div class="prop-label">执行动作</div>
+
+            <select class="prop-input" style="appearance:none;"><option>显示该字段</option><option>隐藏该字段</option></select>
+
+          </div>
+
+          <button class="rule-add-btn">+ 添加条件</button>
+
+        </div>
+
+        <div class="prop-group">
+
+          <div class="prop-group-title">条件列表</div>
+
+          <div class="rule-list">
+
+            <div class="rule-item">
+
+              <div class="ri-head"><span>当 采购类型 等于 紧急采购</span><span class="ri-tag show">显示</span></div>
+
+              <div class="ri-formula">show(remark) when purchase_type == 'urgent'</div>
+
+              <span class="ri-del">删除</span>
+
+            </div>
+
+            <div class="rule-item">
+
+              <div class="ri-head"><span>当 申请部门 为空</span><span class="ri-tag hide">隐藏</span></div>
+
+              <div class="ri-formula">hide(applicant) when dept == null</div>
+
+              <span class="ri-del">删除</span>
+
+            </div>
+
+            <div class="rule-item">
+
+              <div class="ri-head"><span>当 采购类型 等于 项目采购</span><span class="ri-tag show">显示</span></div>
+
+              <div class="ri-formula">show(project_no) when purchase_type == 'project'</div>
+
+              <span class="ri-del">删除</span>
+
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+
+
+      <!-- 联动规则 Tab -->
+
+      <div class="prop-pane" id="prop-pane-link">
+
+        <div class="prop-group">
+
+          <div class="prop-group-title">联动配置</div>
+
+          <div class="prop-field">
+
+            <div class="prop-label">触发字段</div>
+
+            <select class="prop-input" style="appearance:none;"><option>物料编码</option><option>客户</option><option>供应商</option></select>
+
+          </div>
+
+          <div class="prop-field">
+
+            <div class="prop-label">触发事件</div>
+
+            <select class="prop-input" style="appearance:none;"><option>值改变时</option><option>获得焦点时</option><option>失去焦点时</option></select>
+
+          </div>
+
+          <div class="prop-field">
+
+            <div class="prop-label">数据源</div>
+
+            <select class="prop-input" style="appearance:none;"><option>物料实体(material)</option><option>客户实体(customer)</option><option>供应商实体(supplier)</option></select>
+
+          </div>
+
+          <button class="rule-add-btn">+ 添加联动</button>
+
+        </div>
+
+        <div class="prop-group">
+
+          <div class="prop-group-title">联动列表</div>
+
+          <div class="rule-list">
+
+            <div class="rule-item">
+
+              <div class="ri-head"><span>选择物料时自动带出</span><span class="ri-tag link">联动</span></div>
+
+              <div class="linkage-target"><span>物料.</span><span class="lt-field">specification</span><span class="lt-arrow">&rarr;</span><span>规格型号</span></div>
+
+              <div class="linkage-target"><span>物料.</span><span class="lt-field">unit</span><span class="lt-arrow">&rarr;</span><span>计量单位</span></div>
+
+              <div class="linkage-target"><span>物料.</span><span class="lt-field">standard_cost</span><span class="lt-arrow">&rarr;</span><span>标准成本</span></div>
+
+              <span class="ri-del">删除</span>
+
+            </div>
+
+            <div class="rule-item">
+
+              <div class="ri-head"><span>选择客户时自动带出</span><span class="ri-tag link">联动</span></div>
+
+              <div class="linkage-target"><span>客户.</span><span class="lt-field">credit_limit</span><span class="lt-arrow">&rarr;</span><span>信用额度</span></div>
+
+              <div class="linkage-target"><span>客户.</span><span class="lt-field">salesman</span><span class="lt-arrow">&rarr;</span><span>归属销售</span></div>
+
+              <span class="ri-del">删除</span>
+
+            </div>
+
+            <div class="rule-item">
+
+              <div class="ri-head"><span>选择供应商时自动带出</span><span class="ri-tag link">联动</span></div>
+
+              <div class="linkage-target"><span>供应商.</span><span class="lt-field">contact_name</span><span class="lt-arrow">&rarr;</span><span>联系人</span></div>
+
+              <div class="linkage-target"><span>供应商.</span><span class="lt-field">payment_terms</span><span class="lt-arrow">&rarr;</span><span>付款条件</span></div>
+
+              <span class="ri-del">删除</span>
+
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
+
+<div id="sidebarOverlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:99;" onclick="toggleSidebar()"></div>
+
+<script>
+
+
+
+
+
+function switchPropTab(el,paneId){var panel=el.closest('.designer-panel-right');panel.querySelectorAll('.prop-tab').forEach(function(t){t.classList.remove('active');});el.classList.add('active');panel.querySelectorAll('.prop-pane').forEach(function(p){p.classList.remove('active');});document.getElementById(paneId).classList.add('active');}
+
+</script>
+
+
+
+<div class="toast-container" id="toastContainer"></div>
+
+<div class="confirm-modal-overlay" id="confirmModal">
+
+  <div class="confirm-modal-dialog">
+
+    <div class="confirm-modal-header">
+
+      <span class="confirm-modal-icon" id="confirmIcon">&#9888;</span>
+
+      <span class="confirm-modal-title" id="confirmTitle">温馨提示</span>
+
+    </div>
+
+    <div class="confirm-modal-body">
+
+      <div class="confirm-modal-message" id="confirmMessage"></div>
+
+    </div>
+
+    <div class="confirm-modal-footer">
+
+      <button class="btn btn-sm btn-cancel" onclick="closeConfirmModal(false)">取消</button>
+
+      <button class="btn btn-sm btn-primary" style="background: #1890ff;border-color: #1890ff;color:#0a0e1a;" onclick="closeConfirmModal(true)">确定</button>
+
+    </div>
+
+  </div>
+
+</div>
+
+</body>
+
+</html>
+

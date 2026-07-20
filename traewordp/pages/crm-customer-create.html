@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>客户管理 - 新增/编辑</title>
+<link rel="stylesheet" href="../common.css">
+<script src="../common.js"></script>
+<script></script>
+<style>
+.doc-page{display:flex;height:100vh;background:#f0f2f5;}
+.doc-sidebar{width:200px;background:#001529;color:#fff;display:flex;flex-direction:column;}
+.doc-sidebar-title{padding:16px 20px;font-size:15px;font-weight:600;border-bottom:1px solid #002140;background:#001529;}
+.doc-sidebar-menu{list-style:none;padding:0;margin:0;flex:1;}
+.doc-sidebar-menu li a{display:flex;align-items:center;padding:12px 20px;color:#bfbfbf;text-decoration:none;font-size:13px;transition:all 0.3s;}
+.doc-sidebar-menu li a:hover{background:#002140;color:#fff;}
+.doc-sidebar-menu li a.active{background:#1890ff;color:#fff;}
+.doc-content{flex:1;display:flex;flex-direction:column;overflow:hidden;}
+.doc-header{position:sticky;top:0;z-index:100;background:#fff;border-bottom:1px solid #e8e8e8;padding:16px 20px;display:flex;justify-content:space-between;align-items:center;}
+.doc-header-title{font-size:20px;font-weight:600;color:#333;margin-bottom:4px;}
+.doc-header-subtitle{font-size:13px;color:#999;}
+.doc-toolbar{display:flex;gap:8px;flex-wrap:wrap;}
+.toolbar-btn{padding:6px 12px;border-radius:4px;font-size:13px;cursor:pointer;border:1px solid #d9d9d9;background:#fff;color:#666;display:flex;align-items:center;gap:6px;transition:all 0.3s;}
+.toolbar-btn:hover{border-color:#1890ff;color:#1890ff;}
+.toolbar-btn.primary{background:#1890ff;color:#fff;border-color:#1890ff;}
+.toolbar-btn.danger{background:#f5222d;color:#fff;border-color:#f5222d;}
+.doc-body{flex:1;padding:16px;overflow-y:auto;}
+.doc-card{background:#fff;border-radius:4px;box-shadow:0 1px 2px rgba(0,0,0,0.05);overflow:hidden;margin-bottom:16px;}
+.doc-card-title{padding:14px 20px;border-bottom:1px solid #e8e8e8;font-weight:600;font-size:14px;color:#333;background:#fafafa;}
+.form-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px 16px;padding:20px;}
+.form-grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px 16px;padding:20px;}
+.form-grid-2{display:grid;grid-template-columns:repeat(2,1fr);gap:12px 16px;padding:20px;}
+.form-item{display:flex;flex-direction:column;}
+.form-item label{font-size:13px;color:#666;margin-bottom:4px;font-weight:500;}
+.form-item label .required{color:#f5222d;margin-right:4px;}
+.form-item input,.form-item select,.form-item textarea{padding:6px 10px;border:1px solid #e8e8e8;border-radius:4px;font-size:13px;color:#333;background:#fff;box-sizing:border-box;}
+.form-item input:focus,.form-item select:focus,.form-item textarea:focus{outline:none;border-color:#1890ff;}
+.form-item textarea{resize:vertical;min-height:80px;}
+.form-item .readonly{background:#fafafa;color:#999;}
+.lookup-field{display:flex;align-items:center;}
+.lookup-field input{flex:1;border-radius:4px 0 0 4px;}
+.lookup-field button{width:28px;height:28px;border:1px solid #e8e8e8;border-left:none;border-radius:0 4px 4px 0;background:#fff;cursor:pointer;}
+.lookup-field button:hover{background:#f5f5f5;}
+.lookup-modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:2000;justify-content:center;align-items:center;}
+.lookup-modal.show{display:flex;}
+.lookup-dialog{background:#fff;border:1px solid #d9d9d9;border-radius:8px;width:720px;height:500px;overflow:hidden;box-shadow:0 10px 30px rgba(0,0,0,0.15);position:relative;resize:both;}
+.lookup-header{padding:16px 20px;border-bottom:1px solid #f0f0f0;background:#fafafa;display:flex;align-items:center;justify-content:space-between;cursor:move;}
+.lookup-title{font-size:16px;font-weight:600;color:#333;}
+.lookup-close{font-size:20px;color:#999;cursor:pointer;border:none;background:none;width:28px;height:28px;display:flex;align-items:center;justify-content:center;border-radius:4px;}
+.lookup-close:hover{background:#f5f5f5;color:#666;}
+.lookup-search{display:flex;gap:8px;margin-bottom:12px;}
+.lookup-search input{flex:1;padding:8px 12px;border:1px solid #e8e8e8;border-radius:4px;font-size:13px;}
+.lookup-search button{padding:8px 16px;border:none;background:#1890ff;color:#fff;border-radius:4px;cursor:pointer;font-size:13px;}
+.lookup-table{width:100%;border-collapse:collapse;}
+.lookup-table th,.lookup-table td{padding:10px 12px;text-align:left;border-bottom:1px solid #e8e8e8;}
+.lookup-table th{background:#fafafa;font-weight:600;color:#333;}
+.lookup-table tr:hover{background:#f5f5f5;}
+.lookup-table .checkbox-cell{width:40px;}
+.toast{position:fixed;top:60px;right:20px;padding:12px 20px;border-radius:4px;color:#fff;font-size:13px;z-index:9999;animation:toastIn 0.3s ease;}
+@keyframes toastIn{from{opacity:0;transform:translateX(100%);}to{opacity:1;transform:translateX(0);}}
+.toast-success{background:rgba(34,197,94,0.9);}
+.toast-warning{background:rgba(245,158,11,0.9);}
+.toast-error{background:rgba(239,68,68,0.9);}
+</style>
+</head>
+<body>
+<div class="doc-page">
+  <aside class="doc-sidebar">
+    <div class="doc-sidebar-title">业务导航</div>
+    <ul class="doc-sidebar-menu">
+      <li><a href="crm-customer.html"><span class="menu-icon">&#128203;</span> 客户管理列表</a></li>
+      <li><a href="#" class="active"><span class="menu-icon">&#10010;</span> 客户管理新增</a></li>
+    </ul>
+  </aside>
+  <div class="doc-content">
+    <header class="doc-header">
+      <div>
+        <div class="doc-header-title" id="pageTitle">客户管理 - 新增</div>
+        <div class="doc-header-subtitle">新建客户管理</div>
+      </div>
+      <div class="doc-toolbar">
+        <button class="toolbar-btn" onclick="goToList()"><span class="icon">📋</span> 列表</button>
+        <button class="toolbar-btn" onclick="selectFromMaster()"><span class="icon">🔍</span> 从基础资料导入</button>
+        <button class="toolbar-btn primary" onclick="saveDoc()"><span class="icon">✓</span> 保存</button>
+        <button class="toolbar-btn" onclick="submitDoc()"><span class="icon">✓</span> 提交</button>
+        <div style="width:1px;height:24px;background:#e8e8e8;margin:0 8px;"></div>
+        <button class="toolbar-btn danger" onclick="exitDoc()"><span class="icon">✖️</span> 退出</button>
+      </div>
+    </header>
+    <div class="doc-body">
+      <div class="doc-card">
+        <div class="doc-card-title">基本信息（来源于基础资料）</div>
+        <div class="form-grid">
+          <div class="form-item"><label><span class="required">*</span>客户编码</label><input type="text" id="field_编码" placeholder="请输入客户编码"></div>
+          <div class="form-item"><label><span class="required">*</span>客户名称</label><input type="text" id="field_名称" placeholder="请输入客户名称"></div>
+          <div class="form-item"><label>简称</label><input type="text" id="field_简称" placeholder="请输入简称"></div>
+          <div class="form-item"><label>状态</label><select id="field_状态"><option value="active">启用</option><option value="inactive">禁用</option></select></div>
+          <div class="form-item"><label>客户类型</label><select id="field_客户类型"><option value="">请选择</option><option value="enterprise">企业客户</option><option value="individual">个人客户</option><option value="government">政府客户</option><option value="foreign">外资客户</option></select></div>
+          <div class="form-item"><label>所属行业</label><select id="field_所属行业"><option value="">请选择</option><option value="manufacture">制造业</option><option value="retail">零售业</option><option value="finance">金融业</option><option value="healthcare">医疗健康</option><option value="education">教育</option><option value="other">其他</option></select></div>
+          <div class="form-item"><label>信用等级</label><select id="field_信用等级"><option value="">请选择</option><option value="A">A级</option><option value="B">B级</option><option value="C">C级</option><option value="D">D级</option></select></div>
+          <div class="form-item"><label>信用额度</label><input type="number" id="field_信用额度" placeholder="请输入信用额度"></div>
+        </div>
+      </div>
+      <div class="doc-card">
+        <div class="doc-card-title">联系信息</div>
+        <div class="form-grid">
+          <div class="form-item"><label>联系人</label><input type="text" id="field_联系人" placeholder="请输入联系人"></div>
+          <div class="form-item"><label>联系电话</label><input type="text" id="field_联系电话" placeholder="请输入联系电话"></div>
+          <div class="form-item"><label>手机</label><input type="text" id="field_手机" placeholder="请输入手机号码"></div>
+          <div class="form-item"><label>电子邮箱</label><input type="text" id="field_电子邮箱" placeholder="请输入电子邮箱"></div>
+          <div class="form-item"><label>传真</label><input type="text" id="field_传真" placeholder="请输入传真"></div>
+          <div class="form-item"><label>邮编</label><input type="text" id="field_邮编" placeholder="请输入邮编"></div>
+          <div class="form-item"><label>地址</label><input type="text" id="field_地址" placeholder="请输入地址"></div>
+          <div class="form-item"><label>省份</label><input type="text" id="field_省份" placeholder="请输入省份"></div>
+        </div>
+      </div>
+      <div class="doc-card">
+        <div class="doc-card-title">CRM详细信息（补充字段）</div>
+        <div class="form-grid-3">
+          <div class="form-item"><label>客户来源</label><select id="field_客户来源"><option value="">请选择</option><option value="referral">客户推荐</option><option value="website">网站引流</option><option value="exhibition">展会</option><option value="sales">主动开发</option><option value="other">其他</option></select></div>
+          <div class="form-item"><label>客户等级</label><select id="field_客户等级"><option value="">请选择</option><option value="VIP">VIP客户</option><option value="key">重点客户</option><option value="normal">普通客户</option><option value="potential">潜在客户</option></select></div>
+          <div class="form-item"><label>合作状态</label><select id="field_合作状态"><option value="">请选择</option><option value="negotiating">洽谈中</option><option value="cooperating">合作中</option><option value="paused">暂停合作</option><option value="terminated">终止合作</option></select></div>
+          <div class="form-item"><label>首次合作日期</label><input type="date" id="field_首次合作日期"></div>
+          <div class="form-item"><label>预计年销售额</label><input type="number" id="field_预计年销售额" placeholder="请输入预计年销售额"></div>
+          <div class="form-item"><label>开户银行</label><input type="text" id="field_开户银行" placeholder="请输入开户银行"></div>
+          <div class="form-item"><label>银行账号</label><input type="text" id="field_银行账号" placeholder="请输入银行账号"></div>
+          <div class="form-item"><label>税号</label><input type="text" id="field_税号" placeholder="请输入税号"></div>
+          <div class="form-item"><label>营业执照号</label><input type="text" id="field_营业执照号" placeholder="请输入营业执照号"></div>
+        </div>
+      </div>
+      <div class="doc-card">
+        <div class="doc-card-title">备注信息</div>
+        <div class="form-grid-2">
+          <div class="form-item"><label>备注</label><textarea id="field_备注" placeholder="请输入备注信息..."></textarea></div>
+          <div class="form-item"><label>销售备注</label><textarea id="field_销售备注" placeholder="请输入销售备注信息..."></textarea></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="lookup-modal" id="lookupModal">
+  <div class="lookup-dialog">
+    <div class="lookup-header"><span class="lookup-title" id="lookupTitle">从基础资料选择客户</span><button class="lookup-close" onclick="closeLookup()">×</button></div>
+    <div class="lookup-body">
+      <div class="lookup-search"><input type="text" id="lookupKeyword" placeholder="搜索客户..." onkeyup="filterLookup()"><button onclick="filterLookup()">搜索</button></div>
+      <table class="lookup-table"><thead id="lookupTableHead"></thead><tbody id="lookupTableBody"></tbody></table>
+    </div>
+    <div class="lookup-footer" style="padding:12px 20px;border-top:1px solid #e8e8e8;display:flex;justify-content:flex-end;gap:8px;">
+      <button class="toolbar-btn" onclick="closeLookup()">取消</button>
+      <button class="toolbar-btn primary" onclick="confirmLookup()">确定</button>
+    </div>
+  </div>
+</div>
+
+<script>
+var currentDocId = null;
+
+function init() {
+  var urlParams = new URLSearchParams(window.location.search);
+  var editId = urlParams.get('id');
+  if (editId) {
+    loadDoc(editId);
+  }
+}
+
+function selectFromMaster() {
+  var title = document.getElementById('lookupTitle');
+  title.textContent = '从基础资料选择客户';
+  
+  var head = document.getElementById('lookupTableHead');
+  head.innerHTML = '<tr><th class="checkbox-cell"><input type="checkbox" onclick="selectAllLookup()"></th><th>编码</th><th>名称</th><th>简称</th><th>客户类型</th><th>状态</th></tr>';
+  
+  var customers = JSON.parse(localStorage.getItem('erp_customers_cache') || '[]');
+  var body = document.getElementById('lookupTableBody');
+  body.innerHTML = '';
+  
+  customers.forEach(function(item) {
+    var row = document.createElement('tr');
+    row.onclick = function() { this.querySelector('.lookup-checkbox').checked = !this.querySelector('.lookup-checkbox').checked; };
+    var typeText = item.customerType === 'enterprise' ? '企业' : item.customerType === 'individual' ? '个人' : item.customerType === 'government' ? '政府' : '外资';
+    var statusText = item.status === 1 ? '启用' : '禁用';
+    row.innerHTML = '<td class="checkbox-cell"><input type="checkbox" class="lookup-checkbox" value="' + item.id + '"></td>' +
+      '<td>' + item.code + '</td>' +
+      '<td>' + item.name + '</td>' +
+      '<td>' + (item.shortName || '') + '</td>' +
+      '<td>' + typeText + '</td>' +
+      '<td>' + statusText + '</td>';
+    body.appendChild(row);
+  });
+  
+  if (customers.length === 0) {
+    body.innerHTML = '<tr><td colspan="6" style="text-align:center;color:#999;">基础资料中暂无客户数据</td></tr>';
+  }
+  
+  document.getElementById('lookupModal').classList.add('show');
+}
+
+function closeLookup() { document.getElementById('lookupModal').classList.remove('show'); }
+
+function filterLookup() {
+  var keyword = document.getElementById('lookupKeyword').value.trim().toLowerCase();
+  var rows = document.querySelectorAll('#lookupTableBody tr');
+  rows.forEach(function(row) {
+    var text = row.textContent.toLowerCase();
+    row.style.display = text.includes(keyword) ? '' : 'none';
+  });
+}
+
+function selectAllLookup() {
+  var master = document.querySelector('.lookup-table th input');
+  document.querySelectorAll('.lookup-checkbox').forEach(function(cb) { cb.checked = master.checked; });
+}
+
+function confirmLookup() {
+  var checkboxes = document.querySelectorAll('.lookup-checkbox:checked');
+  if (checkboxes.length === 0) { showToast('请选择一条记录', 'warning'); return; }
+  
+  var customers = JSON.parse(localStorage.getItem('erp_customers_cache') || '[]');
+  var item = customers.find(function(d) { return d.id === checkboxes[0].value; });
+  
+  if (item) {
+    document.getElementById('field_编码').value = item.code;
+    document.getElementById('field_名称').value = item.name;
+    document.getElementById('field_简称').value = item.shortName || '';
+    document.getElementById('field_状态').value = item.status === 1 ? 'active' : 'inactive';
+    document.getElementById('field_客户类型').value = item.customerType || '';
+    document.getElementById('field_联系人').value = item.contact || '';
+    document.getElementById('field_联系电话').value = item.phone || '';
+    document.getElementById('field_手机').value = item.mobile || '';
+    document.getElementById('field_电子邮箱').value = item.email || '';
+    document.getElementById('field_地址').value = item.address || '';
+    document.getElementById('field_信用等级').value = item.creditLevel || '';
+    document.getElementById('field_信用额度').value = item.creditLimit || '';
+    document.getElementById('field_开户银行').value = item.bankName || '';
+    document.getElementById('field_银行账号').value = item.bankAccount || '';
+    document.getElementById('field_税号').value = item.taxNo || '';
+    showToast('基础资料数据已导入，请补充CRM详细信息', 'success');
+  }
+  
+  closeLookup();
+}
+
+function goToList() { location.href = 'crm-customer.html'; }
+
+function validateForm() {
+  if (!document.getElementById('field_编码').value.trim()) { showToast('客户编码为必填项！', 'warning'); return false; }
+  if (!document.getElementById('field_名称').value.trim()) { showToast('客户名称为必填项！', 'warning'); return false; }
+  return true;
+}
+
+function saveDoc() {
+  if (!validateForm()) return;
+  
+  var doc = {
+    id: currentDocId || 'CRM-CUST-' + Date.now(),
+    code: document.getElementById('field_编码').value,
+    name: document.getElementById('field_名称').value,
+    shortName: document.getElementById('field_简称').value,
+    status: document.getElementById('field_状态').value,
+    customerType: document.getElementById('field_客户类型').value,
+    industry: document.getElementById('field_所属行业').value,
+    creditLevel: document.getElementById('field_信用等级').value,
+    creditLimit: parseFloat(document.getElementById('field_信用额度').value) || 0,
+    contact: document.getElementById('field_联系人').value,
+    phone: document.getElementById('field_联系电话').value,
+    mobile: document.getElementById('field_手机').value,
+    email: document.getElementById('field_电子邮箱').value,
+    fax: document.getElementById('field_传真').value,
+    zipCode: document.getElementById('field_邮编').value,
+    address: document.getElementById('field_地址').value,
+    province: document.getElementById('field_省份').value,
+    source: document.getElementById('field_客户来源').value,
+    level: document.getElementById('field_客户等级').value,
+    cooperationStatus: document.getElementById('field_合作状态').value,
+    firstCooperationDate: document.getElementById('field_首次合作日期').value,
+    estimatedAnnualSales: parseFloat(document.getElementById('field_预计年销售额').value) || 0,
+    bankName: document.getElementById('field_开户银行').value,
+    bankAccount: document.getElementById('field_银行账号').value,
+    taxNo: document.getElementById('field_税号').value,
+    businessLicenseNo: document.getElementById('field_营业执照号').value,
+    remark: document.getElementById('field_备注').value,
+    salesRemark: document.getElementById('field_销售备注').value,
+    createdAt: new Date().toISOString()
+  };
+  
+  localStorage.setItem('crm_customer_' + doc.id, JSON.stringify(doc));
+  showToast('保存成功！', 'success');
+  currentDocId = doc.id;
+}
+
+function submitDoc() {
+  if (!validateForm()) return;
+  if (!currentDocId) { saveDoc(); }
+  var doc = JSON.parse(localStorage.getItem('crm_customer_' + currentDocId));
+  doc.status = 'pending';
+  localStorage.setItem('crm_customer_' + currentDocId, JSON.stringify(doc));
+  showToast('提交成功，等待审核！', 'success');
+}
+
+function loadDoc(id) {
+  var doc = JSON.parse(localStorage.getItem('crm_customer_' + id));
+  if (doc) {
+    currentDocId = id;
+    document.getElementById('pageTitle').textContent = '客户管理 - 编辑';
+    document.getElementById('field_编码').value = doc.code;
+    document.getElementById('field_名称').value = doc.name;
+    document.getElementById('field_简称').value = doc.shortName || '';
+    document.getElementById('field_状态').value = doc.status;
+    document.getElementById('field_客户类型').value = doc.customerType || '';
+    document.getElementById('field_所属行业').value = doc.industry || '';
+    document.getElementById('field_信用等级').value = doc.creditLevel || '';
+    document.getElementById('field_信用额度').value = doc.creditLimit || '';
+    document.getElementById('field_联系人').value = doc.contact || '';
+    document.getElementById('field_联系电话').value = doc.phone || '';
+    document.getElementById('field_手机').value = doc.mobile || '';
+    document.getElementById('field_电子邮箱').value = doc.email || '';
+    document.getElementById('field_传真').value = doc.fax || '';
+    document.getElementById('field_邮编').value = doc.zipCode || '';
+    document.getElementById('field_地址').value = doc.address || '';
+    document.getElementById('field_省份').value = doc.province || '';
+    document.getElementById('field_客户来源').value = doc.source || '';
+    document.getElementById('field_客户等级').value = doc.level || '';
+    document.getElementById('field_合作状态').value = doc.cooperationStatus || '';
+    document.getElementById('field_首次合作日期').value = doc.firstCooperationDate || '';
+    document.getElementById('field_预计年销售额').value = doc.estimatedAnnualSales || '';
+    document.getElementById('field_开户银行').value = doc.bankName || '';
+    document.getElementById('field_银行账号').value = doc.bankAccount || '';
+    document.getElementById('field_税号').value = doc.taxNo || '';
+    document.getElementById('field_营业执照号').value = doc.businessLicenseNo || '';
+    document.getElementById('field_备注').value = doc.remark || '';
+    document.getElementById('field_销售备注').value = doc.salesRemark || '';
+  }
+}
+
+function exitDoc() {
+  showConfirm("确认退出？未保存的数据将丢失。", function(result) { if(result) {
+    location.href = 'crm-customer.html';
+  } });
+}
+
+, 3000);
+}
+
+init();
+</script>
+</body>
+</html>

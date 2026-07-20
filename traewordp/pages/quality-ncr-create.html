@@ -1,0 +1,774 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>不合格品处理单 - 新增/编辑</title>
+<link rel="stylesheet" href="../common.css">
+<script src="../common.js"></script>
+<script></script>
+<script src="../doc-data-store.js"></script>
+<script src="../doc-conversion.js"></script>
+<style>
+.doc-page{display:flex;height:100vh;background:#f0f2f5;}
+.doc-sidebar{width:200px;background:#001529;color:#fff;display:flex;flex-direction:column;}
+.doc-sidebar-title{padding:16px 20px;font-size:15px;font-weight:600;border-bottom:1px solid #002140;background:#001529;}
+.doc-sidebar-menu{list-style:none;padding:0;margin:0;flex:1;}
+.doc-sidebar-menu li a{display:flex;align-items:center;padding:12px 20px;color:#bfbfbf;text-decoration:none;font-size:13px;transition:all 0.3s;}
+.doc-sidebar-menu li a:hover{background:#002140;color:#fff;}
+.doc-sidebar-menu li a.active{background:#1890ff;color:#fff;}
+.doc-content{flex:1;display:flex;flex-direction:column;overflow:hidden;}
+.doc-header{position:sticky;top:0;z-index:100;background:#fff;border-bottom:1px solid #e8e8e8;padding:16px 20px;display:flex;justify-content:space-between;align-items:center;}
+.doc-header-title{font-size:20px;font-weight:600;color:#333;margin-bottom:4px;}
+.doc-header-subtitle{font-size:13px;color:#999;}
+.doc-toolbar{display:flex;gap:8px;flex-wrap:wrap;}
+.toolbar-btn{padding:6px 12px;border-radius:4px;font-size:13px;cursor:pointer;border:1px solid #d9d9d9;background:#fff;color:#666;display:flex;align-items:center;gap:6px;transition:all 0.3s;}
+.toolbar-btn:hover{border-color:#1890ff;color:#1890ff;}
+.toolbar-btn.primary{background:#1890ff;color:#fff;border-color:#1890ff;}
+.toolbar-btn.danger{background:#f5222d;color:#fff;border-color:#f5222d;}
+.doc-body{flex:1;padding:16px;overflow-y:auto;}
+.doc-card{background:#fff;border-radius:4px;box-shadow:0 1px 2px rgba(0,0,0,0.05);overflow:hidden;margin-bottom:16px;}
+.doc-card-title{padding:14px 20px;border-bottom:1px solid #e8e8e8;font-weight:600;font-size:14px;color:#333;background:#fafafa;}
+.form-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px 16px;padding:20px;}
+.form-item{display:flex;flex-direction:column;}
+.form-item label{font-size:13px;color:#666;margin-bottom:4px;font-weight:500;}
+.form-item label .required{color:#f5222d;margin-right:4px;}
+.form-item input,.form-item select,.form-item textarea{padding:6px 10px;border:1px solid #e8e8e8;border-radius:4px;font-size:13px;color:#333;background:#fff;box-sizing:border-box;}
+.form-item input:focus,.form-item select:focus{outline:none;border-color:#1890ff;}
+.form-item textarea{resize:vertical;min-height:60px;}
+.form-item .readonly{background:#fafafa;color:#999;}
+.lookup-field{display:flex;align-items:center;}
+.lookup-field input{flex:1;border-radius:4px 0 0 4px;}
+.lookup-field button{width:28px;height:28px;border:1px solid #e8e8e8;border-left:none;border-radius:0 4px 4px 0;background:#fff;cursor:pointer;}
+.lookup-field button:hover{background:#f5f5f5;}
+.detail-toolbar{display:flex;justify-content:flex-end;gap:8px;padding:12px 20px;border-bottom:1px solid #e8e8e8;background:#fafafa;}
+.data-table{width:100%;border-collapse:collapse;}
+.data-table th{background:#fafafa;padding:10px 12px;text-align:left;font-weight:600;font-size:12px;color:#666;border-bottom:2px solid #e8e8e8;}
+.data-table td{padding:10px 12px;border-bottom:1px solid #e8e8e8;font-size:13px;color:#333;}
+.data-table tr:hover{background:#f5f5f5;}
+.data-table input{width:100%;padding:4px 8px;border:1px solid #e8e8e8;border-radius:4px;font-size:12px;}
+.data-table select{width:100%;padding:4px 8px;border:1px solid #e8e8e8;border-radius:4px;font-size:12px;}
+.doc-footer{background:#fff;border-top:1px solid #e8e8e8;padding:12px 20px;display:flex;justify-content:flex-end;gap:24px;align-items:center;}
+.footer-item{display:flex;align-items:center;gap:8px;}
+.footer-item label{font-size:12px;color:#666;}
+.footer-item value{font-size:14px;font-weight:600;color:#333;}
+.footer-item value.important{color:#f5222d;}
+.toast{position:fixed;top:20px;right:20px;padding:12px 20px;border-radius:4px;color:#fff;font-size:13px;z-index:9999;}
+.toast-success{background:#52c41a;}
+.toast-warning{background:#faad14;}
+.toast-info{background:#1890ff;}
+.lookup-modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:2000;justify-content:center;align-items:center;}
+.lookup-modal.show{display:flex;}
+.lookup-dialog{background:#fff;border:1px solid #d9d9d9;border-radius:8px;width:800px;min-width:600px;max-width:90vw;height:500px;min-height:400px;max-height:70vh;overflow:hidden;box-shadow:0 10px 30px rgba(0,0,0,0.15);position:relative;resize:both;}
+.lookup-header{padding:16px 20px;border-bottom:1px solid #f0f0f0;background:#fafafa;display:flex;align-items:center;justify-content:space-between;cursor:move;}
+.lookup-title{font-size:16px;font-weight:600;color:#333;}
+.lookup-close{font-size:20px;color:#999;cursor:pointer;border:none;background:none;width:28px;height:28px;display:flex;align-items:center;justify-content:center;border-radius:4px;transition:all 0.3s;cursor:pointer;}
+.lookup-close:hover{background:#f5f5f5;color:#666;}
+.lookup-search{display:flex;gap:8px;margin-bottom:12px;}
+.lookup-search input{flex:1;padding:8px 12px;border:1px solid #e8e8e8;border-radius:4px;font-size:13px;}
+.lookup-search button{padding:8px 16px;border:none;background:#1890ff;color:#fff;border-radius:4px;cursor:pointer;font-size:13px;}
+.lookup-table{width:100%;border-collapse:collapse;}
+.lookup-table th,.lookup-table td{padding:10px 12px;text-align:left;border-bottom:1px solid #e8e8e8;}
+.lookup-table th{background:#fafafa;font-weight:600;color:#333;}
+.btn{padding:6px 16px;border-radius:4px;font-size:13px;cursor:pointer;border:1px solid #d9d9d9;background:#fff;color:#666;transition:all 0.3s;}
+.btn:hover{border-color:#1890ff;color:#1890ff;}
+.btn-primary{background:#1890ff;color:#fff;border-color:#1890ff;}
+.btn-cancel{border-color:#d9d9d9;color:#666;}
+.confirm-modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:3000;justify-content:center;align-items:center;}
+.confirm-modal.show{display:flex;}
+.confirm-dialog{background:#fff;border:1px solid #e8e8e8;border-radius:4px;width:420px;overflow:hidden;}
+.confirm-header{padding:14px 20px;border-bottom:1px solid #e8e8e8;display:flex;align-items:center;justify-content:space-between;background:#fafafa;}
+.confirm-title{font-size:14px;font-weight:600;color:#333;}
+.confirm-close{font-size:18px;color:#999;cursor:pointer;border:none;background:none;}
+.confirm-body{padding:24px 20px;font-size:14px;color:#333;line-height:1.6;background:#fff;}
+.confirm-footer{padding:12px 20px;border-top:1px solid #e8e8e8;display:flex;justify-content:flex-end;gap:8px;background:#fafafa;}
+</style>
+</head>
+<body>
+<div class="doc-page">
+  <aside class="doc-sidebar">
+    <div class="doc-sidebar-title">业务导航</div>
+    <ul class="doc-sidebar-menu">
+      <li><a href="quality-ncr-list.html"><span class="menu-icon">&#128203;</span> 不合格品处理单列表</a></li>
+      <li><a href="#" class="active"><span class="menu-icon">&#10010;</span> 不合格品处理单新增</a></li>
+    </ul>
+  </aside>
+  <div class="doc-content">
+    <header class="doc-header">
+      <div>
+        <div class="doc-header-title" id="pageTitle">不合格品处理单 - 新增</div>
+        <div class="doc-header-subtitle">新建不合格品处理单</div>
+      </div>
+      <div class="doc-toolbar">
+        <button class="toolbar-btn" onclick="copyDoc()"><span class="icon">📋</span> 复制</button>
+        <button class="toolbar-btn primary" onclick="saveDoc()"><span class="icon">✓</span> 保存</button>
+        <button class="toolbar-btn" onclick="submitDoc()"><span class="icon">✓</span> 提交</button>
+        <button class="toolbar-btn" onclick="approveDoc()"><span class="icon">✓</span> 审核</button>
+        <button class="toolbar-btn" onclick="reverseApproveDoc()"><span class="icon">↩️</span> 反审核</button>
+        <div style="width:1px;height:24px;background:#e8e8e8;margin:0 8px;"></div>
+        <button class="toolbar-btn" onclick="selectSourceDoc()"><span class="icon">🔗</span> 选单</button>
+        <button class="toolbar-btn" onclick="pushDownDoc()"><span class="icon">⬇️</span> 下推</button>
+        <button class="toolbar-btn" onclick="prevDoc()"><span class="icon">⬅️</span> 上查</button>
+        <button class="toolbar-btn" onclick="nextDoc()"><span class="icon">➡️</span> 下查</button>
+        
+        <div style="width:1px;height:24px;background:#e8e8e8;margin:0 8px;"></div>
+        <button class="toolbar-btn" onclick="goToList()"><span class="icon">📋</span> 列表</button>
+        <button class="toolbar-btn" onclick="printSettings()"><span class="icon">⚙️</span> 打印设置</button>
+        <button class="toolbar-btn" onclick="printDoc()"><span class="icon">🖨️</span> 打印</button>
+        <button class="toolbar-btn danger" onclick="exitDoc()"><span class="icon">✖️</span> 退出</button>
+      </div>
+    </header>
+    <div class="doc-body">
+      <div class="doc-card">
+        <div class="doc-card-title">基本信息</div>
+        <div class="form-grid">
+<div class="form-item"><label>单据编号</label><input type="text" id="field_单据编号" readonly class="readonly"></div><div class="form-item"><label><span class="required">*</span>日期</label><input type="date" id="field_日期"></div><div class="form-item"><label>检验单号</label><input type="text" id="field_检验单号" placeholder="请输入检验单号"></div><div class="form-item"><label>组织</label><div class="lookup-field"><input type="text" id="field_组织" readonly><button onclick="openLookup('组织', 'org')">...</button></div></div><div class="form-item"><label>处理部门</label><div class="lookup-field"><input type="text" id="field_处理部门" readonly><button onclick="openLookup('处理部门', 'org')">...</button></div></div><div class="form-item"><label>处理人员</label><div class="lookup-field"><input type="text" id="field_处理人员" readonly><button onclick="openLookup('处理人员', 'employee')">...</button></div></div><div class="form-item"><label>处理类型</label><input type="text" id="field_处理类型" placeholder="请输入处理类型"></div><div class="form-item"><label>状态</label><input type="text" id="field_状态" readonly class="readonly"></div><div class="form-item"><label>创建时间</label><input type="text" id="field_创建时间" readonly class="readonly"></div><div class="form-item"><label>备注</label><textarea id="field_备注" placeholder="请输入备注"></textarea></div>
+
+<div class="form-item"><label>单据编号</label><input type="text" id="field_单据编号" readonly class="readonly"></div><div class="form-item"><label><span class="required">*</span>日期</label><input type="date" id="field_日期"></div><div class="form-item"><label>生产订单</label><input type="text" id="field_生产订单" placeholder="请输入生产订单"></div><div class="form-item"><label>组织</label><div class="lookup-field"><input type="text" id="field_组织" readonly><button onclick="openLookup('组织', 'org')">...</button></div></div><div class="form-item"><label>领料部门</label><input type="text" id="field_领料部门" placeholder="请输入领料部门"></div><div class="form-item"><label>领料人员</label><div class="lookup-field"><input type="text" id="field_领料人员" readonly><button onclick="openLookup('领料人员', 'employee')">...</button></div></div><div class="form-item"><label>发料仓库</label><div class="lookup-field"><input type="text" id="field_发料仓库" readonly><button onclick="openWarehouseLookupForHeader()">...</button></div></div><div class="form-item"><label>状态</label><input type="text" id="field_状态" readonly class="readonly"></div><div class="form-item"><label>创建时间</label><input type="text" id="field_创建时间" readonly class="readonly"></div><div class="form-item"><label>备注</label><input type="text" id="field_备注" placeholder="请输入备注"></div>
+        </div>
+      </div>
+      <div class="doc-card">
+        <div class="doc-card-title">明细信息</div>
+        <div class="detail-toolbar">
+          <button class="toolbar-btn primary" onclick="addDetailRow()"><span class="icon">+</span> 新增行</button>
+          <button class="toolbar-btn" onclick="deleteSelectedRows()">删除选中行</button>
+        </div>
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th><input type="checkbox" onclick="selectAllDetails()"></th>
+              <th>序号</th>
+<th>物料编码</th><th>物料名称</th><th>规格型号</th><th>单位</th><th>不合格数量</th><th>处理方式</th><th>处理数量</th><th>备注</th>
+            </tr>
+          </thead>
+          <tbody id="detailBody"></tbody>
+          <tfoot>
+            <tr style="background:#fafafa;font-weight:600;">
+              <td colspan="10" style="text-align:right;">合计成本金额</td>
+              <td id="totalAmount" style="color:#f5222d;font-size:14px;">0.00</td>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+    </div>
+    <footer class="doc-footer">
+      <div class="footer-item"><label>合计金额:</label><value id="footerAmount" class="important">0.00</value></div>
+    </footer>
+  </div>
+</div>
+
+    
+<div class="lookup-modal" id="lookupModal">
+  <div class="lookup-dialog">
+    <div class="lookup-header">
+      <div class="lookup-title" id="lookupTitle">选择</div>
+      <button onclick="closeLookup()">×</button>
+    </div>
+    <div class="lookup-body">
+      <div class="lookup-search">
+        <input type="text" id="lookupKeyword" placeholder="请输入编码或名称搜索" onkeydown="if(event.key==='Enter')filterLookup()">
+        <button onclick="filterLookup()">搜索</button>
+      </div>
+      <table class="lookup-table">
+        <thead id="lookupTableHead"></thead>
+        <tbody id="lookupTableBody"></tbody>
+      </table>
+    </div>
+    <div style="padding:12px 20px;border-top:1px solid #e8e8e8;display:flex;justify-content:flex-end;gap:8px;">
+      <button class="btn btn-cancel" onclick="closeLookup()">取消</button>
+      <button class="btn btn-primary" onclick="confirmLookup()">确定</button>
+    </div>
+  </div>
+</div>
+<script>
+var docType = 'quality_ncr';
+var docName = '不合格品处理单';
+var editingId = null;
+var headerFields = ["单据编号", "日期", "检验单号", "组织", "处理部门", "处理人员", "处理类型", "状态", "创建时间", "备注"];
+var detailFields = ["\u7269\u6599\u7f16\u7801", "\u7269\u6599\u540d\u79f0", "\u89c4\u683c\u578b\u53f7", "\u5355\u4f4d", "\u4ed3\u5e93", "\u6279\u53f7", "\u6570\u91cf", "\u6210\u672c\u5355\u4ef7", "\u6210\u672c\u91d1\u989d", "\u6e90\u5355\u7c7b\u578b", "\u6e90\u5355\u7f16\u53f7", "\u5907\u6ce8"];
+var currentLookupField = null;
+var currentLookupType = null;
+var lookupData = [];
+function init() {
+  var params = new URLSearchParams(window.location.search);
+  editingId = params.get('id');
+  var sourceId = params.get('sourceId');
+  if (editingId) {
+    document.getElementById('pageTitle').innerText = docName + ' - 编辑';
+    loadDoc(editingId);
+  } else if (sourceId) {
+    document.getElementById('pageTitle').innerText = docName + ' - 新增';
+    document.getElementById('field_单据编号').value = generateDocNo();
+    document.getElementById('field_日期').value = new Date().toISOString().split('T')[0];
+    document.getElementById('field_状态').value = '草稿';
+    loadSourceDoc(sourceId);
+  } else {
+    document.getElementById('field_单据编号').value = generateDocNo();
+    document.getElementById('field_日期').value = new Date().toISOString().split('T')[0];
+    document.getElementById('field_状态').value = '草稿';
+    addDetailRow();
+  }
+  initLookupData();
+}
+function generateDocNo() {
+  return 'PRODUCTIONMATERIALREQUEST' + new Date().toISOString().slice(2,10).replace(/-/g,'') + '0001';
+}
+function initLookupData() {
+  if (!localStorage.getItem('erp_orgs')) localStorage.setItem('erp_orgs', JSON.stringify([{id:'org-001',code:'ORG-HQ',name:'磐枢工业集团',form:'集团'}]));
+  if (!localStorage.getItem('erp_suppliers_cache')) localStorage.setItem('erp_suppliers_cache', JSON.stringify([{id:'sup-001',code:'S-001',name:'深圳电子元器件有限公司'}]));
+  if (!localStorage.getItem('erp_customers_cache')) localStorage.setItem('erp_customers_cache', JSON.stringify([{id:'cust-001',code:'C-001',name:'上海科技有限公司'}]));
+  if (!localStorage.getItem('erp_materials_cache')) localStorage.setItem('erp_materials_cache', JSON.stringify([{id:'mat-001',code:'P-001',name:'高频传感器模块',specification:'HT-2026',unit:'个'}]));
+  if (!localStorage.getItem('erp_warehouses_cache')) localStorage.setItem('erp_warehouses_cache', JSON.stringify([{id:'wh-001',code:'WH-001',name:'原料仓'}]));
+}
+function loadDoc(id) {
+  var list = JSON.parse(localStorage.getItem('erp_' + docType + '_list') || '[]');
+  var doc = list.find(function(item) { return item.id === id; });
+  if (doc) {
+    headerFields.forEach(function(f) {
+      if (f !== '备注') {
+        document.getElementById('field_' + f).value = doc[f] || '';
+      }
+    });
+    document.getElementById('field_备注').value = doc.remark || '';
+    if (doc.details) doc.details.forEach(function(d) { addDetailRow(d); });
+    else addDetailRow();
+  }
+}
+function saveDoc() {
+  if (!document.getElementById('field_日期').value.trim()) {
+    showToast('请输入日期', 'warning');
+    return;
+  }
+  if (document.getElementById('field_生产订单') && !document.getElementById('field_生产订单').value.trim()) {
+    showToast('请选择生产订单', 'warning');
+    return;
+  }
+  if (document.getElementById('field_领料部门') && !document.getElementById('field_领料部门').value.trim()) {
+    showToast('请选择领料部门', 'warning');
+    return;
+  }
+  var detailRows = document.querySelectorAll('#detailBody tr');
+  var hasValidDetail = false;
+  detailRows.forEach(function(row) {
+    var materialCode = row.querySelector('[data-field="物料编码"]');
+    if (materialCode && materialCode.value.trim()) {
+      hasValidDetail = true;
+    }
+  });
+  if (!hasValidDetail) {
+    showToast('请至少添加一条明细记录', 'warning');
+    return;
+  }
+  logConversion('saveDoc START', { docType: docType, editingId: editingId });
+  var doc = collectDocData();
+  logConversion('单据数据收集完成', { docNo: doc.单据编号, detailCount: doc.details ? doc.details.length : 0 });
+  var list = JSON.parse(localStorage.getItem('erp_' + docType + '_list') || '[]');
+  logConversion('读取单据列表', { listSize: list.length });
+  if (editingId) {
+    var idx = list.findIndex(function(item) { return item.id === editingId; });
+    logConversion('编辑模式', { idx: idx, editingId: editingId });
+    if (idx !== -1) list[idx] = doc;
+  } else {
+    doc.id = Date.now().toString();
+    doc.createdAt = new Date().toISOString();
+    list.push(doc);
+    editingId = doc.id;
+    logConversion('新增模式', { newId: doc.id });
+  }
+  localStorage.setItem('erp_' + docType + '_list', JSON.stringify(list));
+  logConversion('saveDoc END', { success: true, listSize: list.length });
+  showToast('保存成功', 'success');
+}
+function collectDocData() {
+  var doc = {};
+  headerFields.forEach(function(f) {
+    if (f !== '备注') {
+      var el = document.getElementById('field_' + f);
+      if (el) doc[f] = el.value;
+    }
+  });
+  doc.remark = document.getElementById('field_备注').value;
+  doc.status = document.getElementById('field_状态').value;
+  doc.docNo = document.getElementById('field_单据编号').value;
+  doc.docDate = document.getElementById('field_日期').value;
+  doc.orgName = document.getElementById('field_组织').value;
+  doc.amount = parseFloat(document.getElementById('field_金额').value) || 0;
+  doc.组织 = document.getElementById('field_组织').value;
+  doc.productionOrder = document.getElementById('field_生产订单').value;
+  doc.details = [];
+  document.querySelectorAll('#detailBody tr').forEach(function(row) {
+    var detail = {};
+    detailFields.forEach(function(f) {
+      detail[f] = row.querySelector('[data-field="' + f + '"]').value;
+    });
+    var sourceDocId = row.querySelector('[data-field="source_doc_id"]');
+    if (sourceDocId) detail.source_doc_id = sourceDocId.value;
+    var sourceDetailIndex = row.querySelector('[data-field="source_detail_index"]');
+    if (sourceDetailIndex) detail.source_detail_index = parseInt(sourceDetailIndex.value);
+    doc.details.push(detail);
+  });
+  return doc;
+}
+function submitDoc() {
+  logConversion('submitDoc START', { docType: docType, editingId: editingId });
+  if (!validateDoc(docType)) return;
+  showConfirm('确认提交此单据？', function() {
+    document.getElementById('field_状态').value = '待审核';
+    logConversion('状态变更', { status: '待审核' });
+    saveDoc();
+    logConversion('submitDoc END', { success: true });
+    showToast('提交成功', 'success');
+  });
+}
+function approveDoc() {
+  logConversion('approveDoc START', { docType: docType, editingId: editingId });
+  if (!validateDoc(docType)) return;
+  showConfirm('确认审核此单据？', function() {
+    var rules = getSourceRules(docType);
+    logConversion('审核 - 转换规则查询', { hasRules: rules && rules.length > 0 });
+    if (rules && rules.length > 0) {
+      var doc = collectDocData();
+      doc.id = editingId || Date.now().toString();
+      logConversion('审核 - 收集单据数据', { docNo: doc.单据编号, detailCount: doc.details ? doc.details.length : 0 });
+      var linkageCount = 0;
+      doc.details.forEach(function(detail) {
+        if (detail.source_doc_id !== undefined) {
+          linkageCount++;
+          var convertedQty = parseFloat(detail[qtyField]) || parseFloat(detail.数量) || 0;
+          logConversion('审核 - 明细行转换数量', { materialCode: detail['物料编码'], convertedQty: convertedQty });
+          saveLinkageRecord({
+            source_doc: rules[0].source_doc,
+            source_doc_id: detail.source_doc_id,
+            source_detail_index: detail.source_detail_index,
+            target_doc: docType,
+            target_doc_id: doc.id,
+            converted_qty: convertedQty,
+            create_time: new Date().toISOString()
+          });
+        }
+      });
+      logConversion('审核 - 关联记录保存', { linkageCount: linkageCount });
+      logConversion('审核 - 开始执行反写');
+      executeReverseWrite(doc);
+      logConversion('审核 - 反写完成');
+      logConversion('审核 - 开始计算表头反写字段');
+      calculateHeaderReverseWriteFields(doc);
+      logConversion('审核 - 表头反写字段计算完成');
+    }
+    document.getElementById('field_状态').value = '已审核';
+    logConversion('审核 - 状态变更', { status: '已审核' });
+    saveDoc();
+    logConversion('approveDoc END', { success: true });
+    showToast('审核成功', 'success');
+  });
+}
+function reverseApproveDoc() {
+  var status = document.getElementById('field_状态').value;
+  if (status !== '已审核') {
+    showToast('只有已审核的单据才能反审核', 'warning');
+    return;
+  }
+  showConfirm('确认反审核此单据？', function() {
+    document.getElementById('field_状态').value = '待审核';
+    saveDoc();
+    showToast('反审核成功', 'success');
+  });
+}
+function closeDoc() {
+  showConfirm('确认关闭此单据？', function() {
+    document.getElementById('field_状态').value = '已关闭';
+    saveDoc();
+    showToast('关闭成功', 'success');
+  });
+}
+function reverseCloseDoc() {
+  showConfirm('确认反关闭此单据？', function() {
+    document.getElementById('field_状态').value = '已审核';
+    saveDoc();
+    showToast('反关闭成功', 'success');
+  });
+}
+function copyDoc() {
+  showToast('复制功能开发中', 'info');
+}
+function selectSourceDoc() {
+  var rules = getSourceRules(docType);
+  if (!rules || rules.length === 0) {
+    showToast('此单据不支持选单下推', 'warning');
+    return;
+  }
+  var sourceDocType = rules[0].source_doc;
+  var sourceList = JSON.parse(localStorage.getItem('erp_' + sourceDocType + '_list') || '[]');
+  sourceList = sourceList.filter(function(d) { return d.status === 'approved'; });
+  if (sourceList.length === 0) {
+    showToast('没有已审核的源单据', 'warning');
+    return;
+  }
+  window._sourceList = sourceList;
+  document.getElementById('lookupTitle').innerText = '选择源单据';
+  var head = document.getElementById('lookupTableHead');
+  var body = document.getElementById('lookupTableBody');
+  head.innerHTML = '<tr><th><input type="checkbox" onclick="selectAllSource()"></th><th>单据编号</th><th>日期</th><th>金额</th></tr>';
+  body.innerHTML = '';
+  sourceList.forEach(function(doc) {
+    var row = document.createElement('tr');
+    row.style.cursor = 'pointer';
+    row.innerHTML = '<td><input type="checkbox" class="source-checkbox" value="' + doc.id + '"></td><td>' + doc.docNo + '</td><td>' + doc.docDate + '</td><td>' + parseFloat(doc.amount).toFixed(2) + '</td>';
+    body.appendChild(row);
+  });
+  document.getElementById('lookupModal').classList.add('show');
+  window._lookupMode = 'source_select';
+}
+function selectAllSource() {
+  document.querySelectorAll('.source-checkbox').forEach(function(cb) { cb.checked = event.target.checked; });
+}
+var qtyField = '数量';
+function confirmSourceSelect() {
+  var selectedIds = Array.from(document.querySelectorAll('.source-checkbox:checked')).map(function(cb) { return cb.value; });
+  if (selectedIds.length === 0) {
+    showToast('请选择源单据', 'warning');
+    return;
+  }
+  var sourceList = window._sourceList || [];
+  var defaultWarehouse = document.getElementById('field_发料仓库').value;
+  selectedIds.forEach(function(id) {
+    var sourceDoc = sourceList.find(function(d) { return d.id === id; });
+    if (sourceDoc && sourceDoc.details) {
+      document.getElementById('field_生产订单').value = sourceDoc.docNo || '';
+      sourceDoc.details.forEach(function(detail, index) {
+        var remainingQty = parseFloat(detail['计划数量'] || detail['数量']) || 0;
+        var usedQty = getSourceDocUsedQty(sourceDoc.id, index);
+        remainingQty = Math.max(0, remainingQty - usedQty);
+        if (remainingQty > 0) {
+          var newRow = {
+            '物料编码': detail['物料编码'] || detail['产品编码'] || '',
+            '物料名称': detail['物料名称'] || detail['产品名称'] || '',
+            '规格型号': detail['规格型号'] || '',
+            '单位': detail['单位'] || '',
+            '仓库': defaultWarehouse || '',
+            '批号': '',
+            '数量': remainingQty.toFixed(2),
+            '成本单价': '',
+            '成本金额': '',
+            '源单类型': '生产订单',
+            '源单编号': sourceDoc.docNo || '',
+            'source_doc_id': sourceDoc.id,
+            'source_detail_index': index
+          };
+          addDetailRow(newRow);
+        }
+      });
+    }
+  });
+  closeLookup();
+  showToast('已成功携带生产订单用料清单', 'success');
+}
+function loadSourceDoc(sourceId) {
+  logConversion('loadSourceDoc START', { sourceId: sourceId, targetDocType: docType });
+  var rules = getSourceRules(docType);
+  if (!rules || rules.length === 0) {
+    logConversion('loadSourceDoc END', { reason: '此单据不支持从源单据下推' });
+    return;
+  }
+  var sourceDocType = rules[0].source_doc;
+  var sourceList = JSON.parse(localStorage.getItem('erp_' + sourceDocType + '_list') || '[]');
+  var sourceDoc = sourceList.find(function(d) { return d.id === sourceId; });
+  if (!sourceDoc) {
+    logConversion('loadSourceDoc END', { reason: '未找到源单据' });
+    showToast('未找到源单据', 'error');
+    return;
+  }
+  logConversion('源单据查找成功', { sourceDocNo: sourceDoc.docNo, sourceDocType: sourceDocType });
+  sourceDoc.docType = sourceDocType;
+  var convertData = prepareConvertData(sourceDoc, docType);
+  logConversion('转换数据准备完成', { headerFields: Object.keys(convertData.header), detailCount: convertData.details.length });
+  if (convertData.header.sourceDocNo) {
+    var sourceField = headerFields.find(function(f) { return f === '源单据编号' || f === '生产订单' || f === '采购订单' || f === '销售订单' || f === '收料通知单' || f === '检验单'; });
+    if (sourceField && document.getElementById('field_' + sourceField)) {
+      document.getElementById('field_' + sourceField).value = convertData.header.sourceDocNo;
+    }
+  }
+  if (convertData.header.供应商) {
+    document.getElementById('field_供应商').value = convertData.header.供应商;
+  }
+  if (convertData.header.客户) {
+    document.getElementById('field_客户').value = convertData.header.客户;
+  }
+  if (convertData.header.组织) {
+    document.getElementById('field_组织').value = convertData.header.组织;
+  }
+  if (convertData.details && convertData.details.length > 0) {
+    document.getElementById('detailBody').innerHTML = '';
+    convertData.details.forEach(function(row) {
+      addDetailRow(row);
+    });
+    logConversion('明细数据已加载', { detailCount: convertData.details.length });
+  }
+  logConversion('loadSourceDoc END', { success: true });
+}
+function pushDownDoc() {
+  logConversion('pushDownDoc START', { docType: docType, editingId: editingId });
+  var status = document.getElementById('field_状态').value;
+  if (status !== '已审核') {
+    showToast('只有已审核的单据才能下推', 'warning');
+    return;
+  }
+  var rules = getTargetRules(docType);
+  if (!rules || rules.length === 0) {
+    logConversion('pushDownDoc END', { reason: '此单据不支持下推' });
+    showToast('此单据不支持下推', 'warning');
+    return;
+  }
+  logConversion('下推规则查询', { ruleCount: rules.length, rules: rules.map(function(r) { return r.name; }) });
+  if (rules.length === 1) {
+    var targetDoc = rules[0].target_doc;
+    var targetName = rules[0].name.replace(/.*下推/, '');
+    logConversion('下推目标', { targetDoc: targetDoc, targetName: targetName });
+    showConfirm('确认下推生成' + targetName + '？', function() {
+      logConversion('下推执行', { url: targetDoc.replace(/_/g, '-') + '-create.html?sourceId=' + (editingId || '') });
+      window.location.href = targetDoc.replace(/_/g, '-') + '-create.html?sourceId=' + (editingId || '');
+    });
+  } else {
+    if (typeof createConfirmModal === 'function') createConfirmModal();
+    var html = '';
+    rules.forEach(function(r, i) {
+      html += '<button class="toolbar-btn" style="width:100%;margin-bottom:8px;justify-content:flex-start;" onclick="executePushDown(\'' + r.target_doc + '\',\'' + r.name + '\')"><span class="icon">⬇️</span> ' + r.name + '</button>';
+    });
+    var confirmBodyEl = document.getElementById('confirmBody') || document.getElementById('confirmMessage');
+    if (confirmBodyEl) confirmBodyEl.innerHTML = html;
+    var confirmTitleEl = document.getElementById('confirmTitle');
+    if (confirmTitleEl) confirmTitleEl.innerText = '系统提示';
+    var confirmFooterEl = document.getElementById('confirmFooter');
+    if (confirmFooterEl) confirmFooterEl.style.display = 'none';
+    var confirmModalEl = document.getElementById('confirmModal');
+    if (confirmModalEl) confirmModalEl.classList.add('show');
+  }
+}
+function executePushDown(targetDoc, ruleName) {
+  var modalEl = document.getElementById('confirmModal');
+  if (modalEl) modalEl.classList.remove('show');
+  var footerEl = document.getElementById('confirmFooter');
+  if (footerEl) footerEl.style.display = '';
+  window.location.href = targetDoc.replace(/_/g, '-') + '-create.html?sourceId=' + (editingId || '');
+}
+function prevDoc() {
+  showToast('上查功能开发中', 'info');
+}
+function nextDoc() {
+  showToast('下查功能开发中', 'info');
+}
+function goToList() {
+  window.location.href = 'quality-ncr-list.html';
+}
+function printSettings() {
+  showToast('打印设置功能开发中', 'info');
+}
+function printDoc() {
+  showToast('打印功能开发中', 'info');
+}
+function exitDoc() {
+  showConfirm('确认退出？', function() {
+    window.location.href = 'quality-ncr-list.html';
+  });
+}
+function addDetailRow(data) {
+  var tbody = document.getElementById('detailBody');
+  var row = document.createElement('tr');
+  var idx = tbody.children.length + 1;
+  var cells = '<td><input type="checkbox" class="detail-checkbox"></td>';
+  cells += '<td>' + idx + '</td>';
+  var reverseFields = ['收料数量', '检验数量', '入库数量', '未到货数量', '未入库数量', '发货数量', '出库数量', '未发货数量', '未出库数量', '领料数量', '退料数量', '未领料数量', '合格数量', '不合格数量', '未检验数量', '订单数量', '送检数量', '入库上限', '入库下限', '成品率'];
+  detailFields.forEach(function(f) {
+    if (reverseFields.includes(f)) return;
+    var val = data && data[f] ? data[f] : '';
+    if (f === '仓库') {
+      cells += '<td><div class="lookup-field"><input type="text" data-field="' + f + '" value="' + val + '"><button onclick="openWarehouseLookup(this)">...</button></div></td>';
+    } else if (f === '物料编码') {
+      cells += '<td><div class="lookup-field"><input type="text" data-field="' + f + '" value="' + val + '" readonly><button onclick="openMaterialLookup(this)">...</button></div></td>';
+    } else if (f === '物料名称') {
+      cells += '<td><input type="text" data-field="' + f + '" value="' + val + '" readonly></td>';
+    } else if (f === '成本单价' || f === '成本金额') {
+      cells += '<td><input type="text" data-field="' + f + '" value="' + val + '" readonly class="readonly"></td>';
+    } else if (f === '源单类型' || f === '源单编号') {
+      cells += '<td><input type="text" data-field="' + f + '" value="' + val + '" readonly class="readonly"></td>';
+    } else {
+      cells += '<td><input type="text" data-field="' + f + '" value="' + val + '" oninput="calculateRow(this)"></td>';
+    }
+  });
+  if (data && data.source_doc_id) {
+    cells += '<input type="hidden" data-field="source_doc_id" value="' + data.source_doc_id + '" />';
+  }
+  if (data && data.source_detail_index !== undefined) {
+    cells += '<input type="hidden" data-field="source_detail_index" value="' + data.source_detail_index + '" />';
+  }
+  row.innerHTML = cells;
+  tbody.appendChild(row);
+  if (data) calculateTotal();
+}
+function openWarehouseLookupForHeader() {
+  currentLookupField = '发料仓库';
+  openLookup('发料仓库', 'warehouse');
+}
+function confirmLookup() {
+  var checkboxes = document.querySelectorAll('.lookup-checkbox:checked');
+  if (checkboxes.length === 0) {
+    showToast('请选择一条记录', 'warning');
+    return;
+  }
+  var item = lookupData.find(function(d) { return d.id === checkboxes[0].value; });
+  if (item) {
+    if (currentLookupField === '发料仓库') {
+      document.getElementById('field_发料仓库').value = item.name;
+      var rows = document.querySelectorAll('#detailBody tr');
+      rows.forEach(function(row) {
+        var warehouseInput = row.querySelector('input[data-field="仓库"]');
+        if (warehouseInput && warehouseInput.value === '') {
+          warehouseInput.value = item.name;
+        }
+      });
+    } else {
+      var field = document.getElementById('field_' + currentLookupField);
+      if (field) {
+        field.value = item.name;
+        field.setAttribute('data-id', item.id);
+        field.setAttribute('data-code', item.code);
+      }
+    }
+  }
+  closeLookup();
+}
+function deleteSelectedRows() {
+  document.querySelectorAll('.detail-checkbox:checked').forEach(function(cb) {
+    cb.closest('tr').remove();
+  });
+  calculateTotal();
+}
+function selectAllDetails() {
+  document.querySelectorAll('.detail-checkbox').forEach(function(cb) {
+    cb.checked = document.querySelector('.detail-toolbar + table th input').checked;
+  });
+}
+function calculateRow(input) {
+  var row = input.closest('tr');
+  var qty = parseFloat(row.querySelector('[data-field="数量"]').value) || 0;
+  var price = parseFloat(row.querySelector('[data-field="单价"]').value) || 0;
+  var taxRate = parseFloat(row.querySelector('[data-field="税率"]').value) || 0;
+  var amount = (qty * price).toFixed(2);
+  var tax = (amount * taxRate).toFixed(2);
+  row.querySelector('[data-field="金额"]').value = amount;
+  row.querySelector('[data-field="税额"]').value = tax;
+  calculateTotal();
+}
+function calculateTotal() {
+  var total = 0;
+  document.querySelectorAll('#detailBody tr').forEach(function(row) {
+    var amount = parseFloat(row.querySelector('[data-field="金额"]').value) || 0;
+    total += amount;
+  });
+  document.getElementById('totalAmount').innerText = total.toFixed(2);
+  document.getElementById('footerAmount').innerText = total.toFixed(2);
+  document.getElementById('field_金额').value = total.toFixed(2);
+}
+function openLookup(field, type) {
+  currentLookupField = field;
+  currentLookupType = type;
+  var titles = { 'supplier': '选择供应商', 'customer': '选择客户', 'org': '选择组织', 'warehouse': '选择仓库', 'material': '选择物料', 'employee': '选择员工', 'department': '选择部门' };
+  document.getElementById('lookupTitle').innerText = titles[type] || '选择';
+  var caches = { 'supplier': 'erp_suppliers_cache', 'customer': 'erp_customers_cache', 'org': 'erp_orgs', 'warehouse': 'erp_warehouses_cache', 'material': 'erp_materials_cache', 'employee': 'erp_employees_cache', 'department': 'erp_departments_cache' };
+  var data = JSON.parse(localStorage.getItem(caches[type]) || '[]');
+  if (type === 'material') {
+    renderLookupTable(data, ['code', 'name', 'specification', 'unit'], ['编码', '名称', '规格型号', '单位']);
+  } else {
+    renderLookupTable(data, ['code', 'name'], ['编码', '名称']);
+  }
+  document.getElementById('lookupModal').classList.add('show');
+}
+var currentDetailRow = null;
+function openWarehouseLookup(btn) {
+  currentDetailRow = btn.closest('tr');
+  currentLookupField = 'detail_warehouse';
+  var data = JSON.parse(localStorage.getItem('erp_warehouses_cache') || '[]');
+  renderLookupTable(data, ['code', 'name'], ['编码', '名称']);
+  document.getElementById('lookupTitle').textContent = '选择仓库';
+  document.getElementById('lookupModal').classList.add('show');
+}
+function openMaterialLookup(btn) {
+  currentDetailRow = btn.closest('tr');
+  currentLookupField = 'detail_material';
+  var data = JSON.parse(localStorage.getItem('erp_materials_cache') || '[]');
+  renderLookupTable(data, ['code', 'name', 'specification', 'unit'], ['物料编码', '物料名称', '规格型号', '基本单位']);
+  document.getElementById('lookupTitle').textContent = '选择物料';
+  document.getElementById('lookupModal').classList.add('show');
+}
+function renderLookupTable(data, keys, labels) {
+  var head = document.getElementById('lookupTableHead');
+  var body = document.getElementById('lookupTableBody');
+  head.innerHTML = '<tr>' + labels.map(function(l) { return '<th>' + l + '</th>'; }).join('') + '</tr>';
+  body.innerHTML = '';
+  data.forEach(function(item) {
+    var row = document.createElement('tr');
+    row.style.cursor = 'pointer';
+    row.onclick = function() { selectLookupItem(item); };
+    var cells = keys.map(function(k) { return '<td>' + (item[k] || '') + '</td>'; }).join('');
+    row.innerHTML = cells;
+    body.appendChild(row);
+  });
+}
+function filterLookup() {
+  var keyword = document.getElementById('lookupKeyword').value.toLowerCase();
+  document.querySelectorAll('#lookupTableBody tr').forEach(function(row) {
+    row.style.display = row.innerText.toLowerCase().includes(keyword) ? '' : 'none';
+  });
+}
+function selectLookupItem(item) {
+  window.selectedLookupItem = item;
+  document.querySelectorAll('#lookupTableBody tr').forEach(function(r) {
+    r.style.backgroundColor = '';
+    r.style.borderLeft = '';
+  });
+  var rows = document.querySelectorAll('#lookupTableBody tr');
+  rows.forEach(function(row) {
+    if (row.innerText.includes(item.code) && row.innerText.includes(item.name)) {
+      row.style.backgroundColor = '#e6f7ff';
+      row.style.borderLeft = '3px solid #1890ff';
+    }
+  });
+}
+function confirmLookup() {
+  if (window._lookupMode === 'source_select') {
+    confirmSourceSelect();
+    return;
+  }
+  if (window.selectedLookupItem) {
+    if (currentLookupField === 'detail_material' && currentDetailRow) {
+      var item = window.selectedLookupItem;
+      var codeInput = currentDetailRow.querySelector('[data-field="物料编码"]');
+      var nameInput = currentDetailRow.querySelector('[data-field="物料名称"]');
+      var specInput = currentDetailRow.querySelector('[data-field="规格型号"]');
+      var unitInput = currentDetailRow.querySelector('[data-field="单位"]');
+      if (codeInput) codeInput.value = item.code || '';
+      if (nameInput) nameInput.value = item.name || '';
+      if (specInput) specInput.value = item.specification || '';
+      if (unitInput) unitInput.value = item.unit || '';
+    } else if (currentLookupField === 'detail_warehouse' && currentDetailRow) {
+      var item = window.selectedLookupItem;
+      var whInput = currentDetailRow.querySelector('[data-field="仓库"]');
+      if (whInput) whInput.value = item.name || item.code || '';
+    } else {
+      var displayName = window.selectedLookupItem.name || window.selectedLookupItem.code;
+      document.getElementById('field_' + currentLookupField).value = displayName;
+    }
+    closeLookup();
+  } else {
+    showToast('请选择一条记录', 'warning');
+  }
+}
+function closeLookup() {
+  document.getElementById('lookupModal').classList.remove('show');
+  window.selectedLookupItem = null;
+  window._lookupMode = null;
+}
+document.addEventListener('DOMContentLoaded', init);
+</script>
+</body>
+</html>

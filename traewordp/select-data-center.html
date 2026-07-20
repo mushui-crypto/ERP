@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>选择数据中心 — 磐枢工业智能平台</title>
+<style>
+:root {
+  --bg-base: #0a0e1a;
+  --bg-surface: #111827;
+  --bg-raised: #1e293b;
+  --bg-inset: #0d1321;
+  --border-normal: rgba(56,189,248,0.12);
+  --border-strong: rgba(56,189,248,0.25);
+  --text-primary: #f1f5f9;
+  --text-secondary: #e2e8f0;
+  --text-tertiary: #cbd5e1;
+  --text-accent: #38bdf8;
+  --color-success: #22c55e;
+  --color-warning: #eab308;
+  --color-error: #ef4444;
+  --radius-sm: 2px;
+  --radius-md: 6px;
+  --radius-lg: 10px;
+  --transition: 150ms ease;
+  --font-body: 'Inter', 'Noto Sans SC', 'Microsoft YaHei', system-ui, sans-serif;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { font-size: 14px; }
+body {
+  font-family: var(--font-body);
+  background: var(--bg-base);
+  color: var(--text-primary);
+  min-height: 100vh;
+  display: flex; align-items: center; justify-content: center;
+  padding: 20px;
+}
+.select-wrapper { width: 100%; max-width: 600px; }
+.select-card {
+  background: var(--bg-surface);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border-normal);
+  padding: 40px 32px;
+}
+.select-header { text-align: center; margin-bottom: 32px; }
+.select-header h1 { font-size: 20px; font-weight: 700; color: var(--text-primary); }
+.select-header p { font-size: 12px; color: var(--text-tertiary); margin-top: 8px; }
+
+.section { margin-bottom: 28px; }
+.section-title {
+  font-size: 12px; font-weight: 600; color: var(--text-tertiary);
+  margin-bottom: 12px; display: flex; align-items: center; gap: 8px;
+}
+.section-title::before {
+  content: ''; width: 4px; height: 12px;
+  background: var(--text-accent); border-radius: 2px;
+}
+
+.dc-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+.dc-card {
+  background: var(--bg-inset);
+  border: 1px solid var(--border-normal);
+  border-radius: var(--radius-md);
+  padding: 16px;
+  cursor: pointer;
+  transition: all var(--transition);
+}
+.dc-card:hover { border-color: var(--border-strong); }
+.dc-card.selected {
+  border-color: var(--text-accent);
+  background: rgba(56,189,248,0.08);
+}
+.dc-card.selected::before {
+  content: '✓'; position: absolute; top: 8px; right: 8px;
+  color: var(--text-accent); font-size: 14px; font-weight: 600;
+}
+.dc-card .dc-name { font-size: 14px; font-weight: 600; color: var(--text-primary); margin-bottom: 4px; }
+.dc-card .dc-type { font-size: 11px; color: var(--text-tertiary); }
+.dc-card .dc-host { font-size: 11px; color: var(--text-secondary); margin-top: 4px; }
+
+.org-list { display: flex; flex-direction: column; gap: 8px; }
+.org-item {
+  display: flex; align-items: center; gap: 12px;
+  padding: 12px 14px;
+  background: var(--bg-inset);
+  border: 1px solid var(--border-normal);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all var(--transition);
+}
+.org-item:hover { border-color: var(--border-strong); }
+.org-item.selected {
+  border-color: var(--text-accent);
+  background: rgba(56,189,248,0.08);
+}
+.org-item .org-radio {
+  width: 16px; height: 16px;
+  border: 2px solid var(--border-normal);
+  border-radius: 50%;
+  flex-shrink: 0;
+  transition: all var(--transition);
+}
+.org-item.selected .org-radio {
+  border-color: var(--text-accent);
+  background: var(--text-accent);
+}
+.org-item.selected .org-radio::after {
+  content: ''; display: block;
+  width: 6px; height: 6px; margin: 3px auto;
+  background: #0a0e1a; border-radius: 50%;
+}
+.org-item .org-info { flex: 1; }
+.org-item .org-name { font-size: 14px; color: var(--text-primary); }
+.org-item .org-code { font-size: 11px; color: var(--text-tertiary); }
+
+.btn-confirm {
+  width: 100%; padding: 12px;
+  background: var(--text-accent);
+  color: #0a0e1a;
+  border: none; border-radius: var(--radius-sm);
+  font-size: 15px; font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition);
+  margin-top: 20px;
+}
+.btn-confirm:hover { background: #7dd3fc; }
+.btn-confirm:disabled {
+  opacity: 0.5; cursor: not-allowed;
+}
+
+.empty-state {
+  text-align: center; padding: 40px 20px;
+  color: var(--text-tertiary); font-size: 13px;
+}
+.empty-state .empty-icon { font-size: 48px; margin-bottom: 16px; }
+
+.back-link {
+  text-align: center; margin-top: 16px;
+}
+.back-link a { color: var(--text-accent); font-size: 12px; }
+.back-link a:hover { color: #7dd3fc; }
+</style>
+</head>
+<body>
+<div class="select-wrapper">
+  <div class="select-card">
+    <div class="select-header">
+      <h1>选择数据中心</h1>
+      <p>请选择您要访问的数据中心和组织</p>
+    </div>
+
+    <div class="section">
+      <div class="section-title">数据中心</div>
+      <div class="dc-grid" id="dcGrid">
+        <div class="empty-state" style="grid-column: 1 / -1;">
+          <div class="empty-icon">&#128451;</div>
+          <div>正在加载数据中心...</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">选择组织</div>
+      <div class="org-list" id="orgList">
+        <div class="empty-state">请先选择数据中心</div>
+      </div>
+    </div>
+
+    <button class="btn-confirm" id="btnConfirm" disabled>进入系统</button>
+
+    <div class="back-link">
+      <a href="login.html">返回登录</a>
+    </div>
+  </div>
+</div>
+
+<script>
+const API_BASE = 'http://localhost:3001/api';
+var selectedDcId = null;
+var selectedOrgId = null;
+var dataCenters = [];
+var orgs = [];
+
+function getAccessToken() { return localStorage.getItem('accessToken'); }
+
+function checkLogin() {
+  var token = getAccessToken();
+  if (!token) {
+    localStorage.setItem('accessToken', 'offline_' + Date.now());
+  }
+  return true;
+}
+
+async function loadDataCenters() {
+  checkLogin();
+  dataCenters = [];
+  try {
+    var response = await fetch(API_BASE + '/data-centers', {
+      headers: { 'Authorization': 'Bearer ' + getAccessToken() }
+    });
+    var result = await response.json();
+    if (result.code === 200 && result.data && result.data.list) {
+      dataCenters = result.data.list;
+    } else if (result.code === 200 && Array.isArray(result.data)) {
+      dataCenters = result.data;
+    }
+  } catch (error) {
+    console.error('加载数据中心失败:', error);
+    dataCenters = [
+      { id: 'dc-001', name: '默认数据中心', dbType: 'sqlite', dbHost: 'localhost', dbPort: 3306 }
+    ];
+  }
+  renderDcGrid();
+}
+
+function renderDcGrid() {
+  var grid = document.getElementById('dcGrid');
+  grid.innerHTML = dataCenters.map(function(dc) {
+    var isSelected = selectedDcId === dc.id;
+    return '<div class="dc-card' + (isSelected ? ' selected' : '') + '" onclick="selectDataCenter(\'' + dc.id + '\')" style="position:relative;">' +
+      '<div class="dc-name">' + escapeHtml(dc.name) + '</div>' +
+      '<div class="dc-type">' + getDbTypeLabel(dc.dbType) + '</div>' +
+      '<div class="dc-host">' + escapeHtml(dc.dbHost) + ':' + dc.dbPort + '</div>' +
+    '</div>';
+  }).join('');
+}
+
+function getDbTypeLabel(type) {
+  var types = { mysql: 'MySQL', postgres: 'PostgreSQL', mssql: 'SQL Server', sqlite: 'SQLite', oracle: 'Oracle', dm: '达梦', tidb: 'TiDB' };
+  return types[type] || type;
+}
+
+function selectDataCenter(id) {
+  selectedDcId = id;
+  selectedOrgId = null;
+  renderDcGrid();
+  loadOrgs();
+  updateConfirmBtn();
+}
+
+async function loadOrgs() {
+  orgs = [];
+  if (!selectedDcId) {
+    renderOrgList();
+    return;
+  }
+  try {
+    var response = await fetch(API_BASE + '/organizations', {
+      headers: { 'Authorization': 'Bearer ' + getAccessToken() }
+    });
+    var result = await response.json();
+    if (result.code === 200 && result.data && result.data.list) {
+      orgs = result.data.list;
+    } else if (result.code === 200 && Array.isArray(result.data)) {
+      orgs = result.data;
+    }
+  } catch (error) {
+    console.error('加载组织列表失败:', error);
+  }
+  renderOrgList();
+}
+
+function renderOrgList() {
+  var list = document.getElementById('orgList');
+  list.innerHTML = orgs.map(function(org) {
+    var isSelected = selectedOrgId === org.id;
+    return '<div class="org-item' + (isSelected ? ' selected' : '') + '" onclick="selectOrg(\'' + org.id + '\')">' +
+      '<div class="org-radio"></div>' +
+      '<div class="org-info">' +
+        '<div class="org-name">' + escapeHtml(org.name) + '</div>' +
+        '<div class="org-code">' + escapeHtml(org.code) + '</div>' +
+      '</div>' +
+    '</div>';
+  }).join('');
+}
+
+function selectOrg(id) {
+  selectedOrgId = id;
+  renderOrgList();
+  updateConfirmBtn();
+}
+
+function updateConfirmBtn() {
+  var btn = document.getElementById('btnConfirm');
+  btn.disabled = !selectedDcId || !selectedOrgId;
+}
+
+function escapeHtml(str) {
+  if (!str) return '';
+  return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+
+document.getElementById('btnConfirm').addEventListener('click', function() {
+  if (!selectedDcId || !selectedOrgId) return;
+  var selectedDc = dataCenters.find(function(d) { return d.id === selectedDcId; });
+  var selectedOrg = orgs.find(function(o) { return o.id === selectedOrgId; });
+  
+  localStorage.setItem('dataCenter', JSON.stringify(selectedDc));
+  localStorage.setItem('org', JSON.stringify(selectedOrg));
+  localStorage.setItem('dataCenterId', selectedDcId);
+  localStorage.setItem('orgId', selectedOrgId);
+  
+  localStorage.setItem('currentDataCenter', JSON.stringify(selectedDc));
+  localStorage.setItem('currentOrg', JSON.stringify(selectedOrg));
+  localStorage.setItem('currentDataCenterId', selectedDcId);
+  localStorage.setItem('currentOrgId', selectedOrgId);
+  
+  window.location.href = 'index.html';
+});
+
+window.addEventListener('DOMContentLoaded', function() {
+  checkLogin();
+  loadDataCenters();
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,36 @@
+生产管理-生产领料月报表
+
+、字段说明：
+	 生产组织：FPrdOrgId  (必填项)
+	 月份：FPickMtrlMonth 
+	 生产车间：FWorkShopId 
+	 产品编码：FProdNumId 
+	 物料组：FMaterialGroupId 
+	 汇总依据：FSumBasis  (必填项)
+	 物料编码：FMaterialId 
+	 FRangeDateChk：FRangeDateChk 
+	 至：FApprEndDate 
+	 FMonDateChk：FMonDateChk 
+	 期间从：FApprBeginDate 
+	 单据类型：FMoBillTypeId 
+	 取数来源：FAccSource 
+	 单据状态：FDocStatus  (必填项)
+
+参数FieldKeys显示列：
+	 月份/期间：FPickMtrlMonth 
+	 生产车间：FWorkShopId 
+	 物料编码：FMaterialId 
+	 生产组织：FPrdOrgId 
+	 物料名称：FMATERIALNAME 
+	 规格型号：FMATERIALMODEL 
+	 产品编码：FProdNumId 
+	 产品名称：FProdName 
+	 产品规格型号：FProdModel 
+	 单位：FUnitId 
+	 物料组：FMaterialGroupId 
+	 领料数量：FPICKMTRLQTY 
+	 良品退料数量：FRTNMTRLPASSQTY 
+	 来料不良退料：FINFAILRTNQTY 
+	 作业不良退料：FDOFAILRTNQTY 
+	 补料数量：FFEEDMTRLQTY 
+	 实领数量：FACTUALPICKMTRLQTY 

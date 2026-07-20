@@ -1,0 +1,150 @@
+生产管理-缺料分析单
+
+字段说明：
+单据头：FBillHead 
+	 实体主键：FID 
+	 单据编号：FBillNo 
+	 单据状态：FDocumentStatus 
+	 审核人：FApproverId 
+	 审核日期：FApproveDate 
+	 修改日期：FModifyDate 
+	 创建日期：FCreateDate 
+	 修改人：FModifierId 
+	 创建人：FCreatorId 
+	 备注：FDescription 
+	 单据日期：FDate  (必填项)
+	 单据类型：FBillType  (必填项)
+	 优先顺序：FPriorityType  (必填项)
+	 生产车间：FWorkShopID0 
+	 生产/委外组织：FPrdOrgId  (必填项)
+	 业务类型：FBusinessType  (必填项)
+	 物料范围：FMaterialScopy  (必填项)
+	 考虑预留：FReserved  (必填项)
+	 物料替代：FSubStituted  (必填项)
+	 欠料分析：FShortgeNeedQty  (必填项)
+	 即时库存：FRealityStock 
+	 委外订单：FSubPurSupplyed 
+	 委外截止日期：FSubReqExpiredDate 
+	 生产截止日期：FMoExpiredDate 
+	 生产订单：FMoSupplyed 
+	 采购截止日期：FPurExpiredDate 
+	 采购订单：FPurSupplyed 
+	 是否分析过：FAnalysised 
+	 仅未审核的采购入库：FMatchPurInStk 
+	 扣除未出库调拨单：FExceptTrans 
+	 仅未审核的委外入库：FMatchSubInStk 
+	 仅未审核的生产入库：FMatchInMoStk 
+	 考虑领料仓库：FIsIncludePPBomStk 
+	 调拨策略：FTransferPolicy  (必填项)
+	 扣除未出库的领料单：FExceptPicks 
+	 考虑调拨仓库：FIsIncludeTransStk 
+	 收料通知单：FMatchReceive 
+	 匹配供应考虑货主和货主类型：FMatchOwner 
+	 采购申请单：FRequisition 
+	 截止日期：FPOExpireDate 
+	 组织间需求单：FROSupply 
+	 组织间需求截止日期：FROExpireDate 
+	 推送：FIsPushedPlan 
+	 受托加工收料：FOEMReceive 
+	 受托加工收料截止日期：FOEMRExpireDate 
+	 收料忽略质检结果：FExceptCheck 
+	 库存状态：FStockStatusId 
+订单明细：FEntity 
+	 实体主键：FEntryID 
+	 订单编号：FMoBillNo  (必填项)
+	 行号：FMoEntrySeq 
+	 产品编码：FMaterialId  (必填项)
+	 产品名称：FMaterialName 
+	 规格型号：FMaterialModel 
+	 订单数量：FQty 
+	 已备料数量：FStockReadyQty 
+	 单位：FUnitID  (必填项)
+	 计划开工时间：FPlanStartDate  (必填项)
+	 计划完工时间：FPlanFinishDate  (必填项)
+	 需求优先级：FPriority 
+	 业务状态：FStatus  (必填项)
+	 生产订单单据内码：FMoId 
+	 生产订单分录内码：FMoEntryId 
+	 基本单位：FBaseUnitId 
+	 基本单位生产数量：FBaseUnitQty 
+	 基本单位已备料数量：FBaseStockReadyQty 
+	 业务流程：FBFLowId 
+	 单据日期：FBillDate 
+	 行类型：FRowType 
+	 手工行内码：FManualRowId 
+	 BOM版本：FOrderBomId 
+	 计划跟踪号：FMTONOM 
+	 分析：FMoSelected 
+	 订单类型：FSelOrderType  (必填项)
+	 全展开：FISEXPANDALL 
+	 分析结果：FIsLack 
+	 需求单号：FSALEORDERNO 
+	 需求单分录行号：FSALEORDERENTRYSEQ 
+	 辅助属性：FAuxPropIdLackMo 
+缺料清单：FLackEntity 
+	 实体主键：FEntryID 
+	 子项物料编码：FMaterialIdLack 
+	 子项物料名称：FMaterialNameLack 
+	 子项物料规格：FMaterialModelLack 
+	 辅助属性：FAuxPropIdLack 
+	 单位：FUnitIdLack 
+	 应发数量：FMustQtyLack 
+	 已领数量：FPickedQtyLack 
+	 可领数量：FCanPickedQtyLack 
+	 缺料数量：FLackQtyLack 
+	 缺料基本单位应发数量：FBaseMustQtyLack 
+	 缺料基本单位已领数量：FBasePickedQtyLack 
+	 缺料基本单位可领数量：FBaseCanPickedQtyLack 
+	 缺料基本单位缺料数量：FBaseLackQtyLack 
+	 基本单位：FBaseUnitIdLack 
+	 计划跟踪号：FMTONO 
+	 货主类型：FOwnerTypeId 
+	 货主：FOwnerId 
+	 BOM版本：FBOMID 
+	 可用供应数量：FCanSupplyQtyS 
+	 基本单位可用供应数量：FBaseCanSupplyQtyS 
+	 基本单位未领数量：FBaseNoPickQty 
+	 基本单位其他订单需求数量：FBaseAllocedQty 
+	 其他订单需求数量：FAllocedQty 
+	 采购申请/生产选单数量：FPurJoinQty 
+	 基本单位采购申请选单数量：FBasePurJoinQty 
+	 需求日期：FNeedDate 
+	 库存数量：FInvQtyLack 
+	 基本单位库存数量：FBaseInvQtyLack 
+	 汇总标识：FSUMMARYID 
+	 在途数量统计：FOnOrderQty 
+	 收料在途数量：FRECEIVEQTY 
+	 生产在途数量：FPRDQTY 
+	 委外在途数量：FSUBREQQTY 
+	 采购在途数量：FPURCHASEQTY 
+	 采购申请在途数量：FREQUISITIONQTY 
+	 预留数量：FRESERVEQTYL 
+	 基本单位预留数量：FBASERESERVEQTYL 
+	 库存预留数量：FINVRESERVEQTY 
+	 基本单位库存预留数量：FBASEINVRESERVEQTY 
+	 在途预留数量：FONORDERRESERVEQTY 
+	 基本单位在途预留数量：FBASEONORDERRESERVEQTY 
+仓库：FLKScopeEntity 
+	 实体主键：FEntryID 
+	 选择：FSelected 
+	 仓库编码：FStockId 
+	 仓库名称：FStockName 
+	 仓库属性：FStockProperty 
+	 组织编码：FStockOrgId 
+	 组织名称：FStockOrgName 
+单据类型分录：FBillTypeEntity 
+	 实体主键：FEntryID 
+	 单据类型：FSupplyBillTypeId 
+	 排除：FIsExcept 
+	 单据：FBaseProperty 
+关联关系表：FEntity_Link 
+	 实体主键：FLinkId 
+	 业务流程图：FEntity_Link_FFlowId 
+	 推进路线：FEntity_Link_FFlowLineId 
+	 转换规则：FEntity_Link_FRuleId 
+	 源单表内码：FEntity_Link_FSTableId 
+	 源单表：FEntity_Link_FSTableName 
+	 源单内码：FEntity_Link_FSBillId 
+	 源单分录内码：FEntity_Link_FSId 
+	 原始携带量：FEntity_Link_FBaseUnitQtyOld 
+	 修改携带量：FEntity_Link_FBaseUnitQty 

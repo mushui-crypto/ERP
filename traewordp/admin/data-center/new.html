@@ -1,0 +1,1517 @@
+﻿﻿﻿﻿﻿﻿<!DOCTYPE html>
+
+<html lang="zh-CN">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>新建数据中心 — 磐枢工业智能平台(管理端)</title>
+
+<link rel="stylesheet" href="../common-admin.css">
+
+<script src="../../common.js"></script>
+
+<style>
+
+.form-card {
+
+  max-width: 720px;
+
+  margin: 0 auto;
+
+}
+
+.form-row {
+
+  display: grid;
+
+  grid-template-columns: 1fr 1fr;
+
+  gap: 16px;
+
+}
+
+.form-actions {
+
+  display: flex;
+
+  gap: 12px;
+
+  justify-content: flex-end;
+
+  padding-top: 16px;
+
+  border-top: 1px solid var(--border-normal);
+
+  margin-top: 24px;
+
+  flex-wrap: wrap;
+
+}
+
+
+
+/* ===== 开关组件 ===== */
+
+.switch {
+
+  position: relative;
+
+  display: inline-block;
+
+  width: 40px;
+
+  height: 22px;
+
+  flex-shrink: 0;
+
+}
+
+.switch input { opacity: 0; width: 0; height: 0; }
+
+.switch .slider {
+
+  position: absolute;
+
+  cursor: pointer;
+
+  inset: 0;
+
+  background: var(--bg-inset);
+
+  border: 1px solid var(--border-normal);
+
+  border-radius: 22px;
+
+  transition: var(--transition);
+
+}
+
+.switch .slider::before {
+
+  content: '';
+
+  position: absolute;
+
+  height: 16px;
+
+  width: 16px;
+
+  left: 2px;
+
+  top: 50%;
+
+  transform: translateY(-50%);
+
+  background: var(--text-tertiary);
+
+  border-radius: 50%;
+
+  transition: var(--transition);
+
+}
+
+.switch input:checked + .slider {
+
+  background: var(--admin-accent-light);
+
+  border-color: var(--admin-accent);
+
+}
+
+.switch input:checked + .slider::before {
+
+  transform: translate(18px, -50%);
+
+  background: var(--admin-accent);
+
+}
+
+
+
+/* 表单中的开关行 */
+
+.form-switch-row {
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: space-between;
+
+  padding: 4px 0;
+
+}
+
+.form-switch-row .switch-text {
+
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 2px;
+
+}
+
+.form-switch-row .switch-text .st-title {
+
+  font-size: 13px;
+
+  color: var(--text-primary);
+
+}
+
+.form-switch-row .switch-text .st-desc {
+
+  font-size: 11px;
+
+  color: var(--text-tertiary);
+
+}
+
+
+
+/* 条件展开区块（依赖开关） */
+
+.dependent-block {
+
+  margin-top: 12px;
+
+  padding: 12px;
+
+  background: var(--bg-inset);
+
+  border: 1px dashed var(--border-normal);
+
+  border-radius: var(--radius-sm);
+
+}
+
+
+
+/* ===== 连接测试结果 ===== */
+
+.test-result {
+
+  margin-top: 12px;
+
+  padding: 12px 14px;
+
+  border-radius: var(--radius-sm);
+
+  border: 1px solid var(--border-normal);
+
+  background: var(--bg-inset);
+
+  font-size: 12px;
+
+}
+
+.test-result.success {
+
+  border-color: rgba(34,197,94,0.3);
+
+  background: rgba(34,197,94,0.06);
+
+}
+
+.test-result.error {
+
+  border-color: rgba(239,68,68,0.3);
+
+  background: rgba(239,68,68,0.06);
+
+}
+
+.test-result .result-head {
+
+  display: flex;
+
+  align-items: center;
+
+  gap: 6px;
+
+  font-weight: 600;
+
+  margin-bottom: 8px;
+
+}
+
+.test-result.success .result-head { color: var(--color-success); }
+
+.test-result.error .result-head { color: var(--color-error); }
+
+.test-result.warning .result-head { color: var(--color-warning); }
+
+.test-result .result-detail {
+
+  color: var(--text-secondary);
+
+  font-family: var(--font-mono);
+
+  line-height: 1.8;
+
+  font-size: 11.5px;
+
+}
+
+.test-result .result-detail .detail-line {
+
+  display: flex;
+
+  gap: 8px;
+
+}
+
+.test-result .result-detail .detail-line .dl-label {
+
+  color: var(--text-tertiary);
+
+  min-width: 84px;
+
+}
+
+
+
+/* 加载中状态 */
+
+.loading-overlay {
+
+  position: fixed;
+
+  inset: 0;
+
+  background: rgba(0,0,0,0.6);
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  z-index: 1000;
+
+  font-size: 14px;
+
+  color: white;
+
+}
+
+.loading-overlay .loading-content {
+
+  background: var(--bg-card);
+
+  padding: 24px 32px;
+
+  border-radius: var(--radius-lg);
+
+  display: flex;
+
+  flex-direction: column;
+
+  align-items: center;
+
+  gap: 12px;
+
+}
+
+.loading-overlay .spinner {
+
+  width: 32px;
+
+  height: 32px;
+
+  border: 3px solid rgba(255,255,255,0.1);
+
+  border-top-color: var(--admin-accent);
+
+  border-radius: 50%;
+
+  animation: spin 0.8s linear infinite;
+
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+
+
+/* ===== Toast 提示框 ===== */
+
+.toast-container {
+
+  position: fixed;
+
+  top: 20px;
+
+  right: 20px;
+
+  z-index: 10000;
+
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 10px;
+
+}
+
+.toast {
+
+  display: flex;
+
+  align-items: center;
+
+  gap: 10px;
+
+  padding: 14px 18px;
+
+  border-radius: var(--radius-md);
+
+  background: var(--bg-card);
+
+  border: 1px solid var(--border-normal);
+
+  box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+
+  min-width: 280px;
+
+  max-width: 420px;
+
+  animation: slideIn 0.3s ease;
+
+}
+
+@keyframes slideIn {
+
+  from { transform: translateX(100%); opacity: 0; }
+
+  to { transform: translateX(0); opacity: 1; }
+
+}
+
+.toast .toast-icon {
+
+  font-size: 18px;
+
+  flex-shrink: 0;
+
+}
+
+.toast .toast-content {
+
+  flex: 1;
+
+  font-size: 13px;
+
+  color: var(--text-primary);
+
+}
+
+.toast .toast-title {
+
+  font-weight: 600;
+
+  margin-bottom: 2px;
+
+  color: var(--text-primary);
+
+}
+
+.toast .toast-message {
+
+  color: var(--text-secondary);
+
+  font-size: 12px;
+
+}
+
+.toast-success { border-color: rgba(34,197,94,0.3); background: rgba(34,197,94,0.05); }
+
+.toast-success .toast-title { color: var(--color-success); }
+
+.toast-warning { border-color: rgba(245,158,11,0.3); background: rgba(245,158,11,0.05); }
+
+.toast-warning .toast-title { color: var(--color-warning); }
+
+.toast-error { border-color: rgba(239,68,68,0.3); background: rgba(239,68,68,0.05); }
+
+.toast-error .toast-title { color: var(--color-error); }
+
+.toast-info { border-color: rgba(56,189,248,0.3); background: rgba(56,189,248,0.05); }
+
+.toast-info .toast-title { color: var(--admin-accent); }
+
+</style>
+
+</head>
+
+<body class="light-form-page">
+
+
+
+<aside class="sidebar admin-sidebar" id="sidebar">
+
+    <div class="sidebar-logo">
+
+    <img src="../../images/LOGO.png" alt="磐枢工业智能平台" style="width: 100%; max-width: 200px; display: block;">
+
+    <h1 style="font-size: 16px; margin: 4px 0 0;">磐枢工业智能平台</h1>
+
+  </div>
+
+  <nav class="sidebar-menu">
+
+    <div class="sidebar-menu-group open">
+
+      <div class="sidebar-menu-item" onclick="toggleGroup(this)">
+
+        <span class="icon">&#128451;</span> 数据中心管理
+
+        <span class="arrow">&#9660;</span>
+
+      </div>
+
+      <div class="sub-menu">
+
+        <a class="sidebar-menu-item" href="index.html"><span class="icon"></span> 数据中心总览</a>
+
+        <a class="sidebar-menu-item active" href="new.html"><span class="icon"></span> 新建数据中心</a>
+
+        <a class="sidebar-menu-item" href="backup.html"><span class="icon"></span> 备份管理</a>
+
+      </div>
+
+    </div>
+
+
+
+    <div class="sidebar-menu-group">
+
+      <div class="sidebar-menu-item" onclick="toggleGroup(this)">
+
+        <span class="icon">&#128101;</span> 组织与权限
+
+        <span class="arrow">&#9654;</span>
+
+      </div>
+
+      <div class="sub-menu">
+
+        <a class="sidebar-menu-item" href="../org-perm/org.html"><span class="icon"></span> 组织架构</a>
+
+        <a class="sidebar-menu-item" href="../org-perm/user.html"><span class="icon"></span> 用户管理</a>
+
+        <a class="sidebar-menu-item" href="../org-perm/role.html"><span class="icon"></span> 角色管理</a>
+
+        <a class="sidebar-menu-item" href="../org-perm/menu.html"><span class="icon"></span> 菜单管理</a>
+
+      </div>
+
+    </div>
+
+
+
+    <div class="sidebar-menu-group">
+
+      <div class="sidebar-menu-item" onclick="toggleGroup(this)">
+
+        <span class="icon">&#128187;</span> 开发设计
+
+        <span class="arrow">&#9654;</span>
+
+      </div>
+
+      <div class="sub-menu">
+
+        <a class="sidebar-menu-item" href="../dev-design/lowcode.html"><span class="icon"></span> 低代码开发中心</a>
+
+        <a class="sidebar-menu-item" href="../dev-design/form-designer.html"><span class="icon"></span> 表单设计器</a>
+
+        <a class="sidebar-menu-item" href="../dev-design/doc-flow.html"><span class="icon"></span> 单据转换配置</a>
+
+        <a class="sidebar-menu-item" href="../dev-design/print-template.html"><span class="icon"></span> 套打模板设计</a>
+
+        <a class="sidebar-menu-item" href="../dev-design/workflow.html"><span class="icon"></span> 流程配置</a>
+
+      </div>
+
+    </div>
+
+
+
+    <div class="sidebar-menu-group">
+
+      <div class="sidebar-menu-item" onclick="toggleGroup(this)">
+
+        <span class="icon">&#129302;</span> 智能应用
+
+        <span class="arrow">&#9654;</span>
+
+      </div>
+
+      <div class="sub-menu">
+
+        <a class="sidebar-menu-item" href="../ai-config/api-manage.html"><span class="icon"></span> API管理</a>
+
+        <a class="sidebar-menu-item" href="../ai-config/nl-training.html"><span class="icon"></span> 自然语言训练</a>
+
+        <a class="sidebar-menu-item" href="../ai-config/data-analysis.html"><span class="icon"></span> 数据分析训练</a>
+
+        <a class="sidebar-menu-item" href="../ai-config/agent-config.html"><span class="icon"></span> Agent配置</a>
+
+      </div>
+
+    </div>
+
+
+
+    <div class="sidebar-menu-item" onclick="window.location.href='../../index.html'">
+
+      <span class="icon">&#8592;</span> 返回应用端
+
+    </div>
+
+  </nav>
+
+  <div class="sidebar-user">
+
+    <div class="avatar" style="background:var(--admin-accent-light);color:var(--admin-accent);">管</div>
+
+    <div>
+
+      <div class="user-name">系统管理员</div>
+
+      <div class="user-role">超级管理员</div>
+
+    </div>
+
+  </div>
+
+</aside>
+
+
+
+<div class="main-content" id="mainContent">
+
+  <div class="page-header">
+
+    <div>
+
+      <div class="flex items-center gap-8">
+
+        <button class="sidebar-toggle" onclick="toggleSidebar()">&#9776;</button>
+
+        <div>
+
+          <h2>新建数据中心</h2>
+
+          <div class="breadcrumb"><a href="../../index.html">首页</a><span>/</span><a href="../index.html">管理端</a><span>/</span><a href="index.html">数据中心管理</a><span>/</span><span>新建</span></div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+    <div class="page-actions">
+
+      <a class="btn btn-ghost btn-sm" href="index.html">&#8592; 返回总览</a>
+
+    </div>
+
+  </div>
+
+
+
+  <div class="page-body">
+
+    <div class="form-card">
+
+      <div class="card">
+
+        <div class="card-header">基本信息</div>
+
+        <div class="card-body">
+
+          <div class="form-group">
+
+            <label class="form-label">数据中心名称 <span style="color:var(--color-error);">*</span></label>
+
+            <input type="text" class="form-input" id="dcName" placeholder="请输入数据中心名称，如：重庆工厂数据库">
+
+          </div>
+
+          <div class="form-row">
+
+            <div class="form-group">
+
+              <label class="form-label">数据库类型 <span style="color:var(--color-error);">*</span></label>
+
+              <select class="form-select" id="dbType" onchange="updateDefaultPort()">
+
+                <option value="">请选择数据库类型</option>
+
+                <option value="mysql">MySQL</option>
+
+                <option value="postgres">PostgreSQL</option>
+
+                <option value="mssql">SQL Server</option>
+
+                <option value="oracle">Oracle</option>
+
+                <option value="dm">达梦 DM</option>
+
+                <option value="tidb">TiDB</option>
+
+              </select>
+
+            </div>
+
+            <div class="form-group">
+
+              <label class="form-label">数据库名称 <span style="color:var(--color-error);">*</span></label>
+
+              <input type="text" class="form-input" id="dbName" placeholder="请输入数据库名称">
+
+            </div>
+
+          </div>
+
+          <div class="form-row">
+
+            <div class="form-group">
+
+              <label class="form-label">数据中心编码 <span style="color:var(--color-error);">*</span></label>
+
+              <input type="text" class="form-input" id="dcCode" placeholder="唯一编码，如：CHONGQING_DC">
+
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+
+
+      <div class="card" style="margin-top:16px;">
+
+        <div class="card-header">连接配置</div>
+
+        <div class="card-body">
+
+          <div class="form-row">
+
+            <div class="form-group">
+
+              <label class="form-label">主机地址 <span style="color:var(--color-error);">*</span></label>
+
+              <input type="text" class="form-input" id="dbHost" placeholder="例如: 192.168.1.10">
+
+            </div>
+
+            <div class="form-group">
+
+              <label class="form-label">端口 <span style="color:var(--color-error);">*</span></label>
+
+              <input type="text" class="form-input" id="dbPort" placeholder="默认端口: 3306">
+
+            </div>
+
+          </div>
+
+          <div class="form-row">
+
+            <div class="form-group">
+
+              <label class="form-label">用户名 <span style="color:var(--color-error);">*</span></label>
+
+              <input type="text" class="form-input" id="dbUser" placeholder="数据库用户名">
+
+            </div>
+
+            <div class="form-group">
+
+              <label class="form-label">密码 <span style="color:var(--color-error);">*</span></label>
+
+              <input type="password" class="form-input" id="dbPassword" placeholder="数据库密码">
+
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+
+
+      <div class="card" style="margin-top:16px;">
+
+        <div class="card-header">文件存放路径</div>
+
+        <div class="card-body">
+
+          <div class="form-group">
+
+            <label class="form-label">备份文件存放路径 <span style="color:var(--color-error);">*</span></label>
+
+            <div class="path-selector">
+
+              <input type="text" class="form-input" id="backupPath" placeholder="请选择或输入文件存放路径" value="/data/backup/">
+
+              <button class="btn-browse" onclick="browseFolder()">&#128193; 浏览...</button>
+
+            </div>
+
+          </div>
+
+          <p class="text-muted text-sm mt-8">建议选择磁盘空间充足的路径，备份文件将存储在此目录下。</p>
+
+        </div>
+
+      </div>
+
+
+
+      <div class="card" style="margin-top:16px;">
+
+        <div class="card-header">高级配置</div>
+
+        <div class="card-body">
+
+          <div class="form-row">
+
+            <div class="form-group">
+
+              <label class="form-label">字符集</label>
+
+              <select class="form-select" id="charset">
+
+                <option value="utf8">UTF-8</option>
+
+                <option value="gbk">GBK</option>
+
+                <option value="utf8mb4">UTF8MB4</option>
+
+              </select>
+
+            </div>
+
+            <div class="form-group">
+
+              <label class="form-label">连接池大小</label>
+
+              <input type="number" class="form-input" id="poolSize" placeholder="例如：20" min="1" value="20">
+
+            </div>
+
+          </div>
+
+          <div class="form-row">
+
+            <div class="form-group">
+
+              <label class="form-label">超时时间（秒）</label>
+
+              <input type="number" class="form-input" id="timeout" placeholder="例如：30" min="1" value="30">
+
+            </div>
+
+            <div class="form-group">
+
+              <label class="form-label">SSL 加密</label>
+
+              <div class="form-switch-row" style="padding-top:6px;">
+
+                <div class="switch-text">
+
+                  <span class="st-title">启用 SSL 加密连接</span>
+
+                  <span class="st-desc">启用后需配置证书路径</span>
+
+                </div>
+
+                <label class="switch">
+
+                  <input type="checkbox" id="sslEnabled">
+
+                  <span class="slider"></span>
+
+                </label>
+
+              </div>
+
+            </div>
+
+          </div>
+
+          <div class="dependent-block" id="sslBlock">
+
+            <div class="form-group" style="margin-bottom:0;">
+
+              <label class="form-label">证书路径</label>
+
+              <input type="text" class="form-input" id="sslCertPath" placeholder="例如：/etc/ssl/certs/db-client.crt">
+
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+
+
+      <div class="card" style="margin-top:16px;">
+
+        <div class="card-header">读写分离配置</div>
+
+        <div class="card-body">
+
+          <div class="form-switch-row">
+
+            <div class="switch-text">
+
+              <span class="st-title">启用读写分离</span>
+
+              <span class="st-desc">写操作走主库，读操作自动分发到从库</span>
+
+            </div>
+
+            <label class="switch">
+
+              <input type="checkbox" id="readWriteSeparate">
+
+              <span class="slider"></span>
+
+            </label>
+
+          </div>
+
+          <div class="form-row" style="margin-top:12px;">
+
+            <div class="form-group">
+
+              <label class="form-label">主库地址</label>
+
+              <input type="text" class="form-input" id="masterHost" placeholder="例如：192.168.1.10:3306">
+
+            </div>
+
+            <div class="form-group">
+
+              <label class="form-label">从库地址（多行输入）</label>
+
+              <textarea class="form-textarea" id="slaveHosts" placeholder="每行一个从库地址，例如：&#10;192.168.1.11:3306&#10;192.168.1.12:3306"></textarea>
+
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+
+
+      <div class="card" style="margin-top:16px;">
+
+        <div class="card-header">连接测试结果</div>
+
+        <div class="card-body">
+
+          <div id="testResultContainer">
+
+            <div class="test-result" id="testResult">
+
+              <div class="result-head" style="color:var(--text-tertiary);">&#9432; 未进行测试</div>
+
+              <div class="result-detail">
+
+                <div style="color:var(--text-tertiary);">点击下方"测试连接"按钮检测当前配置的连通性</div>
+
+              </div>
+
+            </div>
+
+          </div>
+
+          <p class="text-muted text-sm mt-12">点击下方"测试连接"按钮可重新检测当前配置的连通性。</p>
+
+        </div>
+
+      </div>
+
+
+
+      <div class="form-actions">
+
+        <a class="btn btn-ghost" href="index.html">取消</a>
+
+        <button class="btn-test-conn" onclick="testConnection()">&#9889; 测试连接</button>
+
+        <button class="btn btn-ghost" onclick="saveDataCenter(true)">&#10010; 保存并继续添加</button>
+
+        <button class="btn btn-primary" onclick="saveDataCenter(false)">保存并连接</button>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
+
+
+
+<div id="sidebarOverlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:99;" onclick="toggleSidebar()"></div>
+
+
+
+<div id="loadingOverlay" style="display:none;" class="loading-overlay">
+
+  <div class="loading-content">
+
+    <div class="spinner"></div>
+
+    <div id="loadingText">处理中...</div>
+
+  </div>
+
+</div>
+
+
+
+<div id="toastContainer" class="toast-container"></div>
+
+
+
+<script>
+
+const API_BASE = 'http://localhost:3001/api';
+
+
+
+function getAccessToken() {
+
+  return localStorage.getItem('accessToken');
+
+}
+
+
+
+function checkLogin() {
+
+  if (!getAccessToken()) {
+
+    localStorage.setItem('accessToken', 'local-dev-token-' + Date.now());
+
+  }
+
+  return true;
+
+}
+
+
+
+function updateDefaultPort() {
+
+  var dbType = document.getElementById('dbType').value;
+
+  var portInput = document.getElementById('dbPort');
+
+  if (!portInput.value) {
+
+    switch(dbType) {
+
+      case 'mysql': portInput.value = '3306'; break;
+
+      case 'postgres': portInput.value = '5432'; break;
+
+      case 'mssql': portInput.value = '1433'; break;
+
+      case 'oracle': portInput.value = '1521'; break;
+
+      case 'dm': portInput.value = '5236'; break;
+
+      case 'tidb': portInput.value = '4000'; break;
+
+    }
+
+  }
+
+}
+
+
+
+function showLoading(text) {
+
+  document.getElementById('loadingText').textContent = text;
+
+  document.getElementById('loadingOverlay').style.display = 'flex';
+
+}
+
+
+
+function hideLoading() {
+
+  document.getElementById('loadingOverlay').style.display = 'none';
+
+}
+
+
+
+async function browseFolder() {
+
+  if (window.showDirectoryPicker) {
+
+    try {
+
+      const handle = await window.showDirectoryPicker();
+
+      document.getElementById('backupPath').value = handle.name;
+
+    } catch (err) {
+
+      console.log('用户取消选择');
+
+    }
+
+  } else {
+
+    var path = prompt('请输入文件存放路径:', document.getElementById('backupPath').value || '/data/backup/');
+
+    if (path) {
+
+      document.getElementById('backupPath').value = path;
+
+    }
+
+  }
+
+}
+
+
+
+async function testConnection() {
+
+  if (!checkLogin()) return;
+
+  
+
+  var data = collectFormData();
+
+  if (!validateForm(data)) return;
+
+  
+
+  showLoading('正在测试连接...');
+
+  
+
+  try {
+
+    var response = await fetch(API_BASE + '/data-centers/test-connection-before-save', {
+
+      method: 'POST',
+
+      headers: {
+
+        'Content-Type': 'application/json',
+
+        'Authorization': 'Bearer ' + getAccessToken()
+
+      },
+
+      body: JSON.stringify(data)
+
+    });
+
+    
+
+    var result = await response.json();
+
+    showTestResult(result.data);
+
+  } catch (error) {
+
+    showTestResult({ success: false, message: '网络错误: ' + error.message });
+
+  } finally {
+
+    hideLoading();
+
+  }
+
+}
+
+
+
+function showTestResult(result) {
+
+  var container = document.getElementById('testResult');
+
+  
+
+  if (result.success) {
+
+    var headText = result.data && !result.data.dbExists ? '&#9888; 服务器可达' : '&#9989; 连接成功';
+
+    var dbStatus = result.data && !result.data.dbExists ? '<div class="detail-line" style="color:var(--color-warning);"><span class="dl-label">数据库状态：</span><span>数据库不存在，将在保存时创建</span></div>' : '';
+
+    
+
+    container.className = result.data && !result.data.dbExists ? 'test-result warning' : 'test-result success';
+
+    container.innerHTML = `
+
+      <div class="result-head">${headText}</div>
+
+      <div class="result-detail">
+
+        <div class="detail-line"><span class="dl-label">目标地址：</span><span>${result.data.host}:${result.data.port}</span></div>
+
+        <div class="detail-line"><span class="dl-label">数据库版本：</span><span>${result.data.version}</span></div>
+
+        ${dbStatus}
+
+        <div class="detail-line"><span class="dl-label">响应时间：</span><span>${result.data.responseTime} ms</span></div>
+
+        <div class="detail-line"><span class="dl-label">测试时间：</span><span>${result.data.timestamp}</span></div>
+
+      </div>
+
+    `;
+
+  } else {
+
+    container.className = 'test-result error';
+
+    container.innerHTML = `
+
+      <div class="result-head">&#10060; 连接失败</div>
+
+      <div class="result-detail">
+
+        <div style="color:var(--color-error);">${result.message}</div>
+
+      </div>
+
+    `;
+
+  }
+
+}
+
+
+
+function collectFormData() {
+
+  return {
+
+    name: document.getElementById('dcName').value,
+
+    code: document.getElementById('dcCode').value,
+
+    dbType: document.getElementById('dbType').value,
+
+    dbName: document.getElementById('dbName').value,
+
+    dbHost: document.getElementById('dbHost').value,
+
+    dbPort: parseInt(document.getElementById('dbPort').value) || 3306,
+
+    dbUser: document.getElementById('dbUser').value,
+
+    dbPassword: document.getElementById('dbPassword').value,
+
+    backupPath: document.getElementById('backupPath').value,
+
+    charset: document.getElementById('charset').value,
+
+    poolSize: parseInt(document.getElementById('poolSize').value) || 20,
+
+    timeout: parseInt(document.getElementById('timeout').value) || 30,
+
+    sslEnabled: document.getElementById('sslEnabled').checked,
+
+    sslCertPath: document.getElementById('sslCertPath').value,
+
+    readWriteSeparate: document.getElementById('readWriteSeparate').checked,
+
+    masterHost: document.getElementById('masterHost').value,
+
+    slaveHosts: document.getElementById('slaveHosts').value
+
+  };
+
+}
+
+
+
+function validateForm(data) {
+
+  var errors = [];
+
+  if (!data.name) errors.push('数据中心名称');
+
+  if (!data.code) errors.push('数据中心编码');
+
+  if (!data.dbType) errors.push('数据库类型');
+
+  if (!data.dbName) errors.push('数据库名称');
+
+  if (!data.dbHost) errors.push('主机地址');
+
+  if (!data.dbPort) errors.push('端口');
+
+  if (!data.dbUser) errors.push('用户名');
+
+  if (!data.dbPassword) errors.push('密码');
+
+  
+
+  if (errors.length > 0) {
+
+    showToast('请填写以下必填项：\n' + errors.join('\n'), 'warning');
+
+    return false;
+
+  }
+
+  return true;
+
+}
+
+
+
+async function saveDataCenter(continueAdding) {
+
+  if (!checkLogin()) return;
+
+  
+
+  var data = collectFormData();
+
+  if (!validateForm(data)) return;
+
+  
+
+  showLoading('正在创建数据中心...');
+
+  
+
+  saveToLocal(data);
+
+  hideLoading();
+
+  
+
+  if (continueAdding) {
+
+    showToast('保存成功！可继续添加下一个数据中心', 'success');
+
+    document.getElementById('dcName').value = '';
+
+    document.getElementById('dcCode').value = '';
+
+    document.getElementById('dbName').value = '';
+
+    document.getElementById('testResult').className = 'test-result';
+
+    document.getElementById('testResult').innerHTML = `
+
+      <div class="result-head" style="color:var(--text-tertiary);">&#9432; 未进行测试</div>
+
+      <div class="result-detail">
+
+        <div style="color:var(--text-tertiary);">点击下方"测试连接"按钮检测当前配置的连通性</div>
+
+      </div>
+
+    `;
+
+  } else {
+
+    showToast('保存成功！已保存到本地缓存', 'success');
+
+    setTimeout(function() {
+
+      window.location.href = 'index.html';
+
+    }, 1500);
+
+  }
+
+  
+
+  try {
+
+    var response = await fetch(API_BASE + '/data-centers', {
+
+      method: 'POST',
+
+      headers: {
+
+        'Content-Type': 'application/json',
+
+        'Authorization': 'Bearer ' + getAccessToken()
+
+      },
+
+      body: JSON.stringify(data)
+
+    });
+
+    var result = await response.json();
+
+    if (result.code !== 200 && !result.id) {
+
+      console.warn('后端保存失败，但已保存到本地缓存');
+
+    }
+
+  } catch (error) {
+
+    console.warn('后端不可用，数据已保存到本地缓存');
+
+  }
+
+}
+
+
+
+function saveToLocal(data) {
+
+  var dcList = JSON.parse(localStorage.getItem('erp_data_centers') || '[]');
+
+  var newDc = {
+
+    id: 'dc-' + Date.now(),
+
+    name: data.name,
+
+    code: data.code,
+
+    dbType: data.dbType,
+
+    dbHost: data.dbHost,
+
+    dbPort: data.dbPort.toString(),
+
+    dbName: data.dbName,
+
+    status: 1,
+
+    maxConnections: data.poolSize || 20,
+
+    isReadonly: false,
+
+    backupPath: data.backupPath,
+
+    charset: data.charset,
+
+    timeout: data.timeout
+
+  };
+
+  dcList.push(newDc);
+
+  localStorage.setItem('erp_data_centers', JSON.stringify(dcList));
+
+  console.log('数据中心已保存到localStorage:', newDc);
+
+  console.log('当前localStorage数据:', localStorage.getItem('erp_data_centers'));
+
+}
+
+
+
+window.addEventListener('DOMContentLoaded', function() {
+
+  checkLogin();
+
+});
+
+
+
+function showToast(message, type = 'info') {
+
+  var container = document.getElementById('toastContainer');
+
+  var icons = {
+
+    success: '&#9989;',
+
+    warning: '&#9888;',
+
+    error: '&#10060;',
+
+    info: '&#9432;'
+
+  };
+
+  var titles = {
+
+    success: '操作成功',
+
+    warning: '温馨提示',
+
+    error: '系统提示',
+
+    info: '系统提示'
+
+  };
+
+  
+
+  var toast = document.createElement('div');
+
+  toast.className = 'toast toast-' + type;
+
+  toast.innerHTML = `
+
+    <div class="toast-icon">${icons[type]}</div>
+
+    <div class="toast-content">
+
+      <div class="toast-title">${titles[type]}</div>
+
+      <div class="toast-message">${message}</div>
+
+    </div>
+
+  `;
+
+  
+
+  container.appendChild(toast);
+
+  
+
+  setTimeout(function() {
+
+    toast.style.opacity = '0';
+
+    toast.style.transform = 'translateX(100%)';
+
+    setTimeout(function() {
+
+      toast.remove();
+
+    }, 300);
+
+  }, 3000);
+
+}</script>
+
+</body>
+
+</html>

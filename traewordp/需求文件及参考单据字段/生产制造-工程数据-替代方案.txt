@@ -1,0 +1,71 @@
+生产制造-工程数据-替代方案 
+
+字段说明：
+单据头：FBillHead 
+	 实体主键：FID 
+	 数据状态：FDocumentStatus 
+	 禁用状态：FForbidStatus 
+	 替代名称：FName  (必填项)
+	 替代编码：FNumber 
+	 描述：FDescription 
+	 创建组织：FCreateOrgId  (必填项)
+	 使用组织：FUseOrgId  (必填项)
+	 创建人：FCreatorId 
+	 修改人：FModifierId 
+	 创建日期：FCreateDate 
+	 修改日期：FModifyDate 
+	 禁用人：FForbidderId 
+	 审核人：FApproverId 
+	 禁用日期：FForbidDate 
+	 审核日期：FApproveDate 
+	 替代策略：FReplacePolicy  (必填项)
+	 替代方式：FReplaceType  (必填项)
+	 替代编码：FReplaceNO 
+	 单据类型：FBillType  (必填项)
+	 替代方案来源：FReplaceSource  (必填项)
+	 替代类型：FRepType  (必填项)
+替代物料：FEntity 
+	 实体主键：FEntryID 
+	 替代物料编码：FSubMaterialID  (必填项)
+	 物料名称：FSubMaterialName 
+	 优先级：FPriority 
+	 替代主料：FSubIsKeyItem 
+	 生效日期：FEffectDate  (必填项)
+	 失效日期：FExpireDate  (必填项)
+	 备注：FMemo 
+	 规格型号：FSubMaterialModel 
+	 物料属性：FSubMaterialErpClsID 
+	 辅助属性：FSubAuxPropID 
+	 BOM版本：FSubBomId 
+	 单位：FSubUnitID  (必填项)
+	 基本单位：FSubBaseUnitID 
+	 替代料BOM行标识：FSubBOMRowId 
+	 分子：FSubNumerator 
+	 分母：FSubDenominator 
+	 替代料基本单位分子：FSubBaseNumerator 
+	 替代料基本单位分母：FSubBaseDenominator 
+	 供应组织：FSubSupplyOrgId 
+	 替代料BOM分录内码：FSubBomEntryId 
+	 替代模板物料：FSUBTemMtrlId 
+	 净需求比例(%)：FSUBNETDEMANDRATE 
+主物料：FEntityMainItems 
+	 实体主键：FEntryID 
+	 物料编码：FMaterialID  (必填项)
+	 物料名称：FMaterialName 
+	 规格型号：FMaterialModel 
+	 物料属性：FMaterialProperty 
+	 辅助属性：FAuxPropID 
+	 BOM版本：FBomId 
+	 替代主料：FIsKeyItem 
+	 单位：FUnitID  (必填项)
+	 基本单位：FBaseUnitID 
+	 优先级：FMainPriority 
+	 主料BOM行标识：FBOMRowId 
+	 分子：FNumerator 
+	 分母：FDenominator 
+	 主物料基本单位分子：FBaseNumerator 
+	 主物料基本单位分母：FBaseDenominator 
+	 供应组织：FMainSupplyOrgId 
+	 BOM分录内码：FBomEntryId 
+	 模板物料：FTemplateMtrlId 
+	 净需求比例(%)：FNETDEMANDRATE 

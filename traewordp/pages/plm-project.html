@@ -1,0 +1,3841 @@
+<!DOCTYPE html>
+
+
+
+<html lang="zh-CN">
+
+
+
+<head>
+
+
+
+<meta charset="UTF-8">
+
+
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+
+
+<title>项目管理 — 磐枢工业智能平台</title>
+
+
+
+<link rel="stylesheet" href="../common.css">
+
+
+
+<script src="../common.js"></script>
+<script>
+</script>
+
+
+
+</head>
+
+
+
+<body>
+
+
+
+
+
+
+
+<aside class="sidebar" id="sidebar">
+
+
+
+<div class="sidebar-logo">
+
+
+
+    <img src="../images/logo.png" alt="磐枢工业智能平台" style="width: 100%; max-width: 200px; margin-bottom: 8px;">
+
+
+
+    <h1 style="font-size: 16px; margin: 0;">磐枢工业智能平台</h1>
+
+
+
+  </div>
+
+
+
+  <nav class="sidebar-menu"></nav>
+
+
+
+<div class="sidebar-user"><div class="avatar">管</div>
+
+
+
+</aside>
+
+
+
+
+
+
+
+<div class="main-content" id="mainContent">
+
+
+
+  <div class="page-header" style="position:sticky;top:0;z-index:100;">
+
+
+
+    <div>
+
+
+
+      <div class="flex items-center gap-8">
+
+
+
+        <button class="sidebar-toggle" onclick="toggleSidebar()">☰</button>
+
+
+
+        <div>
+
+
+
+          <h2>项目管理</h2>
+
+
+
+          <div class="breadcrumb"><a href="../index.html">首页</a><span>></span><a href="#">PLM管理</a><span>></span><span>项目管理</span></div></div>
+
+
+
+        </div>
+
+
+
+      </div>
+
+
+
+    </div>
+
+
+
+    <div class="page-actions">
+
+
+
+      <button class="btn btn-ghost btn-sm">&#128276; 消息</button>
+      </div>
+
+
+
+  </div>
+
+  <div class="doc-header" style="background:#fff;border-bottom:1px solid #e8e8e8;padding:12px 20px;display:flex;justify-content:space-between;align-items:center;">
+    <div style="font-size:14px;color:#666;">快捷操作</div>
+    <div class="doc-toolbar" style="display:flex;gap:8px;flex-wrap:wrap;">
+      <button class="toolbar-btn" style="padding:6px 12px;border-radius:4px;font-size:13px;cursor:pointer;border:1px solid #d9d9d9;background:#fff;color:#666;display:flex;align-items:center;gap:6px;transition:all 0.3s;" onclick="showToast('刷新功能开发中...', 'info')"><span>🔄</span> 刷新</button>
+      <button class="toolbar-btn" style="padding:6px 12px;border-radius:4px;font-size:13px;cursor:pointer;border:1px solid #d9d9d9;background:#fff;color:#666;display:flex;align-items:center;gap:6px;transition:all 0.3s;" onclick="showToast('列设置功能开发中...', 'info')"><span>⚙️</span> 显示/隐藏列</button>
+      <button class="toolbar-btn" style="padding:6px 12px;border-radius:4px;font-size:13px;cursor:pointer;border:1px solid #d9d9d9;background:#fff;color:#666;display:flex;align-items:center;gap:6px;transition:all 0.3s;" onclick="showToast('导出功能开发中...', 'info')"><span>📤</span> 导出</button>
+      <button class="toolbar-btn danger" style="padding:6px 12px;border-radius:4px;font-size:13px;cursor:pointer;border:1px solid #f5222d;background:#f5222d;color:#fff;display:flex;align-items:center;gap:6px;transition:all 0.3s;" onclick="showConfirm('确认退出？', function() {location.href='../index.html';});)"><span>✖️</span> 退出</button>
+    </div>
+  </div>
+
+  <div class="page-body">
+
+
+
+    <div class="tabs">
+
+
+
+      <div class="tab-item active" onclick="switchTab('project')">项目列表</div>
+
+
+
+      <div class="tab-item" onclick="switchTab('task')">项目任务</div>
+
+
+
+      <div class="tab-item" onclick="switchTab('team')">项目团队</div>
+
+
+
+    </div>
+
+
+
+
+
+
+
+    <div class="tab-content">
+
+
+
+      <div class="tab-pane active" id="project">
+
+
+
+        <div class="card">
+
+
+
+          <div class="card-header">项目列表
+
+
+
+            <button class="btn btn-primary btn-sm" onclick="openModal('projectModal')">新建项目</button>
+
+
+
+          </div>
+
+
+
+          <div class="card-body">
+
+
+
+            <div class="list-filter-row">
+
+
+
+              <div class="filter-field">
+
+
+
+                <input type="text" placeholder="项目编号">
+
+
+
+              </div>
+
+
+
+              <div class="filter-field">
+
+
+
+                <input type="text" placeholder="项目名称">
+
+
+
+              </div>
+
+
+
+              <div class="filter-field">
+
+
+
+                <select>
+
+
+
+                  <option value="">项目类型</option>
+
+
+
+                  <option>新产品开发</option>
+
+
+
+                  <option>工艺改进</option>
+
+
+
+                  <option>技术研发</option>
+
+
+
+                  <option>质量提升</option>
+
+
+
+                </select>
+
+
+
+              </div>
+
+
+
+              <div class="filter-field">
+
+
+
+                <select>
+
+
+
+                  <option value="">状态</option>
+
+
+
+                  <option>规划中</option>
+
+
+
+                  <option>进行中</option>
+
+
+
+                  <option>已暂停</option>
+
+
+
+                  <option>已完成</option>
+
+
+
+                  <option>已终止</option>
+
+
+
+                </select>
+
+
+
+              </div>
+
+
+
+              <div class="list-filter-btns">
+
+
+
+                <button class="btn-search">&#128269; 查询</button>
+
+
+
+                <button class="btn-reset">&#8634; 重置</button>
+
+
+
+              </div>
+
+
+
+            </div>
+
+
+
+            <table class="data-table">
+
+
+
+              <thead>
+
+
+
+                <tr>
+
+
+
+                  <th style="width:40px;"><input type="checkbox"></th>
+
+
+
+                  <th>项目编号</th>
+
+
+
+                  <th>项目名称</th>
+
+
+
+                  <th>项目类型</th>
+
+
+
+                  <th>负责人</th>
+
+
+
+                  <th>开始日期</th>
+
+
+
+                  <th>结束日期</th>
+
+
+
+                  <th>状态</th>
+
+
+
+                  <th>进度</th>
+
+
+
+                  <th>操作</th>
+
+
+
+                </tr>
+
+
+
+              </thead>
+
+
+
+              <tbody>
+
+
+
+                <tr>
+
+
+
+                  <td><input type="checkbox"></td>
+
+
+
+                  <td>PRJ-2026-001</td>
+
+
+
+                  <td>新一代智能仪表盘开发</td>
+
+
+
+                  <td>新产品开发</td>
+
+
+
+                  <td>测试人员</td>
+
+
+
+                  <td>2026-01-01</td>
+
+
+
+                  <td>2026-12-31</td>
+
+
+
+                  <td><span class="badge badge-success">进行中</span></td>
+
+
+
+                  <td>
+
+
+
+                    <div style="width:100px;">
+
+
+
+                      <div class="progress-bar">
+
+
+
+                        <div class="fill fill-success" style="width:75%"></div>
+
+
+
+                      </div>
+
+
+
+                      <div class="text-right text-sm text-muted mt-1">75.00%</div>
+
+
+
+                    </div>
+
+
+
+                  </td>
+
+
+
+                  <td class="row-action-links"><a>编辑</a><a>查看详情</a><a>任务管理</a></td>
+
+
+
+                </tr>
+
+
+
+                <tr>
+
+
+
+                  <td><input type="checkbox"></td>
+
+
+
+                  <td>PRJ-2026-002</td>
+
+
+
+                  <td>轻量化材料工艺改进</td>
+
+
+
+                  <td>工艺改进</td>
+
+
+
+                  <td>王工艺师</td>
+
+
+
+                  <td>2026-03-01</td>
+
+
+
+                  <td>2026-09-30</td>
+
+
+
+                  <td><span class="badge badge-success">进行中</span></td>
+
+
+
+                  <td>
+
+
+
+                    <div style="width:100px;">
+
+
+
+                      <div class="progress-bar">
+
+
+
+                        <div class="fill fill-success" style="width:60%"></div>
+
+
+
+                      </div>
+
+
+
+                      <div class="text-right text-sm text-muted mt-1">60.00%</div>
+
+
+
+                    </div>
+
+
+
+                  </td>
+
+
+
+                  <td class="row-action-links"><a>编辑</a><a>查看详情</a><a>任务管理</a></td>
+
+
+
+                </tr>
+
+
+
+                <tr>
+
+
+
+                  <td><input type="checkbox"></td>
+
+
+
+                  <td>PRJ-2026-003</td>
+
+
+
+                  <td>智能语音交互系统研发</td>
+
+
+
+                  <td>技术研发</td>
+
+
+
+                  <td>张总监</td>
+
+
+
+                  <td>2026-05-01</td>
+
+
+
+                  <td>2027-04-30</td>
+
+
+
+                  <td><span class="badge badge-warning">规划中</span></td>
+
+
+
+                  <td>
+
+
+
+                    <div style="width:100px;">
+
+
+
+                      <div class="progress-bar">
+
+
+
+                        <div class="fill fill-warning" style="width:15%"></div>
+
+
+
+                      </div>
+
+
+
+                      <div class="text-right text-sm text-muted mt-1">15.00%</div>
+
+
+
+                    </div>
+
+
+
+                  </td>
+
+
+
+                  <td class="row-action-links"><a>编辑</a><a>查看详情</a><a>任务管理</a></td>
+
+
+
+                </tr>
+
+
+
+                <tr>
+
+
+
+                  <td><input type="checkbox"></td>
+
+
+
+                  <td>PRJ-2026-004</td>
+
+
+
+                  <td>产品质量稳定性提升</td>
+
+
+
+                  <td>质量提升</td>
+
+
+
+                  <td>赵主管</td>
+
+
+
+                  <td>2026-02-01</td>
+
+
+
+                  <td>2026-08-31</td>
+
+
+
+                  <td><span class="badge badge-success">已完成</span></td>
+
+
+
+                  <td>
+
+
+
+                    <div style="width:100px;">
+
+
+
+                      <div class="progress-bar">
+
+
+
+                        <div class="fill fill-success" style="width:100%"></div>
+
+
+
+                      </div>
+
+
+
+                      <div class="text-right text-sm text-muted mt-1">100.00%</div>
+
+
+
+                    </div>
+
+
+
+                  </td>
+
+
+
+                  <td class="row-action-links"><a>查看详情</a><a>归档</a></td>
+
+
+
+                </tr>
+
+
+
+                <tr>
+
+
+
+                  <td><input type="checkbox"></td>
+
+
+
+                  <td>PRJ-2026-005</td>
+
+
+
+                  <td>新能源汽车部件开发</td>
+
+
+
+                  <td>新产品开发</td>
+
+
+
+                  <td>孙经理</td>
+
+
+
+                  <td>2026-04-01</td>
+
+
+
+                  <td>2026-11-30</td>
+
+
+
+                  <td><span class="badge badge-info">已暂停</span></td>
+
+
+
+                  <td>
+
+
+
+                    <div style="width:100px;">
+
+
+
+                      <div class="progress-bar">
+
+
+
+                        <div class="fill fill-info" style="width:45%"></div>
+
+
+
+                      </div>
+
+
+
+                      <div class="text-right text-sm text-muted mt-1">45.00%</div>
+
+
+
+                    </div>
+
+
+
+                  </td>
+
+
+
+                  <td class="row-action-links"><a>编辑</a><a>查看详情</a><a>启动</a></td>
+
+
+
+                </tr>
+
+
+
+                <tr>
+
+
+
+                  <td><input type="checkbox"></td>
+
+
+
+                  <td>PRJ-2026-006</td>
+
+
+
+                  <td>5G通信模块集成</td>
+
+
+
+                  <td>技术研发</td>
+
+
+
+                  <td>周工程师</td>
+
+
+
+                  <td>2026-01-15</td>
+
+
+
+                  <td>2026-07-15</td>
+
+
+
+                  <td><span class="badge badge-error">已终止</span></td>
+
+
+
+                  <td>
+
+
+
+                    <div style="width:100px;">
+
+
+
+                      <div class="progress-bar">
+
+
+
+                        <div class="fill fill-error" style="width:30%"></div>
+
+
+
+                      </div>
+
+
+
+                      <div class="text-right text-sm text-muted mt-1">30.00%</div>
+
+
+
+                    </div>
+
+
+
+                  </td>
+
+
+
+                  <td class="row-action-links"><a>查看详情</a><a>复盘</a></td>
+
+
+
+                </tr>
+
+
+
+                <tr>
+
+
+
+                  <td><input type="checkbox"></td>
+
+
+
+                  <td>PRJ-2026-007</td>
+
+
+
+                  <td>智能座舱系统升级</td>
+
+
+
+                  <td>新产品开发</td>
+
+
+
+                  <td>吴总监</td>
+
+
+
+                  <td>2026-06-01</td>
+
+
+
+                  <td>2027-03-31</td>
+
+
+
+                  <td><span class="badge badge-warning">规划中</span></td>
+
+
+
+                  <td>
+
+
+
+                    <div style="width:100px;">
+
+
+
+                      <div class="progress-bar">
+
+
+
+                        <div class="fill fill-warning" style="width:8%"></div>
+
+
+
+                      </div>
+
+
+
+                      <div class="text-right text-sm text-muted mt-1">8.00%</div>
+
+
+
+                    </div>
+
+
+
+                  </td>
+
+
+
+                  <td class="row-action-links"><a>编辑</a><a>查看详情</a><a>任务管理</a></td>
+
+
+
+                </tr>
+
+
+
+                <tr>
+
+
+
+                  <td><input type="checkbox"></td>
+
+
+
+                  <td>PRJ-2026-008</td>
+
+
+
+                  <td>注塑工艺优化</td>
+
+
+
+                  <td>工艺改进</td>
+
+
+
+                  <td>郑工艺师</td>
+
+
+
+                  <td>2026-02-15</td>
+
+
+
+                  <td>2026-05-15</td>
+
+
+
+                  <td><span class="badge badge-success">已完成</span></td>
+
+
+
+                  <td>
+
+
+
+                    <div style="width:100px;">
+
+
+
+                      <div class="progress-bar">
+
+
+
+                        <div class="fill fill-success" style="width:100%"></div>
+
+
+
+                      </div>
+
+
+
+                      <div class="text-right text-sm text-muted mt-1">100.00%</div>
+
+
+
+                    </div>
+
+
+
+                  </td>
+
+
+
+                  <td class="row-action-links"><a>查看详情</a><a>归档</a></td>
+
+
+
+                </tr>
+
+
+
+              </tbody>
+
+
+
+            </table>
+
+
+
+            <div class="pagination mt-16">
+
+
+
+              <span class="page-btn">&laquo;</span>
+
+
+
+              <span class="page-btn active">1</span>
+
+
+
+              <span class="page-btn">2</span>
+
+
+
+              <span class="page-btn">3</span>
+
+
+
+              <span class="page-btn">&raquo;</span>
+
+
+
+              <span class="page-info">共 22 条记录，每页 8 条</span>
+
+
+
+            </div>
+
+
+
+          </div>
+
+
+
+        </div>
+
+
+
+      </div>
+
+
+
+
+
+
+
+      <div class="tab-pane" id="task">
+
+
+
+        <div class="card">
+
+
+
+          <div class="card-header">项目任务
+
+
+
+            <button class="btn btn-primary btn-sm" onclick="openModal('taskModal')">新建任务</button>
+
+
+
+          </div>
+
+
+
+          <div class="card-body">
+
+
+
+            <div class="list-filter-row">
+
+
+
+              <div class="filter-field">
+
+
+
+                <input type="text" placeholder="任务编号">
+
+
+
+              </div>
+
+
+
+              <div class="filter-field">
+
+
+
+                <input type="text" placeholder="任务名称">
+
+
+
+              </div>
+
+
+
+              <div class="filter-field">
+
+
+
+                <select>
+
+
+
+                  <option value="">所属项目</option>
+
+
+
+                  <option>新一代智能仪表盘开发</option>
+
+
+
+                  <option>轻量化材料工艺改进</option>
+
+
+
+                  <option>智能语音交互系统研发</option>
+
+
+
+                </select>
+
+
+
+              </div>
+
+
+
+              <div class="filter-field">
+
+
+
+                <select>
+
+
+
+                  <option value="">状态</option>
+
+
+
+                  <option>待开始</option>
+
+
+
+                  <option>进行中</option>
+
+
+
+                  <option>已完成</option>
+
+
+
+                  <option>已延期</option>
+
+
+
+                </select>
+
+
+
+              </div>
+
+
+
+              <div class="list-filter-btns">
+
+
+
+                <button class="btn-search">&#128269; 查询</button>
+
+
+
+                <button class="btn-reset">&#8634; 重置</button>
+
+
+
+              </div>
+
+
+
+            </div>
+
+
+
+            <table class="data-table">
+
+
+
+              <thead>
+
+
+
+                <tr>
+
+
+
+                  <th style="width:40px;"><input type="checkbox"></th>
+
+
+
+                  <th>任务编号</th>
+
+
+
+                  <th>任务名称</th>
+
+
+
+                  <th>所属项目</th>
+
+
+
+                  <th>负责人</th>
+
+
+
+                  <th>开始日期</th>
+
+
+
+                  <th>结束日期</th>
+
+
+
+                  <th>进度</th>
+
+
+
+                  <th>状态</th>
+
+
+
+                  <th>操作</th>
+
+
+
+                </tr>
+
+
+
+              </thead>
+
+
+
+              <tbody>
+
+
+
+                <tr>
+
+
+
+                  <td><input type="checkbox"></td>
+
+
+
+                  <td>TASK-001</td>
+
+
+
+                  <td>需求分析与规格定义</td>
+
+
+
+                  <td>新一代智能仪表盘开发</td>
+
+
+
+                  <td>王产品</td>
+
+
+
+                  <td>2026-01-01</td>
+
+
+
+                  <td>2026-02-15</td>
+
+
+
+                  <td>
+
+
+
+                    <div style="width:80px;">
+
+
+
+                      <div class="progress-bar">
+
+
+
+                        <div class="fill fill-success" style="width:100%"></div>
+
+
+
+                      </div>
+
+
+
+                    </div>
+
+
+
+                  </td>
+
+
+
+                  <td><span class="badge badge-success">已完成</span></td>
+
+
+
+                  <td class="row-action-links"><a>查看</a><a>编辑</a></td>
+
+
+
+                </tr>
+
+
+
+                <tr>
+
+
+
+                  <td><input type="checkbox"></td>
+
+
+
+                  <td>TASK-002</td>
+
+
+
+                  <td>外观设计与评审</td>
+
+
+
+                  <td>新一代智能仪表盘开发</td>
+
+
+
+                  <td>李设计师</td>
+
+
+
+                  <td>2026-02-01</td>
+
+
+
+                  <td>2026-04-30</td>
+
+
+
+                  <td>
+
+
+
+                    <div style="width:80px;">
+
+
+
+                      <div class="progress-bar">
+
+
+
+                        <div class="fill fill-success" style="width:100%"></div>
+
+
+
+                      </div>
+
+
+
+                    </div>
+
+
+
+                  </td>
+
+
+
+                  <td><span class="badge badge-success">已完成</span></td>
+
+
+
+                  <td class="row-action-links"><a>查看</a><a>编辑</a></td>
+
+
+
+                </tr>
+
+
+
+                <tr>
+
+
+
+                  <td><input type="checkbox"></td>
+
+
+
+                  <td>TASK-003</td>
+
+
+
+                  <td>硬件电路设计</td>
+
+
+
+                  <td>新一代智能仪表盘开发</td>
+
+
+
+                  <td>张工程师</td>
+
+
+
+                  <td>2026-03-01</td>
+
+
+
+                  <td>2026-06-30</td>
+
+
+
+                  <td>
+
+
+
+                    <div style="width:80px;">
+
+
+
+                      <div class="progress-bar">
+
+
+
+                        <div class="fill fill-success" style="width:85%"></div>
+
+
+
+                      </div>
+
+
+
+                    </div>
+
+
+
+                  </td>
+
+
+
+                  <td><span class="badge badge-success">进行中</span></td>
+
+
+
+                  <td class="row-action-links"><a>查看</a><a>编辑</a><a>汇报</a></td>
+
+
+
+                </tr>
+
+
+
+                <tr>
+
+
+
+                  <td><input type="checkbox"></td>
+
+
+
+                  <td>TASK-004</td>
+
+
+
+                  <td>软件系统开发</td>
+
+
+
+                  <td>新一代智能仪表盘开发</td>
+
+
+
+                  <td>赵程序员</td>
+
+
+
+                  <td>2026-04-01</td>
+
+
+
+                  <td>2026-09-30</td>
+
+
+
+                  <td>
+
+
+
+                    <div style="width:80px;">
+
+
+
+                      <div class="progress-bar">
+
+
+
+                        <div class="fill fill-success" style="width:60%"></div>
+
+
+
+                      </div>
+
+
+
+                    </div>
+
+
+
+                  </td>
+
+
+
+                  <td><span class="badge badge-success">进行中</span></td>
+
+
+
+                  <td class="row-action-links"><a>查看</a><a>编辑</a><a>汇报</a></td>
+
+
+
+                </tr>
+
+
+
+                <tr>
+
+
+
+                  <td><input type="checkbox"></td>
+
+
+
+                  <td>TASK-005</td>
+
+
+
+                  <td>样机制作与测试</td>
+
+
+
+                  <td>新一代智能仪表盘开发</td>
+
+
+
+                  <td>孙工程师</td>
+
+
+
+                  <td>2026-07-01</td>
+
+
+
+                  <td>2026-10-31</td>
+
+
+
+                  <td>
+
+
+
+                    <div style="width:80px;">
+
+
+
+                      <div class="progress-bar">
+
+
+
+                        <div class="fill fill-warning" style="width:20%"></div>
+
+
+
+                      </div>
+
+
+
+                    </div>
+
+
+
+                  </td>
+
+
+
+                  <td><span class="badge badge-success">进行中</span></td>
+
+
+
+                  <td class="row-action-links"><a>查看</a><a>编辑</a><a>汇报</a></td>
+
+
+
+                </tr>
+
+
+
+                <tr>
+
+
+
+                  <td><input type="checkbox"></td>
+
+
+
+                  <td>TASK-006</td>
+
+
+
+                  <td>材料选型与验证</td>
+
+
+
+                  <td>轻量化材料工艺改进</td>
+
+
+
+                  <td>周工艺师</td>
+
+
+
+                  <td>2026-03-01</td>
+
+
+
+                  <td>2026-05-31</td>
+
+
+
+                  <td>
+
+
+
+                    <div style="width:80px;">
+
+
+
+                      <div class="progress-bar">
+
+
+
+                        <div class="fill fill-success" style="width:100%"></div>
+
+
+
+                      </div>
+
+
+
+                    </div>
+
+
+
+                  </td>
+
+
+
+                  <td><span class="badge badge-success">已完成</span></td>
+
+
+
+                  <td class="row-action-links"><a>查看</a><a>编辑</a></td>
+
+
+
+                </tr>
+
+
+
+                <tr>
+
+
+
+                  <td><input type="checkbox"></td>
+
+
+
+                  <td>TASK-007</td>
+
+
+
+                  <td>工艺参数优化</td>
+
+
+
+                  <td>轻量化材料工艺改进</td>
+
+
+
+                  <td>吴工艺师</td>
+
+
+
+                  <td>2026-05-01</td>
+
+
+
+                  <td>2026-08-31</td>
+
+
+
+                  <td>
+
+
+
+                    <div style="width:80px;">
+
+
+
+                      <div class="progress-bar">
+
+
+
+                        <div class="fill fill-success" style="width:55%"></div>
+
+
+
+                      </div>
+
+
+
+                    </div>
+
+
+
+                  </td>
+
+
+
+                  <td><span class="badge badge-success">进行中</span></td>
+
+
+
+                  <td class="row-action-links"><a>查看</a><a>编辑</a><a>汇报</a></td>
+
+
+
+                </tr>
+
+
+
+                <tr>
+
+
+
+                  <td><input type="checkbox"></td>
+
+
+
+                  <td>TASK-008</td>
+
+
+
+                  <td>供应商评估</td>
+
+
+
+                  <td>智能语音交互系统研发</td>
+
+
+
+                  <td>郑采购</td>
+
+
+
+                  <td>2026-05-15</td>
+
+
+
+                  <td>2026-06-30</td>
+
+
+
+                  <td>
+
+
+
+                    <div style="width:80px;">
+
+
+
+                      <div class="progress-bar">
+
+
+
+                        <div class="fill fill-warning" style="width:0%"></div>
+
+
+
+                      </div>
+
+
+
+                    </div>
+
+
+
+                  </td>
+
+
+
+                  <td><span class="badge badge-warning">待开始</span></td>
+
+
+
+                  <td class="row-action-links"><a>查看</a><a>编辑</a></td>
+
+
+
+                </tr>
+
+
+
+              </tbody>
+
+
+
+            </table>
+
+
+
+            <div class="pagination mt-16">
+
+
+
+              <span class="page-btn">&laquo;</span>
+
+
+
+              <span class="page-btn active">1</span>
+
+
+
+              <span class="page-btn">2</span>
+
+
+
+              <span class="page-btn">3</span>
+
+
+
+              <span class="page-btn">4</span>
+
+
+
+              <span class="page-btn">&raquo;</span>
+
+
+
+              <span class="page-info">共 35 条记录，每页 8 条</span>
+
+
+
+            </div>
+
+
+
+          </div>
+
+
+
+        </div>
+
+
+
+      </div>
+
+
+
+
+
+
+
+      <div class="tab-pane" id="team">
+
+
+
+        <div class="card">
+
+
+
+          <div class="card-header">项目团队
+
+
+
+            <button class="btn btn-primary btn-sm" onclick="openModal('teamModal')">添加成员</button>
+
+
+
+          </div>
+
+
+
+          <div class="card-body">
+
+
+
+            <div class="list-filter-row">
+
+
+
+              <div class="filter-field">
+
+
+
+                <input type="text" placeholder="姓名">
+
+
+
+              </div>
+
+
+
+              <div class="filter-field">
+
+
+
+                <select>
+
+
+
+                  <option value="">所属项目</option>
+
+
+
+                  <option>新一代智能仪表盘开发</option>
+
+
+
+                  <option>轻量化材料工艺改进</option>
+
+
+
+                  <option>智能语音交互系统研发</option>
+
+
+
+                </select>
+
+
+
+              </div>
+
+
+
+              <div class="filter-field">
+
+
+
+                <select>
+
+
+
+                  <option value="">角色</option>
+
+
+
+                  <option>项目经理</option>
+
+
+
+                  <option>产品经理</option>
+
+
+
+                  <option>设计师</option>
+
+
+
+                  <option>工程师</option>
+
+
+
+                  <option>工艺师</option>
+
+
+
+                </select>
+
+
+
+              </div>
+
+
+
+              <div class="list-filter-btns">
+
+
+
+                <button class="btn-search">&#128269; 查询</button>
+
+
+
+                <button class="btn-reset">&#8634; 重置</button>
+
+
+
+              </div>
+
+
+
+            </div>
+
+
+
+            <table class="data-table">
+
+
+
+              <thead>
+
+
+
+                <tr>
+
+
+
+                  <th style="width:40px;"><input type="checkbox"></th>
+
+
+
+                  <th>姓名</th>
+
+
+
+                  <th>岗位</th>
+
+
+
+                  <th>角色</th>
+
+
+
+                  <th>权限</th>
+
+
+
+                  <th>所属项目</th>
+
+
+
+                  <th>加入日期</th>
+
+
+
+                  <th>操作</th>
+
+
+
+                </tr>
+
+
+
+              </thead>
+
+
+
+              <tbody>
+
+
+
+                <tr>
+
+
+
+                  <td><input type="checkbox"></td>
+
+
+
+                  <td><div class="flex items-center gap-4"><div class="avatar avatar-sm">李</div><span>测试人员</span></div></td>
+
+
+
+                  <td>项目经理</td>
+
+
+
+                  <td>项目经理</td>
+
+
+
+                  <td>全部权限</td>
+
+
+
+                  <td>新一代智能仪表盘开发</td>
+
+
+
+                  <td>2026-01-01</td>
+
+
+
+                  <td class="row-action-links"><a>编辑权限</a><a>移除</a></td>
+
+
+
+                </tr>
+
+
+
+                <tr>
+
+
+
+                  <td><input type="checkbox"></td>
+
+
+
+                  <td><div class="flex items-center gap-4"><div class="avatar avatar-sm">王</div><span>王产品</span></div></td>
+
+
+
+                  <td>产品经理</td>
+
+
+
+                  <td>产品经理</td>
+
+
+
+                  <td>编辑/查看</td>
+
+
+
+                  <td>新一代智能仪表盘开发</td>
+
+
+
+                  <td>2026-01-01</td>
+
+
+
+                  <td class="row-action-links"><a>编辑权限</a><a>移除</a></td>
+
+
+
+                </tr>
+
+
+
+                <tr>
+
+
+
+                  <td><input type="checkbox"></td>
+
+
+
+                  <td><div class="flex items-center gap-4"><div class="avatar avatar-sm">李</div><span>李设计师</span></div></td>
+
+
+
+                  <td>UI设计师</td>
+
+
+
+                  <td>设计师</td>
+
+
+
+                  <td>编辑/查看</td>
+
+
+
+                  <td>新一代智能仪表盘开发</td>
+
+
+
+                  <td>2026-02-01</td>
+
+
+
+                  <td class="row-action-links"><a>编辑权限</a><a>移除</a></td>
+
+
+
+                </tr>
+
+
+
+                <tr>
+
+
+
+                  <td><input type="checkbox"></td>
+
+
+
+                  <td><div class="flex items-center gap-4"><div class="avatar avatar-sm">张</div><span>张工程师</span></div></td>
+
+
+
+                  <td>硬件工程师</td>
+
+
+
+                  <td>工程师</td>
+
+
+
+                  <td>编辑/查看</td>
+
+
+
+                  <td>新一代智能仪表盘开发</td>
+
+
+
+                  <td>2026-03-01</td>
+
+
+
+                  <td class="row-action-links"><a>编辑权限</a><a>移除</a></td>
+
+
+
+                </tr>
+
+
+
+                <tr>
+
+
+
+                  <td><input type="checkbox"></td>
+
+
+
+                  <td><div class="flex items-center gap-4"><div class="avatar avatar-sm">赵</div><span>赵程序员</span></div></td>
+
+
+
+                  <td>软件工程师</td>
+
+
+
+                  <td>工程师</td>
+
+
+
+                  <td>编辑/查看</td>
+
+
+
+                  <td>新一代智能仪表盘开发</td>
+
+
+
+                  <td>2026-04-01</td>
+
+
+
+                  <td class="row-action-links"><a>编辑权限</a><a>移除</a></td>
+
+
+
+                </tr>
+
+
+
+                <tr>
+
+
+
+                  <td><input type="checkbox"></td>
+
+
+
+                  <td><div class="flex items-center gap-4"><div class="avatar avatar-sm">王</div><span>王工艺师</span></div></td>
+
+
+
+                  <td>工艺工程师</td>
+
+
+
+                  <td>工艺师</td>
+
+
+
+                  <td>全部权限</td>
+
+
+
+                  <td>轻量化材料工艺改进</td>
+
+
+
+                  <td>2026-03-01</td>
+
+
+
+                  <td class="row-action-links"><a>编辑权限</a><a>移除</a></td>
+
+
+
+                </tr>
+
+
+
+                <tr>
+
+
+
+                  <td><input type="checkbox"></td>
+
+
+
+                  <td><div class="flex items-center gap-4"><div class="avatar avatar-sm">周</div><span>周工艺师</span></div></td>
+
+
+
+                  <td>材料工程师</td>
+
+
+
+                  <td>工艺师</td>
+
+
+
+                  <td>编辑/查看</td>
+
+
+
+                  <td>轻量化材料工艺改进</td>
+
+
+
+                  <td>2026-03-01</td>
+
+
+
+                  <td class="row-action-links"><a>编辑权限</a><a>移除</a></td>
+
+
+
+                </tr>
+
+
+
+                <tr>
+
+
+
+                  <td><input type="checkbox"></td>
+
+
+
+                  <td><div class="flex items-center gap-4"><div class="avatar avatar-sm">张</div><span>张总监</span></div></td>
+
+
+
+                  <td>研发总监</td>
+
+
+
+                  <td>项目经理</td>
+
+
+
+                  <td>全部权限</td>
+
+
+
+                  <td>智能语音交互系统研发</td>
+
+
+
+                  <td>2026-05-01</td>
+
+
+
+                  <td class="row-action-links"><a>编辑权限</a><a>移除</a></td>
+
+
+
+                </tr>
+
+
+
+              </tbody>
+
+
+
+            </table>
+
+
+
+            <div class="pagination mt-16">
+
+
+
+              <span class="page-btn">&laquo;</span>
+
+
+
+              <span class="page-btn active">1</span>
+
+
+
+              <span class="page-btn">2</span>
+
+
+
+              <span class="page-btn">&raquo;</span>
+
+
+
+              <span class="page-info">共 18 条记录，每页 8 条</span>
+
+
+
+            </div>
+
+
+
+          </div>
+
+
+
+        </div>
+
+
+
+      </div>
+
+
+
+    </div>
+
+
+
+  </div>
+
+
+
+
+
+
+
+  <div class="modal-overlay" id="projectModal">
+
+
+
+    <div class="modal-dialog">
+
+
+
+      <div class="modal-header">
+
+
+
+        <h3>新建项目</h3>
+
+
+
+        <button class="modal-close" onclick="closeModal('projectModal')">×</button>
+
+
+
+      </div>
+
+
+
+      <div class="modal-body">
+
+
+
+        <div class="grid-2 gap-16">
+
+
+
+          <div class="form-group">
+
+
+
+            <label class="form-label">项目编号</label>
+
+
+
+            <input type="text" class="form-input" placeholder="自动生成">
+
+
+
+          </div>
+
+
+
+          <div class="form-group">
+
+
+
+            <label class="form-label">项目名称</label>
+
+
+
+            <input type="text" class="form-input" placeholder="请输入项目名称">
+
+
+
+          </div>
+
+
+
+          <div class="form-group">
+
+
+
+            <label class="form-label">项目类型</label>
+
+
+
+            <select class="form-select">
+
+
+
+              <option value="">请选择项目类型</option>
+
+
+
+              <option>新产品开发</option>
+
+
+
+              <option>工艺改进</option>
+
+
+
+              <option>技术研发</option>
+
+
+
+              <option>质量提升</option>
+
+
+
+            </select>
+
+
+
+          </div>
+
+
+
+          <div class="form-group">
+
+
+
+            <label class="form-label">负责人</label>
+
+
+
+            <select class="form-select">
+
+
+
+              <option value="">请选择负责人</option>
+
+
+
+              <option>测试人员</option>
+
+
+
+              <option>王工艺师</option>
+
+
+
+              <option>张总监</option>
+
+
+
+              <option>孙经理</option>
+
+
+
+            </select>
+
+
+
+          </div>
+
+
+
+          <div class="form-group">
+
+
+
+            <label class="form-label">开始日期</label>
+
+
+
+            <input type="date" class="form-input">
+
+
+
+          </div>
+
+
+
+          <div class="form-group">
+
+
+
+            <label class="form-label">结束日期</label>
+
+
+
+            <input type="date" class="form-input">
+
+
+
+          </div>
+
+
+
+          <div class="form-group">
+
+
+
+            <label class="form-label">状态</label>
+
+
+
+            <select class="form-select">
+
+
+
+              <option>规划中</option>
+
+
+
+              <option>进行中</option>
+
+
+
+              <option>已暂停</option>
+
+
+
+              <option>已完成</option>
+
+
+
+              <option>已终止</option>
+
+
+
+            </select>
+
+
+
+          </div>
+
+
+
+          <div class="form-group">
+
+
+
+            <label class="form-label">预算(万元)</label>
+
+
+
+            <input type="number" class="form-input" placeholder="0.00" step="0.01">
+
+
+
+          </div>
+
+
+
+          <div class="form-group">
+
+
+
+            <label class="form-label">项目描述</label>
+
+
+
+            <textarea class="form-textarea" placeholder="请输入项目描述"></textarea>
+
+
+
+          </div>
+
+
+
+        </div>
+
+
+
+      </div>
+
+
+
+      <div class="modal-footer">
+
+
+
+        <button class="btn btn-ghost" onclick="closeModal('projectModal')">取消</button>
+
+
+
+        <button class="btn btn-primary" onclick="createProject()">创建项目</button>
+
+
+
+      </div>
+
+
+
+    </div>
+
+
+
+  </div>
+
+
+
+
+
+
+
+  <div class="modal-overlay" id="taskModal">
+
+
+
+    <div class="modal-dialog">
+
+
+
+      <div class="modal-header">
+
+
+
+        <h3>新建任务</h3>
+
+
+
+        <button class="modal-close" onclick="closeModal('taskModal')">×</button>
+
+
+
+      </div>
+
+
+
+      <div class="modal-body">
+
+
+
+        <div class="grid-2 gap-16">
+
+
+
+          <div class="form-group">
+
+
+
+            <label class="form-label">任务编号</label>
+
+
+
+            <input type="text" class="form-input" placeholder="自动生成">
+
+
+
+          </div>
+
+
+
+          <div class="form-group">
+
+
+
+            <label class="form-label">任务名称</label>
+
+
+
+            <input type="text" class="form-input" placeholder="请输入任务名称">
+
+
+
+          </div>
+
+
+
+          <div class="form-group">
+
+
+
+            <label class="form-label">所属项目</label>
+
+
+
+            <select class="form-select">
+
+
+
+              <option value="">请选择项目</option>
+
+
+
+              <option>新一代智能仪表盘开发</option>
+
+
+
+              <option>轻量化材料工艺改进</option>
+
+
+
+              <option>智能语音交互系统研发</option>
+
+
+
+            </select>
+
+
+
+          </div>
+
+
+
+          <div class="form-group">
+
+
+
+            <label class="form-label">负责人</label>
+
+
+
+            <select class="form-select">
+
+
+
+              <option value="">请选择负责人</option>
+
+
+
+              <option>王产品</option>
+
+
+
+              <option>李设计师</option>
+
+
+
+              <option>张工程师</option>
+
+
+
+              <option>赵程序员</option>
+
+
+
+            </select>
+
+
+
+          </div>
+
+
+
+          <div class="form-group">
+
+
+
+            <label class="form-label">开始日期</label>
+
+
+
+            <input type="date" class="form-input">
+
+
+
+          </div>
+
+
+
+          <div class="form-group">
+
+
+
+            <label class="form-label">结束日期</label>
+
+
+
+            <input type="date" class="form-input">
+
+
+
+          </div>
+
+
+
+          <div class="form-group">
+
+
+
+            <label class="form-label">优先级</label>
+
+
+
+            <select class="form-select">
+
+
+
+              <option>高</option>
+
+
+
+              <option>中</option>
+
+
+
+              <option>低</option>
+
+
+
+            </select>
+
+
+
+          </div>
+
+
+
+          <div class="form-group">
+
+
+
+            <label class="form-label">状态</label>
+
+
+
+            <select class="form-select">
+
+
+
+              <option>待开始</option>
+
+
+
+              <option>进行中</option>
+
+
+
+              <option>已完成</option>
+
+
+
+              <option>已延期</option>
+
+
+
+            </select>
+
+
+
+          </div>
+
+
+
+          <div class="form-group">
+
+
+
+            <label class="form-label">任务描述</label>
+
+
+
+            <textarea class="form-textarea" placeholder="请输入任务描述"></textarea>
+
+
+
+          </div>
+
+
+
+        </div>
+
+
+
+      </div>
+
+
+
+      <div class="modal-footer">
+
+
+
+        <button class="btn btn-ghost" onclick="closeModal('taskModal')">取消</button>
+
+
+
+        <button class="btn btn-primary" onclick="createTask()">创建任务</button>
+
+
+
+      </div>
+
+
+
+    </div>
+
+
+
+  </div>
+
+
+
+
+
+
+
+  <div class="modal-overlay" id="teamModal">
+
+
+
+    <div class="modal-dialog">
+
+
+
+      <div class="modal-header">
+
+
+
+        <h3>添加团队成员</h3>
+
+
+
+        <button class="modal-close" onclick="closeModal('teamModal')">×</button>
+
+
+
+      </div>
+
+
+
+      <div class="modal-body">
+
+
+
+        <div class="grid-2 gap-16">
+
+
+
+          <div class="form-group">
+
+
+
+            <label class="form-label">姓名</label>
+
+
+
+            <select class="form-select">
+
+
+
+              <option value="">请选择成员</option>
+
+
+
+              <option>王产品</option>
+
+
+
+              <option>李设计师</option>
+
+
+
+              <option>张工程师</option>
+
+
+
+              <option>赵程序员</option>
+
+
+
+              <option>孙工程师</option>
+
+
+
+              <option>周工艺师</option>
+
+
+
+              <option>吴工艺师</option>
+
+
+
+              <option>郑采购</option>
+
+
+
+            </select>
+
+
+
+          </div>
+
+
+
+          <div class="form-group">
+
+
+
+            <label class="form-label">岗位</label>
+
+
+
+            <input type="text" class="form-input" placeholder="自动填充">
+
+
+
+          </div>
+
+
+
+          <div class="form-group">
+
+
+
+            <label class="form-label">角色</label>
+
+
+
+            <select class="form-select">
+
+
+
+              <option value="">请选择角色</option>
+
+
+
+              <option>项目经理</option>
+
+
+
+              <option>产品经理</option>
+
+
+
+              <option>设计师</option>
+
+
+
+              <option>工程师</option>
+
+
+
+              <option>工艺师</option>
+
+
+
+              <option>测试人员</option>
+
+
+
+              <option>采购</option>
+
+
+
+            </select>
+
+
+
+          </div>
+
+
+
+          <div class="form-group">
+
+
+
+            <label class="form-label">权限</label>
+
+
+
+            <select class="form-select">
+
+
+
+              <option>全部权限</option>
+
+
+
+              <option>编辑/查看</option>
+
+
+
+              <option>仅查看</option>
+
+
+
+            </select>
+
+
+
+          </div>
+
+
+
+          <div class="form-group">
+
+
+
+            <label class="form-label">所属项目</label>
+
+
+
+            <select class="form-select">
+
+
+
+              <option value="">请选择项目</option>
+
+
+
+              <option>新一代智能仪表盘开发</option>
+
+
+
+              <option>轻量化材料工艺改进</option>
+
+
+
+              <option>智能语音交互系统研发</option>
+
+
+
+            </select>
+
+
+
+          </div>
+
+
+
+          <div class="form-group">
+
+
+
+            <label class="form-label">加入日期</label>
+
+
+
+            <input type="date" class="form-input">
+
+
+
+          </div>
+
+
+
+        </div>
+
+
+
+      </div>
+
+
+
+      <div class="modal-footer">
+
+
+
+        <button class="btn btn-ghost" onclick="closeModal('teamModal')">取消</button>
+
+
+
+        <button class="btn btn-primary" onclick="addTeamMember()">添加</button>
+
+
+
+      </div>
+
+
+
+    </div>
+
+
+
+  </div>
+
+
+
+</div>
+
+
+
+
+
+
+
+<script>
+
+
+
+function switchTab(tabId) {
+
+
+
+  document.querySelectorAll('.tab-item').forEach(function(t) { t.classList.remove('active'); });
+
+
+
+  document.querySelectorAll('.tab-pane').forEach(function(p) { p.classList.remove('active'); });
+
+
+
+  event.target.classList.add('active');
+
+
+
+  document.getElementById(tabId).classList.add('active');
+
+
+
+}
+
+
+
+function openModal(id) {
+
+
+
+  document.getElementById(id).classList.add('show');
+
+
+
+}
+
+
+
+function closeModal(id) {
+
+
+
+  document.getElementById(id).classList.remove('show');
+
+
+
+}
+
+
+
+function validateProjectForm() {
+
+
+
+  var projName = document.querySelector('#projectModal .form-input:nth-of-type(2)').value.trim();
+
+
+
+  var projType = document.querySelector('#projectModal .form-select:nth-of-type(1)').value;
+
+
+
+  var leader = document.querySelector('#projectModal .form-select:nth-of-type(2)').value;
+
+
+
+  var startDate = document.querySelector('#projectModal .form-input:nth-of-type(3)').value;
+
+
+
+  var endDate = document.querySelector('#projectModal .form-input:nth-of-type(4)').value;
+
+
+
+  if (!projName) { showToast('请输入项目名称', 'info'); return false; }
+
+
+
+  if (!projType) { showToast('请选择项目类型', 'info'); return false; }
+
+
+
+  if (!leader) { showToast('请选择负责人', 'info'); return false; }
+
+
+
+  if (!startDate) { showToast('请选择开始日期', 'info'); return false; }
+
+
+
+  if (!endDate) { showToast('请选择结束日期', 'info'); return false; }
+
+
+
+  if (startDate > endDate) { showToast('开始日期不能晚于结束日期', 'info'); return false; }
+
+
+
+  return true;
+
+
+
+}
+
+
+
+function createProject() {
+
+
+
+  if (!validateProjectForm()) return;
+
+
+
+  currentStatus = 'created';
+
+
+
+  showToast('项目创建成功！', 'info');
+
+
+
+  closeModal('projectModal');
+
+
+
+}
+
+
+
+function validateTaskForm() {
+
+
+
+  var taskName = document.querySelector('#taskModal .form-input:nth-of-type(2)').value.trim();
+
+
+
+  var project = document.querySelector('#taskModal .form-select:nth-of-type(1)').value;
+
+
+
+  var assignee = document.querySelector('#taskModal .form-select:nth-of-type(2)').value;
+
+
+
+  var startDate = document.querySelector('#taskModal .form-input:nth-of-type(3)').value;
+
+
+
+  var endDate = document.querySelector('#taskModal .form-input:nth-of-type(4)').value;
+
+
+
+  if (!taskName) { showToast('请输入任务名称', 'info'); return false; }
+
+
+
+  if (!project) { showToast('请选择所属项目', 'info'); return false; }
+
+
+
+  if (!assignee) { showToast('请选择负责人', 'info'); return false; }
+
+
+
+  if (!startDate) { showToast('请选择开始日期', 'info'); return false; }
+
+
+
+  if (!endDate) { showToast('请选择结束日期', 'info'); return false; }
+
+
+
+  if (startDate > endDate) { showToast('开始日期不能晚于结束日期', 'info'); return false; }
+
+
+
+  return true;
+
+
+
+}
+
+
+
+function createTask() {
+
+
+
+  if (!validateTaskForm()) return;
+
+
+
+  currentStatus = 'created';
+
+
+
+  showToast('任务创建成功！', 'info');
+
+
+
+  closeModal('taskModal');
+
+
+
+}
+
+
+
+function validateTeamForm() {
+
+
+
+  var name = document.querySelector('#teamModal .form-select:nth-of-type(1)').value;
+
+
+
+  var role = document.querySelector('#teamModal .form-select:nth-of-type(2)').value;
+
+
+
+  var project = document.querySelector('#teamModal .form-select:nth-of-type(4)').value;
+
+
+
+  if (!name) { showToast('请选择成员', 'info'); return false; }
+
+
+
+  if (!role) { showToast('请选择角色', 'info'); return false; }
+
+
+
+  if (!project) { showToast('请选择项目', 'info'); return false; }
+
+
+
+  return true;
+
+
+
+}
+
+
+
+function addTeamMember() {
+
+
+
+  if (!validateTeamForm()) return;
+
+
+
+  currentStatus = 'added';
+
+
+
+  showToast('团队成员添加成功！', 'info');
+
+
+
+  closeModal('teamModal');
+
+
+
+}
+
+
+
+
+var currentLookupField = null;
+var currentLookupType = null;
+var lookupData = [];
+var lookupColumns = [];
+
+function openLookup(fieldId, type) {
+  currentLookupField = fieldId;
+  currentLookupType = type;
+  
+  if (type === 'org') {
+    lookupColumns = ['编码', '名称', '形态', '上级组织'];
+    lookupData = JSON.parse(localStorage.getItem('erp_orgs') || '[]');
+    document.getElementById('lookupTitle').textContent = '选择组织';
+  } else if (type === 'department') {
+    lookupColumns = ['编码', '名称'];
+    lookupData = JSON.parse(localStorage.getItem('erp_departments_cache') || '[]');
+    document.getElementById('lookupTitle').textContent = '选择部门';
+  } else if (type === 'employee') {
+    lookupColumns = ['编号', '姓名', '所属部门'];
+    lookupData = JSON.parse(localStorage.getItem('erp_employees_cache') || '[]');
+    document.getElementById('lookupTitle').textContent = '选择员工';
+  } else if (type === 'supplier') {
+    lookupColumns = ['编码', '名称'];
+    lookupData = JSON.parse(localStorage.getItem('erp_suppliers_cache') || '[]');
+    document.getElementById('lookupTitle').textContent = '选择供应商';
+  } else if (type === 'customer') {
+    lookupColumns = ['编码', '名称'];
+    lookupData = JSON.parse(localStorage.getItem('erp_customers_cache') || '[]');
+    document.getElementById('lookupTitle').textContent = '选择客户';
+  } else if (type === 'material') {
+    lookupColumns = ['物料编码', '物料名称', '规格型号', '基本单位'];
+    lookupData = JSON.parse(localStorage.getItem('erp_materials_cache') || '[]');
+    document.getElementById('lookupTitle').textContent = '选择物料';
+  } else if (type === 'warehouse') {
+    lookupColumns = ['编码', '名称'];
+    lookupData = JSON.parse(localStorage.getItem('erp_warehouses_cache') || '[]');
+    document.getElementById('lookupTitle').textContent = '选择仓库';
+  }
+  
+  renderLookupTable(lookupData);
+  document.getElementById('lookupModal').classList.add('show');
+}
+
+function closeLookup() {
+  document.getElementById('lookupModal').classList.remove('show');
+}
+
+function filterLookup() {
+  var keyword = document.getElementById('lookupKeyword').value.trim().toLowerCase();
+  var filtered = lookupData.filter(function(item) {
+    var code = item.code || '';
+    var name = item.name || '';
+    return code.toLowerCase().includes(keyword) || name.toLowerCase().includes(keyword);
+  });
+  renderLookupTable(filtered);
+}
+
+function renderLookupTable(data) {
+  var head = document.getElementById('lookupTableHead');
+  var body = document.getElementById('lookupTableBody');
+  
+  head.innerHTML = '<tr><th class="checkbox-cell"><input type="checkbox" onclick="selectAllLookup()"></th>' + lookupColumns.map(function(col) { return '<th>' + col + '</th>'; }).join('') + '</tr>';
+  
+  body.innerHTML = '';
+  data.forEach(function(item) {
+    var row = document.createElement('tr');
+    row.onclick = function() { selectLookupRow(this); };
+    var cells = ['<td class="checkbox-cell"><input type="checkbox" class="lookup-checkbox" value="' + item.id + '"></td>'];
+    if (currentLookupType === 'org') {
+      cells.push('<td>' + item.code + '</td><td>' + item.name + '</td><td>' + (item.form || '') + '</td><td>' + (item.parentName || '') + '</td>');
+    } else if (currentLookupType === 'department') {
+      cells.push('<td>' + item.code + '</td><td>' + item.name + '</td>');
+    } else if (currentLookupType === 'employee') {
+      cells.push('<td>' + item.code + '</td><td>' + item.name + '</td><td>' + (item.department || '') + '</td>');
+    } else if (currentLookupType === 'supplier' || currentLookupType === 'customer') {
+      cells.push('<td>' + item.code + '</td><td>' + item.name + '</td>');
+    } else if (currentLookupType === 'material') {
+      cells.push('<td>' + item.code + '</td><td>' + item.name + '</td><td>' + (item.specification || '') + '</td><td>' + (item.unit || '') + '</td>');
+    } else if (currentLookupType === 'warehouse') {
+      cells.push('<td>' + item.code + '</td><td>' + item.name + '</td>');
+    }
+    row.innerHTML = cells.join('');
+    body.appendChild(row);
+  });
+  
+  if (data.length === 0) {
+    body.innerHTML = '<tr><td colspan="' + (lookupColumns.length + 1) + '" style="text-align:center;padding:40px;color:#999;">暂无数据</td></tr>';
+  }
+}
+
+function selectAllLookup() {
+  var master = document.querySelector('.lookup-table th input');
+  var checkboxes = document.querySelectorAll('.lookup-checkbox');
+  checkboxes.forEach(function(cb) { cb.checked = master.checked; });
+}
+
+function selectLookupRow(row) {
+  var checkbox = row.querySelector('.lookup-checkbox');
+  checkbox.checked = !checkbox.checked;
+}
+
+function confirmLookup() {
+  var checkboxes = document.querySelectorAll('.lookup-checkbox:checked');
+  if (checkboxes.length === 0) {
+    showToast('请选择一条记录', 'warning');
+    return;
+  }
+  
+  var item = lookupData.find(function(d) { return d.id === checkboxes[0].value; });
+  if (item) {
+    var field = document.getElementById(currentLookupField);
+    if (field) {
+      field.value = item.name;
+      field.setAttribute('data-id', item.id);
+      field.setAttribute('data-code', item.code);
+      
+      if (currentLookupType === 'material') {
+        var row = field.closest('tr');
+        if (row) {
+          row.querySelector('.material-name').value = item.name;
+          row.querySelector('.material-spec').value = item.specification || '';
+          row.querySelector('.material-unit').value = item.unit || '';
+        }
+      }
+    }
+  }
+  
+  closeLookup();
+}
+
+function openMaterialLookup(btn) {
+  var field = btn.previousElementSibling;
+  field.id = 'lookupField_' + Date.now();
+  currentLookupField = field.id;
+  openLookup(field.id, 'material');
+}
+
+function openOrgLookup(btn) {
+  var field = btn.previousElementSibling;
+  field.id = 'lookupField_' + Date.now();
+  currentLookupField = field.id;
+  openLookup(field.id, 'org');
+}
+
+function openSupplierLookup(btn) {
+  var field = btn.previousElementSibling;
+  field.id = 'lookupField_' + Date.now();
+  currentLookupField = field.id;
+  openLookup(field.id, 'supplier');
+}
+
+function openWarehouseLookup(btn) {
+  var field = btn.previousElementSibling;
+  field.id = 'lookupField_' + Date.now();
+  currentLookupField = field.id;
+  openLookup(field.id, 'warehouse');
+}
+
+function initLookupData() {
+  if (!localStorage.getItem('erp_orgs')) {
+    localStorage.setItem('erp_orgs', JSON.stringify([
+      { id: 'org-001', code: 'ORG-HQ', name: '磐枢工业集团', form: '集团', parentName: '' },
+      { id: 'org-002', code: 'ORG-SM', name: '磐枢智能制造有限公司', form: '公司', parentName: '磐枢工业集团' },
+      { id: 'org-003', code: 'ORG-SM-PD', name: '生产制造部', form: '部门', parentName: '磐枢智能制造有限公司' },
+      { id: 'org-004', code: 'ORG-SM-FA', name: '财务部', form: '部门', parentName: '磐枢智能制造有限公司' },
+      { id: 'org-005', code: 'ORG-SM-SD', name: '销售部', form: '部门', parentName: '磐枢智能制造有限公司' }
+    ]));
+  }
+  if (!localStorage.getItem('erp_departments_cache')) {
+    localStorage.setItem('erp_departments_cache', JSON.stringify([
+      { id: 'dept-001', code: 'DEPT-PD', name: '生产制造部', status: 1 },
+      { id: 'dept-002', code: 'DEPT-FA', name: '财务部', status: 1 },
+      { id: 'dept-003', code: 'DEPT-SD', name: '销售部', status: 1 },
+      { id: 'dept-004', code: 'DEPT-AS', name: '装配车间', status: 1 },
+      { id: 'dept-005', code: 'DEPT-QC', name: '质检车间', status: 1 }
+    ]));
+  }
+  if (!localStorage.getItem('erp_employees_cache')) {
+    localStorage.setItem('erp_employees_cache', JSON.stringify([
+      { id: 'emp-001', code: 'EMP-001', name: '张三', department: '生产制造部', status: 1 },
+      { id: 'emp-002', code: 'EMP-002', name: '李四', department: '生产制造部', status: 1 },
+      { id: 'emp-003', code: 'EMP-003', name: '王五', department: '财务部', status: 1 },
+      { id: 'emp-004', code: 'EMP-004', name: '赵六', department: '销售部', status: 1 },
+      { id: 'emp-005', code: 'EMP-005', name: '钱七', department: '质检车间', status: 1 }
+    ]));
+  }
+  if (!localStorage.getItem('erp_suppliers_cache')) {
+    localStorage.setItem('erp_suppliers_cache', JSON.stringify([
+      { id: 'sup-001', code: 'S-001', name: '深圳电子元器件有限公司', status: 1 },
+      { id: 'sup-002', code: 'S-002', name: '杭州精密机械加工厂', status: 1 },
+      { id: 'sup-003', code: 'S-003', name: '上海材料科技有限公司', status: 1 },
+      { id: 'sup-004', code: 'S-004', name: '东莞五金制品厂', status: 1 }
+    ]));
+  }
+  if (!localStorage.getItem('erp_materials_cache')) {
+    localStorage.setItem('erp_materials_cache', JSON.stringify([
+      { id: 'mat-001', code: 'P-001', name: '高频传感器模块', specification: 'HT-2026', unit: '个', status: 1 },
+      { id: 'mat-002', code: 'P-002', name: '控制电路板', specification: 'CB-2026', unit: '块', status: 1 },
+      { id: 'mat-003', code: 'P-003', name: '智能控制器', specification: 'IC-V3', unit: '台', status: 1 },
+      { id: 'mat-004', code: 'P-004', name: '电源模块', specification: 'PM-500W', unit: '个', status: 1 },
+      { id: 'mat-005', code: 'M-001', name: 'PCB电路板', specification: 'FR-4双层', unit: '块', status: 1 },
+      { id: 'mat-006', code: 'M-002', name: '贴片电阻', specification: '10KΩ 0603', unit: '个', status: 1 },
+      { id: 'mat-007', code: 'M-003', name: '贴片电容', specification: '100μF 0805', unit: '个', status: 1 },
+      { id: 'mat-008', code: 'M-004', name: '螺丝', specification: 'M4x10', unit: '包', status: 1 }
+    ]));
+  }
+  if (!localStorage.getItem('erp_warehouses_cache')) {
+    localStorage.setItem('erp_warehouses_cache', JSON.stringify([
+      { id: 'wh-001', code: 'WH-001', name: '成品仓', status: 1 },
+      { id: 'wh-002', code: 'WH-002', name: '原料仓', status: 1 },
+      { id: 'wh-003', code: 'WH-003', name: '半成品仓', status: 1 },
+      { id: 'wh-004', code: 'WH-004', name: '辅料仓', status: 1 }
+    ]));
+  }
+}
+
+</script>
+
+
+
+
+<div class="lookup-modal" id="lookupModal">
+  <div class="lookup-dialog">
+    <div class="lookup-header">
+      <div class="lookup-title" id="lookupTitle">选择</div>
+      <button class="lookup-close" onclick="closeLookup()">×</button>
+    </div>
+    <div class="lookup-body">
+      <div class="lookup-search">
+        <input type="text" id="lookupKeyword" placeholder="请输入编码或名称搜索" onkeydown="if(event.key==='Enter')filterLookup()">
+        <button onclick="filterLookup()">搜索</button>
+      </div>
+      <table class="lookup-table">
+        <thead id="lookupTableHead"></thead>
+        <tbody id="lookupTableBody"></tbody>
+      </table>
+    </div>
+    <div class="lookup-footer">
+      <button class="btn btn-cancel" onclick="closeLookup()">取消</button>
+      <button class="btn btn-primary" onclick="confirmLookup()">确定</button>
+    </div>
+  </div>
+</div>
+
+</body>
+
+
+
+</html>

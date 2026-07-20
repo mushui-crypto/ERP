@@ -1,0 +1,605 @@
+﻿<!DOCTYPE html>
+
+<html lang="zh-CN">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>AI Agent配置 — 磐枢工业智能平台(管理端)</title>
+
+<link rel="stylesheet" href="../common-admin.css">
+
+<script src="../../common.js"></script>
+
+<style>
+
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+
+.agent-detail { display: none; }
+
+.agent-detail.active { display: block; }
+
+.tools-grid {
+
+  display: grid;
+
+  grid-template-columns: repeat(3, 1fr);
+
+  gap: 8px;
+
+}
+
+.tool-item {
+
+  display: flex;
+
+  align-items: center;
+
+  gap: 6px;
+
+  padding: 8px 12px;
+
+  background: #f5f5f5;
+
+  border: 1px solid #e8e8e8;
+
+  border-radius: var(--radius-sm);
+
+  font-size: 12px;
+
+  color: #666;
+
+}
+
+.tool-item input[type="checkbox"] {
+
+  accent-color: #1890ff;
+
+}
+
+.trigger-options {
+
+  display: flex;
+
+  flex-wrap: wrap;
+
+  gap: 8px;
+
+}
+
+.trigger-option {
+
+  display: flex;
+
+  align-items: center;
+
+  gap: 4px;
+
+  padding: 6px 12px;
+
+  background: #f5f5f5;
+
+  border: 1px solid #e8e8e8;
+
+  border-radius: var(--radius-sm);
+
+  font-size: 12px;
+
+  color: #666;
+
+}
+
+.trigger-option input[type="radio"] {
+
+  accent-color: #1890ff;
+
+}
+
+.test-panel {
+
+  margin-top: 20px;
+
+}
+
+.test-input {
+
+  display: flex;
+
+  gap: 8px;
+
+  margin-bottom: 12px;
+
+}
+
+.test-response {
+
+  background: #f5f5f5;
+
+  border: 1px solid #e8e8e8;
+
+  border-radius: var(--radius-sm);
+
+  padding: 12px;
+
+  max-height: 200px;
+
+  overflow-y: auto;
+
+  font-size: 13px;
+
+  color: #666;
+
+  line-height: 1.6;
+
+}
+
+
+
+/* ===== Toast 提示框 ===== */
+
+.toast-container { position: fixed; top: 20px; right: 20px; z-index: 10000; display: flex; flex-direction: column; gap: 10px; }
+
+.toast { display: flex; align-items: center; gap: 10px; padding: 14px 18px; border-radius: var(--radius-md); background: #fff; border: 1px solid #e8e8e8; box-shadow: 0 4px 16px rgba(0,0,0,0.15); min-width: 280px; max-width: 420px; animation: slideIn 0.3s ease; }
+
+@keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+
+.toast .toast-icon { font-size: 18px; flex-shrink: 0; }
+
+.toast .toast-content { flex: 1; font-size: 13px; }
+
+.toast .toast-title { font-weight: 600; margin-bottom: 2px; color: #333; }
+
+.toast .toast-message { color: #666; font-size: 12px; }
+
+.toast-success { border-color: rgba(34,197,94,0.3); background: rgba(34,197,94,0.05); }
+
+.toast-success .toast-title { color: #52c41a; }
+
+.toast-warning { border-color: rgba(245,158,11,0.3); background: rgba(245,158,11,0.05); }
+
+.toast-warning .toast-title { color: #faad14; }
+
+.toast-error { border-color: rgba(239,68,68,0.3); background: rgba(239,68,68,0.05); }
+
+.toast-error .toast-title { color: #f5222d; }
+
+.toast-info { border-color: rgba(56,189,248,0.3); background: rgba(56,189,248,0.05); }
+
+.toast-info .toast-title { color: #1890ff; }
+
+
+
+/* ===== 确认对话框 ===== */
+
+.confirm-modal-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:2000; justify-content:center; align-items:center; }
+
+.confirm-modal-overlay.show { display:flex; }
+
+.confirm-modal-dialog { background:#fff; border:1px solid #e8e8e8; border-radius:4px; width:420px; overflow:hidden; }
+
+.confirm-modal-header { padding:16px 20px; border-bottom:1px solid #e8e8e8; display:flex; align-items:center; gap:10px; }
+
+.confirm-modal-icon { font-size:20px; }
+
+.confirm-modal-title { font-size:15px; font-weight:600; color:#333; }
+
+.confirm-modal-body { padding:20px; text-align:center; }
+
+.confirm-modal-message { font-size:14px; color: #666; line-height:1.6; }
+
+.confirm-modal-footer { display:flex; gap:12px; justify-content:flex-end; padding:16px 20px; border-top:1px solid #e8e8e8; }
+
+</style>
+
+</head>
+
+<body>
+
+<aside class="sidebar admin-sidebar" id="sidebar">
+
+    <div class="sidebar-logo">
+
+    <img src="../../images/LOGO.png" alt="磐枢工业智能平台" style="width: 100%; max-width: 200px; margin-bottom: 8px;">
+
+    <h1 style="font-size: 16px; margin: 0;">磐枢工业智能平台</h1>
+
+  </div>
+
+  <nav class="sidebar-menu">
+
+    <div class="sidebar-menu-group"><div class="sidebar-menu-item" onclick="toggleGroup(this)"><span class="icon">&#128451;</span> 数据中心管理<span class="arrow">&#9654;</span></div><div class="sub-menu"><a class="sidebar-menu-item" href="../data-center/index.html">数据中心总览</a><a class="sidebar-menu-item" href="../data-center/new.html">新建数据中心</a><a class="sidebar-menu-item" href="../data-center/backup.html">备份管理</a></div></div>
+
+    <div class="sidebar-menu-group"><div class="sidebar-menu-item" onclick="toggleGroup(this)"><span class="icon">&#128101;</span> 组织与权限<span class="arrow">&#9654;</span></div><div class="sub-menu"><a class="sidebar-menu-item" href="../org-perm/org.html">组织架构</a><a class="sidebar-menu-item" href="../org-perm/user.html">用户管理</a><a class="sidebar-menu-item" href="../org-perm/role.html">角色管理</a><a class="sidebar-menu-item" href="../org-perm/menu.html">菜单管理</a></div></div>
+
+
+
+    <div class="sidebar-menu-group"><div class="sidebar-menu-item" onclick="toggleGroup(this)"><span class="icon">&#128187;</span> 开发设计<span class="arrow">&#9654;</span></div><div class="sub-menu"><a class="sidebar-menu-item" href="../dev-design/lowcode.html">低代码开发中心</a><a class="sidebar-menu-item" href="../dev-design/form-designer.html">表单设计器</a><a class="sidebar-menu-item" href="../dev-design/doc-flow.html">单据转换配置</a><a class="sidebar-menu-item" href="../dev-design/print-template.html">套打模板设计</a><a class="sidebar-menu-item" href="../dev-design/workflow.html">流程配置</a></div></div>
+
+
+
+    <div class="sidebar-menu-group"><div class="sidebar-menu-item" onclick="toggleGroup(this)"><span class="icon">&#129302;</span> 智能应用<span class="arrow">&#9660;</span></div><div class="sub-menu"><a class="sidebar-menu-item" href="api-manage.html">API管理</a><a class="sidebar-menu-item" href="nl-training.html">自然语言训练</a><a class="sidebar-menu-item" href="data-analysis.html">数据分析训练</a><a class="sidebar-menu-item active" href="agent-config.html">Agent配置</a></div></div>
+
+
+
+    <div class="sidebar-menu-item" onclick="window.location.href='../../index.html'"><span class="icon">&#8592;</span> 返回应用端</div>
+
+  </nav>
+
+  <div class="sidebar-user"><div class="avatar" style="background: #e6f7ff;color: #1890ff;">管</div><div><div class="user-name">系统管理员</div><div class="user-role">超级管理员</div></div></div>
+
+</aside>
+
+<div class="main-content" id="mainContent">
+
+  <div class="page-header">
+
+    <div><div class="flex items-center gap-8"><button class="sidebar-toggle" onclick="toggleSidebar()">&#9776;</button><div><h2>AI Agent配置</h2><div class="breadcrumb"><a href="../../index.html">首页</a><span>/</span><a href="../index.html">管理端</a><span>/</span><span>智能应用 / Agent配置</span></div></div></div></div>
+
+    <div class="page-actions"><button class="btn btn-primary btn-sm" onclick="showAgentConfigModal()">+ 新建Agent</button></div>
+
+  </div>
+
+  <div class="list-page-body">
+
+    <div class="list-action-bar">
+
+      <button class="action-btn primary-action" onclick="showAgentConfigModal()">&#128200; 新建Agent</button>
+
+      <div class="action-separator"></div>
+
+      <button class="action-btn danger-action">&#128465; 批量删除</button>
+
+      <div style="flex:1;"></div>
+
+      <button class="action-btn">&#8635; 刷新</button>
+
+    </div>
+
+    <div class="list-filter-section">
+
+      <div class="list-filter-tabs">
+
+        <span class="filter-tab active">全部 (8)</span>
+
+        <span class="filter-tab">运行中 (6)</span>
+
+        <span class="filter-tab">已暂停 (2)</span>
+
+      </div>
+
+      <div class="list-filter-row">
+
+        <div class="filter-field">
+
+          <select><option>全部类型</option><option>采购</option><option>销售</option><option>生产</option><option>质量</option><option>财务</option></select>
+
+          <input type="text" placeholder="搜索Agent名称...">
+
+        </div>
+
+        <div class="list-filter-btns">
+
+          <button class="btn-search">&#128269; 查询</button>
+
+          <button class="btn-reset">&#8634; 重置</button>
+
+        </div>
+
+      </div>
+
+    </div>
+
+    <div class="list-table-area">
+
+      <table class="data-table">
+
+        <thead><tr><th><input type="checkbox" class="row-checkbox"></th><th>Agent名称</th><th>描述</th><th>绑定模型</th><th>状态</th><th>操作</th></tr></thead>
+
+        <tbody><tr><td colspan="100%" style="text-align:center;color:#999;padding:20px;">暂无数据</td></tr></tbody>
+
+      </table>
+
+    </div>
+
+    <div class="list-pagination">
+
+      <span class="page-info">共 8 条记录，第 1/1 页</span>
+
+      <div class="page-btns"><button>&#9664;</button><button class="active">1</button><button>&#9654;</button></div>
+
+    </div>
+
+  </div>
+
+</div>
+
+
+
+<div class="modal-overlay" id="agentConfigModal">
+
+  <div class="modal" style="max-width:800px;">
+
+    <div class="modal-header">
+
+      <span>Agent配置</span>
+
+      <button class="btn btn-ghost btn-sm" onclick="hideAgentConfigModal()">✕</button>
+
+    </div>
+
+    <div class="modal-body">
+
+      <div class="card" style="margin-bottom:16px;">
+
+        <div class="card-header">基本信息</div>
+
+        <div class="card-body">
+
+          <div class="form-row">
+
+            <div class="form-group"><label class="form-label">Agent名称</label><input type="text" class="form-input" value="采购智能助手"></div>
+
+            <div class="form-group"><label class="form-label">绑定模型</label><select class="form-select"><option>GLM-4</option><option>Qwen-max</option><option>ERNIE-4.0</option><option>GPT-4o</option><option>GPT-4o-mini</option></select></div>
+
+          </div>
+
+          <div class="form-group"><label class="form-label">描述</label><textarea class="form-textarea" rows="3">智能采购订单处理助手，支持自然语言创建采购订单、查询供应商信息、分析采购数据</textarea></div>
+
+        </div>
+
+      </div>
+
+      <div class="card" style="margin-bottom:16px;">
+
+        <div class="card-header">Prompt编辑区</div>
+
+        <div class="card-body">
+
+          <div class="form-group"><label class="form-label">系统提示词</label><textarea class="form-textarea" rows="6">你是一个专业的采购智能助手，请遵循以下规则：
+
+1. 你可以查询ERP系统中的采购订单、供应商信息、物料库存等数据
+
+2. 你可以根据用户需求生成采购建议和订单预测
+
+3. 请使用专业、简洁的语言回复用户
+
+4. 如果无法回答，请明确告知用户并提供替代方案</textarea></div>
+
+        </div>
+
+      </div>
+
+      <div class="card" style="margin-bottom:16px;">
+
+        <div class="card-header">工具集配置</div>
+
+        <div class="card-body">
+
+          <div class="tools-grid">
+
+            <div class="tool-item"><input type="checkbox" checked>数据库查询</div>
+
+            <div class="tool-item"><input type="checkbox" checked>知识库检索</div>
+
+            <div class="tool-item"><input type="checkbox" checked>数据分析</div>
+
+            <div class="tool-item"><input type="checkbox" checked>采购订单创建</div>
+
+            <div class="tool-item"><input type="checkbox" checked>供应商查询</div>
+
+            <div class="tool-item"><input type="checkbox">库存查询</div>
+
+            <div class="tool-item"><input type="checkbox">价格查询</div>
+
+            <div class="tool-item"><input type="checkbox">报表生成</div>
+
+            <div class="tool-item"><input type="checkbox">邮件通知</div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+      <div class="card" style="margin-bottom:16px;">
+
+        <div class="card-header">触发方式</div>
+
+        <div class="card-body">
+
+          <div class="trigger-options">
+
+            <div class="trigger-option"><input type="radio" name="trigger" checked>手动触发</div>
+
+            <div class="trigger-option"><input type="radio" name="trigger">定时触发</div>
+
+            <div class="trigger-option"><input type="radio" name="trigger">事件触发</div>
+
+            <div class="trigger-option"><input type="radio" name="trigger">API调用</div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+      <div class="test-panel">
+
+        <div class="card-header">测试面板</div>
+
+        <div class="card-body">
+
+          <div class="test-input">
+
+            <input type="text" class="form-input" placeholder="输入测试问题..." id="agentTestInput">
+
+            <button class="btn btn-primary btn-sm" onclick="testAgent()">测试</button>
+
+          </div>
+
+          <div class="test-response">
+
+            根据您的需求，我已查询到以下供应商信息：
+
+
+
+            供应商：深圳市精密塑胶有限公司
+
+            供应商编码：SUP-001
+
+            评级：A级
+
+            主营产品：ABS塑料件、PC塑料件、注塑加工
+
+            交货周期：7天
+
+            联系电话：0755-12345678
+
+
+
+            供应商：东莞市电子科技有限公司
+
+            供应商编码：SUP-002
+
+            评级：A级
+
+            主营产品：电子元器件、线束组件、连接器
+
+            交货周期：5天
+
+            联系电话：0769-87654321
+
+
+
+            是否需要我帮您创建采购订单？
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+    <div class="modal-footer">
+
+      <button class="btn btn-ghost btn-sm" onclick="hideAgentConfigModal()">取消</button>
+
+      <button class="btn btn-primary btn-sm" onclick="saveAgentConfig()">保存配置</button>
+
+    </div>
+
+  </div>
+
+</div>
+
+
+
+<div id="sidebarOverlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:99;" onclick="toggleSidebar()"></div>
+
+<script>
+
+var confirmCallback = null;
+
+function showToast(message, type) {
+
+  var container = document.getElementById('toastContainer');
+
+  var icons = { success: '&#9989;', warning: '&#9888;', error: '&#10060;', info: '&#9432;' };
+
+  var titles = { success: '操作成功', warning: '温馨提示', error: '系统提示', info: '系统提示' };
+
+  var t = type || 'info';
+
+  var toast = document.createElement('div');
+
+  toast.className = 'toast toast-' + t;
+
+  toast.innerHTML = '<div class="toast-icon">' + icons[t] + '</div><div class="toast-content"><div class="toast-title">' + titles[t] + '</div><div class="toast-message">' + message + '</div></div>';
+
+  container.appendChild(toast);
+
+  setTimeout(function() { toast.style.opacity = '0'; toast.style.transform = 'translateX(100%)'; setTimeout(function() { toast.remove(); }, 300); }, 3000);
+
+}
+
+
+
+function showConfirm(message, type, callback) {
+
+  document.getElementById('confirmMessage').textContent = message;
+
+  document.getElementById('confirmTitle').textContent = (type === 'warning') ? '温馨提示' : '系统提示';
+
+  document.getElementById('confirmIcon').innerHTML = (type === 'warning') ? '&#9888;' : '&#10060;';
+
+  confirmCallback = callback;
+
+  document.getElementById('confirmModal').classList.add('show');
+
+}
+
+
+
+function closeConfirmModal(result) {
+
+  document.getElementById('confirmModal').classList.remove('show');
+
+  if (confirmCallback) { confirmCallback(result); confirmCallback = null; }
+
+}
+
+
+
+function showAgentConfigModal(){document.getElementById('agentConfigModal').classList.add('active');}
+
+function hideAgentConfigModal(){document.getElementById('agentConfigModal').classList.remove('active');}
+
+function saveAgentConfig(){showToast('Agent配置已保存', 'success');hideAgentConfigModal();}
+
+function testAgent(){var input=document.getElementById('agentTestInput');if(input.value.trim()){showToast('正在测试Agent...', 'info');}}
+
+
+
+}</script>
+
+
+
+<div class="toast-container" id="toastContainer"></div>
+
+<div class="confirm-modal-overlay" id="confirmModal">
+
+  <div class="confirm-modal-dialog">
+
+    <div class="confirm-modal-header">
+
+      <span class="confirm-modal-icon" id="confirmIcon">&#9888;</span>
+
+      <span class="confirm-modal-title" id="confirmTitle">温馨提示</span>
+
+    </div>
+
+    <div class="confirm-modal-body">
+
+      <div class="confirm-modal-message" id="confirmMessage"></div>
+
+    </div>
+
+    <div class="confirm-modal-footer">
+
+      <button class="btn btn-sm btn-cancel" onclick="closeConfirmModal(false)">取消</button>
+
+      <button class="btn btn-sm btn-primary" style="background: #1890ff;border-color: #1890ff;color:#0a0e1a;" onclick="closeConfirmModal(true)">确定</button>
+
+    </div>
+
+  </div>
+
+</div>
+
+</body>
+
+</html>

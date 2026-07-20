@@ -1,0 +1,90 @@
+盘点方案
+库存管理
+
+字段说明：
+基本信息：FBillHead 
+	 实体主键：FID 
+	 盘点方案编码：FBillNo 
+	 库存组织：FStockOrgId  (必填项)
+	 状态：FDocumentStatus  (必填项)
+	 盘点方案名称：FName 
+	 创建人：FCreatorId 
+	 创建日期：FCreateDate 
+	 最后修改人：FModifierId 
+	 最后修改日期：FModifyDate 
+	 审核人：FApproverId 
+	 审核日期：FApproveDate 
+	 关闭状态：FCloseStatus  (必填项)
+	 过滤条件结果：FFilterString 
+	 过滤表格设置：FFilterSetting 
+	 备注：FNote 
+	 货主类型：FOWnerTypeID 
+	 货主：FOwnerId 
+	 保管者类型：FKeeperTypeId 
+	 保管者：FKeeperId 
+	 仓库编码：FStockId 
+	 至：FStockIdTo 
+	 物料编码：FMaterialId 
+	 至：FMaterialIdTo 
+	 备份日期：FBackUpType 
+	 即时库存：FInventory 
+	 截止日期：FCloseDate 
+	 截止日期：FBackUpDATE 
+	 物料盘点作业允许增加物料：FAllowAddMaterial 
+	 基本单位和库存辅单位库存量同时为零，参与盘点：FZeroStockInCount 
+	 单据类型：FBillTypeID  (必填项)
+	 实盘数默认值：FCheckQtyDefault  (必填项)
+	 禁用物料不参与盘点：FNotIncludeForbidMat 
+	 忽略库存单据审核状态检查：FIgnoreBillCheck 
+	 基本单位库存量为零，库存辅单位库存量不为零，参与盘点：FBZeroStockInCount 
+	 基本单位库存量不为零，库存辅单位库存量为零，参与盘点：FSZeroStockInCount 
+	 动盘开始日期：FMoveBegDate 
+	 盘点类型：FCountType  (必填项)
+	 动盘结束日期：FMoveEndDate 
+	 包含下级物料分组：FIncludeSubMatGroup 
+	 生成盘盈或盘亏单：FUpdateStock 
+	 序列号默认为盘亏状态：FGenLossSN 
+	 在途物料不参与盘点：FExcludeInTransInv 
+	 包含物料分组为空的物料：FIncludeBlkGrpMat 
+过滤项目：FFilterItems 
+	 实体主键：FEntryID 
+	 过滤字段：FFilterField 
+	 比较类型：FCompareType  (必填项)
+	 左括弧：FLeftBracket 
+	 连接逻辑符：FLogic 
+	 右括弧：FRightBracket 
+	 比较值：FValue 
+	 过滤字段Key：FFilterKey 
+分单规则：FAssignBillEntity 
+	 实体主键：FEntryId 
+	 分单依据：FSepBillItemId 
+	 分单依据扩展信息：FSepBillItemEx 
+	 备注：FDescription 
+	 源表字段名：FSrcFieldName 
+	 表名：FTableName 
+	 表关联信息：FTableRelation 
+排序规则：FEntitySort 
+	 实体主键：FEntryID 
+	 排序字段：FSortItemId  (必填项)
+	 排序方式：FSortDirect  (必填项)
+	 来源字段：FSrcFieldNameSt 
+	 表名：FTableNameSt 
+	 表关联信息：FTableRelationSt 
+动盘单据范围：FEntityMoveBill 
+	 实体主键：FEntryID 
+	 单据名称：FMBizFormID  (必填项)
+	 单据类型：FMBizBillTypeID 
+物料范围_物料：FEntityMatRange 
+	 实体主键：FEntryID 
+	 物料编码：FRgMaterialId 
+	 物料名称：FRgMaterialName 
+	 规格型号：FRgMaterialModel 
+物料范围_物料分组：FEntityMatGroupRange 
+	 实体主键：FEntryID 
+	 物料分组：FRgMaterialGroupName 
+	 物料分组编码：FRgMaterialGroupId 
+	 物料分组内码(文本)：FRgSMaterialGroupId 
+动盘仓库范围：FEntityMoveStock 
+	 实体主键：FEntryID 
+	 仓库编码：FMvStockId  (必填项)
+	 仓库名称：FMvStockname 

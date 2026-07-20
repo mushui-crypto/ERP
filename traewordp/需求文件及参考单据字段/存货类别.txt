@@ -1,0 +1,20 @@
+存货类别
+
+字段说明：
+单据头：FBillHead 
+	 实体主键：FCATEGORYID 
+	 数据状态：FDocumentStatus 
+	 禁用状态：FForbidStatus 
+	 名称：FName  (必填项)
+	 编码：FNumber  (必填项)
+	 描述：FDescription 
+	 创建组织：FCreateOrgId  (必填项)
+	 使用组织：FUseOrgId  (必填项)
+	 创建人：FCreatorId 
+	 修改人：FModifierId 
+	 创建日期：FCreateDate 
+	 修改日期：FModifyDate 
+	 审核人：FApproverId 
+	 审核日期：FApproveDate 
+	 禁用人：FForbidderId 
+	 禁用日期：FForbidDate 

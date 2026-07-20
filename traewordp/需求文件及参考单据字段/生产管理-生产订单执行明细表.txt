@@ -1,0 +1,63 @@
+生产管理-生产订单执行明细表
+
+
+字段说明：
+	 至：：FEndMONumber 
+	 下达日期：FBeginConveyDate  (必填项)
+	 产品编码：FBeginMaterialId 
+	 生产订单：FBeginMONumber 
+	 至：：FEndPlanFinishDate  (必填项)
+	 计划完工日期：FBeginPlanFinishDate  (必填项)
+	 单据类型：FMOBillType  (必填项)
+	 至：：FEndMaterialId 
+	 至：：FEndPlanStartDate  (必填项)
+	 计划开工日期：FBeginPlanStartDate  (必填项)
+	 至：：FEndConveyDate  (必填项)
+	 业务状态：FStatus  (必填项)
+	 挂起状态：FIsSuspend  (必填项)
+	 领料计算：FCtrlItem  (必填项)
+	 生产组织：FPrdOrgId 
+	 生产车间：FWorkshopId  (必填项)
+	 参与查询：FConveyDateInvolve 
+	 参与查询：FStartDateInvolve 
+	 参与查询：FFinishDateInvolve 
+	 产品编码：FMulMaterial 
+
+参数FieldKeys显示列：
+	 生产车间：FWORKSHOPID 
+	 单据类型：FMOBILLTYPEID 
+	 生产订单编号：FMOBILLNO 
+	 生产订单行号：FMOENTRYSEQ 
+	 产品编码：FMATERIALID 
+	 产品名称：FMATERIALNAME 
+	 规格型号：FMATERIALMODEL 
+	 产品类型：FPRODUCTTYPENAME 
+	 辅助属性：FAUXPROP 
+	 BOM版本：FBOMID 
+	 计划跟踪号：FMTONO 
+	 生产单位：FPRDUNITID 
+	 计划开工日期：FPLANSTARTDATE 
+	 计划完工日期：FPLANFINISHDATE 
+	 需求来源：FREQSRC 
+	 需求单据：FSaleOrderNo 
+	 需求单据行号：FSALEORDERENTRYSEQ 
+	 下达日期：FCONVEYDATE 
+	 开工日期：FSTARTDATE 
+	 完工日期：FFINISHDATE 
+	 计划生产数量：FPLANQTY 
+	 汇报数量：FREPORTQTY 
+	 请检数量：FAPPINSPECTQTY 
+	 检验数量：FINSPECTQTY 
+	 完工数量：FFINISHQTY 
+	 合格品入库数量：FSTOCKINQUAQTY 
+	 不合格品入库数量：FSTOCKINFAILQTY 
+	 报废品入库数量：FStockInScrapQty 
+	 返工品入库数量：FSTOCKINREMADEQTY 
+	 退库数量：FReStkQty 
+	 未入库数量：FNOSTOCKINQTY 
+	 计划完成率%：FPLANFINISHPERCENT 
+	 合格率%：FQUAPERCENT 
+	 入库货主：FInStockOwnerName 
+	 材料套数：FPICKEDQTY 
+	 业务状态：FSTATUSNAME 
+	 结案类型：FCLOSETYPENAME 

@@ -1,0 +1,2463 @@
+<!DOCTYPE html>
+
+
+
+<html lang="zh-CN">
+
+
+
+<head>
+
+
+
+<meta charset="UTF-8">
+
+
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+
+
+<title>风险智能预警中心 — 磐枢工业智能平台</title>
+
+
+
+<link rel="stylesheet" href="../common.css">
+
+
+
+<script src="../common.js"></script>
+<script>
+</script>
+
+
+
+<script src="../common.js"></script>
+<script>
+var currentLookupField = null;
+var currentLookupType = null;
+var lookupData = [];
+var lookupColumns = [];
+
+function openLookup(fieldId, type) {
+  currentLookupField = fieldId;
+  currentLookupType = type;
+  
+  if (type === 'org') {
+    lookupColumns = ['编码', '名称', '形态', '上级组织'];
+    lookupData = JSON.parse(localStorage.getItem('erp_orgs') || '[]');
+    document.getElementById('lookupTitle').textContent = '选择组织';
+  } else if (type === 'department') {
+    lookupColumns = ['编码', '名称'];
+    lookupData = JSON.parse(localStorage.getItem('erp_departments_cache') || '[]');
+    document.getElementById('lookupTitle').textContent = '选择部门';
+  } else if (type === 'employee') {
+    lookupColumns = ['编号', '姓名', '所属部门'];
+    lookupData = JSON.parse(localStorage.getItem('erp_employees_cache') || '[]');
+    document.getElementById('lookupTitle').textContent = '选择员工';
+  } else if (type === 'supplier') {
+    lookupColumns = ['编码', '名称'];
+    lookupData = JSON.parse(localStorage.getItem('erp_suppliers_cache') || '[]');
+    document.getElementById('lookupTitle').textContent = '选择供应商';
+  } else if (type === 'customer') {
+    lookupColumns = ['编码', '名称'];
+    lookupData = JSON.parse(localStorage.getItem('erp_customers_cache') || '[]');
+    document.getElementById('lookupTitle').textContent = '选择客户';
+  } else if (type === 'material') {
+    lookupColumns = ['物料编码', '物料名称', '规格型号', '基本单位'];
+    lookupData = JSON.parse(localStorage.getItem('erp_materials_cache') || '[]');
+    document.getElementById('lookupTitle').textContent = '选择物料';
+  } else if (type === 'warehouse') {
+    lookupColumns = ['编码', '名称'];
+    lookupData = JSON.parse(localStorage.getItem('erp_warehouses_cache') || '[]');
+    document.getElementById('lookupTitle').textContent = '选择仓库';
+  }
+  
+  renderLookupTable(lookupData);
+  document.getElementById('lookupModal').classList.add('show');
+}
+
+function closeLookup() {
+  document.getElementById('lookupModal').classList.remove('show');
+}
+
+function filterLookup() {
+  var keyword = document.getElementById('lookupKeyword').value.trim().toLowerCase();
+  var filtered = lookupData.filter(function(item) {
+    var code = item.code || '';
+    var name = item.name || '';
+    return code.toLowerCase().includes(keyword) || name.toLowerCase().includes(keyword);
+  });
+  renderLookupTable(filtered);
+}
+
+function renderLookupTable(data) {
+  var head = document.getElementById('lookupTableHead');
+  var body = document.getElementById('lookupTableBody');
+  
+  head.innerHTML = '<tr><th class="checkbox-cell"><input type="checkbox" onclick="selectAllLookup()"></th>' + lookupColumns.map(function(col) { return '<th>' + col + '</th>'; }).join('') + '</tr>';
+  
+  body.innerHTML = '';
+  data.forEach(function(item) {
+    var row = document.createElement('tr');
+    row.onclick = function() { selectLookupRow(this); };
+    var cells = ['<td class="checkbox-cell"><input type="checkbox" class="lookup-checkbox" value="' + item.id + '"></td>'];
+    if (currentLookupType === 'org') {
+      cells.push('<td>' + item.code + '</td><td>' + item.name + '</td><td>' + (item.form || '') + '</td><td>' + (item.parentName || '') + '</td>');
+    } else if (currentLookupType === 'department') {
+      cells.push('<td>' + item.code + '</td><td>' + item.name + '</td>');
+    } else if (currentLookupType === 'employee') {
+      cells.push('<td>' + item.code + '</td><td>' + item.name + '</td><td>' + (item.department || '') + '</td>');
+    } else if (currentLookupType === 'supplier' || currentLookupType === 'customer') {
+      cells.push('<td>' + item.code + '</td><td>' + item.name + '</td>');
+    } else if (currentLookupType === 'material') {
+      cells.push('<td>' + item.code + '</td><td>' + item.name + '</td><td>' + (item.specification || '') + '</td><td>' + (item.unit || '') + '</td>');
+    } else if (currentLookupType === 'warehouse') {
+      cells.push('<td>' + item.code + '</td><td>' + item.name + '</td>');
+    }
+    row.innerHTML = cells.join('');
+    body.appendChild(row);
+  });
+  
+  if (data.length === 0) {
+    body.innerHTML = '<tr><td colspan="' + (lookupColumns.length + 1) + '" style="text-align:center;padding:40px;color:#999;">暂无数据</td></tr>';
+  }
+}
+
+function selectAllLookup() {
+  var master = document.querySelector('.lookup-table th input');
+  var checkboxes = document.querySelectorAll('.lookup-checkbox');
+  checkboxes.forEach(function(cb) { cb.checked = master.checked; });
+}
+
+function selectLookupRow(row) {
+  var checkbox = row.querySelector('.lookup-checkbox');
+  checkbox.checked = !checkbox.checked;
+}
+
+function confirmLookup() {
+  var checkboxes = document.querySelectorAll('.lookup-checkbox:checked');
+  if (checkboxes.length === 0) {
+    showToast('请选择一条记录', 'warning');
+    return;
+  }
+  
+  var item = lookupData.find(function(d) { return d.id === checkboxes[0].value; });
+  if (item) {
+    var field = document.getElementById(currentLookupField);
+    if (field) {
+      field.value = item.name;
+      field.setAttribute('data-id', item.id);
+      field.setAttribute('data-code', item.code);
+      
+      if (currentLookupType === 'material') {
+        var row = field.closest('tr');
+        if (row) {
+          row.querySelector('.material-name').value = item.name;
+          row.querySelector('.material-spec').value = item.specification || '';
+          row.querySelector('.material-unit').value = item.unit || '';
+        }
+      }
+    }
+  }
+  
+  closeLookup();
+}
+
+function openMaterialLookup(btn) {
+  var field = btn.previousElementSibling;
+  field.id = 'lookupField_' + Date.now();
+  currentLookupField = field.id;
+  openLookup(field.id, 'material');
+}
+
+function openOrgLookup(btn) {
+  var field = btn.previousElementSibling;
+  field.id = 'lookupField_' + Date.now();
+  currentLookupField = field.id;
+  openLookup(field.id, 'org');
+}
+
+function openSupplierLookup(btn) {
+  var field = btn.previousElementSibling;
+  field.id = 'lookupField_' + Date.now();
+  currentLookupField = field.id;
+  openLookup(field.id, 'supplier');
+}
+
+function openWarehouseLookup(btn) {
+  var field = btn.previousElementSibling;
+  field.id = 'lookupField_' + Date.now();
+  currentLookupField = field.id;
+  openLookup(field.id, 'warehouse');
+}
+
+function initLookupData() {
+  if (!localStorage.getItem('erp_orgs')) {
+    localStorage.setItem('erp_orgs', JSON.stringify([
+      { id: 'org-001', code: 'ORG-HQ', name: '磐枢工业集团', form: '集团', parentName: '' },
+      { id: 'org-002', code: 'ORG-SM', name: '磐枢智能制造有限公司', form: '公司', parentName: '磐枢工业集团' },
+      { id: 'org-003', code: 'ORG-SM-PD', name: '生产制造部', form: '部门', parentName: '磐枢智能制造有限公司' },
+      { id: 'org-004', code: 'ORG-SM-FA', name: '财务部', form: '部门', parentName: '磐枢智能制造有限公司' },
+      { id: 'org-005', code: 'ORG-SM-SD', name: '销售部', form: '部门', parentName: '磐枢智能制造有限公司' }
+    ]));
+  }
+  if (!localStorage.getItem('erp_departments_cache')) {
+    localStorage.setItem('erp_departments_cache', JSON.stringify([
+      { id: 'dept-001', code: 'DEPT-PD', name: '生产制造部', status: 1 },
+      { id: 'dept-002', code: 'DEPT-FA', name: '财务部', status: 1 },
+      { id: 'dept-003', code: 'DEPT-SD', name: '销售部', status: 1 },
+      { id: 'dept-004', code: 'DEPT-AS', name: '装配车间', status: 1 },
+      { id: 'dept-005', code: 'DEPT-QC', name: '质检车间', status: 1 }
+    ]));
+  }
+  if (!localStorage.getItem('erp_employees_cache')) {
+    localStorage.setItem('erp_employees_cache', JSON.stringify([
+      { id: 'emp-001', code: 'EMP-001', name: '张三', department: '生产制造部', status: 1 },
+      { id: 'emp-002', code: 'EMP-002', name: '李四', department: '生产制造部', status: 1 },
+      { id: 'emp-003', code: 'EMP-003', name: '王五', department: '财务部', status: 1 },
+      { id: 'emp-004', code: 'EMP-004', name: '赵六', department: '销售部', status: 1 },
+      { id: 'emp-005', code: 'EMP-005', name: '钱七', department: '质检车间', status: 1 }
+    ]));
+  }
+  if (!localStorage.getItem('erp_suppliers_cache')) {
+    localStorage.setItem('erp_suppliers_cache', JSON.stringify([
+      { id: 'sup-001', code: 'S-001', name: '深圳电子元器件有限公司', status: 1 },
+      { id: 'sup-002', code: 'S-002', name: '杭州精密机械加工厂', status: 1 },
+      { id: 'sup-003', code: 'S-003', name: '上海材料科技有限公司', status: 1 },
+      { id: 'sup-004', code: 'S-004', name: '东莞五金制品厂', status: 1 }
+    ]));
+  }
+  if (!localStorage.getItem('erp_materials_cache')) {
+    localStorage.setItem('erp_materials_cache', JSON.stringify([
+      { id: 'mat-001', code: 'P-001', name: '高频传感器模块', specification: 'HT-2026', unit: '个', status: 1 },
+      { id: 'mat-002', code: 'P-002', name: '控制电路板', specification: 'CB-2026', unit: '块', status: 1 },
+      { id: 'mat-003', code: 'P-003', name: '智能控制器', specification: 'IC-V3', unit: '台', status: 1 },
+      { id: 'mat-004', code: 'P-004', name: '电源模块', specification: 'PM-500W', unit: '个', status: 1 },
+      { id: 'mat-005', code: 'M-001', name: 'PCB电路板', specification: 'FR-4双层', unit: '块', status: 1 },
+      { id: 'mat-006', code: 'M-002', name: '贴片电阻', specification: '10KΩ 0603', unit: '个', status: 1 },
+      { id: 'mat-007', code: 'M-003', name: '贴片电容', specification: '100μF 0805', unit: '个', status: 1 },
+      { id: 'mat-008', code: 'M-004', name: '螺丝', specification: 'M4x10', unit: '包', status: 1 }
+    ]));
+  }
+  if (!localStorage.getItem('erp_warehouses_cache')) {
+    localStorage.setItem('erp_warehouses_cache', JSON.stringify([
+      { id: 'wh-001', code: 'WH-001', name: '成品仓', status: 1 },
+      { id: 'wh-002', code: 'WH-002', name: '原料仓', status: 1 },
+      { id: 'wh-003', code: 'WH-003', name: '半成品仓', status: 1 },
+      { id: 'wh-004', code: 'WH-004', name: '辅料仓', status: 1 }
+    ]));
+  }
+}
+
+</script>
+
+
+
+<style>
+
+
+
+.toast-container {
+
+
+
+  position: fixed;
+
+
+
+  top: 60px;
+
+
+
+  right: 20px;
+
+
+
+  z-index: 1000;
+
+
+
+  display: flex;
+
+
+
+  flex-direction: column;
+
+
+
+  gap: 8px;
+
+
+
+}
+
+
+
+.toast {
+
+
+
+  padding: 12px 16px;
+
+
+
+  border-radius: var(--radius-md);
+
+
+
+  font-size: 13px;
+
+
+
+  color: var(--text-primary);
+
+
+
+  min-width: 280px;
+
+
+
+  max-width: 400px;
+
+
+
+  display: flex;
+
+
+
+  align-items: center;
+
+
+
+  gap: 8px;
+
+
+
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+
+
+
+  animation: toastIn 0.3s ease;
+
+
+
+}
+
+
+
+@keyframes toastIn {
+
+
+
+  from { opacity: 0; transform: translateX(100%); }
+
+
+
+  to { opacity: 1; transform: translateX(0); }
+
+
+
+}
+
+
+
+.toast-success { background: rgba(34,197,94,0.9); }
+
+
+
+.toast-error { background: rgba(239,68,68,0.9); }
+
+
+
+.toast-warning { background: rgba(234,179,8,0.9); }
+
+
+
+.toast-info { background: rgba(6,182,212,0.9); }
+
+
+
+.toast-icon { font-size: 16px; }
+
+
+
+
+
+
+
+.confirm-modal-overlay {
+
+
+
+  position: fixed;
+
+
+
+  inset: 0;
+
+
+
+  background: rgba(0,0,0,0.6);
+
+
+
+  display: none;
+
+
+
+  align-items: center;
+
+
+
+  justify-content: center;
+
+
+
+  z-index: 2000;
+
+
+
+}
+
+
+
+.confirm-modal-overlay.show { display: flex; }
+
+
+
+.confirm-modal {
+
+
+
+  background: var(--bg-surface);
+
+
+
+  border: 1px solid var(--border-normal);
+
+
+
+  border-radius: var(--radius-lg);
+
+
+
+  padding: 24px;
+
+
+
+  min-width: 360px;
+
+
+
+  max-width: 480px;
+
+
+
+  box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+
+
+
+}
+
+
+
+.confirm-modal-header {
+
+
+
+  font-size: 14px;
+
+
+
+  font-weight: 600;
+
+
+
+  color: var(--text-primary);
+
+
+
+  margin-bottom: 12px;
+
+
+
+}
+
+
+
+.confirm-modal-body {
+
+
+
+  font-size: 13px;
+
+
+
+  color: var(--text-secondary);
+
+
+
+  line-height: 1.6;
+
+
+
+  margin-bottom: 20px;
+
+
+
+}
+
+
+
+.confirm-modal-footer {
+
+
+
+  display: flex;
+
+
+
+  justify-content: flex-end;
+
+
+
+  gap: 8px;
+
+
+
+}
+
+
+
+
+
+
+
+.stat-grid {
+
+
+
+  display: grid;
+
+
+
+  grid-template-columns: repeat(4, 1fr);
+
+
+
+  gap: 16px;
+
+
+
+  margin-bottom: 20px;
+
+
+
+}
+
+
+
+.stat-card .stat-icon { font-size: 18px; margin-bottom: 6px; }
+
+
+
+.stat-card .stat-value { font-size: 24px; }
+
+
+
+.stat-card .stat-label { font-size: 12px; }
+
+
+
+
+
+
+
+.type-grid {
+
+
+
+  display: grid;
+
+
+
+  grid-template-columns: repeat(7, 1fr);
+
+
+
+  gap: 10px;
+
+
+
+  margin-bottom: 20px;
+
+
+
+}
+
+
+
+.type-item {
+
+
+
+  background: var(--bg-surface);
+
+
+
+  border: 1px solid var(--border-normal);
+
+
+
+  border-radius: var(--radius-md);
+
+
+
+  padding: 12px;
+
+
+
+  text-align: center;
+
+
+
+  transition: border-color var(--transition);
+
+
+
+}
+
+
+
+.type-item:hover { border-color: var(--border-strong); }
+
+
+
+.type-item .type-icon { font-size: 16px; margin-bottom: 4px; opacity: 0.7; }
+
+
+
+.type-item .type-count { font-family: var(--font-mono); font-size: 18px; font-weight: 700; color: var(--text-primary); }
+
+
+
+.type-item .type-name { font-size: 11px; color: var(--text-tertiary); margin-top: 2px; }
+
+
+
+
+
+
+
+.bar-chart-wrapper { position: relative; }
+
+
+
+.bar-chart {
+
+
+
+  display: flex;
+
+
+
+  align-items: flex-end;
+
+
+
+  gap: 8px;
+
+
+
+  height: 160px;
+
+
+
+  padding-top: 20px;
+
+
+
+  border-bottom: 1px solid var(--border-normal);
+
+
+
+  position: relative;
+
+
+
+}
+
+
+
+.bar-chart .bar-item {
+
+
+
+  flex: 1;
+
+
+
+  display: flex;
+
+
+
+  flex-direction: column;
+
+
+
+  align-items: center;
+
+
+
+  gap: 4px;
+
+
+
+  position: relative;
+
+
+
+}
+
+
+
+.bar-chart .bar-fill {
+
+
+
+  width: 100%;
+
+
+
+  max-width: 28px;
+
+
+
+  border-radius: 2px 2px 0 0;
+
+
+
+  transition: height 300ms ease;
+
+
+
+  position: relative;
+
+
+
+}
+
+
+
+.bar-chart .bar-fill::before {
+
+
+
+  content: attr(data-value);
+
+
+
+  position: absolute;
+
+
+
+  top: -18px;
+
+
+
+  left: 50%;
+
+
+
+  transform: translateX(-50%);
+
+
+
+  font-size: 10px;
+
+
+
+  font-family: var(--font-mono);
+
+
+
+  color: var(--text-secondary);
+
+
+
+  white-space: nowrap;
+
+
+
+}
+
+
+
+.bar-chart .bar-label {
+
+
+
+  font-size: 10px;
+
+
+
+  color: var(--text-tertiary);
+
+
+
+  position: absolute;
+
+
+
+  bottom: -22px;
+
+
+
+}
+
+
+
+
+
+
+
+.modal-overlay { z-index: 300; }
+
+
+
+.modal-lg { max-width: 720px; }
+
+
+
+
+
+
+
+@media (max-width: 1200px) {
+
+
+
+  .stat-grid { grid-template-columns: repeat(2, 1fr); }
+
+
+
+  .type-grid { grid-template-columns: repeat(4, 1fr); }
+
+
+
+}
+
+
+
+@media (max-width: 768px) {
+
+
+
+  .stat-grid { grid-template-columns: 1fr; }
+
+
+
+  .type-grid { grid-template-columns: repeat(2, 1fr); }
+
+
+
+}
+
+
+
+
+.lookup-modal { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:2000; justify-content:center; align-items:center; }
+.lookup-modal.show { display:flex; }
+.lookup-dialog { background:#fff; border:1px solid #e8e8e8; border-radius:4px; width:720px; max-height:70vh; overflow:hidden; }
+.lookup-header { padding:14px 20px; border-bottom:1px solid #e8e8e8; display:flex; align-items:center; justify-content:space-between; }
+.lookup-title { font-size:15px; font-weight:600; color:#333; }
+.lookup-close { font-size:20px; color:#666; cursor:pointer; background:none; border:none; }
+.lookup-close:hover { color:#333; }
+.lookup-body { padding:16px; }
+.lookup-search { display:flex; gap:8px; margin-bottom:12px; }
+.lookup-search input { flex:1; padding:6px 10px; border:1px solid #e8e8e8; border-radius:4px; font-size:13px; }
+.lookup-search button { padding:6px 16px; background:#1890ff; color:#fff; border:none; border-radius:4px; cursor:pointer; }
+.lookup-table { width:100%; border-collapse:collapse; font-size:13px; }
+.lookup-table th, .lookup-table td { padding:10px 12px; text-align:left; border-bottom:1px solid #e8e8e8; }
+.lookup-table th { background:#fafafa; font-weight:600; color:#333; }
+.lookup-table tr:hover { background:#f5f5f5; }
+.lookup-table .checkbox-cell { width:40px; }
+.lookup-footer { padding:12px 20px; border-top:1px solid #e8e8e8; display:flex; justify-content:flex-end; gap:8px; }
+.lookup-field { display:flex; align-items:center; }
+.lookup-field input { flex:1; padding:6px 10px; border:1px solid #e8e8e8; border-radius:4px 0 0 4px; font-size:13px; }
+.lookup-field button { width:28px; height:28px; border:1px solid #e8e8e8; border-left:none; border-radius:0 4px 4px 0; background:#fff; cursor:pointer; display:flex; align-items:center; justify-content:center; }
+.lookup-field button:hover { background:#f5f5f5; }
+
+</style>
+
+
+
+</head>
+
+
+
+<body>
+
+
+
+
+
+
+
+<aside class="sidebar" id="sidebar">
+
+
+
+<div class="sidebar-logo">
+
+
+
+    <img src="../images/logo.png" alt="磐枢工业智能平台" style="width: 100%; max-width: 200px; margin-bottom: 8px;">
+
+
+
+    <h1 style="font-size: 16px; margin: 0;">磐枢工业智能平台</h1>
+
+
+
+  </div>
+
+
+
+  <nav class="sidebar-menu"></nav>
+
+
+
+<div class="sidebar-user">
+
+
+
+    <div class="avatar">管</div>
+
+
+
+</aside>
+
+
+
+
+
+
+
+<div class="main-content" id="mainContent">
+
+
+
+  <div class="page-header" style="position:sticky;top:0;z-index:100;">
+
+
+
+    <div>
+
+
+
+      <div class="flex items-center gap-8">
+
+
+
+        <button class="sidebar-toggle" onclick="toggleSidebar()">&#9776;</button>
+
+
+
+        <div>
+
+
+
+          <h2>风险智能预警中心</h2>
+
+
+
+          <div class="breadcrumb"><a href="../index.html">首页</a><span>/</span><span>智能体应用</span><span>/</span><span>风险预警中心</span></div></div>
+
+
+
+        </div>
+
+
+
+      </div>
+
+
+
+    </div>
+
+
+
+    <div class="page-actions">
+
+
+
+      <button class="btn btn-ghost btn-sm" onclick="refreshData()">&#128260; 刷新</button>
+
+
+
+      <button class="btn btn-primary btn-sm" onclick="exportData()">&#128190; 导出</button>
+
+      </div>
+
+
+
+  </div>
+
+  <div class="doc-header" style="background:#fff;border-bottom:1px solid #e8e8e8;padding:12px 20px;display:flex;justify-content:space-between;align-items:center;">
+    <div style="font-size:14px;color:#666;">快捷操作</div>
+    <div class="doc-toolbar" style="display:flex;gap:8px;flex-wrap:wrap;">
+      <button class="toolbar-btn" style="padding:6px 12px;border-radius:4px;font-size:13px;cursor:pointer;border:1px solid #d9d9d9;background:#fff;color:#666;display:flex;align-items:center;gap:6px;transition:all 0.3s;" onclick="showToast('刷新功能开发中...', 'info')"><span>🔄</span> 刷新</button>
+      <button class="toolbar-btn" style="padding:6px 12px;border-radius:4px;font-size:13px;cursor:pointer;border:1px solid #d9d9d9;background:#fff;color:#666;display:flex;align-items:center;gap:6px;transition:all 0.3s;" onclick="showToast('列设置功能开发中...', 'info')"><span>⚙️</span> 显示/隐藏列</button>
+      <button class="toolbar-btn" style="padding:6px 12px;border-radius:4px;font-size:13px;cursor:pointer;border:1px solid #d9d9d9;background:#fff;color:#666;display:flex;align-items:center;gap:6px;transition:all 0.3s;" onclick="showToast('导出功能开发中...', 'info')"><span>📤</span> 导出</button>
+      <button class="toolbar-btn danger" style="padding:6px 12px;border-radius:4px;font-size:13px;cursor:pointer;border:1px solid #f5222d;background:#f5222d;color:#fff;display:flex;align-items:center;gap:6px;transition:all 0.3s;" onclick="showConfirm('确认退出？', function() {location.href='../index.html';});)"><span>✖️</span> 退出</button>
+    </div>
+  </div>
+
+  <div class="page-body">
+
+
+
+    <div class="stat-grid">
+
+
+
+      <div class="stat-card" style="border-color:rgba(239,68,68,0.5);background:rgba(239,68,68,0.05);">
+
+
+
+        <div class="stat-icon" style="color:#ef4444;">&#9888;</div>
+
+
+
+        <div class="stat-value" style="color:#ef4444;">8</div>
+
+
+
+        <div class="stat-label">严重预警</div>
+
+
+
+      </div>
+
+
+
+      <div class="stat-card" style="border-color:rgba(249,115,22,0.5);background:rgba(249,115,22,0.05);">
+
+
+
+        <div class="stat-icon" style="color:#f97316;">&#9889;</div>
+
+
+
+        <div class="stat-value" style="color:#f97316;">15</div>
+
+
+
+        <div class="stat-label">一般预警</div>
+
+
+
+      </div>
+
+
+
+      <div class="stat-card" style="border-color:rgba(59,130,246,0.5);background:rgba(59,130,246,0.05);">
+
+
+
+        <div class="stat-icon" style="color:#3b82f6;">&#128276;</div>
+
+
+
+        <div class="stat-value" style="color:#3b82f6;">12</div>
+
+
+
+        <div class="stat-label">轻微预警</div>
+
+
+
+      </div>
+
+
+
+      <div class="stat-card" style="border-color:rgba(34,197,94,0.5);background:rgba(34,197,94,0.05);">
+
+
+
+        <div class="stat-icon" style="color:#22c55e;">&#10004;</div>
+
+
+
+        <div class="stat-value" style="color:#22c55e;">45</div>
+
+
+
+        <div class="stat-label">已处理</div>
+
+
+
+      </div>
+
+
+
+    </div>
+
+
+
+
+
+
+
+    <div class="type-grid">
+
+
+
+      <div class="type-item" style="border-color:rgba(239,68,68,0.3);"><div class="type-icon" style="color:#ef4444;">&#128223;</div><div class="type-count" style="color:#ef4444;">6</div><div class="type-name">缺料预警</div></div>
+
+
+
+      <div class="type-item" style="border-color:rgba(249,115,22,0.3);"><div class="type-icon" style="color:#f97316;">&#128220;</div><div class="type-count" style="color:#f97316;">5</div><div class="type-name">积压预警</div></div>
+
+
+
+      <div class="type-item" style="border-color:rgba(239,68,68,0.3);"><div class="type-icon" style="color:#ef4444;">&#128712;</div><div class="type-count" style="color:#ef4444;">4</div><div class="type-name">质量预警</div></div>
+
+
+
+      <div class="type-item" style="border-color:rgba(249,115,22,0.3);"><div class="type-icon" style="color:#f97316;">&#128176;</div><div class="type-count" style="color:#f97316;">8</div><div class="type-name">成本预警</div></div>
+
+
+
+      <div class="type-item" style="border-color:rgba(59,130,246,0.3);"><div class="type-icon" style="color:#3b82f6;">&#128101;</div><div class="type-count" style="color:#3b82f6;">3</div><div class="type-name">人力预警</div></div>
+
+
+
+      <div class="type-item" style="border-color:rgba(249,115,22,0.3);"><div class="type-icon" style="color:#f97316;">&#128200;</div><div class="type-count" style="color:#f97316;">7</div><div class="type-name">交付预警</div></div>
+
+
+
+      <div class="type-item" style="border-color:rgba(239,68,68,0.3);"><div class="type-icon" style="color:#ef4444;">&#128196;</div><div class="type-count" style="color:#ef4444;">2</div><div class="type-name">财务预警</div></div>
+
+
+
+    </div>
+
+
+
+
+
+
+
+    <div class="card mb-16">
+
+
+
+      <div class="card-header"><span>&#128197; 近30天预警趋势</span></div>
+
+
+
+      <div class="card-body">
+
+
+
+        <div class="bar-chart-wrapper">
+
+
+
+          <div class="bar-chart" style="margin-bottom:32px;">
+
+
+
+            <div class="bar-item"><div class="bar-fill" data-value="8" style="height:40%;background:#ef4444;"></div><span class="bar-label">6/11</span></div>
+
+
+
+            <div class="bar-item"><div class="bar-fill" data-value="5" style="height:25%;background:#f97316;"></div><span class="bar-label">6/13</span></div>
+
+
+
+            <div class="bar-item"><div class="bar-fill" data-value="12" style="height:60%;background:#ef4444;"></div><span class="bar-label">6/15</span></div>
+
+
+
+            <div class="bar-item"><div class="bar-fill" data-value="15" style="height:75%;background:#ef4444;"></div><span class="bar-label">6/17</span></div>
+
+
+
+            <div class="bar-item"><div class="bar-fill" data-value="6" style="height:30%;background:#f97316;"></div><span class="bar-label">6/19</span></div>
+
+
+
+            <div class="bar-item"><div class="bar-fill" data-value="9" style="height:45%;background:#f97316;"></div><span class="bar-label">6/21</span></div>
+
+
+
+            <div class="bar-item"><div class="bar-fill" data-value="7" style="height:35%;background:#f97316;"></div><span class="bar-label">6/23</span></div>
+
+
+
+            <div class="bar-item"><div class="bar-fill" data-value="18" style="height:90%;background:#ef4444;"></div><span class="bar-label">6/25</span></div>
+
+
+
+            <div class="bar-item"><div class="bar-fill" data-value="10" style="height:50%;background:#f97316;"></div><span class="bar-label">6/27</span></div>
+
+
+
+            <div class="bar-item"><div class="bar-fill" data-value="14" style="height:70%;background:#ef4444;"></div><span class="bar-label">6/29</span></div>
+
+
+
+            <div class="bar-item"><div class="bar-fill" data-value="8" style="height:40%;background:#f97316;"></div><span class="bar-label">7/1</span></div>
+
+
+
+            <div class="bar-item"><div class="bar-fill" data-value="11" style="height:55%;background:#f97316;"></div><span class="bar-label">7/3</span></div>
+
+
+
+            <div class="bar-item"><div class="bar-fill" data-value="16" style="height:80%;background:#ef4444;"></div><span class="bar-label">7/5</span></div>
+
+
+
+            <div class="bar-item"><div class="bar-fill" data-value="9" style="height:45%;background:#f97316;"></div><span class="bar-label">7/7</span></div>
+
+
+
+            <div class="bar-item"><div class="bar-fill" data-value="13" style="height:65%;background:#ef4444;"></div><span class="bar-label">7/9</span></div>
+
+
+
+          </div>
+
+
+
+        </div>
+
+
+
+        <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--text-tertiary);">
+
+
+
+          <span>30天累计预警: <strong style="color:var(--text-primary);font-family:var(--font-mono);">151</strong> 条</span>
+
+
+
+          <span style="display:flex;align-items:center;gap:16px;">
+
+
+
+            <span style="display:flex;align-items:center;gap:4px;"><span style="width:10px;height:10px;border-radius:2px;background:#ef4444;"></span> 严重/一般</span>
+
+
+
+            <span style="display:flex;align-items:center;gap:4px;"><span style="width:10px;height:10px;border-radius:2px;background:#f97316;"></span> 轻微</span>
+
+
+
+          </span>
+
+
+
+          <span>日均预警: <strong style="color:var(--text-accent);font-family:var(--font-mono);">5.0</strong> 条</span>
+
+
+
+        </div>
+
+
+
+      </div>
+
+
+
+    </div>
+
+
+
+
+
+
+
+    <div class="card">
+
+
+
+      <div class="list-filter-section">
+
+
+
+        <div class="list-filter-tabs">
+
+
+
+          <div class="filter-tab active" onclick="filterByStatus('all')">全部</div>
+
+
+
+          <div class="filter-tab" onclick="filterByStatus('pending')">待处理</div>
+
+
+
+          <div class="filter-tab" onclick="filterByStatus('processing')">处理中</div>
+
+
+
+          <div class="filter-tab" onclick="filterByStatus('closed')">已关闭</div>
+
+
+
+          <div class="filter-tab" onclick="filterByStatus('ignored')">已忽略</div>
+
+
+
+        </div>
+
+
+
+        <div class="list-filter-row">
+
+
+
+          <div class="filter-field">
+
+
+
+            <select id="filter-type" onchange="applyFilter()">
+
+
+
+              <option value="">预警类型</option>
+
+
+
+              <option value="缺料">缺料预警</option>
+
+
+
+              <option value="积压">积压预警</option>
+
+
+
+              <option value="质量">质量预警</option>
+
+
+
+              <option value="成本">成本预警</option>
+
+
+
+              <option value="人力">人力预警</option>
+
+
+
+              <option value="交付">交付预警</option>
+
+
+
+              <option value="财务">财务预警</option>
+
+
+
+            </select>
+
+
+
+          </div>
+
+
+
+          <div class="filter-field">
+
+
+
+            <select id="filter-level" onchange="applyFilter()">
+
+
+
+              <option value="">预警级别</option>
+
+
+
+              <option value="严重">严重</option>
+
+
+
+              <option value="一般">一般</option>
+
+
+
+              <option value="轻微">轻微</option>
+
+
+
+            </select>
+
+
+
+          </div>
+
+
+
+          <div class="filter-field">
+
+
+
+            <select id="filter-status" onchange="applyFilter()">
+
+
+
+              <option value="">状态</option>
+
+
+
+              <option value="待处理">待处理</option>
+
+
+
+              <option value="处理中">处理中</option>
+
+
+
+              <option value="已关闭">已关闭</option>
+
+
+
+              <option value="已忽略">已忽略</option>
+
+
+
+            </select>
+
+
+
+          </div>
+
+
+
+          <div class="filter-field">
+
+
+
+            <input type="date" id="filter-start" placeholder="开始日期">
+
+
+
+          </div>
+
+
+
+          <div class="filter-field">
+
+
+
+            <input type="date" id="filter-end" placeholder="结束日期">
+
+
+
+          </div>
+
+
+
+          <div class="filter-btns">
+
+
+
+            <button class="btn-search" onclick="applyFilter()">&#128269; 查询</button>
+
+
+
+            <button class="btn-reset" onclick="resetFilter()">&#128265; 重置</button>
+
+
+
+          </div>
+
+
+
+        </div>
+
+
+
+      </div>
+
+
+
+      <div class="list-table-area">
+
+
+
+        <table class="data-table">
+
+
+
+          <thead>
+
+
+
+            <tr>
+
+
+
+              <th><input type="checkbox" class="row-checkbox"></th>
+
+
+
+              <th>预警编号</th>
+
+
+
+              <th>预警类型</th>
+
+
+
+              <th>关联对象</th>
+
+
+
+              <th>预警级别</th>
+
+
+
+              <th>风险描述</th>
+
+
+
+              <th>影响分析</th>
+
+
+
+              <th>预警时间</th>
+
+
+
+              <th>处理状态</th>
+
+
+
+              <th>操作</th>
+
+
+
+            </tr>
+
+
+
+          </thead>
+
+
+
+          <tbody><tr><td colspan="100%" style="text-align:center;color:var(--text-tertiary);padding:20px;">暂无数据</td></tr></tbody>
+
+
+
+        </table>
+
+
+
+      </div>
+
+
+
+      <div class="list-pagination">
+
+
+
+        <div class="page-info">共 15 条记录，显示 1-15 条</div>
+
+
+
+        <div class="page-btns">
+
+
+
+          <button onclick="prevPage()">上一页</button>
+
+
+
+          <button class="active">1</button>
+
+
+
+          <button onclick="nextPage()">下一页</button>
+
+
+
+        </div>
+
+
+
+      </div>
+
+
+
+    </div>
+
+
+
+  </div>
+
+
+
+</div>
+
+
+
+
+
+
+
+<div id="toastContainer" class="toast-container"></div>
+
+
+
+
+
+
+
+<div class="confirm-modal-overlay" id="confirmModal">
+
+
+
+  <div class="confirm-modal">
+
+
+
+    <div class="confirm-modal-header">温馨提示</div>
+
+
+
+    <div class="confirm-modal-body" id="confirmMessage"></div>
+
+
+
+    <div class="confirm-modal-footer">
+
+
+
+      <button class="btn btn-ghost" onclick="closeConfirmModal()">取消</button>
+
+
+
+      <button class="btn btn-primary" onclick="confirmOk()">确定</button>
+
+
+
+    </div>
+
+
+
+  </div>
+
+
+
+</div>
+
+
+
+
+
+
+
+<div class="modal-overlay" id="detailModal">
+
+
+
+  <div class="modal modal-lg">
+
+
+
+    <div class="modal-header">
+
+
+
+      <span>&#128197; 预警详情</span>
+
+
+
+      <button class="btn btn-ghost btn-sm" onclick="closeModal('detailModal')">&#10006;</button>
+
+
+
+    </div>
+
+
+
+    <div class="modal-body">
+
+
+
+      <div class="form-group">
+
+
+
+        <label class="form-label">预警编号</label>
+
+
+
+        <input type="text" class="form-input" value="WARN-2026-0089" readonly>
+
+
+
+      </div>
+
+
+
+      <div class="grid-2 gap-16">
+
+
+
+        <div class="form-group">
+
+
+
+          <label class="form-label">预警类型</label>
+
+
+
+          <input type="text" class="form-input" value="缺料预警" readonly>
+
+
+
+        </div>
+
+
+
+        <div class="form-group">
+
+
+
+          <label class="form-label">预警级别</label>
+
+
+
+          <input type="text" class="form-input" value="严重" readonly>
+
+
+
+        </div>
+
+
+
+      </div>
+
+
+
+      <div class="form-group">
+
+
+
+        <label class="form-label">关联对象</label>
+
+
+
+        <input type="text" class="form-input" value="ABS树脂 PC-770" readonly>
+
+
+
+      </div>
+
+
+
+      <div class="form-group">
+
+
+
+        <label class="form-label">风险描述</label>
+
+
+
+        <textarea class="form-textarea" readonly>当前库存 ABS树脂 PC-770 数量为 160 KG，安全库存为 500 KG，实际库存仅为安全库存的 32.00%。根据生产计划，未来7天内预计消耗 350 KG，若不及时补货，将导致生产中断。</textarea>
+
+
+
+      </div>
+
+
+
+      <div class="form-group">
+
+
+
+        <label class="form-label">影响分析</label>
+
+
+
+        <textarea class="form-textarea" readonly>1. 影响生产工单 MO-2026-0345（仪表盘外壳）的正常生产，计划产量 2,000 SET，若断料将导致延期交付。
+
+
+
+2. 关联销售订单 SO-2026-0562 交货日期为 2026-07-15，若生产中断将导致逾期交付。
+
+
+
+3. 预计影响金额：约 125.00 万元（订单金额）。</textarea>
+
+
+
+      </div>
+
+
+
+      <div class="form-group">
+
+
+
+        <label class="form-label">处置建议</label>
+
+
+
+        <textarea class="form-textarea" readonly>1. 立即联系供应商紧急补货，建议采购数量 500 KG。
+
+
+
+2. 调整生产计划，优先安排其他可用材料的产品生产。
+
+
+
+3. 通知测试部门门，提前与客户沟通可能的交货延迟。
+
+
+
+4. 检查库存管理策略，考虑提高该物料的安全库存水平。</textarea>
+
+
+
+      </div>
+
+
+
+      <div class="form-group">
+
+
+
+        <label class="form-label">历史记录</label>
+
+
+
+        <div style="background:var(--bg-inset);border:1px solid var(--border-normal);border-radius:var(--radius-sm);padding:12px;">
+
+
+
+          <div style="font-size:12px;color:var(--text-secondary);margin-bottom:8px;">
+
+
+
+            <span style="color:var(--text-tertiary);">2026-07-09 10:30</span> - 系统自动生成预警
+
+
+
+          </div>
+
+
+
+          <div style="font-size:12px;color:var(--text-secondary);margin-bottom:8px;">
+
+
+
+            <span style="color:var(--text-tertiary);">2026-07-09 10:35</span> - 预警已发送至采购员测试人员
+
+
+
+          </div>
+
+
+
+          <div style="font-size:12px;color:var(--text-secondary);">
+
+
+
+            <span style="color:var(--text-tertiary);">2026-07-09 11:00</span> - 待处理状态，等待确认
+
+
+
+          </div>
+
+
+
+        </div>
+
+
+
+      </div>
+
+
+
+    </div>
+
+
+
+    <div class="modal-footer">
+
+
+
+      <button class="btn btn-ghost" onclick="closeModal('detailModal')">关闭</button>
+
+
+
+      <button class="btn btn-primary" onclick="confirmAlert('WARN-2026-0089')">确认预警</button>
+
+
+
+    </div>
+
+
+
+  </div>
+
+
+
+</div>
+
+
+
+
+
+
+
+<div class="modal-overlay" id="assignModal">
+
+
+
+  <div class="modal">
+
+
+
+    <div class="modal-header">
+
+
+
+      <span>&#128101; 指派处理</span>
+
+
+
+      <button class="btn btn-ghost btn-sm" onclick="closeModal('assignModal')">&#10006;</button>
+
+
+
+    </div>
+
+
+
+    <div class="modal-body">
+
+
+
+      <div class="form-group">
+
+
+
+        <label class="form-label">选择处理人</label>
+
+
+
+        <select class="form-select">
+
+
+
+          <option>测试人员 - 采购主管</option>
+
+
+
+          <option>测试人员 - 生产主管</option>
+
+
+
+          <option>测试人员 - 仓库管理员</option>
+
+
+
+          <option>测试人员 - 质量经理</option>
+
+
+
+        </select>
+
+
+
+      </div>
+
+
+
+      <div class="form-group">
+
+
+
+        <label class="form-label">处理备注</label>
+
+
+
+        <textarea class="form-textarea" placeholder="请输入处理备注..."></textarea>
+
+
+
+      </div>
+
+
+
+    </div>
+
+
+
+    <div class="modal-footer">
+
+
+
+      <button class="btn btn-ghost" onclick="closeModal('assignModal')">取消</button>
+
+
+
+      <button class="btn btn-primary" onclick="doAssign()">确认指派</button>
+
+
+
+    </div>
+
+
+
+  </div>
+
+
+
+</div>
+
+
+
+
+
+
+
+<div class="modal-overlay" id="processModal">
+
+
+
+  <div class="modal">
+
+
+
+    <div class="modal-header">
+
+
+
+      <span>&#128203; 处理预警</span>
+
+
+
+      <button class="btn btn-ghost btn-sm" onclick="closeModal('processModal')">&#10006;</button>
+
+
+
+    </div>
+
+
+
+    <div class="modal-body">
+
+
+
+      <div class="form-group">
+
+
+
+        <label class="form-label">处理方式</label>
+
+
+
+        <select class="form-select">
+
+
+
+          <option>已补货</option>
+
+
+
+          <option>已调整生产计划</option>
+
+
+
+          <option>已联系客户协商</option>
+
+
+
+          <option>已启动应急预案</option>
+
+
+
+          <option>其他</option>
+
+
+
+        </select>
+
+
+
+      </div>
+
+
+
+      <div class="form-group">
+
+
+
+        <label class="form-label">处理结果</label>
+
+
+
+        <textarea class="form-textarea" placeholder="请输入处理结果详情..."></textarea>
+
+
+
+      </div>
+
+
+
+      <div class="form-group">
+
+
+
+        <label class="form-label">预计完成时间</label>
+
+
+
+        <input type="date" class="form-input">
+
+
+
+      </div>
+
+
+
+    </div>
+
+
+
+    <div class="modal-footer">
+
+
+
+      <button class="btn btn-ghost" onclick="closeModal('processModal')">取消</button>
+
+
+
+      <button class="btn btn-primary" onclick="doProcess()">确认处理</button>
+
+
+
+    </div>
+
+
+
+  </div>
+
+
+
+</div>
+
+
+
+
+
+
+
+<script>
+
+
+
+
+
+
+
+
+
+
+;
+
+
+
+  toast.className = 'toast toast-' + (type || 'info');
+
+
+
+  toast.innerHTML = '<span class="toast-icon">' + (icons[type] || icons.info) + '</span><span>' + message + '</span>';
+
+
+
+  container.appendChild(toast);
+
+
+
+  setTimeout(function() { toast.remove(); }, 3000);
+closeConfirmModal();
+
+
+
+
+
+
+
+function refreshData() {
+
+
+
+  showToast('数据已刷新', 'success');
+
+
+
+}
+
+
+
+function exportData() {
+
+
+
+  showToast('导出功能已触发', 'info');
+
+
+
+}
+
+
+
+function filterByStatus(status) {
+
+
+
+  document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
+
+
+
+  event.target.classList.add('active');
+
+
+
+}
+
+
+
+function applyFilter() {
+
+
+
+  showToast('查询条件已应用', 'info');
+
+
+
+}
+
+
+
+function resetFilter() {
+
+
+
+  document.getElementById('filter-type').value = '';
+
+
+
+  document.getElementById('filter-level').value = '';
+
+
+
+  document.getElementById('filter-status').value = '';
+
+
+
+  document.getElementById('filter-start').value = '';
+
+
+
+  document.getElementById('filter-end').value = '';
+
+
+
+}
+
+
+
+function prevPage() {}
+
+
+
+function nextPage() {}
+
+
+
+function showDetail(id) {
+
+
+
+  document.getElementById('detailModal').classList.add('active');
+
+
+
+}
+
+
+
+function confirmAlert(id) {
+
+
+
+  showConfirm('确认要确认该预警吗？', 'warning', function() {
+
+
+
+    showToast('预警 ' + id + ' 已确认', 'success');
+
+
+
+  });
+
+
+
+}
+
+
+
+function assignAlert(id) {
+
+
+
+  document.getElementById('assignModal').classList.add('active');
+
+
+
+}
+
+
+
+function processAlert(id) {
+
+
+
+  document.getElementById('processModal').classList.add('active');
+
+
+
+}
+
+
+
+function closeAlert(id) {
+
+
+
+  showConfirm('确认要关闭该预警吗？', 'warning', function() {
+
+
+
+    showToast('预警 ' + id + ' 已关闭', 'success');
+
+
+
+  });
+
+
+
+}
+
+
+
+function closeModal(id) {
+
+
+
+  document.getElementById(id).classList.remove('active');
+
+
+
+}
+
+
+
+function doAssign() {
+
+
+
+  showToast('指派成功', 'success');
+
+
+
+  closeModal('assignModal');
+
+
+
+}
+
+
+
+function doProcess() {
+
+
+
+  showToast('处理成功', 'success');
+
+
+
+  closeModal('processModal');
+
+
+
+}
+
+
+
+
+
+
+
+
+
+
+
+}
+
+
+
+}
+
+
+
+}
+
+
+
+}
+</script>
+
+
+
+
+<div class="lookup-modal" id="lookupModal">
+  <div class="lookup-dialog">
+    <div class="lookup-header">
+      <div class="lookup-title" id="lookupTitle">选择</div>
+      <button class="lookup-close" onclick="closeLookup()">×</button>
+    </div>
+    <div class="lookup-body">
+      <div class="lookup-search">
+        <input type="text" id="lookupKeyword" placeholder="请输入编码或名称搜索" onkeydown="if(event.key==='Enter')filterLookup()">
+        <button onclick="filterLookup()">搜索</button>
+      </div>
+      <table class="lookup-table">
+        <thead id="lookupTableHead"></thead>
+        <tbody id="lookupTableBody"></tbody>
+      </table>
+    </div>
+    <div class="lookup-footer">
+      <button class="btn btn-cancel" onclick="closeLookup()">取消</button>
+      <button class="btn btn-primary" onclick="confirmLookup()">确定</button>
+    </div>
+  </div>
+</div>
+
+</body>
+
+
+
+</html>

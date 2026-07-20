@@ -1,0 +1,209 @@
+退货通知单
+
+
+字段说明：
+基本信息：FBillHead 
+	 实体主键：FID 
+	 单据编号：FBillNo 
+	 单据状态：FDocumentStatus 
+	 销售组织：FSaleOrgId  (必填项)
+	 日期：FDate  (必填项)
+	 销售员：FSalesManId 
+	 库存组织：FRetorgId  (必填项)
+	 销售部门：FSaledeptid 
+	 销售组：FSaleGroupId 
+	 库存部门：FRetDeptId 
+	 仓管员：FStockerId 
+	 库存组：FStockerGroupId 
+	 退货客户：FRetcustId  (必填项)
+	 付款方：FPayCusId 
+	 结算方：FSettleCusId 
+	 收货方：FReceiveCusId 
+	 创建人：FCreatorId 
+	 作废日期：FCancelDate 
+	 作废状态：FCancelStatus 
+	 最后修改日期：FModifyDate 
+	 审核日期：FApproveDate 
+	 创建日期：FCreateDate 
+	 审核人：FApproverId 
+	 作废人：FCancellerId 
+	 最后修改人：FModifierId 
+	 单据类型：FBillTypeID  (必填项)
+	 货主类型：FOwnerTypeIdHead 
+	 货主：FOwnerIdHead 
+	 业务类型：FBussinessType 
+	 退货原因：FReturnReason 
+	 收货方地址：FReceiveAddress 
+	 交货地点：FHeadLocId 
+	 信用检查结果：FCreditCheckResult 
+	 对应组织：FCorrespondOrgId 
+	 收货方联系人：FReceiveCusContact 
+	 备注：FDescription 
+	 关闭状态：FBillCloseStatus 
+	 关闭人：FCloserId 
+	 关闭日期：FClosedDate 
+	 是否手动关闭：FManualClose 
+	 序列号上传：FScanBox 
+	 收货人姓名：FLinkMan 
+	 联系电话：FLinkPhone 
+	 关闭原因：FCloseReason 
+	 预设基础资料字段2：FPRESETBASE2 
+	 预设基础资料字段1：FPRESETBASE1 
+	 预设辅助资料字段1：FPRESETASSISTANT1 
+	 预设辅助资料字段2：FPRESETASSISTANT2 
+明细信息：FEntity 
+	 实体主键：FENTRYID 
+	 物料编码：FMaterialId  (必填项)
+	 物料名称：FMaterialName 
+	 规格型号：FMaterialModel 
+	 物料类别：FMaterialType 
+	 销售数量：FQty 
+	 BOM版本：FBOMId 
+	 有效期至：FExpiryDate 
+	 基本单位：FASEUNITID  (必填项)
+	 销售基本数量：FBaseUnitQty 
+	 备注：FEntryDescription 
+	 订单单号：FOrderNo 
+	 关联退货数量：FJoinRetQty 
+	 关联退货数量（基本单位）：FBaseJoinretQty 
+	 销售单位：FUnitID  (必填项)
+	 辅助属性：FAuxpropId 
+	 累计退货数量（基本单位）：FBaseSumRetQty 
+	 累计退货数量：FSumRetQty 
+	 源单类型：FSrcType 
+	 生产日期：FPRODUCEDATE 
+	 保质期单位：FExpUnit 
+	 保质期：FExpPeriod 
+	 客户物料编码：FMapId 
+	 客户物料名称：FMapName 
+	 批号：FLot 
+	 退货类型：FRmType  (必填项)
+	 计价单位：FPriceUnitId 
+	 计价数量：FPriceUnitQty 
+	 单价：FPrice 
+	 含税单价：FTaxPrice 
+	 税组合：FTaxCombination 
+	 税率%：FEntryTaxRate 
+	 价格系数：FPriceCoefficient 
+	 系统定价：FSysPrice 
+	 最低限价：FLimitDownPrice 
+	 折前金额：FBefDisAmt 
+	 折前价税合计：FBefDisAllAmt 
+	 折扣率%：FDiscountRate 
+	 折扣额：FDiscount 
+	 金额：FAmount 
+	 金额（本位币）：FAmount_LC 
+	 税额：FEntryTaxAmount 
+	 税额（本位币）：FTaxAmount_LC 
+	 价税合计：FAllAmount 
+	 价税合计（本位币）：FAllAmount_LC 
+	 是否赠品：FIsFree 
+	 净价：FTaxNetPrice 
+	 退货日期：FDeliverydate  (必填项)
+	 物料允许库存属性：FIsInventory 
+	 业务流程：FBFLowId 
+	 源单编号：FSrcBillNo 
+	 仓库：FStockId 
+	 订单类型：FSOBILLTYPEID 
+	 计划跟踪号：FMtoNo 
+	 当前库存：FInventoryQty 
+	 计价基本数量：FPriceBaseQty 
+	 已检验数量：FCheckQty 
+	 已检验数量(基本单位)：FBaseCheckQty 
+	 合格判退数量：FQualifiedQty 
+	 合格判退数量(基本单位)：FBaseQualifiedQty 
+	 不合格判退数量：FUnqualifiedQty 
+	 不合格判退数量(基本单位)：FBaseUnqualifiedQty 
+	 报废判退数量：FJunkedQty 
+	 报废判退数量(基本单位)：FBaseJunkedQty 
+	 关联检验数量：FJoinCheckQty 
+	 关联检验数量(基本单位)：FBaseJoinCheckQty 
+	 关联合格判退数量：FJoinQualifiedQty 
+	 关联合格判退数量(基本单位)：FBaseJoinQualifiedQty 
+	 关联报废判退数量：FJoinJunkedQty 
+	 关联报废判退数量(基本单位)：FBaseJoinJunkedQty 
+	 关联不合格判退数量：FJoinUnqualifiedQty 
+	 关联不合格判退数量(基本单位)：FBaseJoinUnqualifiedQty 
+	 库存单位：FStockUnitID 
+	 库存数量：FStockQty 
+	 库存基本数量：FStockBaseQty 
+	 关联退货数量（库存基本）：FStockBaseJoinRetQty 
+	 累计退货数量（库存基本）：FStockBaseSumRetQty 
+	 销售基本分子：FSalBaseNum 
+	 库存基本分母：FStockBaseDen 
+	 携带的主业务单位：FSRCBIZUNITID 
+	 货主类型：FOwnerTypeID 
+	 货主：FOwnerID  (必填项)
+	 拒收标志：FRefuseFlag 
+	 销售订单EntryId：FSOEntryId 
+	 退货检验：FIsReturnCheck 
+	 产品类型：FRowType 
+	 父项产品：FParentMatId 
+	 行标识：FRowId 
+	 父行标识：FParentRowId 
+	 单价折扣：FPriceDiscount 
+	 行关闭状态：FCLOSESTATUS 
+	 尾差处理标识：FTailDiffFlag 
+	 序列号单位：FSNUnitID 
+	 序列号单位数量：FSNQty 
+	 BOM分录内码：FBOMEntryId 
+	 行价目表：FPriceListEntry 
+	 变更数量(库存基本)：FStockChangeBaseQty 
+	 变更数量(库存)：FSTOCKCHANGEQTY 
+	 修改原因：FModifyReason 
+	 原销售数量：FOriginQty 
+	 原库存数量：FOriginStockQty 
+财务信息：SubHeadEntity 
+	 实体主键：FEntryId 
+	 结算组织：FSettleOrgId  (必填项)
+	 收款条件：FChageCondition 
+	 结算方式：FSettleTypeId 
+	 结算币别：FSettleCurrId  (必填项)
+	 汇率类型：FExchangeTypeId 
+	 汇率：FExchangeRate 
+	 本位币：FLocalCurrId 
+	 折扣表：FDiscountListId 
+	 价税合计：FBillAllAmount 
+	 金额：FBillAmount 
+	 税额：FBillTaxAmount 
+	 金额（本位币）：FBillAmount_LC 
+	 价税合计（本位币）：FBillAllAmount_LC 
+	 是否含税：FIsIncludedTax 
+	 税额（本位币）：FBillTaxAmount_LC 
+	 价目表：FPriceListId 
+	 价外税：FIsPriceExcludeTax 
+税务明细：FTaxDetailSubEntity 
+	 实体主键：FDetailID 
+	 税率名称：FTaxRateId 
+	 税率%：FTaxRate 
+	 税额：FTaxAmount 
+	 计入成本比例%：FCostPercent 
+	 计入成本金额：FCostAmount 
+	 增值税：FVAT 
+	 卖方代扣代缴：FSellerWithholding 
+	 买方代扣代缴：FBuyerWithholding 
+序列号子单据体：FSerialSubEntity 
+	 实体主键：FDetailID 
+	 序列号：FSerialNo 
+	 序列号：FSerialId 
+	 备注：FSerialNote 
+	 下推退货标识：FPushReturn 
+	 检验结果：FInspectResult 
+关联关系表：FEntity_Link 
+	 实体主键：FLinkId 
+	 业务流程图：FEntity_Link_FFlowId 
+	 推进路线：FEntity_Link_FFlowLineId 
+	 转换规则：FEntity_Link_FRuleId 
+	 源单表内码：FEntity_Link_FSTableId 
+	 源单表：FEntity_Link_FSTableName 
+	 源单内码：FEntity_Link_FSBillId 
+	 源单分录内码：FEntity_Link_FSId 
+	 原始携带量：FEntity_Link_FPriceBaseQtyOld 
+	 修改携带量：FEntity_Link_FPriceBaseQty 
+	 原始携带量：FEntity_Link_FBaseUnitQtyOld 
+	 修改携带量：FEntity_Link_FBaseUnitQty 
+	 原始携带量：FEntity_Link_FStockBaseQtyOld 
+	 修改携带量：FEntity_Link_FStockBaseQty 
+	 迁移图：FEntity_Link_FLnkTrackerId 
+	 上游状态：FEntity_Link_FLnkSState 
+	 数量FLnk：FEntity_Link_FLnkAmount 

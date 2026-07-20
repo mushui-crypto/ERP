@@ -1,0 +1,1428 @@
+<!DOCTYPE html>
+
+
+
+<html lang="zh-CN">
+
+
+
+<head>
+
+
+
+<meta charset="UTF-8">
+
+
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+
+
+<title>计划运算汇总表 - 磐枢工业智能平台</title>
+
+
+
+<link rel="stylesheet" href="../common.css">
+
+
+
+<script src="../common.js"></script>
+<script>
+</script>
+
+
+
+<style>
+
+
+
+
+
+
+
+.toast-container {
+
+
+
+  position: fixed;
+
+
+
+  top: 60px;
+
+
+
+  right: 20px;
+
+
+
+  z-index: 1000;
+
+
+
+  display: flex;
+
+
+
+  flex-direction: column;
+
+
+
+  gap: 8px;
+
+
+
+}
+
+
+
+.toast {
+
+
+
+  padding: 12px 16px;
+
+
+
+  border-radius: var(--radius-md);
+
+
+
+  font-size: 13px;
+
+
+
+  color: var(--text-primary);
+
+
+
+  min-width: 280px;
+
+
+
+  max-width: 400px;
+
+
+
+  display: flex;
+
+
+
+  align-items: center;
+
+
+
+  gap: 8px;
+
+
+
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+
+
+
+  animation: toastIn 0.3s ease;
+
+
+
+}
+
+
+
+@keyframes toastIn {
+
+
+
+  from { opacity: 0; transform: translateX(100%); }
+
+
+
+  to { opacity: 1; transform: translateX(0); }
+
+
+
+}
+
+
+
+.toast-success { background: rgba(34,197,94,0.9); }
+
+
+
+.toast-error { background: rgba(239,68,68,0.9); }
+
+
+
+.toast-warning { background: rgba(234,179,8,0.9); }
+
+
+
+.toast-info { background: rgba(6,182,212,0.9); }
+
+
+
+.toast-icon { font-size: 16px; }
+
+
+
+
+
+
+
+.confirm-modal-overlay {
+
+
+
+  position: fixed;
+
+
+
+  inset: 0;
+
+
+
+  background: rgba(0,0,0,0.6);
+
+
+
+  display: none;
+
+
+
+  align-items: center;
+
+
+
+  justify-content: center;
+
+
+
+  z-index: 2000;
+
+
+
+}
+
+
+
+.confirm-modal-overlay.show { display: flex; }
+
+
+
+.confirm-modal {
+
+
+
+  background: var(--bg-surface);
+
+
+
+  border: 1px solid var(--border-normal);
+
+
+
+  border-radius: var(--radius-lg);
+
+
+
+  padding: 24px;
+
+
+
+  min-width: 360px;
+
+
+
+  max-width: 480px;
+
+
+
+  box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+
+
+
+}
+
+
+
+.confirm-modal-header {
+
+
+
+  font-size: 14px;
+
+
+
+  font-weight: 600;
+
+
+
+  color: var(--text-primary);
+
+
+
+  margin-bottom: 12px;
+
+
+
+}
+
+
+
+.confirm-modal-body {
+
+
+
+  font-size: 13px;
+
+
+
+  color: var(--text-secondary);
+
+
+
+  line-height: 1.6;
+
+
+
+  margin-bottom: 20px;
+
+
+
+}
+
+
+
+.confirm-modal-footer {
+
+
+
+  display: flex;
+
+
+
+  justify-content: flex-end;
+
+
+
+  gap: 8px;
+
+
+
+}
+
+
+
+
+
+
+
+<style>
+
+
+
+.main-content{display:flex;flex-direction:column;}
+
+
+
+.list-action-bar{flex-shrink:0;}
+
+
+
+.report-body{padding:16px;display:flex;flex-direction:column;gap:16px;flex:1;overflow-y:auto;}
+
+
+
+.calc-bar{background:var(--bg-surface);border:1px solid var(--border-normal);border-radius:var(--radius-md);padding:14px 16px;display:flex;align-items:center;gap:12px;flex-wrap:wrap;}
+
+
+
+.calc-bar .calc-field{display:inline-flex;align-items:center;gap:6px;}
+
+
+
+.calc-bar .calc-field label{font-size:12px;color:var(--text-tertiary);white-space:nowrap;}
+
+
+
+.calc-bar .calc-field select,.calc-bar .calc-field input{background:var(--bg-inset);border:1px solid var(--border-normal);border-radius:var(--radius-sm);color:var(--text-primary);font-size:12px;padding:6px 10px;outline:none;}
+
+
+
+.calc-bar .calc-field select:focus,.calc-bar .calc-field input:focus{border-color:var(--text-accent);}
+
+
+
+.stat-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;}
+
+
+
+.stat-card-mini{background:var(--bg-surface);border:1px solid var(--border-normal);border-radius:var(--radius-md);padding:16px;}
+
+
+
+.stat-card-mini .stat-icon{font-size:20px;margin-bottom:8px;}
+
+
+
+.stat-card-mini .stat-num{font-family:var(--font-mono);font-size:26px;font-weight:700;color:var(--text-primary);line-height:1.2;}
+
+
+
+.stat-card-mini .stat-name{font-size:12px;color:var(--text-tertiary);margin-top:4px;}
+
+
+
+.report-section{background:var(--bg-surface);border:1px solid var(--border-normal);border-radius:var(--radius-md);overflow:hidden;}
+
+
+
+.report-section .section-header{padding:12px 16px;border-bottom:1px solid var(--border-normal);font-size:13px;font-weight:600;color:var(--text-primary);display:flex;align-items:center;justify-content:space-between;}
+
+
+
+.report-section .section-header .section-title{display:flex;align-items:center;gap:6px;}
+
+
+
+.report-section .section-header .section-title::before{content:'';display:inline-block;width:3px;height:14px;background:var(--text-accent);border-radius:2px;}
+
+
+
+.log-area{padding:12px 16px;font-size:12px;color:var(--text-secondary);font-family:var(--font-mono);line-height:1.8;background:var(--bg-inset);}
+
+
+
+.log-area .log-line{display:flex;gap:12px;}
+
+
+
+.log-area .log-time{color:var(--text-tertiary);white-space:nowrap;}
+
+
+
+.log-area .log-msg{color:var(--text-secondary);}
+
+
+
+.log-area .log-success{color:var(--color-success);}
+
+
+
+.log-area .log-warning{color:var(--color-warning);}
+
+
+
+
+.lookup-modal { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:2000; justify-content:center; align-items:center; }
+.lookup-modal.show { display:flex; }
+.lookup-dialog { background:#fff; border:1px solid #e8e8e8; border-radius:4px; width:720px; max-height:70vh; overflow:hidden; }
+.lookup-header { padding:14px 20px; border-bottom:1px solid #e8e8e8; display:flex; align-items:center; justify-content:space-between; }
+.lookup-title { font-size:15px; font-weight:600; color:#333; }
+.lookup-close { font-size:20px; color:#666; cursor:pointer; background:none; border:none; }
+.lookup-close:hover { color:#333; }
+.lookup-body { padding:16px; }
+.lookup-search { display:flex; gap:8px; margin-bottom:12px; }
+.lookup-search input { flex:1; padding:6px 10px; border:1px solid #e8e8e8; border-radius:4px; font-size:13px; }
+.lookup-search button { padding:6px 16px; background:#1890ff; color:#fff; border:none; border-radius:4px; cursor:pointer; }
+.lookup-table { width:100%; border-collapse:collapse; font-size:13px; }
+.lookup-table th, .lookup-table td { padding:10px 12px; text-align:left; border-bottom:1px solid #e8e8e8; }
+.lookup-table th { background:#fafafa; font-weight:600; color:#333; }
+.lookup-table tr:hover { background:#f5f5f5; }
+.lookup-table .checkbox-cell { width:40px; }
+.lookup-footer { padding:12px 20px; border-top:1px solid #e8e8e8; display:flex; justify-content:flex-end; gap:8px; }
+.lookup-field { display:flex; align-items:center; }
+.lookup-field input { flex:1; padding:6px 10px; border:1px solid #e8e8e8; border-radius:4px 0 0 4px; font-size:13px; }
+.lookup-field button { width:28px; height:28px; border:1px solid #e8e8e8; border-left:none; border-radius:0 4px 4px 0; background:#fff; cursor:pointer; display:flex; align-items:center; justify-content:center; }
+.lookup-field button:hover { background:#f5f5f5; }
+
+</style>
+
+
+
+</head>
+
+
+
+</style>
+
+<body>
+
+
+
+<aside class="sidebar" id="sidebar">
+
+
+
+<div class="sidebar-logo">
+
+
+
+    <img src="../images/logo.png" alt="磐枢工业智能平台" style="width: 100%; max-width: 200px; margin-bottom: 8px;">
+
+
+
+    <h1 style="font-size: 16px; margin: 0;">磐枢工业智能平台</h1>
+
+
+
+  </div>
+
+
+
+  <nav class="sidebar-menu"></nav>
+
+
+
+<div class="sidebar-user"><div class="avatar">管</div>
+
+
+
+</aside>
+
+
+
+<div class="main-content" id="mainContent">
+
+
+
+  <div class="page-header" style="position:sticky;top:0;z-index:100;">
+
+
+
+    <div>
+
+
+
+      <div class="flex items-center gap-8">
+
+
+
+        <button class="sidebar-toggle" onclick="toggleSidebar()">&#9776;</button>
+
+
+
+        <div>
+
+
+
+          <h2>计划运算汇总表</h2>
+
+
+
+          <div class="breadcrumb"><a href="../index.html">首页</a><span>&gt;</span><span>生产制造</span><span>&gt;</span><span>计划管理</span><span>&gt;</span><span>计划查询</span><span>&gt;</span><span>计划运算汇总表</span></div></div>
+
+
+
+        </div>
+
+
+
+      </div>
+
+
+
+    </div>
+
+
+
+  </div>
+
+
+
+
+
+
+
+  <div class="list-action-bar">
+
+
+
+      <button class="action-btn">过滤</button>
+
+
+
+      <button class="action-btn">刷新</button>
+
+
+
+      <span class="action-separator"></span>
+
+
+
+      <button class="action-btn">导出</button>
+
+
+
+      <button class="action-btn">打印</button>
+
+
+
+      <span class="action-separator"></span>
+
+
+
+      <button class="action-btn">综合查询</button>
+
+
+
+      <button class="action-btn">选项</button>
+
+
+
+    </div>
+
+
+
+
+
+
+
+  <div class="report-body">
+
+
+
+    <div class="calc-bar">
+
+
+
+      <div class="calc-field">
+
+
+
+        <label>运算方案</label>
+
+
+
+        <select><option>PS-2026-001 Q3主生产计划方案</option><option>PS-2026-002 Q3物料需求计划方案</option><option>PS-2026-005 原材料采购计划方案</option></select>
+
+
+
+      </div>
+
+
+
+      <div class="calc-field">
+
+
+
+        <label>开始日期</label>
+
+
+
+        <input type="date" value="2026-07-01">
+
+
+
+      </div>
+
+
+
+      <div class="calc-field">
+
+
+
+        <label>结束日期</label>
+
+
+
+        <input type="date" value="2026-09-30">
+
+
+
+      </div>
+
+
+
+      <button class="btn btn-primary" onclick="showToast('开始执行MRP运算', 'info')">执行运算</button>
+
+      <button class="btn btn-primary" onclick="generatePurchaseRequest()">生成采购申请</button>
+
+      <button class="btn btn-primary" onclick="generateProductionOrder()">生成生产订单</button>
+
+      <button class="btn btn-ghost" onclick="showToast('查看历史运算记录', 'info')">历史记录</button>
+
+
+
+    </div>
+
+
+
+
+
+
+
+    <div class="stat-row">
+
+
+
+      <div class="stat-card-mini">
+
+
+
+        <div class="stat-icon">📋</div>
+
+
+
+        <div class="stat-num">86</div>
+
+
+
+        <div class="stat-name">计划订单数</div>
+
+
+
+      </div>
+
+
+
+      <div class="stat-card-mini">
+
+
+
+        <div class="stat-icon">🛒</div>
+
+
+
+        <div class="stat-num">52</div>
+
+
+
+        <div class="stat-name">采购建议数</div>
+
+
+
+      </div>
+
+
+
+      <div class="stat-card-mini">
+
+
+
+        <div class="stat-icon">🏭</div>
+
+
+
+        <div class="stat-num">28</div>
+
+
+
+        <div class="stat-name">生产建议数</div>
+
+
+
+      </div>
+
+
+
+      <div class="stat-card-mini">
+
+
+
+        <div class="stat-icon">📊</div>
+
+
+
+        <div class="stat-num">92.50%</div>
+
+
+
+        <div class="stat-name">需求覆盖率</div>
+
+
+
+      </div>
+
+
+
+    </div>
+
+
+
+
+
+
+
+    <div class="report-section">
+
+
+
+      <div class="section-header">
+
+
+
+        <span class="section-title">MRP执行摘要</span>
+
+
+
+        <span class="text-muted text-sm">共 8 条记录</span>
+
+
+
+      </div>
+
+
+
+      <div class="table-wrapper">
+
+
+
+        <table class="data-table">
+
+
+
+          <thead><tr>
+
+
+
+            <th>方案编号</th>
+
+
+
+            <th>运算日期</th>
+
+
+
+            <th>运算状态</th>
+
+
+
+            <th style="text-align:right">计划订单数</th>
+
+
+
+            <th style="text-align:right">采购建议数</th>
+
+
+
+            <th style="text-align:right">生产建议数</th>
+
+
+
+            <th style="text-align:right">委外建议数</th>
+
+
+
+            <th>覆盖率</th>
+
+
+
+            <th>操作</th>
+
+
+
+          </tr></thead>
+
+
+
+          <tbody>
+
+
+
+            <tr><td><a>PS-2026-001</a></td><td>2026-07-10</td><td><span class="badge badge-success">运算完成</span></td><td style="text-align:right">86</td><td style="text-align:right">52</td><td style="text-align:right">28</td><td style="text-align:right">6</td><td><span class="badge badge-success">92.50%</span></td><td class="row-action-links"><a>查看明细</a> <a>重新运算</a> <a>导出报告</a></td></tr>
+
+
+
+            <tr><td><a>PS-2026-002</a></td><td>2026-07-09</td><td><span class="badge badge-success">运算完成</span></td><td style="text-align:right">156</td><td style="text-align:right">98</td><td style="text-align:right">45</td><td style="text-align:right">13</td><td><span class="badge badge-success">96.80%</span></td><td class="row-action-links"><a>查看明细</a> <a>重新运算</a> <a>导出报告</a></td></tr>
+
+
+
+            <tr><td><a>PS-2026-005</a></td><td>2026-07-08</td><td><span class="badge badge-success">运算完成</span></td><td style="text-align:right">42</td><td style="text-align:right">42</td><td style="text-align:right">0</td><td style="text-align:right">0</td><td><span class="badge badge-warning">88.20%</span></td><td class="row-action-links"><a>查看明细</a> <a>重新运算</a> <a>导出报告</a></td></tr>
+
+
+
+            <tr><td><a>PS-2026-003</a></td><td>2026-07-07</td><td><span class="badge badge-success">运算完成</span></td><td style="text-align:right">78</td><td style="text-align:right">45</td><td style="text-align:right">25</td><td style="text-align:right">8</td><td><span class="badge badge-error">76.50%</span></td><td class="row-action-links"><a>查看明细</a> <a>重新运算</a> <a>导出报告</a></td></tr>
+
+
+
+            <tr><td><a>PS-2026-001</a></td><td>2026-07-03</td><td><span class="badge badge-success">运算完成</span></td><td style="text-align:right">82</td><td style="text-align:right">50</td><td style="text-align:right">26</td><td style="text-align:right">6</td><td><span class="badge badge-success">94.30%</span></td><td class="row-action-links"><a>查看明细</a> <a>重新运算</a> <a>导出报告</a></td></tr>
+
+
+
+            <tr><td><a>PS-2026-002</a></td><td>2026-06-30</td><td><span class="badge badge-success">运算完成</span></td><td style="text-align:right">148</td><td style="text-align:right">92</td><td style="text-align:right">43</td><td style="text-align:right">13</td><td><span class="badge badge-success">97.10%</span></td><td class="row-action-links"><a>查看明细</a> <a>重新运算</a> <a>导出报告</a></td></tr>
+
+
+
+            <tr><td><a>PS-2026-004</a></td><td>2026-06-28</td><td><span class="badge badge-warning">运算异常</span></td><td style="text-align:right">0</td><td style="text-align:right">0</td><td style="text-align:right">0</td><td style="text-align:right">0</td><td><span class="badge badge-error">0.00%</span></td><td class="row-action-links"><a>查看明细</a> <a>重新运算</a></td></tr>
+
+
+
+            <tr><td><a>PS-2026-008</a></td><td>2026-06-25</td><td><span class="badge badge-success">运算完成</span></td><td style="text-align:right">28</td><td style="text-align:right">10</td><td style="text-align:right">5</td><td style="text-align:right">13</td><td><span class="badge badge-warning">85.60%</span></td><td class="row-action-links"><a>查看明细</a> <a>重新运算</a> <a>导出报告</a></td></tr>
+
+
+
+          </tbody>
+
+
+
+        </table>
+
+
+
+      </div>
+
+
+
+    </div>
+
+
+
+
+
+
+
+    <div class="report-section">
+
+
+
+      <div class="section-header">
+
+
+
+        <span class="section-title">最近运算日志</span>
+
+
+
+        <span class="text-muted text-sm">运算状态：<span class="text-success">成功</span></span>
+
+
+
+      </div>
+
+
+
+      <div class="log-area">
+
+
+
+        <div class="log-line"><span class="log-time">2026-07-10 08:00:00</span><span class="log-msg">开始执行MRP运算，方案：PS-2026-001 Q3主生产计划方案</span></div>
+
+
+
+        <div class="log-line"><span class="log-time">2026-07-10 08:00:02</span><span class="log-msg">加载物料主数据，共 1,256 条</span></div>
+
+
+
+        <div class="log-line"><span class="log-time">2026-07-10 08:00:05</span><span class="log-msg">加载销售订单需求，共 48 条</span></div>
+
+
+
+        <div class="log-line"><span class="log-time">2026-07-10 08:00:06</span><span class="log-msg">加载预测需求，共 12 条</span></div>
+
+
+
+        <div class="log-line"><span class="log-time">2026-07-10 08:00:08</span><span class="log-msg">加载库存数据，共 856 条</span></div>
+
+
+
+        <div class="log-line"><span class="log-time">2026-07-10 08:00:12</span><span class="log-msg">执行物料需求展开，BOM层级 5 层</span></div>
+
+
+
+        <div class="log-line"><span class="log-time">2026-07-10 08:00:18</span><span class="log-success">生成计划订单 86 条（采购 52 条，生产 28 条，委外 6 条）</span></div>
+
+
+
+        <div class="log-line"><span class="log-time">2026-07-10 08:00:19</span><span class="log-warning">存在 7 条物料需求无法完全覆盖，建议检查安全库存</span></div>
+
+
+
+        <div class="log-line"><span class="log-time">2026-07-10 08:00:20</span><span class="log-success">MRP运算完成，需求覆盖率 92.50%</span></div>
+
+
+
+        <div class="log-line"><span class="log-time">2026-07-10 08:00:20</span><span class="log-msg">结束时间：2026-07-10 08:00:20，总耗时 20 秒</span></div>
+
+
+
+      </div>
+
+
+
+    </div>
+
+
+
+  </div>
+
+
+
+</div>
+
+
+
+<script>
+
+
+
+
+
+
+
+
+
+
+;
+
+
+
+  toast.className = 'toast toast-' + (type || 'info');
+
+
+
+  toast.innerHTML = '<span class="toast-icon">' + (icons[type] || icons.info) + '</span><span>' + message + '</span>';
+
+
+
+container.appendChild(toast);
+
+
+
+}
+
+
+
+  setTimeout(function() { toast.remove(); }, 3000);
+function closeConfirmModal() {
+
+
+
+  document.getElementById('confirmModal').classList.remove('show');
+
+
+
+  confirmCallback = null;
+
+
+
+
+
+
+
+}
+
+
+
+function confirmOk() {
+
+
+
+  if (confirmCallback) {
+
+
+
+    confirmCallback();
+
+
+
+  }
+
+
+
+  closeConfirmModal();
+
+
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+var currentLookupField = null;
+var currentLookupType = null;
+var lookupData = [];
+var lookupColumns = [];
+
+function openLookup(fieldId, type) {
+  currentLookupField = fieldId;
+  currentLookupType = type;
+  
+  if (type === 'org') {
+    lookupColumns = ['编码', '名称', '形态', '上级组织'];
+    lookupData = JSON.parse(localStorage.getItem('erp_orgs') || '[]');
+    document.getElementById('lookupTitle').textContent = '选择组织';
+  } else if (type === 'department') {
+    lookupColumns = ['编码', '名称'];
+    lookupData = JSON.parse(localStorage.getItem('erp_departments_cache') || '[]');
+    document.getElementById('lookupTitle').textContent = '选择部门';
+  } else if (type === 'employee') {
+    lookupColumns = ['编号', '姓名', '所属部门'];
+    lookupData = JSON.parse(localStorage.getItem('erp_employees_cache') || '[]');
+    document.getElementById('lookupTitle').textContent = '选择员工';
+  } else if (type === 'supplier') {
+    lookupColumns = ['编码', '名称'];
+    lookupData = JSON.parse(localStorage.getItem('erp_suppliers_cache') || '[]');
+    document.getElementById('lookupTitle').textContent = '选择供应商';
+  } else if (type === 'customer') {
+    lookupColumns = ['编码', '名称'];
+    lookupData = JSON.parse(localStorage.getItem('erp_customers_cache') || '[]');
+    document.getElementById('lookupTitle').textContent = '选择客户';
+  } else if (type === 'material') {
+    lookupColumns = ['物料编码', '物料名称', '规格型号', '基本单位'];
+    lookupData = JSON.parse(localStorage.getItem('erp_materials_cache') || '[]');
+    document.getElementById('lookupTitle').textContent = '选择物料';
+  } else if (type === 'warehouse') {
+    lookupColumns = ['编码', '名称'];
+    lookupData = JSON.parse(localStorage.getItem('erp_warehouses_cache') || '[]');
+    document.getElementById('lookupTitle').textContent = '选择仓库';
+  }
+  
+  renderLookupTable(lookupData);
+  document.getElementById('lookupModal').classList.add('show');
+}
+
+function closeLookup() {
+  document.getElementById('lookupModal').classList.remove('show');
+}
+
+function filterLookup() {
+  var keyword = document.getElementById('lookupKeyword').value.trim().toLowerCase();
+  var filtered = lookupData.filter(function(item) {
+    var code = item.code || '';
+    var name = item.name || '';
+    return code.toLowerCase().includes(keyword) || name.toLowerCase().includes(keyword);
+  });
+  renderLookupTable(filtered);
+}
+
+function renderLookupTable(data) {
+  var head = document.getElementById('lookupTableHead');
+  var body = document.getElementById('lookupTableBody');
+  
+  head.innerHTML = '<tr><th class="checkbox-cell"><input type="checkbox" onclick="selectAllLookup()"></th>' + lookupColumns.map(function(col) { return '<th>' + col + '</th>'; }).join('') + '</tr>';
+  
+  body.innerHTML = '';
+  data.forEach(function(item) {
+    var row = document.createElement('tr');
+    row.onclick = function() { selectLookupRow(this); };
+    var cells = ['<td class="checkbox-cell"><input type="checkbox" class="lookup-checkbox" value="' + item.id + '"></td>'];
+    if (currentLookupType === 'org') {
+      cells.push('<td>' + item.code + '</td><td>' + item.name + '</td><td>' + (item.form || '') + '</td><td>' + (item.parentName || '') + '</td>');
+    } else if (currentLookupType === 'department') {
+      cells.push('<td>' + item.code + '</td><td>' + item.name + '</td>');
+    } else if (currentLookupType === 'employee') {
+      cells.push('<td>' + item.code + '</td><td>' + item.name + '</td><td>' + (item.department || '') + '</td>');
+    } else if (currentLookupType === 'supplier' || currentLookupType === 'customer') {
+      cells.push('<td>' + item.code + '</td><td>' + item.name + '</td>');
+    } else if (currentLookupType === 'material') {
+      cells.push('<td>' + item.code + '</td><td>' + item.name + '</td><td>' + (item.specification || '') + '</td><td>' + (item.unit || '') + '</td>');
+    } else if (currentLookupType === 'warehouse') {
+      cells.push('<td>' + item.code + '</td><td>' + item.name + '</td>');
+    }
+    row.innerHTML = cells.join('');
+    body.appendChild(row);
+  });
+  
+  if (data.length === 0) {
+    body.innerHTML = '<tr><td colspan="' + (lookupColumns.length + 1) + '" style="text-align:center;padding:40px;color:#999;">暂无数据</td></tr>';
+  }
+}
+
+function selectAllLookup() {
+  var master = document.querySelector('.lookup-table th input');
+  var checkboxes = document.querySelectorAll('.lookup-checkbox');
+  checkboxes.forEach(function(cb) { cb.checked = master.checked; });
+}
+
+function selectLookupRow(row) {
+  var checkbox = row.querySelector('.lookup-checkbox');
+  checkbox.checked = !checkbox.checked;
+}
+
+function confirmLookup() {
+  var checkboxes = document.querySelectorAll('.lookup-checkbox:checked');
+  if (checkboxes.length === 0) {
+    showToast('请选择一条记录', 'warning');
+    return;
+  }
+  
+  var item = lookupData.find(function(d) { return d.id === checkboxes[0].value; });
+  if (item) {
+    var field = document.getElementById(currentLookupField);
+    if (field) {
+      field.value = item.name;
+      field.setAttribute('data-id', item.id);
+      field.setAttribute('data-code', item.code);
+      
+      if (currentLookupType === 'material') {
+        var row = field.closest('tr');
+        if (row) {
+          row.querySelector('.material-name').value = item.name;
+          row.querySelector('.material-spec').value = item.specification || '';
+          row.querySelector('.material-unit').value = item.unit || '';
+        }
+      }
+    }
+  }
+  
+  closeLookup();
+}
+
+function openMaterialLookup(btn) {
+  var field = btn.previousElementSibling;
+  field.id = 'lookupField_' + Date.now();
+  currentLookupField = field.id;
+  openLookup(field.id, 'material');
+}
+
+function openOrgLookup(btn) {
+  var field = btn.previousElementSibling;
+  field.id = 'lookupField_' + Date.now();
+  currentLookupField = field.id;
+  openLookup(field.id, 'org');
+}
+
+function openSupplierLookup(btn) {
+  var field = btn.previousElementSibling;
+  field.id = 'lookupField_' + Date.now();
+  currentLookupField = field.id;
+  openLookup(field.id, 'supplier');
+}
+
+function openWarehouseLookup(btn) {
+  var field = btn.previousElementSibling;
+  field.id = 'lookupField_' + Date.now();
+  currentLookupField = field.id;
+  openLookup(field.id, 'warehouse');
+}
+
+function initLookupData() {
+  if (!localStorage.getItem('erp_orgs')) {
+    localStorage.setItem('erp_orgs', JSON.stringify([
+      { id: 'org-001', code: 'ORG-HQ', name: '磐枢工业集团', form: '集团', parentName: '' },
+      { id: 'org-002', code: 'ORG-SM', name: '磐枢智能制造有限公司', form: '公司', parentName: '磐枢工业集团' },
+      { id: 'org-003', code: 'ORG-SM-PD', name: '生产制造部', form: '部门', parentName: '磐枢智能制造有限公司' },
+      { id: 'org-004', code: 'ORG-SM-FA', name: '财务部', form: '部门', parentName: '磐枢智能制造有限公司' },
+      { id: 'org-005', code: 'ORG-SM-SD', name: '销售部', form: '部门', parentName: '磐枢智能制造有限公司' }
+    ]));
+  }
+  if (!localStorage.getItem('erp_departments_cache')) {
+    localStorage.setItem('erp_departments_cache', JSON.stringify([
+      { id: 'dept-001', code: 'DEPT-PD', name: '生产制造部', status: 1 },
+      { id: 'dept-002', code: 'DEPT-FA', name: '财务部', status: 1 },
+      { id: 'dept-003', code: 'DEPT-SD', name: '销售部', status: 1 },
+      { id: 'dept-004', code: 'DEPT-AS', name: '装配车间', status: 1 },
+      { id: 'dept-005', code: 'DEPT-QC', name: '质检车间', status: 1 }
+    ]));
+  }
+  if (!localStorage.getItem('erp_employees_cache')) {
+    localStorage.setItem('erp_employees_cache', JSON.stringify([
+      { id: 'emp-001', code: 'EMP-001', name: '张三', department: '生产制造部', status: 1 },
+      { id: 'emp-002', code: 'EMP-002', name: '李四', department: '生产制造部', status: 1 },
+      { id: 'emp-003', code: 'EMP-003', name: '王五', department: '财务部', status: 1 },
+      { id: 'emp-004', code: 'EMP-004', name: '赵六', department: '销售部', status: 1 },
+      { id: 'emp-005', code: 'EMP-005', name: '钱七', department: '质检车间', status: 1 }
+    ]));
+  }
+  if (!localStorage.getItem('erp_suppliers_cache')) {
+    localStorage.setItem('erp_suppliers_cache', JSON.stringify([
+      { id: 'sup-001', code: 'S-001', name: '深圳电子元器件有限公司', status: 1 },
+      { id: 'sup-002', code: 'S-002', name: '杭州精密机械加工厂', status: 1 },
+      { id: 'sup-003', code: 'S-003', name: '上海材料科技有限公司', status: 1 },
+      { id: 'sup-004', code: 'S-004', name: '东莞五金制品厂', status: 1 }
+    ]));
+  }
+  if (!localStorage.getItem('erp_materials_cache')) {
+    localStorage.setItem('erp_materials_cache', JSON.stringify([
+      { id: 'mat-001', code: 'P-001', name: '高频传感器模块', specification: 'HT-2026', unit: '个', status: 1 },
+      { id: 'mat-002', code: 'P-002', name: '控制电路板', specification: 'CB-2026', unit: '块', status: 1 },
+      { id: 'mat-003', code: 'P-003', name: '智能控制器', specification: 'IC-V3', unit: '台', status: 1 },
+      { id: 'mat-004', code: 'P-004', name: '电源模块', specification: 'PM-500W', unit: '个', status: 1 },
+      { id: 'mat-005', code: 'M-001', name: 'PCB电路板', specification: 'FR-4双层', unit: '块', status: 1 },
+      { id: 'mat-006', code: 'M-002', name: '贴片电阻', specification: '10KΩ 0603', unit: '个', status: 1 },
+      { id: 'mat-007', code: 'M-003', name: '贴片电容', specification: '100μF 0805', unit: '个', status: 1 },
+      { id: 'mat-008', code: 'M-004', name: '螺丝', specification: 'M4x10', unit: '包', status: 1 }
+    ]));
+  }
+  if (!localStorage.getItem('erp_warehouses_cache')) {
+    localStorage.setItem('erp_warehouses_cache', JSON.stringify([
+      { id: 'wh-001', code: 'WH-001', name: '成品仓', status: 1 },
+      { id: 'wh-002', code: 'WH-002', name: '原料仓', status: 1 },
+      { id: 'wh-003', code: 'WH-003', name: '半成品仓', status: 1 },
+      { id: 'wh-004', code: 'WH-004', name: '辅料仓', status: 1 }
+    ]));
+  }
+}
+
+</script>
+
+
+
+
+<div class="lookup-modal" id="lookupModal">
+  <div class="lookup-dialog">
+    <div class="lookup-header">
+      <div class="lookup-title" id="lookupTitle">选择</div>
+      <button class="lookup-close" onclick="closeLookup()">×</button>
+    </div>
+    <div class="lookup-body">
+      <div class="lookup-search">
+        <input type="text" id="lookupKeyword" placeholder="请输入编码或名称搜索" onkeydown="if(event.key==='Enter')filterLookup()">
+        <button onclick="filterLookup()">搜索</button>
+      </div>
+      <table class="lookup-table">
+        <thead id="lookupTableHead"></thead>
+        <tbody id="lookupTableBody"></tbody>
+      </table>
+    </div>
+    <div class="lookup-footer">
+      <button class="btn btn-cancel" onclick="closeLookup()">取消</button>
+      <button class="btn btn-primary" onclick="confirmLookup()">确定</button>
+    </div>
+  </div>
+</div>
+
+
+<div class="confirm-modal-overlay" id="confirmModal">
+  <div class="confirm-modal-dialog">
+    <div class="confirm-modal-header">
+      <span class="confirm-modal-icon" id="confirmIcon">&#9888;</span>
+      <span class="confirm-modal-title" id="confirmTitle">系统提示</span>
+    </div>
+    <div class="confirm-modal-body">
+      <div class="confirm-modal-message" id="confirmMessage"></div>
+    </div>
+    <div class="confirm-modal-footer">
+      <button class="btn-cancel" onclick="closeConfirmModal(false)">取消</button>
+      <button class="btn-confirm" onclick="closeConfirmModal(true)">确定</button>
+    </div>
+  </div>
+</div>
+
+<script>
+function generatePurchaseRequest() {
+  showConfirm('确认根据MRP运算结果生成采购申请单？', function() {
+    var materials = JSON.parse(localStorage.getItem('erp_materials_cache') || '[]');
+    var purchaseMaterials = materials.filter(function(m) {
+      return m.code && m.code.indexOf('M-') === 0;
+    });
+
+    if (purchaseMaterials.length === 0) {
+      showToast('没有需要采购的物料', 'warning');
+      return;
+    }
+
+    var orgName = '磐枢智能制造有限公司';
+    var existingList = JSON.parse(localStorage.getItem('erp_purchase_request_list') || '[]');
+
+    var details = purchaseMaterials.map(function(m) {
+      var qty = Math.ceil(Math.random() * 100 + 50);
+      var price = parseFloat(m.price || 100);
+      return {
+        '物料编码': m.code,
+        '物料名称': m.name,
+        '规格型号': m.specification || '',
+        '单位': m.unit || '个',
+        '数量': qty.toString(),
+        '单价': price.toFixed(2),
+        '金额': (qty * price).toFixed(2),
+        '税率': '0.13',
+        '税额': (qty * price * 0.13).toFixed(2),
+        '备注': 'MRP运算生成'
+      };
+    });
+
+    var totalAmount = details.reduce(function(sum, d) {
+      return sum + parseFloat(d['金额']);
+    }, 0);
+
+    var doc = {
+      id: Date.now().toString(),
+      docNo: 'PR' + new Date().toISOString().slice(0, 10).replace(/-/g, '') + Math.floor(Math.random() * 10000).toString().padStart(4, '0'),
+      docDate: new Date().toISOString().slice(0, 10),
+      partnerName: '',
+      orgName: orgName,
+      组织: orgName,
+      供应商: '',
+      amount: totalAmount,
+      status: 'draft',
+      createdAt: new Date().toISOString(),
+      remark: 'MRP运算自动生成',
+      details: details
+    };
+
+    doc['单据编号'] = doc.docNo;
+    doc['日期'] = doc.docDate;
+    doc['状态'] = 'draft';
+
+    existingList.push(doc);
+    localStorage.setItem('erp_purchase_request_list', JSON.stringify(existingList));
+
+    showToast('已生成采购申请单：' + doc.docNo + '，共 ' + details.length + ' 条明细', 'success');
+  });
+}
+
+function generateProductionOrder() {
+  showConfirm('确认根据MRP运算结果生成生产订单？', function() {
+    var materials = JSON.parse(localStorage.getItem('erp_materials_cache') || '[]');
+    var productMaterials = materials.filter(function(m) {
+      return m.code && m.code.indexOf('P-') === 0;
+    });
+
+    if (productMaterials.length === 0) {
+      showToast('没有需要生产的物料', 'warning');
+      return;
+    }
+
+    var orgName = '磐枢智能制造有限公司';
+    var existingList = JSON.parse(localStorage.getItem('erp_production_order_list') || '[]');
+
+    var details = productMaterials.map(function(m) {
+      var qty = Math.ceil(Math.random() * 50 + 10);
+      var price = parseFloat(m.price || 500);
+      return {
+        '物料编码': m.code,
+        '物料名称': m.name,
+        '规格型号': m.specification || '',
+        '单位': m.unit || '台',
+        '数量': qty.toString(),
+        '计划开工时间': new Date().toISOString().slice(0, 10),
+        '计划完工时间': new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10),
+        '单价': price.toFixed(2),
+        '金额': (qty * price).toFixed(2),
+        '备注': 'MRP运算生成'
+      };
+    });
+
+    var totalAmount = details.reduce(function(sum, d) {
+      return sum + parseFloat(d['金额']);
+    }, 0);
+
+    var doc = {
+      id: Date.now().toString(),
+      docNo: 'PO' + new Date().toISOString().slice(0, 10).replace(/-/g, '') + Math.floor(Math.random() * 10000).toString().padStart(4, '0'),
+      docDate: new Date().toISOString().slice(0, 10),
+      orgName: orgName,
+      组织: orgName,
+      amount: totalAmount,
+      status: 'draft',
+      createdAt: new Date().toISOString(),
+      remark: 'MRP运算自动生成',
+      details: details
+    };
+
+    doc['单据编号'] = doc.docNo;
+    doc['日期'] = doc.docDate;
+    doc['状态'] = 'draft';
+
+    existingList.push(doc);
+    localStorage.setItem('erp_production_order_list', JSON.stringify(existingList));
+
+    showToast('已生成生产订单：' + doc.docNo + '，共 ' + details.length + ' 条明细', 'success');
+  });
+}
+</script>
+
+</body>
+
+
+
+</html>

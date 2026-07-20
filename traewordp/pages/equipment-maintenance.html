@@ -1,0 +1,3523 @@
+<!DOCTYPE html>
+
+
+
+<html lang="zh-CN">
+
+
+
+<head>
+
+
+
+<meta charset="UTF-8">
+
+
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+
+
+<title>设备保养 — 磐枢工业智能平台</title>
+
+
+
+<link rel="stylesheet" href="../common.css">
+
+
+
+<script src="../common.js"></script>
+<script>
+</script>
+
+
+
+<script src="../common.js"></script>
+<script>
+var currentLookupField = null;
+var currentLookupType = null;
+var lookupData = [];
+var lookupColumns = [];
+
+function openLookup(fieldId, type) {
+  currentLookupField = fieldId;
+  currentLookupType = type;
+  
+  if (type === 'org') {
+    lookupColumns = ['编码', '名称', '形态', '上级组织'];
+    lookupData = JSON.parse(localStorage.getItem('erp_orgs') || '[]');
+    document.getElementById('lookupTitle').textContent = '选择组织';
+  } else if (type === 'department') {
+    lookupColumns = ['编码', '名称'];
+    lookupData = JSON.parse(localStorage.getItem('erp_departments_cache') || '[]');
+    document.getElementById('lookupTitle').textContent = '选择部门';
+  } else if (type === 'employee') {
+    lookupColumns = ['编号', '姓名', '所属部门'];
+    lookupData = JSON.parse(localStorage.getItem('erp_employees_cache') || '[]');
+    document.getElementById('lookupTitle').textContent = '选择员工';
+  } else if (type === 'supplier') {
+    lookupColumns = ['编码', '名称'];
+    lookupData = JSON.parse(localStorage.getItem('erp_suppliers_cache') || '[]');
+    document.getElementById('lookupTitle').textContent = '选择供应商';
+  } else if (type === 'customer') {
+    lookupColumns = ['编码', '名称'];
+    lookupData = JSON.parse(localStorage.getItem('erp_customers_cache') || '[]');
+    document.getElementById('lookupTitle').textContent = '选择客户';
+  } else if (type === 'material') {
+    lookupColumns = ['物料编码', '物料名称', '规格型号', '基本单位'];
+    lookupData = JSON.parse(localStorage.getItem('erp_materials_cache') || '[]');
+    document.getElementById('lookupTitle').textContent = '选择物料';
+  } else if (type === 'warehouse') {
+    lookupColumns = ['编码', '名称'];
+    lookupData = JSON.parse(localStorage.getItem('erp_warehouses_cache') || '[]');
+    document.getElementById('lookupTitle').textContent = '选择仓库';
+  }
+  
+  renderLookupTable(lookupData);
+  document.getElementById('lookupModal').classList.add('show');
+}
+
+function closeLookup() {
+  document.getElementById('lookupModal').classList.remove('show');
+}
+
+function filterLookup() {
+  var keyword = document.getElementById('lookupKeyword').value.trim().toLowerCase();
+  var filtered = lookupData.filter(function(item) {
+    var code = item.code || '';
+    var name = item.name || '';
+    return code.toLowerCase().includes(keyword) || name.toLowerCase().includes(keyword);
+  });
+  renderLookupTable(filtered);
+}
+
+function renderLookupTable(data) {
+  var head = document.getElementById('lookupTableHead');
+  var body = document.getElementById('lookupTableBody');
+  
+  head.innerHTML = '<tr><th class="checkbox-cell"><input type="checkbox" onclick="selectAllLookup()"></th>' + lookupColumns.map(function(col) { return '<th>' + col + '</th>'; }).join('') + '</tr>';
+  
+  body.innerHTML = '';
+  data.forEach(function(item) {
+    var row = document.createElement('tr');
+    row.onclick = function() { selectLookupRow(this); };
+    var cells = ['<td class="checkbox-cell"><input type="checkbox" class="lookup-checkbox" value="' + item.id + '"></td>'];
+    if (currentLookupType === 'org') {
+      cells.push('<td>' + item.code + '</td><td>' + item.name + '</td><td>' + (item.form || '') + '</td><td>' + (item.parentName || '') + '</td>');
+    } else if (currentLookupType === 'department') {
+      cells.push('<td>' + item.code + '</td><td>' + item.name + '</td>');
+    } else if (currentLookupType === 'employee') {
+      cells.push('<td>' + item.code + '</td><td>' + item.name + '</td><td>' + (item.department || '') + '</td>');
+    } else if (currentLookupType === 'supplier' || currentLookupType === 'customer') {
+      cells.push('<td>' + item.code + '</td><td>' + item.name + '</td>');
+    } else if (currentLookupType === 'material') {
+      cells.push('<td>' + item.code + '</td><td>' + item.name + '</td><td>' + (item.specification || '') + '</td><td>' + (item.unit || '') + '</td>');
+    } else if (currentLookupType === 'warehouse') {
+      cells.push('<td>' + item.code + '</td><td>' + item.name + '</td>');
+    }
+    row.innerHTML = cells.join('');
+    body.appendChild(row);
+  });
+  
+  if (data.length === 0) {
+    body.innerHTML = '<tr><td colspan="' + (lookupColumns.length + 1) + '" style="text-align:center;padding:40px;color:#999;">暂无数据</td></tr>';
+  }
+}
+
+function selectAllLookup() {
+  var master = document.querySelector('.lookup-table th input');
+  var checkboxes = document.querySelectorAll('.lookup-checkbox');
+  checkboxes.forEach(function(cb) { cb.checked = master.checked; });
+}
+
+function selectLookupRow(row) {
+  var checkbox = row.querySelector('.lookup-checkbox');
+  checkbox.checked = !checkbox.checked;
+}
+
+function confirmLookup() {
+  var checkboxes = document.querySelectorAll('.lookup-checkbox:checked');
+  if (checkboxes.length === 0) {
+    showToast('请选择一条记录', 'warning');
+    return;
+  }
+  
+  var item = lookupData.find(function(d) { return d.id === checkboxes[0].value; });
+  if (item) {
+    var field = document.getElementById(currentLookupField);
+    if (field) {
+      field.value = item.name;
+      field.setAttribute('data-id', item.id);
+      field.setAttribute('data-code', item.code);
+      
+      if (currentLookupType === 'material') {
+        var row = field.closest('tr');
+        if (row) {
+          row.querySelector('.material-name').value = item.name;
+          row.querySelector('.material-spec').value = item.specification || '';
+          row.querySelector('.material-unit').value = item.unit || '';
+        }
+      }
+    }
+  }
+  
+  closeLookup();
+}
+
+function openMaterialLookup(btn) {
+  var field = btn.previousElementSibling;
+  field.id = 'lookupField_' + Date.now();
+  currentLookupField = field.id;
+  openLookup(field.id, 'material');
+}
+
+function openOrgLookup(btn) {
+  var field = btn.previousElementSibling;
+  field.id = 'lookupField_' + Date.now();
+  currentLookupField = field.id;
+  openLookup(field.id, 'org');
+}
+
+function openSupplierLookup(btn) {
+  var field = btn.previousElementSibling;
+  field.id = 'lookupField_' + Date.now();
+  currentLookupField = field.id;
+  openLookup(field.id, 'supplier');
+}
+
+function openWarehouseLookup(btn) {
+  var field = btn.previousElementSibling;
+  field.id = 'lookupField_' + Date.now();
+  currentLookupField = field.id;
+  openLookup(field.id, 'warehouse');
+}
+
+function initLookupData() {
+  if (!localStorage.getItem('erp_orgs')) {
+    localStorage.setItem('erp_orgs', JSON.stringify([
+      { id: 'org-001', code: 'ORG-HQ', name: '磐枢工业集团', form: '集团', parentName: '' },
+      { id: 'org-002', code: 'ORG-SM', name: '磐枢智能制造有限公司', form: '公司', parentName: '磐枢工业集团' },
+      { id: 'org-003', code: 'ORG-SM-PD', name: '生产制造部', form: '部门', parentName: '磐枢智能制造有限公司' },
+      { id: 'org-004', code: 'ORG-SM-FA', name: '财务部', form: '部门', parentName: '磐枢智能制造有限公司' },
+      { id: 'org-005', code: 'ORG-SM-SD', name: '销售部', form: '部门', parentName: '磐枢智能制造有限公司' }
+    ]));
+  }
+  if (!localStorage.getItem('erp_departments_cache')) {
+    localStorage.setItem('erp_departments_cache', JSON.stringify([
+      { id: 'dept-001', code: 'DEPT-PD', name: '生产制造部', status: 1 },
+      { id: 'dept-002', code: 'DEPT-FA', name: '财务部', status: 1 },
+      { id: 'dept-003', code: 'DEPT-SD', name: '销售部', status: 1 },
+      { id: 'dept-004', code: 'DEPT-AS', name: '装配车间', status: 1 },
+      { id: 'dept-005', code: 'DEPT-QC', name: '质检车间', status: 1 }
+    ]));
+  }
+  if (!localStorage.getItem('erp_employees_cache')) {
+    localStorage.setItem('erp_employees_cache', JSON.stringify([
+      { id: 'emp-001', code: 'EMP-001', name: '张三', department: '生产制造部', status: 1 },
+      { id: 'emp-002', code: 'EMP-002', name: '李四', department: '生产制造部', status: 1 },
+      { id: 'emp-003', code: 'EMP-003', name: '王五', department: '财务部', status: 1 },
+      { id: 'emp-004', code: 'EMP-004', name: '赵六', department: '销售部', status: 1 },
+      { id: 'emp-005', code: 'EMP-005', name: '钱七', department: '质检车间', status: 1 }
+    ]));
+  }
+  if (!localStorage.getItem('erp_suppliers_cache')) {
+    localStorage.setItem('erp_suppliers_cache', JSON.stringify([
+      { id: 'sup-001', code: 'S-001', name: '深圳电子元器件有限公司', status: 1 },
+      { id: 'sup-002', code: 'S-002', name: '杭州精密机械加工厂', status: 1 },
+      { id: 'sup-003', code: 'S-003', name: '上海材料科技有限公司', status: 1 },
+      { id: 'sup-004', code: 'S-004', name: '东莞五金制品厂', status: 1 }
+    ]));
+  }
+  if (!localStorage.getItem('erp_materials_cache')) {
+    localStorage.setItem('erp_materials_cache', JSON.stringify([
+      { id: 'mat-001', code: 'P-001', name: '高频传感器模块', specification: 'HT-2026', unit: '个', status: 1 },
+      { id: 'mat-002', code: 'P-002', name: '控制电路板', specification: 'CB-2026', unit: '块', status: 1 },
+      { id: 'mat-003', code: 'P-003', name: '智能控制器', specification: 'IC-V3', unit: '台', status: 1 },
+      { id: 'mat-004', code: 'P-004', name: '电源模块', specification: 'PM-500W', unit: '个', status: 1 },
+      { id: 'mat-005', code: 'M-001', name: 'PCB电路板', specification: 'FR-4双层', unit: '块', status: 1 },
+      { id: 'mat-006', code: 'M-002', name: '贴片电阻', specification: '10KΩ 0603', unit: '个', status: 1 },
+      { id: 'mat-007', code: 'M-003', name: '贴片电容', specification: '100μF 0805', unit: '个', status: 1 },
+      { id: 'mat-008', code: 'M-004', name: '螺丝', specification: 'M4x10', unit: '包', status: 1 }
+    ]));
+  }
+  if (!localStorage.getItem('erp_warehouses_cache')) {
+    localStorage.setItem('erp_warehouses_cache', JSON.stringify([
+      { id: 'wh-001', code: 'WH-001', name: '成品仓', status: 1 },
+      { id: 'wh-002', code: 'WH-002', name: '原料仓', status: 1 },
+      { id: 'wh-003', code: 'WH-003', name: '半成品仓', status: 1 },
+      { id: 'wh-004', code: 'WH-004', name: '辅料仓', status: 1 }
+    ]));
+  }
+}
+
+</script>
+
+
+
+<style>
+
+
+
+.stat-card-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 20px; }
+
+
+
+@media (max-width: 992px) { .stat-card-row { grid-template-columns: repeat(2, 1fr); } }
+
+
+
+@media (max-width: 768px) { .stat-card-row { grid-template-columns: 1fr; } }
+
+
+
+
+.lookup-modal { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:2000; justify-content:center; align-items:center; }
+.lookup-modal.show { display:flex; }
+.lookup-dialog { background:#fff; border:1px solid #e8e8e8; border-radius:4px; width:720px; max-height:70vh; overflow:hidden; }
+.lookup-header { padding:14px 20px; border-bottom:1px solid #e8e8e8; display:flex; align-items:center; justify-content:space-between; }
+.lookup-title { font-size:15px; font-weight:600; color:#333; }
+.lookup-close { font-size:20px; color:#666; cursor:pointer; background:none; border:none; }
+.lookup-close:hover { color:#333; }
+.lookup-body { padding:16px; }
+.lookup-search { display:flex; gap:8px; margin-bottom:12px; }
+.lookup-search input { flex:1; padding:6px 10px; border:1px solid #e8e8e8; border-radius:4px; font-size:13px; }
+.lookup-search button { padding:6px 16px; background:#1890ff; color:#fff; border:none; border-radius:4px; cursor:pointer; }
+.lookup-table { width:100%; border-collapse:collapse; font-size:13px; }
+.lookup-table th, .lookup-table td { padding:10px 12px; text-align:left; border-bottom:1px solid #e8e8e8; }
+.lookup-table th { background:#fafafa; font-weight:600; color:#333; }
+.lookup-table tr:hover { background:#f5f5f5; }
+.lookup-table .checkbox-cell { width:40px; }
+.lookup-footer { padding:12px 20px; border-top:1px solid #e8e8e8; display:flex; justify-content:flex-end; gap:8px; }
+.lookup-field { display:flex; align-items:center; }
+.lookup-field input { flex:1; padding:6px 10px; border:1px solid #e8e8e8; border-radius:4px 0 0 4px; font-size:13px; }
+.lookup-field button { width:28px; height:28px; border:1px solid #e8e8e8; border-left:none; border-radius:0 4px 4px 0; background:#fff; cursor:pointer; display:flex; align-items:center; justify-content:center; }
+.lookup-field button:hover { background:#f5f5f5; }
+
+</style>
+
+
+
+</head>
+
+
+
+<body>
+
+
+
+
+
+
+
+<!-- ===== SIDEBAR ===== -->
+
+
+
+<aside class="sidebar" id="sidebar">
+
+
+
+<div class="sidebar-logo">
+
+
+
+    <img src="../images/logo.png" alt="磐枢工业智能平台" style="width: 100%; max-width: 200px; margin-bottom: 8px;">
+
+
+
+    <h1 style="font-size: 16px; margin: 0;">磐枢工业智能平台</h1>
+
+
+
+  </div>
+
+
+
+  <nav class="sidebar-menu"></nav>
+
+
+
+<div class="sidebar-user">
+
+
+
+    <div class="avatar">管</div>
+
+
+
+</aside>
+
+
+
+
+
+
+
+<!-- ===== MAIN CONTENT ===== -->
+
+
+
+<div class="main-content" id="mainContent">
+
+
+
+  <div class="page-header" style="position:sticky;top:0;z-index:100;">
+
+
+
+    <div>
+
+
+
+      <div class="flex items-center gap-8">
+
+
+
+        <button class="sidebar-toggle" id="sidebarToggle" onclick="toggleSidebar()">&#9776;</button>
+
+
+
+        <div>
+
+
+
+          <h2 id="pageTitle">设备保养</h2>
+
+
+
+          <div class="breadcrumb" id="pageBreadcrumb">
+
+
+
+            <a href="../index.html">首页</a><span>/</span><a href="../index.html">设备管理</a><span>/</span><span>设备保养</span>
+
+
+
+          </div></div>
+
+
+
+        </div>
+
+
+
+      </div>
+
+
+
+    </div>
+
+
+
+    <div class="page-actions">
+
+
+
+      <button class="btn btn-ghost btn-sm">&#128276; 消息</button>
+
+
+
+      <button class="btn btn-ghost btn-sm" onclick="window.location.href='../login.html'">&#9211; 退出</button>
+
+      </div>
+
+
+
+  </div>
+
+  <div class="doc-header" style="background:#fff;border-bottom:1px solid #e8e8e8;padding:12px 20px;display:flex;justify-content:space-between;align-items:center;">
+    <div style="font-size:14px;color:#666;">快捷操作</div>
+    <div class="doc-toolbar" style="display:flex;gap:8px;flex-wrap:wrap;">
+      <button class="toolbar-btn" style="padding:6px 12px;border-radius:4px;font-size:13px;cursor:pointer;border:1px solid #d9d9d9;background:#fff;color:#666;display:flex;align-items:center;gap:6px;transition:all 0.3s;" onclick="showToast('刷新功能开发中...', 'info')"><span>🔄</span> 刷新</button>
+      <button class="toolbar-btn" style="padding:6px 12px;border-radius:4px;font-size:13px;cursor:pointer;border:1px solid #d9d9d9;background:#fff;color:#666;display:flex;align-items:center;gap:6px;transition:all 0.3s;" onclick="showToast('列设置功能开发中...', 'info')"><span>⚙️</span> 显示/隐藏列</button>
+      <button class="toolbar-btn" style="padding:6px 12px;border-radius:4px;font-size:13px;cursor:pointer;border:1px solid #d9d9d9;background:#fff;color:#666;display:flex;align-items:center;gap:6px;transition:all 0.3s;" onclick="showToast('导出功能开发中...', 'info')"><span>📤</span> 导出</button>
+      <button class="toolbar-btn danger" style="padding:6px 12px;border-radius:4px;font-size:13px;cursor:pointer;border:1px solid #f5222d;background:#f5222d;color:#fff;display:flex;align-items:center;gap:6px;transition:all 0.3s;" onclick="showConfirm('确认退出？', function() {location.href='../index.html';});)"><span>✖️</span> 退出</button>
+    </div>
+  </div>
+
+  <div class="page-body">
+
+
+
+    <!-- ===== TABS ===== -->
+
+
+
+    <div class="tabs">
+
+
+
+      <div class="tab-item active" onclick="switchTab('plan')">保养计划</div>
+
+
+
+      <div class="tab-item" onclick="switchTab('record')">保养记录</div>
+
+
+
+      <div class="tab-item" onclick="switchTab('warning')">保养预警</div>
+
+
+
+    </div>
+
+
+
+
+
+
+
+    <!-- ===== TAB: 保养计划 ===== -->
+
+
+
+    <div class="tab-pane active" id="tab-plan">
+
+
+
+      <div class="card">
+
+
+
+        <div class="card-header">保养计划列表</div>
+
+
+
+        <div class="card-body">
+
+
+
+          <div class="toolbar" style="margin-bottom:16px;">
+
+
+
+            <div class="toolbar-left">
+
+
+
+              <button class="btn btn-primary btn-sm" onclick="addPlan()">&#10133; 新增</button>
+
+
+
+              <button class="btn btn-ghost btn-sm" onclick="editPlan()">&#128221; 编辑</button>
+
+
+
+              <button class="btn btn-ghost btn-sm" onclick="deletePlan()">&#128465; 删除</button>
+
+
+
+            </div>
+
+
+
+            <div class="toolbar-right">
+
+
+
+              <div class="form-search" style="width:200px;">
+
+
+
+                <input type="text" class="form-input" placeholder="搜索计划编号/设备名称">
+
+
+
+              </div>
+
+
+
+            </div>
+
+
+
+          </div>
+
+
+
+          <div class="table-wrapper">
+
+
+
+            <table class="data-table">
+
+
+
+              <thead>
+
+
+
+                <tr>
+
+
+
+                  <th>计划编号</th>
+
+
+
+                  <th>设备编号</th>
+
+
+
+                  <th>设备名称</th>
+
+
+
+                  <th>保养类型</th>
+
+
+
+                  <th>周期(天)</th>
+
+
+
+                  <th>上次保养日期</th>
+
+
+
+                  <th>下次保养日期</th>
+
+
+
+                  <th>状态</th>
+
+
+
+                  <th>操作</th>
+
+
+
+                </tr>
+
+
+
+              </thead>
+
+
+
+              <tbody>
+
+
+
+                <tr>
+
+
+
+                  <td>PM-PLAN-001</td>
+
+
+
+                  <td>CNC-001</td>
+
+
+
+                  <td>CNC加工中心A</td>
+
+
+
+                  <td><span class="badge badge-success">日常保养</span></td>
+
+
+
+                  <td>7</td>
+
+
+
+                  <td>2026-07-01</td>
+
+
+
+                  <td>2026-07-08</td>
+
+
+
+                  <td><span class="badge badge-success">正常</span></td>
+
+
+
+                  <td class="row-action-links"><a href="#" onclick="openModal('detailModal')">详情</a><a href="#" onclick="executeMaintenance('PM-PLAN-001')">执行</a></td>
+
+
+
+                </tr>
+
+
+
+                <tr>
+
+
+
+                  <td>PM-PLAN-002</td>
+
+
+
+                  <td>CNC-002</td>
+
+
+
+                  <td>CNC加工中心B</td>
+
+
+
+                  <td><span class="badge badge-warning">定期保养</span></td>
+
+
+
+                  <td>30</td>
+
+
+
+                  <td>2026-06-15</td>
+
+
+
+                  <td>2026-07-15</td>
+
+
+
+                  <td><span class="badge badge-warning">即将到期</span></td>
+
+
+
+                  <td class="row-action-links"><a href="#" onclick="openModal('detailModal')">详情</a><a href="#" onclick="executeMaintenance('PM-PLAN-001')">执行</a></td>
+
+
+
+                </tr>
+
+
+
+                <tr>
+
+
+
+                  <td>PM-PLAN-003</td>
+
+
+
+                  <td>LATHE-001</td>
+
+
+
+                  <td>车床A</td>
+
+
+
+                  <td><span class="badge badge-info">专项保养</span></td>
+
+
+
+                  <td>90</td>
+
+
+
+                  <td>2026-04-10</td>
+
+
+
+                  <td>2026-07-09</td>
+
+
+
+                  <td><span class="badge badge-error">逾期</span></td>
+
+
+
+                  <td class="row-action-links"><a href="#" onclick="openModal('detailModal')">详情</a><a href="#" onclick="executeMaintenance('PM-PLAN-001')">执行</a></td>
+
+
+
+                </tr>
+
+
+
+                <tr>
+
+
+
+                  <td>PM-PLAN-004</td>
+
+
+
+                  <td>MILL-001</td>
+
+
+
+                  <td>铣床A</td>
+
+
+
+                  <td><span class="badge badge-success">日常保养</span></td>
+
+
+
+                  <td>7</td>
+
+
+
+                  <td>2026-07-03</td>
+
+
+
+                  <td>2026-07-10</td>
+
+
+
+                  <td><span class="badge badge-success">正常</span></td>
+
+
+
+                  <td class="row-action-links"><a href="#" onclick="openModal('detailModal')">详情</a><a href="#" onclick="executeMaintenance('PM-PLAN-001')">执行</a></td>
+
+
+
+                </tr>
+
+
+
+                <tr>
+
+
+
+                  <td>PM-PLAN-005</td>
+
+
+
+                  <td>GRIND-001</td>
+
+
+
+                  <td>磨床A</td>
+
+
+
+                  <td><span class="badge badge-warning">定期保养</span></td>
+
+
+
+                  <td>30</td>
+
+
+
+                  <td>2026-06-20</td>
+
+
+
+                  <td>2026-07-20</td>
+
+
+
+                  <td><span class="badge badge-success">正常</span></td>
+
+
+
+                  <td class="row-action-links"><a href="#" onclick="openModal('detailModal')">详情</a><a href="#" onclick="executeMaintenance('PM-PLAN-001')">执行</a></td>
+
+
+
+                </tr>
+
+
+
+              </tbody>
+
+
+
+            </table>
+
+
+
+          </div>
+
+
+
+          <div class="pagination" style="margin-top:16px;">
+
+
+
+            <div class="page-btn">上一页</div>
+
+
+
+            <div class="page-btn active">1</div>
+
+
+
+            <div class="page-btn">2</div>
+
+
+
+            <div class="page-btn">3</div>
+
+
+
+            <div class="page-btn">下一页</div>
+
+
+
+            <div class="page-info">共 15 条，显示 1-5 条</div>
+
+
+
+          </div>
+
+
+
+        </div>
+
+
+
+      </div>
+
+
+
+    </div>
+
+
+
+
+
+
+
+    <!-- ===== TAB: 保养记录 ===== -->
+
+
+
+    <div class="tab-pane" id="tab-record">
+
+
+
+      <div class="card">
+
+
+
+        <div class="card-header">保养记录列表</div>
+
+
+
+        <div class="card-body">
+
+
+
+          <div class="toolbar" style="margin-bottom:16px;">
+
+
+
+            <div class="toolbar-left">
+
+
+
+              <button class="btn btn-primary btn-sm" onclick="addRecord()">&#10133; 新增</button>
+
+
+
+              <button class="btn btn-ghost btn-sm" onclick="editRecord()">&#128221; 编辑</button>
+
+
+
+              <button class="btn btn-ghost btn-sm" onclick="deleteRecord()">&#128465; 删除</button>
+
+
+
+            </div>
+
+
+
+            <div class="toolbar-right">
+
+
+
+              <div class="form-search" style="width:200px;">
+
+
+
+                <input type="text" class="form-input" placeholder="搜索记录编号/设备名称">
+
+
+
+              </div>
+
+
+
+            </div>
+
+
+
+          </div>
+
+
+
+          <div class="table-wrapper">
+
+
+
+            <table class="data-table">
+
+
+
+              <thead>
+
+
+
+                <tr>
+
+
+
+                  <th>记录编号</th>
+
+
+
+                  <th>设备编号</th>
+
+
+
+                  <th>设备名称</th>
+
+
+
+                  <th>保养类型</th>
+
+
+
+                  <th>保养日期</th>
+
+
+
+                  <th>保养人员</th>
+
+
+
+                  <th>保养内容</th>
+
+
+
+                  <th>状态</th>
+
+
+
+                  <th>操作</th>
+
+
+
+                </tr>
+
+
+
+              </thead>
+
+
+
+              <tbody>
+
+
+
+                <tr>
+
+
+
+                  <td>PM-REC-001</td>
+
+
+
+                  <td>CNC-001</td>
+
+
+
+                  <td>CNC加工中心A</td>
+
+
+
+                  <td><span class="badge badge-success">日常保养</span></td>
+
+
+
+                  <td>2026-07-01</td>
+
+
+
+                  <td>测试人员</td>
+
+
+
+                  <td>清洁设备表面，检查润滑油液位，紧固螺丝</td>
+
+
+
+                  <td><span class="badge badge-success">已完成</span></td>
+
+
+
+                  <td class="row-action-links"><a href="#" onclick="openModal('detailModal')">详情</a></td>
+
+
+
+                </tr>
+
+
+
+                <tr>
+
+
+
+                  <td>PM-REC-002</td>
+
+
+
+                  <td>CNC-002</td>
+
+
+
+                  <td>CNC加工中心B</td>
+
+
+
+                  <td><span class="badge badge-warning">定期保养</span></td>
+
+
+
+                  <td>2026-06-15</td>
+
+
+
+                  <td>测试人员</td>
+
+
+
+                  <td>更换润滑油，检查主轴轴承，校准刀具</td>
+
+
+
+                  <td><span class="badge badge-success">已完成</span></td>
+
+
+
+                  <td class="row-action-links"><a href="#" onclick="openModal('detailModal')">详情</a></td>
+
+
+
+                </tr>
+
+
+
+                <tr>
+
+
+
+                  <td>PM-REC-003</td>
+
+
+
+                  <td>LATHE-001</td>
+
+
+
+                  <td>车床A</td>
+
+
+
+                  <td><span class="badge badge-info">专项保养</span></td>
+
+
+
+                  <td>2026-04-10</td>
+
+
+
+                  <td>测试人员</td>
+
+
+
+                  <td>大修：更换导轨，检修传动系统，重新装配</td>
+
+
+
+                  <td><span class="badge badge-success">已完成</span></td>
+
+
+
+                  <td class="row-action-links"><a href="#" onclick="openModal('detailModal')">详情</a></td>
+
+
+
+                </tr>
+
+
+
+                <tr>
+
+
+
+                  <td>PM-REC-004</td>
+
+
+
+                  <td>MILL-001</td>
+
+
+
+                  <td>铣床A</td>
+
+
+
+                  <td><span class="badge badge-success">日常保养</span></td>
+
+
+
+                  <td>2026-07-03</td>
+
+
+
+                  <td>测试人员</td>
+
+
+
+                  <td>清洁设备，检查冷却液，润滑各部位</td>
+
+
+
+                  <td><span class="badge badge-success">已完成</span></td>
+
+
+
+                  <td class="row-action-links"><a href="#" onclick="openModal('detailModal')">详情</a></td>
+
+
+
+                </tr>
+
+
+
+                <tr>
+
+
+
+                  <td>PM-REC-005</td>
+
+
+
+                  <td>CNC-001</td>
+
+
+
+                  <td>CNC加工中心A</td>
+
+
+
+                  <td><span class="badge badge-success">日常保养</span></td>
+
+
+
+                  <td>2026-07-08</td>
+
+
+
+                  <td>测试人员</td>
+
+
+
+                  <td>清洁设备，检查刀具磨损，补充润滑油</td>
+
+
+
+                  <td><span class="badge badge-warning">进行中</span></td>
+
+
+
+                  <td class="row-action-links"><a href="#" onclick="openModal('detailModal')">详情</a></td>
+
+
+
+                </tr>
+
+
+
+              </tbody>
+
+
+
+            </table>
+
+
+
+          </div>
+
+
+
+          <div class="pagination" style="margin-top:16px;">
+
+
+
+            <div class="page-btn">上一页</div>
+
+
+
+            <div class="page-btn active">1</div>
+
+
+
+            <div class="page-btn">2</div>
+
+
+
+            <div class="page-btn">3</div>
+
+
+
+            <div class="page-btn">下一页</div>
+
+
+
+            <div class="page-info">共 28 条，显示 1-5 条</div>
+
+
+
+          </div>
+
+
+
+        </div>
+
+
+
+      </div>
+
+
+
+    </div>
+
+
+
+
+
+
+
+    <!-- ===== TAB: 保养预警 ===== -->
+
+
+
+    <div class="tab-pane" id="tab-warning">
+
+
+
+      <div class="stat-card-row">
+
+
+
+        <div class="stat-card" style="border-color:rgba(234,179,8,0.2);">
+
+
+
+          <div class="stat-icon" style="color:var(--color-warning);">&#9200;</div>
+
+
+
+          <div class="stat-value" style="color:var(--color-warning);">8</div>
+
+
+
+          <div class="stat-label">即将到期保养</div>
+
+
+
+        </div>
+
+
+
+        <div class="stat-card" style="border-color:rgba(239,68,68,0.2);">
+
+
+
+          <div class="stat-icon" style="color:var(--color-error);">&#9888;</div>
+
+
+
+          <div class="stat-value" style="color:var(--color-error);">3</div>
+
+
+
+          <div class="stat-label">逾期未保养</div>
+
+
+
+        </div>
+
+
+
+        <div class="stat-card" style="border-color:rgba(34,197,94,0.2);">
+
+
+
+          <div class="stat-icon" style="color:var(--color-success);">&#9989;</div>
+
+
+
+          <div class="stat-value" style="color:var(--color-success);">15</div>
+
+
+
+          <div class="stat-label">本月已保养</div>
+
+
+
+        </div>
+
+
+
+      </div>
+
+
+
+      <div class="card">
+
+
+
+        <div class="card-header">保养预警列表</div>
+
+
+
+        <div class="card-body">
+
+
+
+          <div class="table-wrapper">
+
+
+
+            <table class="data-table">
+
+
+
+              <thead>
+
+
+
+                <tr>
+
+
+
+                  <th>预警类型</th>
+
+
+
+                  <th>计划编号</th>
+
+
+
+                  <th>设备编号</th>
+
+
+
+                  <th>设备名称</th>
+
+
+
+                  <th>保养类型</th>
+
+
+
+                  <th>下次保养日期</th>
+
+
+
+                  <th>逾期天数</th>
+
+
+
+                  <th>操作</th>
+
+
+
+                </tr>
+
+
+
+              </thead>
+
+
+
+              <tbody>
+
+
+
+                <tr>
+
+
+
+                  <td><span class="badge badge-error">逾期未保养</span></td>
+
+
+
+                  <td>PM-PLAN-003</td>
+
+
+
+                  <td>LATHE-001</td>
+
+
+
+                  <td>车床A</td>
+
+
+
+                  <td><span class="badge badge-info">专项保养</span></td>
+
+
+
+                  <td>2026-07-09</td>
+
+
+
+                  <td>1</td>
+
+
+
+                  <td class="row-action-links"><a href="#" onclick="executeMaintenance('PM-PLAN-003')">立即保养</a><a href="#" onclick="deferMaintenance('PM-PLAN-003')">延期</a></td>
+
+
+
+                </tr>
+
+
+
+                <tr>
+
+
+
+                  <td><span class="badge badge-warning">即将到期</span></td>
+
+
+
+                  <td>PM-PLAN-002</td>
+
+
+
+                  <td>CNC-002</td>
+
+
+
+                  <td>CNC加工中心B</td>
+
+
+
+                  <td><span class="badge badge-warning">定期保养</span></td>
+
+
+
+                  <td>2026-07-15</td>
+
+
+
+                  <td>-5</td>
+
+
+
+                  <td class="row-action-links"><a href="#" onclick="arrangeMaintenance('PM-PLAN-002')">安排保养</a></td>
+
+
+
+                </tr>
+
+
+
+                <tr>
+
+
+
+                  <td><span class="badge badge-warning">即将到期</span></td>
+
+
+
+                  <td>PM-PLAN-004</td>
+
+
+
+                  <td>MILL-001</td>
+
+
+
+                  <td>铣床A</td>
+
+
+
+                  <td><span class="badge badge-success">日常保养</span></td>
+
+
+
+                  <td>2026-07-10</td>
+
+
+
+                  <td>0</td>
+
+
+
+                  <td class="row-action-links"><a href="#" onclick="arrangeMaintenance('PM-PLAN-004')">安排保养</a></td>
+
+
+
+                </tr>
+
+
+
+                <tr>
+
+
+
+                  <td><span class="badge badge-warning">即将到期</span></td>
+
+
+
+                  <td>PM-PLAN-005</td>
+
+
+
+                  <td>GRIND-001</td>
+
+
+
+                  <td>磨床A</td>
+
+
+
+                  <td><span class="badge badge-warning">定期保养</span></td>
+
+
+
+                  <td>2026-07-20</td>
+
+
+
+                  <td>-10</td>
+
+
+
+                  <td class="row-action-links"><a href="#" onclick="arrangeMaintenance('PM-PLAN-005')">安排保养</a></td>
+
+
+
+                </tr>
+
+
+
+              </tbody>
+
+
+
+            </table>
+
+
+
+          </div>
+
+
+
+        </div>
+
+
+
+      </div>
+
+
+
+    </div>
+
+
+
+  </div>
+
+
+
+</div>
+
+
+
+
+
+
+
+<!-- ===== MODAL ===== -->
+
+
+
+<div class="modal-overlay" id="detailModal">
+
+
+
+  <div class="modal-dialog">
+
+
+
+    <div class="modal-header">
+
+
+
+      <h3>保养详情</h3>
+
+
+
+      <button class="modal-close" onclick="closeModal('detailModal')">&times;</button>
+
+
+
+    </div>
+
+
+
+    <div class="modal-body">
+
+
+
+      <div class="grid-2" style="gap:16px;">
+
+
+
+        <div class="form-group">
+
+
+
+          <label class="form-label">计划编号</label>
+
+
+
+          <input type="text" class="form-input" value="PM-PLAN-001" readonly>
+
+
+
+        </div>
+
+
+
+        <div class="form-group">
+
+
+
+          <label class="form-label">设备编号</label>
+
+
+
+          <input type="text" class="form-input" value="CNC-001" readonly>
+
+
+
+        </div>
+
+
+
+        <div class="form-group">
+
+
+
+          <label class="form-label">设备名称</label>
+
+
+
+          <input type="text" class="form-input" value="CNC加工中心A" readonly>
+
+
+
+        </div>
+
+
+
+        <div class="form-group">
+
+
+
+          <label class="form-label">保养类型</label>
+
+
+
+          <span class="badge badge-success">日常保养</span>
+
+
+
+        </div>
+
+
+
+        <div class="form-group">
+
+
+
+          <label class="form-label">周期(天)</label>
+
+
+
+          <input type="text" class="form-input" value="7" readonly>
+
+
+
+        </div>
+
+
+
+        <div class="form-group">
+
+
+
+          <label class="form-label">下次保养日期</label>
+
+
+
+          <input type="text" class="form-input" value="2026-07-08" readonly>
+
+
+
+        </div>
+
+
+
+        <div class="form-group">
+
+
+
+          <label class="form-label">状态</label>
+
+
+
+          <span class="badge badge-success">正常</span>
+
+
+
+        </div>
+
+
+
+      </div>
+
+
+
+      <div class="form-group">
+
+
+
+        <label class="form-label">保养内容</label>
+
+
+
+        <textarea class="form-textarea" readonly>1. 清洁设备表面及导轨
+
+
+
+2. 检查润滑油液位，不足时补充
+
+
+
+3. 紧固各部位螺丝
+
+
+
+4. 检查刀具磨损情况
+
+
+
+5. 测试设备运行状态</textarea>
+
+
+
+      </div>
+
+
+
+    </div>
+
+
+
+    <div class="modal-footer">
+
+
+
+      <button class="btn btn-ghost btn-sm" onclick="closeModal('detailModal')">关闭</button>
+
+
+
+    </div>
+
+
+
+  </div>
+
+
+
+</div>
+
+
+
+
+
+
+
+<div class="modal-overlay" id="editModal">
+
+
+
+  <div class="modal-dialog">
+
+
+
+    <div class="modal-header">
+
+
+
+      <h3 id="editModalTitle">新增保养计划</h3>
+
+
+
+      <button class="modal-close" onclick="closeModal('editModal')">&times;</button>
+
+
+
+    </div>
+
+
+
+    <div class="modal-body">
+
+
+
+      <div class="grid-2" style="gap:16px;">
+
+
+
+        <div class="form-group">
+
+
+
+          <label class="form-label required">计划编号</label>
+
+
+
+          <input type="text" class="form-input" id="planCode" placeholder="自动生成">
+
+
+
+        </div>
+
+
+
+        <div class="form-group">
+
+
+
+          <label class="form-label required">设备编号</label>
+
+
+
+          <div class="lookup-input-group">
+
+
+
+            <input type="text" class="form-input" id="equipmentCode" placeholder="选择设备" readonly>
+
+
+
+            <button class="lookup-btn" onclick="showEquipmentLookup()">...</button>
+
+
+
+          </div>
+
+
+
+        </div>
+
+
+
+        <div class="form-group">
+
+
+
+          <label class="form-label required">设备名称</label>
+
+
+
+          <input type="text" class="form-input" id="equipmentName" placeholder="设备名称">
+
+
+
+        </div>
+
+
+
+        <div class="form-group">
+
+
+
+          <label class="form-label required">保养类型</label>
+
+
+
+          <select class="form-input" id="maintenanceType">
+
+
+
+            <option value="">请选择</option>
+
+
+
+            <option value="daily">日常保养</option>
+
+
+
+            <option value="regular">定期保养</option>
+
+
+
+            <option value="special">专项保养</option>
+
+
+
+          </select>
+
+
+
+        </div>
+
+
+
+        <div class="form-group">
+
+
+
+          <label class="form-label required">周期(天)</label>
+
+
+
+          <input type="number" class="form-input" id="cycleDays" placeholder="保养周期">
+
+
+
+        </div>
+
+
+
+        <div class="form-group">
+
+
+
+          <label class="form-label">上次保养日期</label>
+
+
+
+          <input type="date" class="form-input" id="lastMaintenanceDate">
+
+
+
+        </div>
+
+
+
+        <div class="form-group">
+
+
+
+          <label class="form-label">下次保养日期</label>
+
+
+
+          <input type="date" class="form-input" id="nextMaintenanceDate">
+
+
+
+        </div>
+
+
+
+        <div class="form-group">
+
+
+
+          <label class="form-label">负责人</label>
+
+
+
+          <div class="lookup-input-group">
+
+
+
+            <input type="text" class="form-input" id="responsiblePerson" placeholder="选择职员">
+
+
+
+            <button class="lookup-btn" onclick="showPersonLookup()">...</button>
+
+
+
+          </div>
+
+
+
+        </div>
+
+
+
+        <div class="form-group">
+
+
+
+          <label class="form-label">部门</label>
+
+
+
+          <div class="lookup-input-group">
+
+
+
+            <input type="text" class="form-input" id="department" placeholder="选择部门">
+
+
+
+            <button class="lookup-btn" onclick="showDepartmentLookup()">...</button>
+
+
+
+          </div>
+
+
+
+        </div>
+
+
+
+        <div class="form-group">
+
+
+
+          <label class="form-label">状态</label>
+
+
+
+          <select class="form-input" id="status">
+
+
+
+            <option value="normal">正常</option>
+
+
+
+            <option value="warning">即将到期</option>
+
+
+
+            <option value="overdue">逾期</option>
+
+
+
+          </select>
+
+
+
+        </div>
+
+
+
+      </div>
+
+
+
+      <div class="form-group">
+
+
+
+        <label class="form-label">保养内容</label>
+
+
+
+        <textarea class="form-textarea" id="maintenanceContent" rows="4" placeholder="请输入保养内容"></textarea>
+
+
+
+      </div>
+
+
+
+    </div>
+
+
+
+    <div class="modal-footer">
+
+
+
+      <button class="btn btn-ghost btn-sm" onclick="closeModal('editModal')">取消</button>
+
+
+
+      <button class="btn btn-primary btn-sm" onclick="savePlan()">保存</button>
+
+
+
+      <button class="btn btn-success btn-sm" onclick="submitPlan()">提交审核</button>
+
+
+
+    </div>
+
+
+
+  </div>
+
+
+
+</div>
+
+
+
+
+
+
+
+<div class="modal-overlay" id="recordModal">
+
+
+
+  <div class="modal-dialog">
+
+
+
+    <div class="modal-header">
+
+
+
+      <h3 id="recordModalTitle">新增保养记录</h3>
+
+
+
+      <button class="modal-close" onclick="closeModal('recordModal')">&times;</button>
+
+
+
+    </div>
+
+
+
+    <div class="modal-body">
+
+
+
+      <div class="grid-2" style="gap:16px;">
+
+
+
+        <div class="form-group">
+
+
+
+          <label class="form-label">记录编号</label>
+
+
+
+          <input type="text" class="form-input" id="recordCode" placeholder="自动生成">
+
+
+
+        </div>
+
+
+
+        <div class="form-group">
+
+
+
+          <label class="form-label required">设备编号</label>
+
+
+
+          <div class="lookup-input-group">
+
+
+
+            <input type="text" class="form-input" id="recordEquipmentCode" placeholder="选择设备" readonly>
+
+
+
+            <button class="lookup-btn" onclick="showEquipmentLookup()">...</button>
+
+
+
+          </div>
+
+
+
+        </div>
+
+
+
+        <div class="form-group">
+
+
+
+          <label class="form-label required">设备名称</label>
+
+
+
+          <input type="text" class="form-input" id="recordEquipmentName" placeholder="设备名称">
+
+
+
+        </div>
+
+
+
+        <div class="form-group">
+
+
+
+          <label class="form-label required">保养类型</label>
+
+
+
+          <select class="form-input" id="recordMaintenanceType">
+
+
+
+            <option value="">请选择</option>
+
+
+
+            <option value="daily">日常保养</option>
+
+
+
+            <option value="regular">定期保养</option>
+
+
+
+            <option value="special">专项保养</option>
+
+
+
+          </select>
+
+
+
+        </div>
+
+
+
+        <div class="form-group">
+
+
+
+          <label class="form-label required">保养日期</label>
+
+
+
+          <input type="date" class="form-input" id="recordMaintenanceDate">
+
+
+
+        </div>
+
+
+
+        <div class="form-group">
+
+
+
+          <label class="form-label required">保养人员</label>
+
+
+
+          <div class="lookup-input-group">
+
+
+
+            <input type="text" class="form-input" id="recordMaintenancePerson" placeholder="选择职员">
+
+
+
+            <button class="lookup-btn" onclick="showPersonLookup()">...</button>
+
+
+
+          </div>
+
+
+
+        </div>
+
+
+
+        <div class="form-group">
+
+
+
+          <label class="form-label">部门</label>
+
+
+
+          <div class="lookup-input-group">
+
+
+
+            <input type="text" class="form-input" id="recordDepartment" placeholder="选择部门">
+
+
+
+            <button class="lookup-btn" onclick="showDepartmentLookup()">...</button>
+
+
+
+          </div>
+
+
+
+        </div>
+
+
+
+        <div class="form-group">
+
+
+
+          <label class="form-label">状态</label>
+
+
+
+          <select class="form-input" id="recordStatus">
+
+
+
+            <option value="in_progress">进行中</option>
+
+
+
+            <option value="completed">已完成</option>
+
+
+
+          </select>
+
+
+
+        </div>
+
+
+
+      </div>
+
+
+
+      <div class="form-group">
+
+
+
+        <label class="form-label required">保养内容</label>
+
+
+
+        <textarea class="form-textarea" id="recordMaintenanceContent" rows="4" placeholder="请输入保养内容"></textarea>
+
+
+
+      </div>
+
+
+
+      <div class="form-group">
+
+
+
+        <label class="form-label">保养结果</label>
+
+
+
+        <textarea class="form-textarea" id="recordMaintenanceResult" rows="3" placeholder="请输入保养结果"></textarea>
+
+
+
+      </div>
+
+
+
+    </div>
+
+
+
+    <div class="modal-footer">
+
+
+
+      <button class="btn btn-ghost btn-sm" onclick="closeModal('recordModal')">取消</button>
+
+
+
+      <button class="btn btn-primary btn-sm" onclick="saveRecord()">保存</button>
+
+
+
+      <button class="btn btn-success btn-sm" onclick="completeRecord()">完成并提交</button>
+
+
+
+    </div>
+
+
+
+  </div>
+
+
+
+</div>
+
+
+
+
+
+
+
+<script>
+
+
+
+var currentStatus = 'normal';
+
+
+
+var currentPlanId = null;
+
+
+
+var currentRecordId = null;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+function switchTab(tabName) {
+
+
+
+  document.querySelectorAll('.tab-item').forEach(item => item.classList.remove('active'));
+
+
+
+  document.querySelectorAll('.tab-pane').forEach(pane => pane.classList.remove('active'));
+
+
+
+  event.target.classList.add('active');
+
+
+
+  document.getElementById('tab-' + tabName).classList.add('active');
+
+
+
+
+
+
+
+}
+
+
+
+function openModal(modalId) {
+
+
+
+  document.getElementById(modalId).classList.add('show');
+
+
+
+
+
+
+
+}
+
+
+
+function closeModal(modalId) {
+
+
+
+  document.getElementById(modalId).classList.remove('show');
+
+
+
+
+
+
+
+}
+
+
+
+function validateForm() {
+
+
+
+  var errors = [];
+
+
+
+  
+
+
+
+  var equipmentCode = document.getElementById('equipmentCode');
+
+
+
+  var equipmentName = document.getElementById('equipmentName');
+
+
+
+  var maintenanceType = document.getElementById('maintenanceType');
+
+
+
+  var cycleDays = document.getElementById('cycleDays');
+
+
+
+  
+
+
+
+  if (equipmentCode && !equipmentCode.value.trim()) {
+
+
+
+    errors.push('请选择设备编号');
+
+
+
+  }
+
+
+
+  if (equipmentName && !equipmentName.value.trim()) {
+
+
+
+    errors.push('请输入设备名称');
+
+
+
+  }
+
+
+
+  if (maintenanceType && !maintenanceType.value) {
+
+
+
+    errors.push('请选择保养类型');
+
+
+
+  }
+
+
+
+  if (cycleDays && (!cycleDays.value || parseInt(cycleDays.value) <= 0)) {
+
+
+
+    errors.push('请输入有效的保养周期');
+
+
+
+  }
+
+
+
+  
+
+
+
+  if (errors.length > 0) {
+
+
+
+    showToast(errors.join('\n'), 'error');
+
+
+
+    return false;
+
+
+
+  }
+
+
+
+  return true;
+
+
+
+
+
+
+
+
+
+
+
+}
+
+
+
+
+
+
+
+function validateRecordForm() {
+
+
+
+  var errors = [];
+
+
+
+  
+
+
+
+  var recordEquipmentCode = document.getElementById('recordEquipmentCode');
+
+
+
+  var recordEquipmentName = document.getElementById('recordEquipmentName');
+
+
+
+  var recordMaintenanceType = document.getElementById('recordMaintenanceType');
+
+
+
+  var recordMaintenanceDate = document.getElementById('recordMaintenanceDate');
+
+
+
+  var recordMaintenancePerson = document.getElementById('recordMaintenancePerson');
+
+
+
+  var recordMaintenanceContent = document.getElementById('recordMaintenanceContent');
+
+
+
+  
+
+
+
+  if (recordEquipmentCode && !recordEquipmentCode.value.trim()) {
+
+
+
+    errors.push('请选择设备编号');
+
+
+
+  }
+
+
+
+  if (recordEquipmentName && !recordEquipmentName.value.trim()) {
+
+
+
+    errors.push('请输入设备名称');
+
+
+
+  }
+
+
+
+  if (recordMaintenanceType && !recordMaintenanceType.value) {
+
+
+
+    errors.push('请选择保养类型');
+
+
+
+  }
+
+
+
+  if (recordMaintenanceDate && !recordMaintenanceDate.value) {
+
+
+
+    errors.push('请选择保养日期');
+
+
+
+  }
+
+
+
+  if (recordMaintenancePerson && !recordMaintenancePerson.value.trim()) {
+
+
+
+    errors.push('请选择保养人员');
+
+
+
+  }
+
+
+
+  if (recordMaintenanceContent && !recordMaintenanceContent.value.trim()) {
+
+
+
+    errors.push('请输入保养内容');
+
+
+
+  }
+
+
+
+  
+
+
+
+  if (errors.length > 0) {
+
+
+
+    showToast(errors.join('\n'), 'error');
+
+
+
+    return false;
+
+
+
+  }
+
+
+
+  return true;
+
+
+
+
+
+
+
+
+
+
+
+}
+
+
+
+
+
+
+
+function addPlan() {
+
+
+
+  currentPlanId = null;
+
+
+
+  document.getElementById('editModalTitle').textContent = '新增保养计划';
+
+
+
+  clearPlanForm();
+
+
+
+  openModal('editModal');
+
+
+
+
+
+
+
+}
+
+
+
+function editPlan() {
+
+
+
+  currentPlanId = 'PM-PLAN-001';
+
+
+
+  document.getElementById('editModalTitle').textContent = '编辑保养计划';
+
+
+
+  fillPlanForm();
+
+
+
+  openModal('editModal');
+
+
+
+
+
+
+
+}
+
+
+
+function deletePlan() {
+
+
+
+  showConfirm('确认删除选中的保养计划？', 'error', function(result, function() {
+
+
+
+    if (result) {
+
+
+
+      showToast('删除成功', 'success');
+
+
+
+    });
+
+
+
+  });
+
+
+
+
+
+
+
+}
+
+
+
+function savePlan() {
+
+
+
+  if (!validateForm()) return;
+
+
+
+  
+
+
+
+  showToast('保存成功', 'success');
+
+
+
+  closeModal('editModal');
+
+
+
+
+
+
+
+}
+
+
+
+function submitPlan() {
+
+
+
+  if (!validateForm()) return;
+
+
+
+  
+
+
+
+  showConfirm('确认提交审核？', 'warning', function(result, function() {
+
+
+
+    if (result) {
+
+
+
+      currentStatus = 'pending';
+
+
+
+      showToast('已提交审核', 'success');
+
+
+
+      closeModal('editModal');
+
+
+
+    });
+
+
+
+  });
+
+
+
+
+
+
+
+}
+
+
+
+function addRecord() {
+
+
+
+  currentRecordId = null;
+
+
+
+  document.getElementById('recordModalTitle').textContent = '新增保养记录';
+
+
+
+  clearRecordForm();
+
+
+
+  openModal('recordModal');
+
+
+
+
+
+
+
+}
+
+
+
+function editRecord() {
+
+
+
+  currentRecordId = 'PM-REC-001';
+
+
+
+  document.getElementById('recordModalTitle').textContent = '编辑保养记录';
+
+
+
+  fillRecordForm();
+
+
+
+  openModal('recordModal');
+
+
+
+
+
+
+
+}
+
+
+
+function deleteRecord() {
+
+
+
+  showConfirm('确认删除选中的保养记录？', 'error', function(result, function() {
+
+
+
+    if (result) {
+
+
+
+      showToast('删除成功', 'success');
+
+
+
+    });
+
+
+
+  });
+
+
+
+
+
+
+
+}
+
+
+
+function saveRecord() {
+
+
+
+  if (!validateRecordForm()) return;
+
+
+
+  
+
+
+
+  showToast('保存成功', 'success');
+
+
+
+  closeModal('recordModal');
+
+
+
+
+
+
+
+}
+
+
+
+function completeRecord() {
+
+
+
+  if (!validateRecordForm()) return;
+
+
+
+  
+
+
+
+  showConfirm('确认完成保养并提交记录？', 'warning', function(result, function() {
+
+
+
+    if (result) {
+
+
+
+      currentStatus = 'completed';
+
+
+
+      showToast('保养记录已完成', 'success');
+
+
+
+      closeModal('recordModal');
+
+
+
+    });
+
+
+
+  });
+
+
+
+
+
+
+
+}
+
+
+
+function showEquipmentLookup() {
+
+
+
+  showToast('设备选择功能开发中', 'info');
+
+
+
+
+
+
+
+}
+
+
+
+function showPersonLookup() {
+
+
+
+  showToast('职员选择功能开发中', 'info');
+
+
+
+
+
+
+
+}
+
+
+
+function showDepartmentLookup() {
+
+
+
+  showToast('部门选择功能开发中', 'info');
+
+
+
+
+
+
+
+}
+
+
+
+function executeMaintenance(planId) {
+
+
+
+  showConfirm('确认执行保养计划 ' + planId + '？', 'warning', function(result, function() {
+
+
+
+    if (result) {
+
+
+
+      showToast('已开始执行保养', 'success');
+
+
+
+    });
+
+
+
+  });
+
+
+
+
+
+
+
+}
+
+
+
+function arrangeMaintenance(planId) {
+
+
+
+  showToast('已安排保养计划 ' + planId, 'success');
+
+
+
+
+
+
+
+}
+
+
+
+function deferMaintenance(planId) {
+
+
+
+  showConfirm('确认延期保养计划 ' + planId + '？', 'warning', function(result, function() {
+
+
+
+    if (result) {
+
+
+
+      showToast('保养计划已延期', 'success');
+
+
+
+    });
+
+
+
+  });
+
+
+
+
+
+
+
+}
+
+
+
+function clearPlanForm() {
+
+
+
+  var inputs = document.querySelectorAll('#editModal input, #editModal select, #editModal textarea');
+
+
+
+  inputs.forEach(function(input) {
+
+
+
+    input.value = '';
+
+
+
+  });
+
+
+
+  document.getElementById('status').value = 'normal';
+
+
+
+
+
+
+
+}
+
+
+
+function fillPlanForm() {
+
+
+
+  document.getElementById('planCode').value = 'PM-PLAN-001';
+
+
+
+  document.getElementById('equipmentCode').value = 'CNC-001';
+
+
+
+  document.getElementById('equipmentName').value = 'CNC加工中心A';
+
+
+
+  document.getElementById('maintenanceType').value = 'daily';
+
+
+
+  document.getElementById('cycleDays').value = '7';
+
+
+
+  document.getElementById('lastMaintenanceDate').value = '2026-07-01';
+
+
+
+  document.getElementById('nextMaintenanceDate').value = '2026-07-08';
+
+
+
+  document.getElementById('responsiblePerson').value = '测试人员';
+
+
+
+  document.getElementById('department').value = '生产事业部';
+
+
+
+  document.getElementById('status').value = 'normal';
+
+
+
+  document.getElementById('maintenanceContent').value = '1. 清洁设备表面及导轨\n2. 检查润滑油液位，不足时补充\n3. 紧固各部位螺丝\n4. 检查刀具磨损情况\n5. 测试设备运行状态';
+
+
+
+
+
+
+
+}
+
+
+
+function clearRecordForm() {
+
+
+
+  var inputs = document.querySelectorAll('#recordModal input, #recordModal select, #recordModal textarea');
+
+
+
+  inputs.forEach(function(input) {
+
+
+
+    input.value = '';
+
+
+
+  });
+
+
+
+  document.getElementById('recordStatus').value = 'in_progress';
+
+
+
+
+
+
+
+}
+
+
+
+function fillRecordForm() {
+
+
+
+  document.getElementById('recordCode').value = 'PM-REC-001';
+
+
+
+  document.getElementById('recordEquipmentCode').value = 'CNC-001';
+
+
+
+  document.getElementById('recordEquipmentName').value = 'CNC加工中心A';
+
+
+
+  document.getElementById('recordMaintenanceType').value = 'daily';
+
+
+
+  document.getElementById('recordMaintenanceDate').value = '2026-07-01';
+
+
+
+  document.getElementById('recordMaintenancePerson').value = '测试人员';
+
+
+
+  document.getElementById('recordDepartment').value = '生产事业部';
+
+
+
+  document.getElementById('recordStatus').value = 'completed';
+
+
+
+  document.getElementById('recordMaintenanceContent').value = '清洁设备表面，检查润滑油液位，紧固螺丝';
+
+
+
+}
+
+
+
+
+
+
+
+document.querySelectorAll('.modal-overlay').forEach(overlay => {
+
+
+
+  overlay.addEventListener('click', function(e) {
+
+
+
+    if (e.target === this) this.classList.remove('show');
+
+
+
+  });
+
+
+
+});
+
+
+
+
+
+
+
+
+
+
+
+
+</script>
+
+
+
+
+<div class="lookup-modal" id="lookupModal">
+  <div class="lookup-dialog">
+    <div class="lookup-header">
+      <div class="lookup-title" id="lookupTitle">选择</div>
+      <button class="lookup-close" onclick="closeLookup()">×</button>
+    </div>
+    <div class="lookup-body">
+      <div class="lookup-search">
+        <input type="text" id="lookupKeyword" placeholder="请输入编码或名称搜索" onkeydown="if(event.key==='Enter')filterLookup()">
+        <button onclick="filterLookup()">搜索</button>
+      </div>
+      <table class="lookup-table">
+        <thead id="lookupTableHead"></thead>
+        <tbody id="lookupTableBody"></tbody>
+      </table>
+    </div>
+    <div class="lookup-footer">
+      <button class="btn btn-cancel" onclick="closeLookup()">取消</button>
+      <button class="btn btn-primary" onclick="confirmLookup()">确定</button>
+    </div>
+  </div>
+</div>
+
+</body>
+
+
+
+</html>

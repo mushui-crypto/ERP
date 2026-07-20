@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>薪资管理 - 基础资料</title>
+<link rel="stylesheet" href="../common.css">
+<script src="../common.js"></script>
+<script></script>
+<style>
+.page-header { margin-bottom: 20px; }
+.search-area { background: #fff; padding: 16px 20px; border-radius: 6px; margin-bottom: 20px; }
+.search-row { display: flex; gap: 16px; margin-bottom: 12px; flex-wrap: wrap; }
+.search-item { display: flex; align-items: center; gap: 8px; }
+.search-item label { font-size: 13px; color: #666; }
+.search-item input, .search-item select { padding: 6px 10px; border: 1px solid #e8e8e8; border-radius: 4px; font-size: 13px; }
+.search-btn { padding: 6px 16px; background: #1890ff; color: #fff; border: none; border-radius: 4px; cursor: pointer; font-size: 13px; }
+.search-btn:hover { background: #40a9ff; }
+.table-wrapper { background: #fff; border-radius: 6px; overflow: hidden; }
+.data-table { width: 100%; border-collapse: collapse; }
+.data-table th, .data-table td { padding: 12px 16px; text-align: left; border-bottom: 1px solid #e8e8e8; font-size: 13px; }
+.data-table th { background: #fafafa; font-weight: 600; color: #333; }
+.data-table tr:hover { background: #f5f5f5; }
+.action-btn { padding: 4px 10px; margin-right: 4px; border: none; border-radius: 4px; cursor: pointer; font-size: 12px; }
+.action-btn.view { background: #e6f7ff; color: #1890ff; }
+.action-btn.edit { background: #fffbe6; color: #faad14; }
+.action-btn.delete { background: #fff2f0; color: #f5222d; }
+.badge { padding: 2px 8px; border-radius: 4px; font-size: 12px; }
+.badge-success { background: #f6ffed; color: #52c41a; }
+.badge-warning { background: #fffbe6; color: #faad14; }
+</style>
+</head>
+<body>
+<aside class="sidebar" id="sidebar"><div class="sidebar-logo"><img src="../images/logo.png" alt="磐枢工业智能平台" style="width: 100%; max-width: 200px; margin-bottom: 8px;"><h1 style="font-size: 16px; margin: 0;">磐枢HubPang</h1></div><nav class="sidebar-menu"></nav><div class="sidebar-user"><div class="avatar">管理员</div></aside>
+<div class="main-content" id="mainContent">
+<div class="page-header" style="position:sticky;top:0;z-index:100;"><div><div class="flex items-center gap-8"><button class="sidebar-toggle" onclick="toggleSidebar()">&#9776;</button><div><h2>薪资管理</h2><div class="breadcrumb"><a href="../index.html">首页</a> <span>/</span> <span>基础资料</span></div></div></div></div></div></div>
+<div class="search-area"><div class="search-row"><div class="search-item"><label>关键字</label><input type="text" placeholder="请输入关键字"></div><div class="search-item"><label>状态</label><select><option>全部状态</option><option>已启用</option><option>未启用</option></select></div></div><button class="search-btn" onclick="searchData()">查询</button></div><div class="table-wrapper"><table class="data-table"><thead><tr><th>员工编号</th><th>姓名</th><th>基本工资</th><th>绩效工资</th><th>实发工资</th><th>操作</th></tr></thead><tbody><tr><td>EMP-001</td><td>张三</td><td>8000</td><td>2000</td><td>10000</td><td><button class="action-btn view" onclick="viewItem()">查看</button><button class="action-btn edit" onclick="editItem()">编辑</button><button class="action-btn delete" onclick="deleteItem()">删除</button></td></tr><tr><td>EMP-002</td><td>李四</td><td>6000</td><td>1500</td><td>7500</td><td><button class="action-btn view" onclick="viewItem()">查看</button><button class="action-btn edit" onclick="editItem()">编辑</button><button class="action-btn delete" onclick="deleteItem()">删除</button></td></tr></tbody></table></div></div><script>
+function searchData(){ showToast('查询成功', 'info'); }
+function viewItem(){ showToast('查看详情', 'info'); }
+function editItem(){ showToast('编辑', 'info'); }
+function deleteItem(){ showConfirm("确认退出？", function(result) { if(result) { showToast('删除成功', 'info'); } }); }
+</script>
+</body>
+</html>

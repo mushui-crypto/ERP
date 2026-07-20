@@ -1,0 +1,1088 @@
+<!DOCTYPE html>
+
+
+
+<html lang="zh-CN">
+
+
+
+<head>
+
+
+
+<meta charset="UTF-8">
+
+
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+
+
+<title>省市 - 磐枢工业智能平台</title>
+
+
+
+<link rel="stylesheet" href="../common.css">
+
+
+
+<script src="../common.js"></script>
+<script>
+</script>
+
+
+
+<style>
+
+
+
+.pc-layout { display:flex; gap:12px; padding:12px 16px; flex:1; overflow:hidden; }
+
+
+
+.pc-left { width:30%; background:var(--bg-surface); border:1px solid var(--border-normal); border-radius:var(--radius-md); display:flex; flex-direction:column; overflow:hidden; }
+
+
+
+.pc-right { flex:1; background:var(--bg-surface); border:1px solid var(--border-normal); border-radius:var(--radius-md); display:flex; flex-direction:column; overflow:hidden; }
+
+
+
+.pc-panel-header { padding:12px 14px; border-bottom:1px solid var(--border-normal); font-weight:600; font-size:14px; color:var(--text-primary); display:flex; justify-content:space-between; align-items:center; }
+
+
+
+.pc-search { padding:8px 10px; border-bottom:1px solid var(--border-normal); }
+
+
+
+.pc-list { flex:1; overflow-y:auto; }
+
+
+
+.province-item { padding:10px 14px; cursor:pointer; color:var(--text-secondary); font-size:13px; border-left:3px solid transparent; transition:all 150ms ease; display:flex; align-items:center; justify-content:space-between; }
+
+
+
+.province-item:hover { background:rgba(56,189,248,0.06); color:var(--text-primary); }
+
+
+
+.province-item.active { border-left-color:var(--text-accent); background:rgba(56,189,248,0.1); color:var(--text-accent); }
+
+
+
+.province-item .pi-count { font-size:11px; color:var(--text-tertiary); }
+
+
+
+.province-item.active .pi-count { color:var(--text-accent); }
+
+
+
+.pc-table-wrap { flex:1; overflow:auto; }
+
+
+
+.pc-empty { text-align:center; padding:60px 20px; color:var(--text-tertiary); font-size:13px; }
+
+
+
+.pc-empty .icon { font-size:40px; opacity:0.3; margin-bottom:12px; }
+
+
+
+
+.lookup-modal { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:2000; justify-content:center; align-items:center; }
+.lookup-modal.show { display:flex; }
+.lookup-dialog { background:#fff; border:1px solid #e8e8e8; border-radius:4px; width:720px; max-height:70vh; overflow:hidden; }
+.lookup-header { padding:14px 20px; border-bottom:1px solid #e8e8e8; display:flex; align-items:center; justify-content:space-between; }
+.lookup-title { font-size:15px; font-weight:600; color:#333; }
+.lookup-close { font-size:20px; color:#666; cursor:pointer; background:none; border:none; }
+.lookup-close:hover { color:#333; }
+.lookup-body { padding:16px; }
+.lookup-search { display:flex; gap:8px; margin-bottom:12px; }
+.lookup-search input { flex:1; padding:6px 10px; border:1px solid #e8e8e8; border-radius:4px; font-size:13px; }
+.lookup-search button { padding:6px 16px; background:#1890ff; color:#fff; border:none; border-radius:4px; cursor:pointer; }
+.lookup-table { width:100%; border-collapse:collapse; font-size:13px; }
+.lookup-table th, .lookup-table td { padding:10px 12px; text-align:left; border-bottom:1px solid #e8e8e8; }
+.lookup-table th { background:#fafafa; font-weight:600; color:#333; }
+.lookup-table tr:hover { background:#f5f5f5; }
+.lookup-table .checkbox-cell { width:40px; }
+.lookup-footer { padding:12px 20px; border-top:1px solid #e8e8e8; display:flex; justify-content:flex-end; gap:8px; }
+.lookup-field { display:flex; align-items:center; }
+.lookup-field input { flex:1; padding:6px 10px; border:1px solid #e8e8e8; border-radius:4px 0 0 4px; font-size:13px; }
+.lookup-field button { width:28px; height:28px; border:1px solid #e8e8e8; border-left:none; border-radius:0 4px 4px 0; background:#fff; cursor:pointer; display:flex; align-items:center; justify-content:center; }
+.lookup-field button:hover { background:#f5f5f5; }
+
+</style>
+
+
+
+</head>
+
+
+
+<body>
+
+
+
+<aside class="sidebar" id="sidebar">
+
+
+
+<div class="sidebar-logo">
+
+
+
+    <img src="../images/logo.png" alt="磐枢工业智能平台" style="width: 100%; max-width: 200px; margin-bottom: 8px;">
+
+
+
+    <h1 style="font-size: 16px; margin: 0;">磐枢工业智能平台</h1>
+
+
+
+  </div>
+
+
+
+  <nav class="sidebar-menu"></nav>
+
+
+
+<div class="sidebar-user"><div class="avatar">管</div>
+
+
+
+</aside>
+
+
+
+<div class="main-content" id="mainContent">
+
+
+
+  <div class="page-header" style="position:sticky;top:0;z-index:100;">
+
+
+
+    <div>
+
+
+
+      <div class="flex items-center gap-8">
+
+
+
+        <button class="sidebar-toggle" onclick="toggleSidebar()">☰</button>
+
+
+
+        <div>
+
+
+
+          <h2>省市</h2>
+
+
+
+          <div class="breadcrumb"><a href="../index.html">首页</a><span>></span><span>基础管理</span><span>></span><span>辅助资料</span><span>></span><span>省市</span></div></div>
+
+
+
+        </div>
+
+
+
+      </div>
+
+
+
+    </div>
+
+
+
+    <div class="page-actions">
+
+
+
+      <button class="btn btn-ghost btn-sm">&#128276; 消息</button>
+      </div>
+
+
+
+  </div>
+
+
+
+  <div class="page-body list-page-body">
+
+
+
+    <div class="list-action-bar">
+
+
+
+      <span class="action-btn">过滤</span>
+
+
+
+      <span class="action-btn">刷新</span>
+
+
+
+      <span class="action-separator"></span>
+
+
+
+      <span class="action-btn" onclick="openModal('editModal')">新增</span>
+
+
+
+      <span class="action-btn">删除</span>
+
+
+
+      <span class="action-btn">修改</span>
+
+
+
+      <span class="action-separator"></span>
+
+
+
+      <span class="action-btn">选项</span>
+
+
+
+      <span class="action-btn">退出</span>
+
+
+
+    </div>
+
+
+
+    <div class="pc-layout">
+
+
+
+      <div class="pc-left">
+
+
+
+        <div class="pc-panel-header"><span>省份列表</span><span style="font-size:12px;font-weight:400;color:var(--text-tertiary);">共 10 个</span></div>
+
+
+
+        <div class="pc-search"><input type="text" class="form-input" placeholder="搜索省份" style="width:100%;"></div>
+
+
+
+        <div class="pc-list" id="provinceList">
+
+
+
+          <div class="province-item active" onclick="selectProvince('北京', this)"><span>&#128205; 北京</span><span class="pi-count">4 市</span></div>
+
+
+
+          <div class="province-item" onclick="selectProvince('上海', this)"><span>&#128205; 上海</span><span class="pi-count">4 市</span></div>
+
+
+
+          <div class="province-item" onclick="selectProvince('广东', this)"><span>&#128205; 广东</span><span class="pi-count">4 市</span></div>
+
+
+
+          <div class="province-item" onclick="selectProvince('江苏', this)"><span>&#128205; 江苏</span><span class="pi-count">4 市</span></div>
+
+
+
+          <div class="province-item" onclick="selectProvince('浙江', this)"><span>&#128205; 浙江</span><span class="pi-count">0 市</span></div>
+
+
+
+          <div class="province-item" onclick="selectProvince('山东', this)"><span>&#128205; 山东</span><span class="pi-count">0 市</span></div>
+
+
+
+          <div class="province-item" onclick="selectProvince('四川', this)"><span>&#128205; 四川</span><span class="pi-count">0 市</span></div>
+
+
+
+          <div class="province-item" onclick="selectProvince('湖北', this)"><span>&#128205; 湖北</span><span class="pi-count">0 市</span></div>
+
+
+
+          <div class="province-item" onclick="selectProvince('福建', this)"><span>&#128205; 福建</span><span class="pi-count">0 市</span></div>
+
+
+
+          <div class="province-item" onclick="selectProvince('河南', this)"><span>&#128205; 河南</span><span class="pi-count">0 市</span></div>
+
+
+
+        </div>
+
+
+
+      </div>
+
+
+
+      <div class="pc-right">
+
+
+
+        <div class="pc-panel-header"><span><span id="currentProvince">北京</span> - 城市列表</span><span style="font-size:12px;font-weight:400;color:var(--text-tertiary);">共 <span id="cityCount">4</span> 个城市</span></div>
+
+
+
+        <div class="pc-table-wrap">
+
+
+
+          <table class="data-table">
+
+
+
+            <thead>
+
+
+
+              <tr>
+
+
+
+                <th style="width:40px;"><input type="checkbox" class="row-checkbox"></th>
+
+
+
+                <th>城市编码</th>
+
+
+
+                <th>城市名称</th>
+
+
+
+                <th>区号</th>
+
+
+
+                <th>邮编</th>
+
+
+
+                <th>状态</th>
+
+
+
+                <th>操作</th>
+
+
+
+              </tr>
+
+
+
+            </thead>
+
+
+
+            <tbody id="cityTbody"></tbody>
+
+
+
+          </table>
+
+
+
+        </div>
+
+
+
+      </div>
+
+
+
+    </div>
+
+
+
+  </div>
+
+
+
+  <div class="modal-overlay" id="editModal">
+
+
+
+    <div class="modal" style="max-width:680px;">
+
+
+
+      <div class="modal-header">
+
+
+
+        <span>城市信息</span>
+
+
+
+        <span style="cursor:pointer;font-size:18px;color:var(--text-tertiary);" onclick="closeModal('editModal')">×</span>
+
+
+
+      </div>
+
+
+
+      <div class="modal-body">
+
+
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:0 16px;">
+
+
+
+          <div class="form-group">
+
+
+
+            <label class="form-label">所属省份</label>
+
+
+
+            <select class="form-select">
+
+
+
+              <option>北京</option>
+
+
+
+              <option>上海</option>
+
+
+
+              <option>广东</option>
+
+
+
+              <option>江苏</option>
+
+
+
+              <option>浙江</option>
+
+
+
+            </select>
+
+
+
+          </div>
+
+
+
+          <div class="form-group">
+
+
+
+            <label class="form-label">城市编码</label>
+
+
+
+            <input type="text" class="form-input" placeholder="请输入城市编码">
+
+
+
+          </div>
+
+
+
+          <div class="form-group">
+
+
+
+            <label class="form-label">城市名称</label>
+
+
+
+            <input type="text" class="form-input" placeholder="请输入城市名称">
+
+
+
+          </div>
+
+
+
+          <div class="form-group">
+
+
+
+            <label class="form-label">区号</label>
+
+
+
+            <input type="text" class="form-input" placeholder="请输入区号">
+
+
+
+          </div>
+
+
+
+          <div class="form-group">
+
+
+
+            <label class="form-label">邮编</label>
+
+
+
+            <input type="text" class="form-input" placeholder="请输入邮编">
+
+
+
+          </div>
+
+
+
+          <div class="form-group">
+
+
+
+            <label class="form-label">状态</label>
+
+
+
+            <select class="form-select">
+
+
+
+              <option>启用</option>
+
+
+
+              <option>禁用</option>
+
+
+
+            </select>
+
+
+
+          </div>
+
+
+
+        </div>
+
+
+
+      </div>
+
+
+
+      <div class="modal-footer">
+
+
+
+        <button class="btn btn-ghost" onclick="closeModal('editModal')">取消</button>
+
+
+
+        <button class="btn btn-primary" onclick="closeModal('editModal')">保存</button>
+
+
+
+      </div>
+
+
+
+    </div>
+
+
+
+  </div>
+
+
+
+</div>
+
+
+
+<script>
+
+
+
+function openModal(id){ document.getElementById(id).classList.add('active'); }
+
+
+
+function closeModal(id){ document.getElementById(id).classList.remove('active'); }
+
+
+
+
+
+
+
+var cityData = {
+
+
+
+  '北京': [
+
+
+
+    {code:'CT-BJ-001', name:'东城区', area:'010', zip:'100010'},
+
+
+
+    {code:'CT-BJ-002', name:'西城区', area:'010', zip:'100032'},
+
+
+
+    {code:'CT-BJ-003', name:'朝阳区', area:'010', zip:'100020'},
+
+
+
+    {code:'CT-BJ-004', name:'海淀区', area:'010', zip:'100089'}
+
+
+
+  ],
+
+
+
+  '上海': [
+
+
+
+    {code:'CT-SH-001', name:'黄浦区', area:'021', zip:'200001'},
+
+
+
+    {code:'CT-SH-002', name:'徐汇区', area:'021', zip:'200030'},
+
+
+
+    {code:'CT-SH-003', name:'长宁区', area:'021', zip:'200050'},
+
+
+
+    {code:'CT-SH-004', name:'静安区', area:'021', zip:'200040'}
+
+
+
+  ],
+
+
+
+  '广东': [
+
+
+
+    {code:'CT-GD-001', name:'广州市', area:'020', zip:'510000'},
+
+
+
+    {code:'CT-GD-002', name:'深圳市', area:'0755', zip:'518000'},
+
+
+
+    {code:'CT-GD-003', name:'东莞市', area:'0769', zip:'523000'},
+
+
+
+    {code:'CT-GD-004', name:'佛山市', area:'0757', zip:'528000'}
+
+
+
+  ],
+
+
+
+  '江苏': [
+
+
+
+    {code:'CT-JS-001', name:'南京市', area:'025', zip:'210000'},
+
+
+
+    {code:'CT-JS-002', name:'苏州市', area:'0512', zip:'215000'},
+
+
+
+    {code:'CT-JS-003', name:'无锡市', area:'0510', zip:'214000'},
+
+
+
+    {code:'CT-JS-004', name:'常州市', area:'0519', zip:'213000'}
+
+
+
+  ]
+
+
+
+};
+
+
+
+
+
+
+
+function selectProvince(name, el) {
+
+
+
+}
+
+
+
+  document.querySelectorAll('.province-item').forEach(function(i){ i.classList.remove('active'); });
+
+
+
+  el.classList.add('active');
+
+
+
+  document.getElementById('currentProvince').textContent = name;
+
+
+
+  renderCities(name);
+
+
+
+
+
+
+
+function renderCities(name) {
+
+
+
+  var cities = cityData[name] || [];
+
+
+
+  document.getElementById('cityCount').textContent = cities.length;
+
+
+
+  var tbody = document.getElementById('cityTbody');
+
+
+
+  if (cities.length === 0) {
+
+
+
+    tbody.innerHTML = '<tr><td colspan="7"><div class="pc-empty"><div class="icon">&#128194;</div>该省份暂无城市数据</div></td></tr>';
+
+
+
+    return;
+
+
+
+  }
+
+
+
+  tbody.innerHTML = cities.map(function(c){
+
+
+
+    return '<tr><td><input type="checkbox" class="row-checkbox"></td>'+
+
+
+
+      '<td>'+c.code+'</td><td>'+c.name+'</td><td>'+c.area+'</td><td>'+c.zip+'</td>'+
+
+
+
+      '<td><span class="badge badge-success">启用</span></td>'+
+
+
+
+      '<td class="row-action-links"><a onclick="openModal('editModal')">查看</a><a onclick="openModal('editModal')">编辑</a></td></tr>';
+
+
+
+  }).join('');
+
+
+
+}
+
+
+
+
+
+
+
+renderCities('北京');
+
+
+
+
+var currentLookupField = null;
+var currentLookupType = null;
+var lookupData = [];
+var lookupColumns = [];
+
+function openLookup(fieldId, type) {
+  currentLookupField = fieldId;
+  currentLookupType = type;
+  
+  if (type === 'org') {
+    lookupColumns = ['编码', '名称', '形态', '上级组织'];
+    lookupData = JSON.parse(localStorage.getItem('erp_orgs') || '[]');
+    document.getElementById('lookupTitle').textContent = '选择组织';
+  } else if (type === 'department') {
+    lookupColumns = ['编码', '名称'];
+    lookupData = JSON.parse(localStorage.getItem('erp_departments_cache') || '[]');
+    document.getElementById('lookupTitle').textContent = '选择部门';
+  } else if (type === 'employee') {
+    lookupColumns = ['编号', '姓名', '所属部门'];
+    lookupData = JSON.parse(localStorage.getItem('erp_employees_cache') || '[]');
+    document.getElementById('lookupTitle').textContent = '选择员工';
+  } else if (type === 'supplier') {
+    lookupColumns = ['编码', '名称'];
+    lookupData = JSON.parse(localStorage.getItem('erp_suppliers_cache') || '[]');
+    document.getElementById('lookupTitle').textContent = '选择供应商';
+  } else if (type === 'customer') {
+    lookupColumns = ['编码', '名称'];
+    lookupData = JSON.parse(localStorage.getItem('erp_customers_cache') || '[]');
+    document.getElementById('lookupTitle').textContent = '选择客户';
+  } else if (type === 'material') {
+    lookupColumns = ['物料编码', '物料名称', '规格型号', '基本单位'];
+    lookupData = JSON.parse(localStorage.getItem('erp_materials_cache') || '[]');
+    document.getElementById('lookupTitle').textContent = '选择物料';
+  } else if (type === 'warehouse') {
+    lookupColumns = ['编码', '名称'];
+    lookupData = JSON.parse(localStorage.getItem('erp_warehouses_cache') || '[]');
+    document.getElementById('lookupTitle').textContent = '选择仓库';
+  }
+  
+  renderLookupTable(lookupData);
+  document.getElementById('lookupModal').classList.add('show');
+}
+
+function closeLookup() {
+  document.getElementById('lookupModal').classList.remove('show');
+}
+
+function filterLookup() {
+  var keyword = document.getElementById('lookupKeyword').value.trim().toLowerCase();
+  var filtered = lookupData.filter(function(item) {
+    var code = item.code || '';
+    var name = item.name || '';
+    return code.toLowerCase().includes(keyword) || name.toLowerCase().includes(keyword);
+  });
+  renderLookupTable(filtered);
+}
+
+function renderLookupTable(data) {
+  var head = document.getElementById('lookupTableHead');
+  var body = document.getElementById('lookupTableBody');
+  
+  head.innerHTML = '<tr><th class="checkbox-cell"><input type="checkbox" onclick="selectAllLookup()"></th>' + lookupColumns.map(function(col) { return '<th>' + col + '</th>'; }).join('') + '</tr>';
+  
+  body.innerHTML = '';
+  data.forEach(function(item) {
+    var row = document.createElement('tr');
+    row.onclick = function() { selectLookupRow(this); };
+    var cells = ['<td class="checkbox-cell"><input type="checkbox" class="lookup-checkbox" value="' + item.id + '"></td>'];
+    if (currentLookupType === 'org') {
+      cells.push('<td>' + item.code + '</td><td>' + item.name + '</td><td>' + (item.form || '') + '</td><td>' + (item.parentName || '') + '</td>');
+    } else if (currentLookupType === 'department') {
+      cells.push('<td>' + item.code + '</td><td>' + item.name + '</td>');
+    } else if (currentLookupType === 'employee') {
+      cells.push('<td>' + item.code + '</td><td>' + item.name + '</td><td>' + (item.department || '') + '</td>');
+    } else if (currentLookupType === 'supplier' || currentLookupType === 'customer') {
+      cells.push('<td>' + item.code + '</td><td>' + item.name + '</td>');
+    } else if (currentLookupType === 'material') {
+      cells.push('<td>' + item.code + '</td><td>' + item.name + '</td><td>' + (item.specification || '') + '</td><td>' + (item.unit || '') + '</td>');
+    } else if (currentLookupType === 'warehouse') {
+      cells.push('<td>' + item.code + '</td><td>' + item.name + '</td>');
+    }
+    row.innerHTML = cells.join('');
+    body.appendChild(row);
+  });
+  
+  if (data.length === 0) {
+    body.innerHTML = '<tr><td colspan="' + (lookupColumns.length + 1) + '" style="text-align:center;padding:40px;color:#999;">暂无数据</td></tr>';
+  }
+}
+
+function selectAllLookup() {
+  var master = document.querySelector('.lookup-table th input');
+  var checkboxes = document.querySelectorAll('.lookup-checkbox');
+  checkboxes.forEach(function(cb) { cb.checked = master.checked; });
+}
+
+function selectLookupRow(row) {
+  var checkbox = row.querySelector('.lookup-checkbox');
+  checkbox.checked = !checkbox.checked;
+}
+
+function confirmLookup() {
+  var checkboxes = document.querySelectorAll('.lookup-checkbox:checked');
+  if (checkboxes.length === 0) {
+    showToast('请选择一条记录', 'warning');
+    return;
+  }
+  
+  var item = lookupData.find(function(d) { return d.id === checkboxes[0].value; });
+  if (item) {
+    var field = document.getElementById(currentLookupField);
+    if (field) {
+      field.value = item.name;
+      field.setAttribute('data-id', item.id);
+      field.setAttribute('data-code', item.code);
+      
+      if (currentLookupType === 'material') {
+        var row = field.closest('tr');
+        if (row) {
+          row.querySelector('.material-name').value = item.name;
+          row.querySelector('.material-spec').value = item.specification || '';
+          row.querySelector('.material-unit').value = item.unit || '';
+        }
+      }
+    }
+  }
+  
+  closeLookup();
+}
+
+function openMaterialLookup(btn) {
+  var field = btn.previousElementSibling;
+  field.id = 'lookupField_' + Date.now();
+  currentLookupField = field.id;
+  openLookup(field.id, 'material');
+}
+
+function openOrgLookup(btn) {
+  var field = btn.previousElementSibling;
+  field.id = 'lookupField_' + Date.now();
+  currentLookupField = field.id;
+  openLookup(field.id, 'org');
+}
+
+function openSupplierLookup(btn) {
+  var field = btn.previousElementSibling;
+  field.id = 'lookupField_' + Date.now();
+  currentLookupField = field.id;
+  openLookup(field.id, 'supplier');
+}
+
+function openWarehouseLookup(btn) {
+  var field = btn.previousElementSibling;
+  field.id = 'lookupField_' + Date.now();
+  currentLookupField = field.id;
+  openLookup(field.id, 'warehouse');
+}
+
+function initLookupData() {
+  if (!localStorage.getItem('erp_orgs')) {
+    localStorage.setItem('erp_orgs', JSON.stringify([
+      { id: 'org-001', code: 'ORG-HQ', name: '磐枢工业集团', form: '集团', parentName: '' },
+      { id: 'org-002', code: 'ORG-SM', name: '磐枢智能制造有限公司', form: '公司', parentName: '磐枢工业集团' },
+      { id: 'org-003', code: 'ORG-SM-PD', name: '生产制造部', form: '部门', parentName: '磐枢智能制造有限公司' },
+      { id: 'org-004', code: 'ORG-SM-FA', name: '财务部', form: '部门', parentName: '磐枢智能制造有限公司' },
+      { id: 'org-005', code: 'ORG-SM-SD', name: '销售部', form: '部门', parentName: '磐枢智能制造有限公司' }
+    ]));
+  }
+  if (!localStorage.getItem('erp_departments_cache')) {
+    localStorage.setItem('erp_departments_cache', JSON.stringify([
+      { id: 'dept-001', code: 'DEPT-PD', name: '生产制造部', status: 1 },
+      { id: 'dept-002', code: 'DEPT-FA', name: '财务部', status: 1 },
+      { id: 'dept-003', code: 'DEPT-SD', name: '销售部', status: 1 },
+      { id: 'dept-004', code: 'DEPT-AS', name: '装配车间', status: 1 },
+      { id: 'dept-005', code: 'DEPT-QC', name: '质检车间', status: 1 }
+    ]));
+  }
+  if (!localStorage.getItem('erp_employees_cache')) {
+    localStorage.setItem('erp_employees_cache', JSON.stringify([
+      { id: 'emp-001', code: 'EMP-001', name: '张三', department: '生产制造部', status: 1 },
+      { id: 'emp-002', code: 'EMP-002', name: '李四', department: '生产制造部', status: 1 },
+      { id: 'emp-003', code: 'EMP-003', name: '王五', department: '财务部', status: 1 },
+      { id: 'emp-004', code: 'EMP-004', name: '赵六', department: '销售部', status: 1 },
+      { id: 'emp-005', code: 'EMP-005', name: '钱七', department: '质检车间', status: 1 }
+    ]));
+  }
+  if (!localStorage.getItem('erp_suppliers_cache')) {
+    localStorage.setItem('erp_suppliers_cache', JSON.stringify([
+      { id: 'sup-001', code: 'S-001', name: '深圳电子元器件有限公司', status: 1 },
+      { id: 'sup-002', code: 'S-002', name: '杭州精密机械加工厂', status: 1 },
+      { id: 'sup-003', code: 'S-003', name: '上海材料科技有限公司', status: 1 },
+      { id: 'sup-004', code: 'S-004', name: '东莞五金制品厂', status: 1 }
+    ]));
+  }
+  if (!localStorage.getItem('erp_materials_cache')) {
+    localStorage.setItem('erp_materials_cache', JSON.stringify([
+      { id: 'mat-001', code: 'P-001', name: '高频传感器模块', specification: 'HT-2026', unit: '个', status: 1 },
+      { id: 'mat-002', code: 'P-002', name: '控制电路板', specification: 'CB-2026', unit: '块', status: 1 },
+      { id: 'mat-003', code: 'P-003', name: '智能控制器', specification: 'IC-V3', unit: '台', status: 1 },
+      { id: 'mat-004', code: 'P-004', name: '电源模块', specification: 'PM-500W', unit: '个', status: 1 },
+      { id: 'mat-005', code: 'M-001', name: 'PCB电路板', specification: 'FR-4双层', unit: '块', status: 1 },
+      { id: 'mat-006', code: 'M-002', name: '贴片电阻', specification: '10KΩ 0603', unit: '个', status: 1 },
+      { id: 'mat-007', code: 'M-003', name: '贴片电容', specification: '100μF 0805', unit: '个', status: 1 },
+      { id: 'mat-008', code: 'M-004', name: '螺丝', specification: 'M4x10', unit: '包', status: 1 }
+    ]));
+  }
+  if (!localStorage.getItem('erp_warehouses_cache')) {
+    localStorage.setItem('erp_warehouses_cache', JSON.stringify([
+      { id: 'wh-001', code: 'WH-001', name: '成品仓', status: 1 },
+      { id: 'wh-002', code: 'WH-002', name: '原料仓', status: 1 },
+      { id: 'wh-003', code: 'WH-003', name: '半成品仓', status: 1 },
+      { id: 'wh-004', code: 'WH-004', name: '辅料仓', status: 1 }
+    ]));
+  }
+}
+
+</script>
+
+
+
+
+<div class="lookup-modal" id="lookupModal">
+  <div class="lookup-dialog">
+    <div class="lookup-header">
+      <div class="lookup-title" id="lookupTitle">选择</div>
+      <button class="lookup-close" onclick="closeLookup()">×</button>
+    </div>
+    <div class="lookup-body">
+      <div class="lookup-search">
+        <input type="text" id="lookupKeyword" placeholder="请输入编码或名称搜索" onkeydown="if(event.key==='Enter')filterLookup()">
+        <button onclick="filterLookup()">搜索</button>
+      </div>
+      <table class="lookup-table">
+        <thead id="lookupTableHead"></thead>
+        <tbody id="lookupTableBody"></tbody>
+      </table>
+    </div>
+    <div class="lookup-footer">
+      <button class="btn btn-cancel" onclick="closeLookup()">取消</button>
+      <button class="btn btn-primary" onclick="confirmLookup()">确定</button>
+    </div>
+  </div>
+</div>
+
+</body>
+
+
+
+</html>

@@ -1,0 +1,2197 @@
+<!DOCTYPE html>
+
+
+
+<html lang="zh-CN">
+
+
+
+<head>
+
+
+
+<meta charset="UTF-8">
+
+
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+
+
+<title>销售管道 — 磐枢工业智能平台</title>
+
+
+
+<link rel="stylesheet" href="../common.css">
+
+
+
+<script src="../common.js"></script>
+<script>
+</script>
+
+
+
+<style>
+
+
+
+.pipeline-container { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; padding: 16px; }
+
+
+
+.pipeline-column { background: var(--bg-surface); border: 1px solid var(--border-normal); border-radius: var(--radius-md); display: flex; flex-direction: column; }
+
+
+
+.pipeline-column-header { padding: 12px 14px; border-bottom: 1px solid var(--border-normal); display: flex; align-items: center; justify-content: space-between; }
+
+
+
+.pipeline-column-title { font-size: 13px; font-weight: 600; color: var(--text-primary); }
+
+
+
+.pipeline-column-count { background: rgba(56,189,248,0.15); color: var(--text-accent); font-size: 11px; padding: 1px 6px; border-radius: 8px; }
+
+
+
+.pipeline-column-body { flex: 1; padding: 8px; overflow-y: auto; }
+
+
+
+.pipeline-card { background: var(--bg-raised); border: 1px solid var(--border-normal); border-radius: var(--radius-sm); padding: 12px; margin-bottom: 8px; cursor: grab; transition: all var(--transition); }
+
+
+
+.pipeline-card:hover { border-color: var(--border-strong); box-shadow: 0 2px 8px rgba(0,0,0,0.2); }
+
+
+
+.pipeline-card:active { cursor: grabbing; }
+
+
+
+.pipeline-card .card-customer { font-size: 13px; font-weight: 600; color: var(--text-primary); margin-bottom: 4px; }
+
+
+
+.pipeline-card .card-product { font-size: 12px; color: var(--text-tertiary); margin-bottom: 6px; }
+
+
+
+.pipeline-card .card-amount { font-family: var(--font-mono); font-size: 14px; font-weight: 600; color: var(--text-accent); margin-bottom: 6px; }
+
+
+
+.pipeline-card .card-meta { display: flex; flex-wrap: wrap; gap: 6px; font-size: 11px; }
+
+
+
+.pipeline-card .card-meta .item { display: flex; align-items: center; gap: 3px; color: var(--text-tertiary); }
+
+
+
+.pipeline-card .card-meta .item .badge { font-size: 10px; padding: 1px 5px; }
+
+
+
+.pipeline-card .card-meta .item .icon { font-size: 10px; }
+
+
+
+.view-toggle { display: flex; gap: 4px; padding: 8px 16px; background: var(--bg-surface); border-bottom: 1px solid var(--border-normal); }
+
+
+
+.view-toggle button { padding: 6px 16px; font-size: 12px; border: 1px solid var(--border-normal); border-radius: var(--radius-sm); background: transparent; color: var(--text-secondary); cursor: pointer; transition: all var(--transition); }
+
+
+
+.view-toggle button:hover { border-color: var(--border-strong); }
+
+
+
+.view-toggle button.active { background: var(--text-accent); color: #0a0e1a; border-color: var(--text-accent); }
+
+
+
+.pipeline-list-view { display: none; }
+
+
+
+.pipeline-list-view.active { display: block; }
+
+
+
+.pipeline-pipeline-view { display: block; }
+
+
+
+.pipeline-pipeline-view.active { display: block; }
+
+
+
+
+.lookup-modal { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:2000; justify-content:center; align-items:center; }
+.lookup-modal.show { display:flex; }
+.lookup-dialog { background:#fff; border:1px solid #e8e8e8; border-radius:4px; width:720px; max-height:70vh; overflow:hidden; }
+.lookup-header { padding:14px 20px; border-bottom:1px solid #e8e8e8; display:flex; align-items:center; justify-content:space-between; }
+.lookup-title { font-size:15px; font-weight:600; color:#333; }
+.lookup-close { font-size:20px; color:#666; cursor:pointer; background:none; border:none; }
+.lookup-close:hover { color:#333; }
+.lookup-body { padding:16px; }
+.lookup-search { display:flex; gap:8px; margin-bottom:12px; }
+.lookup-search input { flex:1; padding:6px 10px; border:1px solid #e8e8e8; border-radius:4px; font-size:13px; }
+.lookup-search button { padding:6px 16px; background:#1890ff; color:#fff; border:none; border-radius:4px; cursor:pointer; }
+.lookup-table { width:100%; border-collapse:collapse; font-size:13px; }
+.lookup-table th, .lookup-table td { padding:10px 12px; text-align:left; border-bottom:1px solid #e8e8e8; }
+.lookup-table th { background:#fafafa; font-weight:600; color:#333; }
+.lookup-table tr:hover { background:#f5f5f5; }
+.lookup-table .checkbox-cell { width:40px; }
+.lookup-footer { padding:12px 20px; border-top:1px solid #e8e8e8; display:flex; justify-content:flex-end; gap:8px; }
+.lookup-field { display:flex; align-items:center; }
+.lookup-field input { flex:1; padding:6px 10px; border:1px solid #e8e8e8; border-radius:4px 0 0 4px; font-size:13px; }
+.lookup-field button { width:28px; height:28px; border:1px solid #e8e8e8; border-left:none; border-radius:0 4px 4px 0; background:#fff; cursor:pointer; display:flex; align-items:center; justify-content:center; }
+.lookup-field button:hover { background:#f5f5f5; }
+
+.column-modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:2000;justify-content:center;align-items:center;}
+.column-modal.show{display:flex;}
+.column-dialog{background:#fff;border:1px solid #d9d9d9;border-radius:8px;width:560px;min-width:400px;max-width:720px;height:420px;min-height:300px;max-height:70vh;overflow:hidden;box-shadow:0 10px 30px rgba(0,0,0,0.15);position:relative;resize:both;}
+.column-header{padding:16px 20px;border-bottom:1px solid #f0f0f0;background:#fafafa;display:flex;align-items:center;justify-content:space-between;cursor:move;}
+.column-title{font-size:16px;font-weight:600;color:#333;}
+.column-close{font-size:20px;color:#999;cursor:pointer;border:none;background:none;width:28px;height:28px;display:flex;align-items:center;justify-content:center;border-radius:4px;transition:all 0.3s;cursor:pointer;}
+.column-close:hover{background:#f5f5f5;color:#666;}
+.column-body{padding:20px;overflow-y:auto;height:calc(100% - 88px);background:#fff;}
+.column-footer{padding:14px 20px;border-top:1px solid #f0f0f0;display:flex;justify-content:flex-end;gap:12px;background:#fafafa;position:absolute;bottom:0;left:0;right:0;}
+.column-item{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:4px;transition:all 0.2s;}
+.column-item:hover{background:#f5f7fa;}
+.column-item input[type="checkbox"]{width:16px;height:16px;cursor:pointer;accent-color:#1890ff;}
+.column-item label{font-size:14px;color:#333;cursor:pointer;flex:1;}
+
+</style>
+
+
+
+</head>
+
+
+
+<body>
+
+
+
+
+
+
+
+<aside class="sidebar" id="sidebar">
+
+
+
+<div class="sidebar-logo">
+
+
+
+    <img src="../images/logo.png" alt="磐枢工业智能平台" style="width: 100%; max-width: 200px; margin-bottom: 8px;">
+
+
+
+    <h1 style="font-size: 16px; margin: 0;">磐枢工业智能平台</h1>
+
+
+
+  </div>
+
+
+
+  <nav class="sidebar-menu"></nav>
+
+
+
+<div class="sidebar-user"><div class="avatar">管</div>
+
+
+
+</aside>
+
+
+
+
+
+
+
+<div class="main-content" id="mainContent">
+
+
+
+  <div class="page-header" style="position:sticky;top:0;z-index:100;">
+
+
+
+    <div>
+
+
+
+      <div class="flex items-center gap-8">
+
+
+
+        <button class="sidebar-toggle" onclick="toggleSidebar()">☰</button>
+
+
+
+        <div>
+
+
+
+          <h2>销售管道</h2>
+
+
+
+          <div class="breadcrumb"><a href="../index.html">首页</a><span>></span><span>CRM客户</span><span>></span><span>销售管道</span></div></div>
+
+
+
+        </div>
+
+
+
+      </div>
+
+
+
+    </div>
+
+
+
+    <div class="page-actions">
+
+
+
+      <button class="btn btn-primary btn-sm" onclick="openModal('addOpportunityModal')">+ 新增机会</button>
+      </div>
+
+
+
+  </div>
+
+
+
+
+
+
+
+  <div class="page-body" style="padding:0; height:calc(100vh - 56px); overflow:hidden;">
+
+
+
+    <div class="view-toggle">
+
+
+
+      <button class="active" onclick="switchView('pipeline')">管道视图</button>
+
+
+
+      <button onclick="switchView('list')">列表视图</button>
+
+
+
+    </div>
+
+
+
+
+
+
+
+    <div class="pipeline-pipeline-view" id="pipelineView" style="height:calc(100% - 44px); overflow:auto;">
+
+
+
+      <div class="pipeline-container">
+
+
+
+        <div class="pipeline-column">
+
+
+
+          <div class="pipeline-column-header">
+
+
+
+            <span class="pipeline-column-title">线索</span>
+
+
+
+            <span class="pipeline-column-count">2</span>
+
+
+
+          </div>
+
+
+
+          <div class="pipeline-column-body">
+
+
+
+            <div class="pipeline-card" draggable="true" ondragstart="dragStart(event)" ondragend="dragEnd(event)">
+
+
+
+              <div class="card-customer">广州美的集团有限公司</div>
+
+
+
+              <div class="card-product">汽车仪表盘外壳采购项目</div>
+
+
+
+              <div class="card-amount">¥ 156,800.00</div>
+
+
+
+              <div class="card-meta">
+
+
+
+                <span class="item"><span class="icon">📅</span>2026-08-15</span>
+
+
+
+                <span class="item"><span class="icon">👤</span>李明辉</span>
+
+
+
+                <span class="item"><span class="badge badge-danger">高</span></span>
+
+
+
+              </div>
+
+
+
+            </div>
+
+
+
+            <div class="pipeline-card" draggable="true" ondragstart="dragStart(event)" ondragend="dragEnd(event)">
+
+
+
+              <div class="card-customer">江苏苏宁易购集团有限公司</div>
+
+
+
+              <div class="card-product">智能家居零部件</div>
+
+
+
+              <div class="card-amount">¥ 89,600.00</div>
+
+
+
+              <div class="card-meta">
+
+
+
+                <span class="item"><span class="icon">📅</span>2026-08-20</span>
+
+
+
+                <span class="item"><span class="icon">👤</span>陈静</span>
+
+
+
+                <span class="item"><span class="badge badge-warning">中</span></span>
+
+
+
+              </div>
+
+
+
+            </div>
+
+
+
+          </div>
+
+
+
+        </div>
+
+
+
+
+
+
+
+        <div class="pipeline-column">
+
+
+
+          <div class="pipeline-column-header">
+
+
+
+            <span class="pipeline-column-title">商机</span>
+
+
+
+            <span class="pipeline-column-count">3</span>
+
+
+
+          </div>
+
+
+
+          <div class="pipeline-column-body">
+
+
+
+            <div class="pipeline-card" draggable="true" ondragstart="dragStart(event)" ondragend="dragEnd(event)">
+
+
+
+              <div class="card-customer">深圳测试公司</div>
+
+
+
+              <div class="card-product">智能驾驶舱总成</div>
+
+
+
+              <div class="card-amount">¥ 856,200.00</div>
+
+
+
+              <div class="card-meta">
+
+
+
+                <span class="item"><span class="icon">📅</span>2026-07-28</span>
+
+
+
+                <span class="item"><span class="icon">👤</span>张伟</span>
+
+
+
+                <span class="item"><span class="badge badge-danger">高</span></span>
+
+
+
+              </div>
+
+
+
+            </div>
+
+
+
+            <div class="pipeline-card" draggable="true" ondragstart="dragStart(event)" ondragend="dragEnd(event)">
+
+
+
+              <div class="card-customer">北京字节跳动科技有限公司</div>
+
+
+
+              <div class="card-product">VR设备外壳定制</div>
+
+
+
+              <div class="card-amount">¥ 328,500.00</div>
+
+
+
+              <div class="card-meta">
+
+
+
+                <span class="item"><span class="icon">📅</span>2026-07-30</span>
+
+
+
+                <span class="item"><span class="icon">👤</span>王芳</span>
+
+
+
+                <span class="item"><span class="badge badge-info">低</span></span>
+
+
+
+              </div>
+
+
+
+            </div>
+
+
+
+            <div class="pipeline-card" draggable="true" ondragstart="dragStart(event)" ondragend="dragEnd(event)">
+
+
+
+              <div class="card-customer">成都腾讯科技有限公司</div>
+
+
+
+              <div class="card-product">游戏手柄外壳</div>
+
+
+
+              <div class="card-amount">¥ 178,250.00</div>
+
+
+
+              <div class="card-meta">
+
+
+
+                <span class="item"><span class="icon">📅</span>2026-08-05</span>
+
+
+
+                <span class="item"><span class="icon">👤</span>李明辉</span>
+
+
+
+                <span class="item"><span class="badge badge-warning">中</span></span>
+
+
+
+              </div>
+
+
+
+            </div>
+
+
+
+          </div>
+
+
+
+        </div>
+
+
+
+
+
+
+
+        <div class="pipeline-column">
+
+
+
+          <div class="pipeline-column-header">
+
+
+
+            <span class="pipeline-column-title">谈判</span>
+
+
+
+            <span class="pipeline-column-count">3</span>
+
+
+
+          </div>
+
+
+
+          <div class="pipeline-column-body">
+
+
+
+            <div class="pipeline-card" draggable="true" ondragstart="dragStart(event)" ondragend="dragEnd(event)">
+
+
+
+              <div class="card-customer">上海汽车集团股份有限公司</div>
+
+
+
+              <div class="card-product">保险杠总成年度订单</div>
+
+
+
+              <div class="card-amount">¥ 1,256,800.00</div>
+
+
+
+              <div class="card-meta">
+
+
+
+                <span class="item"><span class="icon">📅</span>2026-07-20</span>
+
+
+
+                <span class="item"><span class="icon">👤</span>张伟</span>
+
+
+
+                <span class="item"><span class="badge badge-danger">高</span></span>
+
+
+
+              </div>
+
+
+
+            </div>
+
+
+
+            <div class="pipeline-card" draggable="true" ondragstart="dragStart(event)" ondragend="dragEnd(event)">
+
+
+
+              <div class="card-customer">测试公司</div>
+
+
+
+              <div class="card-product">新能源汽车内饰件</div>
+
+
+
+              <div class="card-amount">¥ 512,000.00</div>
+
+
+
+              <div class="card-meta">
+
+
+
+                <span class="item"><span class="icon">📅</span>2026-07-22</span>
+
+
+
+                <span class="item"><span class="icon">👤</span>王芳</span>
+
+
+
+                <span class="item"><span class="badge badge-danger">高</span></span>
+
+
+
+              </div>
+
+
+
+            </div>
+
+
+
+            <div class="pipeline-card" draggable="true" ondragstart="dragStart(event)" ondragend="dragEnd(event)">
+
+
+
+              <div class="card-customer">浙江阿里巴巴网络有限公司</div>
+
+
+
+              <div class="card-product">物流设备配件</div>
+
+
+
+              <div class="card-amount">¥ 245,000.00</div>
+
+
+
+              <div class="card-meta">
+
+
+
+                <span class="item"><span class="icon">📅</span>2026-07-25</span>
+
+
+
+                <span class="item"><span class="icon">👤</span>陈静</span>
+
+
+
+                <span class="item"><span class="badge badge-warning">中</span></span>
+
+
+
+              </div>
+
+
+
+            </div>
+
+
+
+          </div>
+
+
+
+        </div>
+
+
+
+
+
+
+
+        <div class="pipeline-column">
+
+
+
+          <div class="pipeline-column-header">
+
+
+
+            <span class="pipeline-column-title">成交</span>
+
+
+
+            <span class="pipeline-column-count">2</span>
+
+
+
+          </div>
+
+
+
+          <div class="pipeline-column-body">
+
+
+
+            <div class="pipeline-card" draggable="true" ondragstart="dragStart(event)" ondragend="dragEnd(event)">
+
+
+
+              <div class="card-customer">重庆长安汽车股份有限公司</div>
+
+
+
+              <div class="card-product">门板内饰件批量订单</div>
+
+
+
+              <div class="card-amount">¥ 635,800.00</div>
+
+
+
+              <div class="card-meta">
+
+
+
+                <span class="item"><span class="icon">📅</span>2026-07-10</span>
+
+
+
+                <span class="item"><span class="icon">👤</span>张伟</span>
+
+
+
+                <span class="item"><span class="badge badge-success">已成交</span></span>
+
+
+
+              </div>
+
+
+
+            </div>
+
+
+
+            <div class="pipeline-card" draggable="true" ondragstart="dragStart(event)" ondragend="dragEnd(event)">
+
+
+
+              <div class="card-customer">宁德时代新能源科技股份有限公司</div>
+
+
+
+              <div class="card-product">电池外壳组件</div>
+
+
+
+              <div class="card-amount">¥ 923,400.00</div>
+
+
+
+              <div class="card-meta">
+
+
+
+                <span class="item"><span class="icon">📅</span>2026-07-12</span>
+
+
+
+                <span class="item"><span class="icon">👤</span>李明辉</span>
+
+
+
+                <span class="item"><span class="badge badge-success">已成交</span></span>
+
+
+
+              </div>
+
+
+
+            </div>
+
+
+
+          </div>
+
+
+
+        </div>
+
+
+
+      </div>
+
+
+
+    </div>
+
+
+
+
+
+
+
+    <div class="pipeline-list-view" id="listView" style="height:calc(100% - 44px);">
+
+
+
+      <div class="list-page-body" style="height:100%;">
+
+
+
+        <div class="list-action-bar">
+
+
+
+          <button class="action-btn">过滤</button>
+
+
+
+          <button class="action-btn">刷新</button>
+
+
+
+          <span class="action-separator"></span>
+
+
+
+          <button class="action-btn primary-action" onclick="openModal('addOpportunityModal')">新增</button>
+
+
+
+          <button class="action-btn" onclick="editOpportunity()">修改</button>
+
+
+
+          <button class="action-btn danger-action" onclick="deleteOpportunity()">删除</button>
+
+
+
+          <span class="action-separator"></span>
+
+
+
+          <button class="action-btn">导出</button>
+
+
+
+          <span class="action-separator"></span>
+
+
+
+          <button class="action-btn" onclick="openColumnSettings()">显示/隐藏列</button>
+
+          <button class="action-btn">选项</button>
+
+          <button class="action-btn">退出</button>
+
+
+
+        </div>
+
+
+
+
+
+
+
+        <div class="list-filter-section">
+
+
+
+          <div class="list-filter-tabs">
+
+
+
+            <span class="filter-tab active">全部</span>
+
+
+
+            <span class="filter-tab">线索</span>
+
+
+
+            <span class="filter-tab">商机</span>
+
+
+
+            <span class="filter-tab">谈判</span>
+
+
+
+            <span class="filter-tab">成交</span>
+
+
+
+          </div>
+
+
+
+          <div class="list-filter-row">
+
+
+
+            <div class="filter-field"><input type="text" placeholder="机会名称"></div>
+
+
+
+            <div class="filter-field"><input type="text" placeholder="客户名称"></div>
+
+
+
+            <div class="filter-field">
+
+
+
+              <select><option>阶段</option><option>线索</option><option>商机</option><option>谈判</option><option>成交</option></select>
+
+
+
+            </div>
+
+
+
+            <div class="filter-field">
+
+
+
+              <select><option>负责人</option><option>李明辉</option><option>王芳</option><option>张伟</option><option>陈静</option></select>
+
+
+
+            </div>
+
+
+
+            <div class="list-filter-btns">
+
+
+
+              <button class="btn-search">查询</button>
+
+
+
+              <button class="btn-reset">重置</button>
+
+
+
+            </div>
+
+
+
+          </div>
+
+
+
+        </div>
+
+
+
+
+
+
+
+        <div class="list-table-area">
+
+
+
+          <table class="data-table">
+            <thead><tr>
+              <th><input type="checkbox" class="row-checkbox"></th>
+              <th data-column="name">机会名称</th>
+              <th data-column="customer">客户</th>
+              <th data-column="amount" style="text-align:right">金额(元)</th>
+              <th data-column="stage">阶段</th>
+              <th data-column="owner">负责人</th>
+              <th data-column="expectedDate">预计成交日期</th>
+              <th data-column="probability">概率(%)</th>
+              <th data-column="priority">优先级</th>
+              <th>操作</th>
+            </tr></thead>
+
+
+
+            <tbody><tr><td colspan="100%" style="text-align:center;color:var(--text-tertiary);padding:20px;">暂无数据</td></tr></tbody>
+
+
+
+          </table>
+
+
+
+        </div>
+
+
+
+
+
+
+
+        <div class="list-pagination">
+
+
+
+          <span class="page-info">共 10 条记录，第 1/1 页</span>
+
+
+
+          <div class="page-btns">
+
+
+
+            <button>&lt; 上一页</button>
+
+
+
+            <button class="active">1</button>
+
+
+
+            <button>下一页 &gt;</button>
+
+
+
+          </div>
+
+
+
+        </div>
+
+
+
+      </div>
+
+
+
+    </div>
+
+
+
+  </div>
+
+
+
+
+
+
+
+  <div class="modal-overlay" id="addOpportunityModal">
+
+
+
+    <div class="modal-dialog">
+
+
+
+      <div class="modal-header">
+
+
+
+        <h3>新增销售机会</h3>
+
+
+
+        <button class="modal-close" onclick="closeModal('addOpportunityModal')">&times;</button>
+
+
+
+      </div>
+
+
+
+      <div class="modal-body">
+
+
+
+        <div class="grid-2" style="gap:16px;">
+
+
+
+          <div class="form-group">
+
+
+
+            <label class="form-label">机会名称</label>
+
+
+
+            <input class="form-input" type="text" placeholder="请输入机会名称">
+
+
+
+          </div>
+
+
+
+          <div class="form-group">
+
+
+
+            <label class="form-label">客户</label>
+
+
+
+            <select class="form-select">
+
+
+
+              <option>深圳测试公司</option>
+
+
+
+              <option>上海汽车集团股份有限公司</option>
+
+
+
+              <option>北京字节跳动科技有限公司</option>
+
+
+
+              <option>广州美的集团有限公司</option>
+
+
+
+            </select>
+
+
+
+          </div>
+
+
+
+          <div class="form-group">
+
+
+
+            <label class="form-label">产品</label>
+
+
+
+            <input class="form-input" type="text" placeholder="请输入产品名称">
+
+
+
+          </div>
+
+
+
+          <div class="form-group">
+
+
+
+            <label class="form-label">金额(元)</label>
+
+
+
+            <input class="form-input" type="text" placeholder="请输入金额">
+
+
+
+          </div>
+
+
+
+          <div class="form-group">
+
+
+
+            <label class="form-label">阶段</label>
+
+
+
+            <select class="form-select">
+
+
+
+              <option>线索</option><option>商机</option><option>谈判</option><option>成交</option>
+
+
+
+            </select>
+
+
+
+          </div>
+
+
+
+          <div class="form-group">
+
+
+
+            <label class="form-label">负责人</label>
+
+
+
+            <select class="form-select">
+
+
+
+              <option>李明辉</option><option>王芳</option><option>张伟</option><option>陈静</option>
+
+
+
+            </select>
+
+
+
+          </div>
+
+
+
+          <div class="form-group">
+
+
+
+            <label class="form-label">预计成交日期</label>
+
+
+
+            <input class="form-input" type="date">
+
+
+
+          </div>
+
+
+
+          <div class="form-group">
+
+
+
+            <label class="form-label">概率(%)</label>
+
+
+
+            <input class="form-input" type="text" placeholder="请输入概率">
+
+
+
+          </div>
+
+
+
+          <div class="form-group">
+
+
+
+            <label class="form-label">优先级</label>
+
+
+
+            <select class="form-select">
+
+
+
+              <option>高</option><option>中</option><option>低</option>
+
+
+
+            </select>
+
+
+
+          </div>
+
+
+
+        </div>
+
+
+
+      </div>
+
+
+
+      <div class="modal-footer">
+
+
+
+        <button class="btn btn-ghost" onclick="closeModal('addOpportunityModal')">取消</button>
+
+
+
+        <button class="btn btn-primary" onclick="saveOpportunity()">保存</button>
+
+
+
+      </div>
+
+
+
+    </div>
+
+
+
+  </div>
+
+
+
+</div>
+
+
+
+
+
+
+
+<script>
+
+
+
+function openModal(id) {
+
+
+
+  document.getElementById(id).classList.add('show');
+
+
+
+}
+
+
+
+function closeModal(id) {
+
+
+
+  document.getElementById(id).classList.remove('show');
+
+
+
+}
+
+
+
+document.querySelectorAll('.modal-overlay').forEach(function(ov) {
+
+
+
+  ov.addEventListener('click', function(e) {
+
+
+
+    if (e.target === ov) ov.classList.remove('show');
+
+
+
+  });
+
+
+
+});
+
+
+
+function switchView(view) {
+
+
+
+  var pipelineView = document.getElementById('pipelineView');
+
+
+
+  var listView = document.getElementById('listView');
+
+
+
+  var buttons = document.querySelectorAll('.view-toggle button');
+
+
+
+  if (view === 'pipeline') {
+
+
+
+    pipelineView.style.display = 'block';
+
+
+
+    listView.style.display = 'none';
+
+
+
+    buttons[0].classList.add('active');
+
+
+
+    buttons[1].classList.remove('active');
+
+
+
+  } else {
+
+
+
+    pipelineView.style.display = 'none';
+
+
+
+    listView.style.display = 'block';
+
+
+
+    buttons[0].classList.remove('active');
+
+
+
+    buttons[1].classList.add('active');
+
+
+
+  }
+
+
+
+}
+
+
+
+var draggedCard = null;
+var allColumns = ['name', 'customer', 'amount', 'stage', 'owner', 'expectedDate', 'probability', 'priority'];
+var visibleColumns = JSON.parse(localStorage.getItem('crm_pipeline_columns') || JSON.stringify(allColumns));
+
+function dragStart(e) {
+
+
+
+  draggedCard = e.target;
+
+
+
+  e.target.style.opacity = '0.5';
+
+
+
+  e.dataTransfer.effectAllowed = 'move';
+
+
+
+}
+
+
+
+function dragEnd(e) {
+
+
+
+  e.target.style.opacity = '1';
+
+
+
+  draggedCard = null;
+
+
+
+}
+
+
+
+document.querySelectorAll('.pipeline-column-body').forEach(function(col) {
+
+
+
+  col.addEventListener('dragover', function(e) {
+
+
+
+    e.preventDefault();
+
+
+
+    e.dataTransfer.dropEffect = 'move';
+
+
+
+    this.style.border = '1px dashed var(--text-accent)';
+
+
+
+  });
+
+
+
+  col.addEventListener('dragleave', function(e) {
+
+
+
+    e.preventDefault();
+
+
+
+    this.style.border = 'none';
+
+
+
+  });
+
+
+
+  col.addEventListener('drop', function(e) {
+
+
+
+    e.preventDefault();
+
+
+
+    this.style.border = 'none';
+
+
+
+    if (draggedCard) {
+
+
+
+      this.appendChild(draggedCard);
+
+
+
+    }
+
+
+
+  });
+
+
+
+});
+
+
+
+document.querySelectorAll('.filter-tab').forEach(function(tab) {
+
+
+
+  tab.addEventListener('click', function() {
+
+
+
+    this.parentElement.querySelectorAll('.filter-tab').forEach(function(t) { t.classList.remove('active'); });
+
+
+
+    this.classList.add('active');
+
+
+
+  });
+
+
+
+});
+
+
+
+
+
+
+
+function validateForm() {
+
+
+
+  var modal = document.getElementById('addOpportunityModal');
+
+
+
+  var name = modal.querySelector('.form-input[type="text"][placeholder="请输入机会名称"]').value.trim();
+
+
+
+  var customer = modal.querySelector('.form-select').value;
+
+
+
+  var amount = modal.querySelector('.form-input[type="text"][placeholder="请输入金额"]').value.trim();
+
+
+
+  
+
+
+
+  if (!name) {
+
+
+
+    showToast('请输入机会名称', 'info');
+
+
+
+    return false;
+
+
+
+  }
+
+
+
+  if (!customer || customer === '请选择客户') {
+
+
+
+    showToast('请选择客户', 'info');
+
+
+
+    return false;
+
+
+
+  }
+
+
+
+  if (!amount) {
+
+
+
+    showToast('请输入金额', 'info');
+
+
+
+    return false;
+
+
+
+  }
+
+
+
+  return true;
+
+
+
+
+
+
+
+
+
+
+
+}
+
+
+
+
+
+
+
+function saveOpportunity() {
+
+
+
+  if (!validateForm()) return;
+
+
+
+  showToast('销售机会保存成功！', 'info');
+
+
+
+  closeModal('addOpportunityModal');
+
+
+
+
+
+
+
+function editOpportunity() {
+
+
+
+  var checkboxes = document.querySelectorAll('.row-checkbox:checked');
+
+
+
+  if (checkboxes.length === 0) {
+
+
+
+    showToast('请选择要修改的机会', 'info');
+
+
+
+    return;
+
+
+
+  }
+
+
+
+  if (checkboxes.length > 1) {
+
+
+
+    showToast('只能选择一个机会进行修改', 'info');
+
+
+
+    return;
+
+
+
+  }
+
+
+
+  openModal('addOpportunityModal');
+
+
+
+
+
+
+
+function deleteOpportunity() {
+
+
+
+  var checkboxes = document.querySelectorAll('.row-checkbox:checked');
+
+
+
+  if (checkboxes.length === 0) {
+
+
+
+    showToast('请选择要删除的机会', 'info');
+
+
+
+    return;
+
+
+
+  }
+
+
+
+  showConfirm('确定要删除选中的 ' + checkboxes.length + ' 个机会吗？', function() {
+
+
+
+    showToast('删除成功！', 'info');
+
+
+
+  });
+
+
+
+}
+
+
+
+
+
+
+
+document.querySelectorAll('.row-action-links a').forEach(function(link) {
+
+
+
+  link.addEventListener('click', function(e) {
+
+
+
+    e.preventDefault();
+
+
+
+    var action = this.textContent;
+
+
+
+    if (action === '删除') {
+
+
+
+      showConfirm("确认退出？", function(result) { if(result) {
+
+
+
+        showToast('删除成功！', 'info');
+
+
+
+      } });
+
+
+
+    } else if (action === '编辑') {
+
+
+
+      openModal('addOpportunityModal');
+
+
+
+    } else if (action === '查看') {
+
+
+
+      showToast('查看机会详情', 'info');
+
+
+
+    }
+
+
+
+  });
+
+
+
+});
+
+
+
+
+
+
+
+}
+
+
+
+}
+var currentLookupField = null;
+var currentLookupType = null;
+var lookupData = [];
+var lookupColumns = [];
+
+function openLookup(fieldId, type) {
+  currentLookupField = fieldId;
+  currentLookupType = type;
+  
+  if (type === 'org') {
+    lookupColumns = ['编码', '名称', '形态', '上级组织'];
+    lookupData = JSON.parse(localStorage.getItem('erp_orgs') || '[]');
+    document.getElementById('lookupTitle').textContent = '选择组织';
+  } else if (type === 'department') {
+    lookupColumns = ['编码', '名称'];
+    lookupData = JSON.parse(localStorage.getItem('erp_departments_cache') || '[]');
+    document.getElementById('lookupTitle').textContent = '选择部门';
+  } else if (type === 'employee') {
+    lookupColumns = ['编号', '姓名', '所属部门'];
+    lookupData = JSON.parse(localStorage.getItem('erp_employees_cache') || '[]');
+    document.getElementById('lookupTitle').textContent = '选择员工';
+  } else if (type === 'supplier') {
+    lookupColumns = ['编码', '名称'];
+    lookupData = JSON.parse(localStorage.getItem('erp_suppliers_cache') || '[]');
+    document.getElementById('lookupTitle').textContent = '选择供应商';
+  } else if (type === 'customer') {
+    lookupColumns = ['编码', '名称'];
+    lookupData = JSON.parse(localStorage.getItem('erp_customers_cache') || '[]');
+    document.getElementById('lookupTitle').textContent = '选择客户';
+  } else if (type === 'material') {
+    lookupColumns = ['物料编码', '物料名称', '规格型号', '基本单位'];
+    lookupData = JSON.parse(localStorage.getItem('erp_materials_cache') || '[]');
+    document.getElementById('lookupTitle').textContent = '选择物料';
+  } else if (type === 'warehouse') {
+    lookupColumns = ['编码', '名称'];
+    lookupData = JSON.parse(localStorage.getItem('erp_warehouses_cache') || '[]');
+    document.getElementById('lookupTitle').textContent = '选择仓库';
+  }
+  
+  renderLookupTable(lookupData);
+  document.getElementById('lookupModal').classList.add('show');
+}
+
+function closeLookup() {
+  document.getElementById('lookupModal').classList.remove('show');
+}
+
+function filterLookup() {
+  var keyword = document.getElementById('lookupKeyword').value.trim().toLowerCase();
+  var filtered = lookupData.filter(function(item) {
+    var code = item.code || '';
+    var name = item.name || '';
+    return code.toLowerCase().includes(keyword) || name.toLowerCase().includes(keyword);
+  });
+  renderLookupTable(filtered);
+}
+
+function renderLookupTable(data) {
+  var head = document.getElementById('lookupTableHead');
+  var body = document.getElementById('lookupTableBody');
+  
+  head.innerHTML = '<tr><th class="checkbox-cell"><input type="checkbox" onclick="selectAllLookup()"></th>' + lookupColumns.map(function(col) { return '<th>' + col + '</th>'; }).join('') + '</tr>';
+  
+  body.innerHTML = '';
+  data.forEach(function(item) {
+    var row = document.createElement('tr');
+    row.onclick = function() { selectLookupRow(this); };
+    var cells = ['<td class="checkbox-cell"><input type="checkbox" class="lookup-checkbox" value="' + item.id + '"></td>'];
+    if (currentLookupType === 'org') {
+      cells.push('<td>' + item.code + '</td><td>' + item.name + '</td><td>' + (item.form || '') + '</td><td>' + (item.parentName || '') + '</td>');
+    } else if (currentLookupType === 'department') {
+      cells.push('<td>' + item.code + '</td><td>' + item.name + '</td>');
+    } else if (currentLookupType === 'employee') {
+      cells.push('<td>' + item.code + '</td><td>' + item.name + '</td><td>' + (item.department || '') + '</td>');
+    } else if (currentLookupType === 'supplier' || currentLookupType === 'customer') {
+      cells.push('<td>' + item.code + '</td><td>' + item.name + '</td>');
+    } else if (currentLookupType === 'material') {
+      cells.push('<td>' + item.code + '</td><td>' + item.name + '</td><td>' + (item.specification || '') + '</td><td>' + (item.unit || '') + '</td>');
+    } else if (currentLookupType === 'warehouse') {
+      cells.push('<td>' + item.code + '</td><td>' + item.name + '</td>');
+    }
+    row.innerHTML = cells.join('');
+    body.appendChild(row);
+  });
+  
+  if (data.length === 0) {
+    body.innerHTML = '<tr><td colspan="' + (lookupColumns.length + 1) + '" style="text-align:center;padding:40px;color:#999;">暂无数据</td></tr>';
+  }
+}
+
+function selectAllLookup() {
+  var master = document.querySelector('.lookup-table th input');
+  var checkboxes = document.querySelectorAll('.lookup-checkbox');
+  checkboxes.forEach(function(cb) { cb.checked = master.checked; });
+}
+
+function selectLookupRow(row) {
+  var checkbox = row.querySelector('.lookup-checkbox');
+  checkbox.checked = !checkbox.checked;
+}
+
+function confirmLookup() {
+  var checkboxes = document.querySelectorAll('.lookup-checkbox:checked');
+  if (checkboxes.length === 0) {
+    showToast('请选择一条记录', 'warning');
+    return;
+  }
+  
+  var item = lookupData.find(function(d) { return d.id === checkboxes[0].value; });
+  if (item) {
+    var field = document.getElementById(currentLookupField);
+    if (field) {
+      field.value = item.name;
+      field.setAttribute('data-id', item.id);
+      field.setAttribute('data-code', item.code);
+      
+      if (currentLookupType === 'material') {
+        var row = field.closest('tr');
+        if (row) {
+          row.querySelector('.material-name').value = item.name;
+          row.querySelector('.material-spec').value = item.specification || '';
+          row.querySelector('.material-unit').value = item.unit || '';
+        }
+      }
+    }
+  }
+  
+  closeLookup();
+}
+
+function openMaterialLookup(btn) {
+  var field = btn.previousElementSibling;
+  field.id = 'lookupField_' + Date.now();
+  currentLookupField = field.id;
+  openLookup(field.id, 'material');
+}
+
+function openOrgLookup(btn) {
+  var field = btn.previousElementSibling;
+  field.id = 'lookupField_' + Date.now();
+  currentLookupField = field.id;
+  openLookup(field.id, 'org');
+}
+
+function openSupplierLookup(btn) {
+  var field = btn.previousElementSibling;
+  field.id = 'lookupField_' + Date.now();
+  currentLookupField = field.id;
+  openLookup(field.id, 'supplier');
+}
+
+function openWarehouseLookup(btn) {
+  var field = btn.previousElementSibling;
+  field.id = 'lookupField_' + Date.now();
+  currentLookupField = field.id;
+  openLookup(field.id, 'warehouse');
+}
+
+function initLookupData() {
+  if (!localStorage.getItem('erp_orgs')) {
+    localStorage.setItem('erp_orgs', JSON.stringify([
+      { id: 'org-001', code: 'ORG-HQ', name: '磐枢工业集团', form: '集团', parentName: '' },
+      { id: 'org-002', code: 'ORG-SM', name: '磐枢智能制造有限公司', form: '公司', parentName: '磐枢工业集团' },
+      { id: 'org-003', code: 'ORG-SM-PD', name: '生产制造部', form: '部门', parentName: '磐枢智能制造有限公司' },
+      { id: 'org-004', code: 'ORG-SM-FA', name: '财务部', form: '部门', parentName: '磐枢智能制造有限公司' },
+      { id: 'org-005', code: 'ORG-SM-SD', name: '销售部', form: '部门', parentName: '磐枢智能制造有限公司' }
+    ]));
+  }
+  if (!localStorage.getItem('erp_departments_cache')) {
+    localStorage.setItem('erp_departments_cache', JSON.stringify([
+      { id: 'dept-001', code: 'DEPT-PD', name: '生产制造部', status: 1 },
+      { id: 'dept-002', code: 'DEPT-FA', name: '财务部', status: 1 },
+      { id: 'dept-003', code: 'DEPT-SD', name: '销售部', status: 1 },
+      { id: 'dept-004', code: 'DEPT-AS', name: '装配车间', status: 1 },
+      { id: 'dept-005', code: 'DEPT-QC', name: '质检车间', status: 1 }
+    ]));
+  }
+  if (!localStorage.getItem('erp_employees_cache')) {
+    localStorage.setItem('erp_employees_cache', JSON.stringify([
+      { id: 'emp-001', code: 'EMP-001', name: '张三', department: '生产制造部', status: 1 },
+      { id: 'emp-002', code: 'EMP-002', name: '李四', department: '生产制造部', status: 1 },
+      { id: 'emp-003', code: 'EMP-003', name: '王五', department: '财务部', status: 1 },
+      { id: 'emp-004', code: 'EMP-004', name: '赵六', department: '销售部', status: 1 },
+      { id: 'emp-005', code: 'EMP-005', name: '钱七', department: '质检车间', status: 1 }
+    ]));
+  }
+  if (!localStorage.getItem('erp_suppliers_cache')) {
+    localStorage.setItem('erp_suppliers_cache', JSON.stringify([
+      { id: 'sup-001', code: 'S-001', name: '深圳电子元器件有限公司', status: 1 },
+      { id: 'sup-002', code: 'S-002', name: '杭州精密机械加工厂', status: 1 },
+      { id: 'sup-003', code: 'S-003', name: '上海材料科技有限公司', status: 1 },
+      { id: 'sup-004', code: 'S-004', name: '东莞五金制品厂', status: 1 }
+    ]));
+  }
+  if (!localStorage.getItem('erp_materials_cache')) {
+    localStorage.setItem('erp_materials_cache', JSON.stringify([
+      { id: 'mat-001', code: 'P-001', name: '高频传感器模块', specification: 'HT-2026', unit: '个', status: 1 },
+      { id: 'mat-002', code: 'P-002', name: '控制电路板', specification: 'CB-2026', unit: '块', status: 1 },
+      { id: 'mat-003', code: 'P-003', name: '智能控制器', specification: 'IC-V3', unit: '台', status: 1 },
+      { id: 'mat-004', code: 'P-004', name: '电源模块', specification: 'PM-500W', unit: '个', status: 1 },
+      { id: 'mat-005', code: 'M-001', name: 'PCB电路板', specification: 'FR-4双层', unit: '块', status: 1 },
+      { id: 'mat-006', code: 'M-002', name: '贴片电阻', specification: '10KΩ 0603', unit: '个', status: 1 },
+      { id: 'mat-007', code: 'M-003', name: '贴片电容', specification: '100μF 0805', unit: '个', status: 1 },
+      { id: 'mat-008', code: 'M-004', name: '螺丝', specification: 'M4x10', unit: '包', status: 1 }
+    ]));
+  }
+  if (!localStorage.getItem('erp_warehouses_cache')) {
+    localStorage.setItem('erp_warehouses_cache', JSON.stringify([
+      { id: 'wh-001', code: 'WH-001', name: '成品仓', status: 1 },
+      { id: 'wh-002', code: 'WH-002', name: '原料仓', status: 1 },
+      { id: 'wh-003', code: 'WH-003', name: '半成品仓', status: 1 },
+      { id: 'wh-004', code: 'WH-004', name: '辅料仓', status: 1 }
+    ]));
+  }
+}
+
+function updateColumnVisibility() {
+  document.querySelectorAll('th[data-column], td[data-column]').forEach(function(el) {
+    var col = el.getAttribute('data-column');
+    el.style.display = visibleColumns.includes(col) ? '' : 'none';
+  });
+}
+
+function openColumnSettings() {
+  var container = document.getElementById('columnCheckboxes');
+  container.innerHTML = '';
+  var colLabels = { 'name': '机会名称', 'customer': '客户', 'amount': '金额(元)', 'stage': '阶段', 'owner': '负责人', 'expectedDate': '预计成交日期', 'probability': '概率(%)', 'priority': '优先级' };
+  allColumns.forEach(function(col) {
+    var item = document.createElement('div');
+    item.className = 'column-item';
+    var checked = visibleColumns.includes(col) ? 'checked' : '';
+    item.innerHTML = '<input type="checkbox" ' + checked + ' value="' + col + '" onchange="toggleColumn(this)">' + '<label>' + (colLabels[col] || col) + '</label>';
+    container.appendChild(item);
+  });
+  document.getElementById('columnModal').classList.add('show');
+}
+
+function closeColumnSettings() { document.getElementById('columnModal').classList.remove('show'); }
+
+function toggleColumn(cb) {
+  var idx = visibleColumns.indexOf(cb.value);
+  if (cb.checked && idx === -1) visibleColumns.push(cb.value);
+  else if (!cb.checked && idx !== -1) visibleColumns.splice(idx, 1);
+}
+
+function saveColumnSettings() {
+  localStorage.setItem('crm_pipeline_columns', JSON.stringify(visibleColumns));
+  showToast('列设置已保存', 'success');
+  closeColumnSettings();
+  updateColumnVisibility();
+}
+
+</script>
+
+
+
+
+<div class="lookup-modal" id="lookupModal">
+  <div class="lookup-dialog">
+    <div class="lookup-header">
+      <div class="lookup-title" id="lookupTitle">选择</div>
+      <button class="lookup-close" onclick="closeLookup()">×</button>
+    </div>
+    <div class="lookup-body">
+      <div class="lookup-search">
+        <input type="text" id="lookupKeyword" placeholder="请输入编码或名称搜索" onkeydown="if(event.key==='Enter')filterLookup()">
+        <button onclick="filterLookup()">搜索</button>
+      </div>
+      <table class="lookup-table">
+        <thead id="lookupTableHead"></thead>
+        <tbody id="lookupTableBody"></tbody>
+      </table>
+    </div>
+    <div class="lookup-footer">
+      <button class="btn btn-cancel" onclick="closeLookup()">取消</button>
+      <button class="btn btn-primary" onclick="confirmLookup()">确定</button>
+    </div>
+  </div>
+</div>
+<div class="column-modal" id="columnModal">
+  <div class="column-dialog">
+    <div class="column-header">
+      <div class="column-title">列设置</div>
+      <button class="column-close" onclick="closeColumnSettings()">×</button>
+    </div>
+    <div class="column-body">
+      <div id="columnCheckboxes"></div>
+    </div>
+    <div class="column-footer">
+      <button class="btn btn-cancel" onclick="closeColumnSettings()">取消</button>
+      <button class="btn btn-primary" onclick="saveColumnSettings()">确定</button>
+    </div>
+  </div>
+</div>
+
+</body>
+
+
+
+</html>
