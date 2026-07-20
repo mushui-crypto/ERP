@@ -15,11 +15,11 @@ import {
 
 export class PurchaseOrderEntryDto {
   @IsOptional() @IsString() id?: string;
-  @IsNotEmpty() @IsString() materialId: string;
-  @IsNotEmpty() @IsString() materialCode: string;
-  @IsNotEmpty() @IsString() materialName: string;
+  @IsOptional() @IsString() materialId?: string;
+  @IsOptional() @IsString() materialCode?: string;
+  @IsOptional() @IsString() materialName?: string;
   @IsOptional() @IsString() materialModel?: string;
-  @IsNotEmpty() @IsString() unitId: string;
+  @IsOptional() @IsString() unitId?: string;
   @IsOptional() @IsString() unitCode?: string;
   @IsOptional() @IsString() unitName?: string;
   @IsNumber() @Min(0.0001) orderQty: number;

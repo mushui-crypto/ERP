@@ -18,19 +18,25 @@ export class PurchaseRequestEntry extends BaseEntity {
   @Column({ name: 'purchase_org_id', length: 36, comment: '采购组织ID/FPurchaseOrgId' })
   purchaseOrgId: string;
 
-  @Column({ name: 'material_id', length: 36, comment: '物料ID/FMaterialId' })
+  @Column({ name: 'expense_item_code', length: 50, nullable: true, comment: '费用/服务项目文本编码' })
+  expenseItemCode: string;
+
+  @Column({ name: 'expense_item_name', length: 200, nullable: true, comment: '费用/服务项目文本名称' })
+  expenseItemName: string;
+
+  @Column({ name: 'material_id', length: 36, nullable: true, comment: '物料ID/FMaterialId；费用采购可空' })
   materialId: string;
 
-  @Column({ name: 'material_code', length: 50, comment: '物料编码' })
+  @Column({ name: 'material_code', length: 50, nullable: true, comment: '物料编码；费用采购可空' })
   materialCode: string;
 
-  @Column({ name: 'material_name', length: 200, comment: '物料名称/FMaterialName' })
+  @Column({ name: 'material_name', length: 200, nullable: true, comment: '物料名称/FMaterialName；费用采购可空' })
   materialName: string;
 
   @Column({ name: 'material_model', length: 200, nullable: true, comment: '规格型号/FMaterialModel' })
   materialModel: string;
 
-  @Column({ name: 'unit_id', length: 36, comment: '申请单位ID/FUnitId' })
+  @Column({ name: 'unit_id', length: 36, nullable: true, comment: '申请单位ID/FUnitId；费用采购可空' })
   unitId: string;
 
   @Column({ name: 'unit_code', length: 50, nullable: true, comment: '申请单位编码' })

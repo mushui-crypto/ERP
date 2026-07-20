@@ -1,0 +1,29 @@
+{
+  "checkedAt": "2026-07-20T18:14:00+08:00",
+  "api": "http://localhost:3003/api",
+  "result": "PASS",
+  "checks": [
+    {
+      "id": "P3-QUERY-01",
+      "name": "GET /api/purchase-requests 全量查询返回费用采购申请",
+      "status": "PASS",
+      "detail": {
+        "total": 127,
+        "list": 127,
+        "expensePurchase": 19,
+        "status0": 7
+      }
+    },
+    {
+      "id": "P3-FE-REG-01",
+      "name": "P3 前端浏览器复验",
+      "status": "PASS",
+      "detail": {
+        "total": 12,
+        "passed": 12,
+        "failed": 0,
+        "evidence": "/Users/dq/Documents/ERP/hub-erp-v0/采购模块P3费用采购前端浏览器复验证据-20260720.json"
+      }
+    }
+  ]
+}

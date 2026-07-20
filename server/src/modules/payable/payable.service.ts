@@ -74,6 +74,38 @@ export interface CreateEstimatedPayableFromAssetAcceptanceInput {
   }>;
 }
 
+export interface CreateEstimatedPayableFromExpenseAcceptanceInput {
+  expenseAcceptanceId: string;
+  expenseAcceptanceNo: string;
+  supplierId: string;
+  currencyId: string;
+  settleOrgId: string;
+  paymentTermId: string;
+  approvedAt: Date;
+  createdBy?: string;
+  entries: Array<{
+    expenseAcceptanceEntryId: string;
+    sourceReceiveNoticeEntryId: string;
+    sourceOrderEntryId: string;
+    sourceRequestEntryId?: string;
+    expenseItemCode?: string;
+    expenseItemName: string;
+    materialId?: string;
+    materialCode?: string;
+    materialName?: string;
+    materialModel?: string;
+    unitId?: string;
+    unitCode?: string;
+    unitName?: string;
+    quantity: number;
+    unitPrice: number;
+    taxRate: number;
+    untaxedAmount: number;
+    taxAmount: number;
+    totalAmount: number;
+  }>;
+}
+
 export interface CreateRedPayableEntryFromPurchaseReturnInput {
   purchaseReturnEntryId: string;
   sourceReceiveNoticeEntryId: string;
@@ -477,6 +509,106 @@ export class PayableService {
     return payable;
   }
 
+  async createEstimatedPayableFromExpenseAcceptance(
+    input: CreateEstimatedPayableFromExpenseAcceptanceInput,
+    manager: EntityManager,
+  ) {
+    const repository = manager.getRepository(Payable);
+    const existing = await repository.findOne({
+      where: {
+        payableType: 'ESTIMATED',
+        sourceType: 'EXPENSE_ACCEPTANCE',
+        sourceId: input.expenseAcceptanceId,
+        isDeleted: 0,
+      },
+      relations: { entries: true },
+      lock: { mode: 'pessimistic_write' },
+    });
+    if (existing) return existing;
+    if (!input.entries.length) throw new BadRequestException('费用验收没有有效明细，无法生成暂估应付');
+    if (!input.currencyId || !input.settleOrgId || !input.paymentTermId) {
+      throw new BadRequestException('费用验收缺少结算组织、币别或付款条件');
+    }
+    const paymentTerm = await manager.findOne(PaymentTerm, {
+      where: { id: input.paymentTermId, isDeleted: 0, status: 1 },
+      lock: { mode: 'pessimistic_read' },
+    });
+    if (!paymentTerm) throw new BadRequestException('付款条件不存在或未启用，无法生成暂估应付');
+
+    const payableDate = new Date(input.approvedAt);
+    const dueDate = new Date(payableDate);
+    dueDate.setDate(dueDate.getDate() + Number(paymentTerm.creditDays || 0));
+    const untaxedAmount = this.round(
+      input.entries.reduce((sum, entry) => sum + Number(entry.untaxedAmount || 0), 0),
+      2,
+    );
+    const taxAmount = this.round(
+      input.entries.reduce((sum, entry) => sum + Number(entry.taxAmount || 0), 0),
+      2,
+    );
+    const totalAmount = this.round(
+      input.entries.reduce((sum, entry) => sum + Number(entry.totalAmount || 0), 0),
+      2,
+    );
+    if (totalAmount < 0) throw new BadRequestException('费用验收价税合计不能小于0');
+
+    const payable = await repository.save(repository.create({
+      payableNo: this.generatePayableNo(),
+      payableType: 'ESTIMATED',
+      supplierId: input.supplierId,
+      sourceType: 'EXPENSE_ACCEPTANCE',
+      sourceId: input.expenseAcceptanceId,
+      sourceNo: input.expenseAcceptanceNo,
+      currencyId: input.currencyId,
+      settleOrgId: input.settleOrgId,
+      paymentTermId: input.paymentTermId,
+      untaxedAmount,
+      taxAmount,
+      amount: totalAmount,
+      paidAmount: 0,
+      balance: totalAmount,
+      payableDate,
+      dueDate,
+      period: this.formatPeriod(payableDate),
+      status: this.calculateStatus(totalAmount, 0, dueDate),
+      remark: `费用验收 ${input.expenseAcceptanceNo} 审核生成暂估应付`,
+      createdBy: input.createdBy || null,
+      updatedBy: input.createdBy || null,
+    }));
+    const entryRepository = manager.getRepository(PayableEntry);
+    payable.entries = await entryRepository.save(input.entries.map((entry, index) =>
+      entryRepository.create({
+        payableId: payable.id,
+        lineNo: index + 1,
+        inventoryInEntryId: null,
+        purchaseReturnEntryId: null,
+        assetAcceptanceEntryId: null,
+        expenseAcceptanceEntryId: entry.expenseAcceptanceEntryId,
+        sourceReceiveNoticeEntryId: entry.sourceReceiveNoticeEntryId,
+        sourceOrderEntryId: entry.sourceOrderEntryId,
+        sourceRequestEntryId: entry.sourceRequestEntryId || null,
+        expenseItemCode: entry.expenseItemCode || null,
+        expenseItemName: entry.expenseItemName,
+        materialId: entry.materialId || null,
+        materialCode: entry.materialCode || null,
+        materialName: entry.materialName || null,
+        materialModel: entry.materialModel || null,
+        unitId: entry.unitId || null,
+        unitCode: entry.unitCode || null,
+        unitName: entry.unitName || null,
+        quantity: Number(entry.quantity),
+        unitPrice: Number(entry.unitPrice),
+        taxRate: Number(entry.taxRate || 0),
+        untaxedAmount: this.round(Number(entry.untaxedAmount), 2),
+        taxAmount: this.round(Number(entry.taxAmount), 2),
+        totalAmount: this.round(Number(entry.totalAmount), 2),
+        createdBy: input.createdBy || null,
+        updatedBy: input.createdBy || null,
+      }),
+    ));
+    return payable;
+  }
+
   async update(id: string, dto: UpdatePayableDto): Promise<Payable> {
     const payable = await this.findById(id);
     if (!payable) throw new NotFoundException('应付账款不存在');
@@ -484,6 +616,7 @@ export class PayableService {
     if (
       (payable.payableType === 'ESTIMATED' && payable.sourceType === 'PURCHASE_INBOUND') ||
       (payable.payableType === 'ESTIMATED' && payable.sourceType === 'ASSET_ACCEPTANCE') ||
+      (payable.payableType === 'ESTIMATED' && payable.sourceType === 'EXPENSE_ACCEPTANCE') ||
       (payable.payableType === 'RED' && payable.sourceType === 'PURCHASE_RETURN')
     ) {
       throw new BadRequestException('采购来源应付不允许通过通用应付接口修改');
@@ -505,6 +638,7 @@ export class PayableService {
     if (
       (payable.payableType === 'ESTIMATED' && payable.sourceType === 'PURCHASE_INBOUND') ||
       (payable.payableType === 'ESTIMATED' && payable.sourceType === 'ASSET_ACCEPTANCE') ||
+      (payable.payableType === 'ESTIMATED' && payable.sourceType === 'EXPENSE_ACCEPTANCE') ||
       (payable.payableType === 'RED' && payable.sourceType === 'PURCHASE_RETURN')
     ) {
       throw new BadRequestException('采购来源应付不允许通过通用应付接口删除');

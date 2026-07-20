@@ -127,6 +127,11 @@ export class PurchaseOrderService {
   }
 
   async create(dto: CreatePurchaseOrderDto) {
+    dto.entries.forEach((entry, index) => {
+      if (!entry.materialId || !entry.materialCode || !entry.materialName || !entry.unitId) {
+        throw new BadRequestException(`手工标准采购订单明细第${index + 1}行物料和单位不能为空`);
+      }
+    });
     return this.dataSource.transaction(async (manager) => {
       const first = dto.entries[0];
       const order = manager.create(PurchaseOrder, {
@@ -430,6 +435,8 @@ export class PurchaseOrderService {
               purchaseOrderId: saved.id,
               lineNo: index + 1,
               supplierId: dto.supplierId,
+              expenseItemCode: requestEntry.expenseItemCode,
+              expenseItemName: requestEntry.expenseItemName,
               materialId: requestEntry.materialId,
               materialCode: requestEntry.materialCode,
               materialName: requestEntry.materialName,
@@ -447,7 +454,9 @@ export class PurchaseOrderService {
               netAmount: money.netAmount,
               deliveryDate: line.deliveryDate ? new Date(line.deliveryDate) : requestEntry.requiredDate,
               warehouseId: line.warehouseId || requestEntry.warehouseId,
-              checkIncoming: line.checkIncoming ?? true,
+              checkIncoming: first.purchaseRequest.businessType === PurchaseBusinessType.EXPENSE_PURCHASE
+                ? false
+                : line.checkIncoming ?? true,
               sourceRequestId: requestEntry.purchaseRequestId,
               sourceRequestNo: requestEntry.purchaseRequest.requestNo,
               sourceRequestEntryId: requestEntry.id,
@@ -543,6 +552,8 @@ export class PurchaseOrderService {
                   materialCode: existing.materialCode,
                   materialName: existing.materialName,
                   materialModel: existing.materialModel,
+                  expenseItemCode: existing.expenseItemCode,
+                  expenseItemName: existing.expenseItemName,
                   unitId: existing.unitId,
                   unitCode: existing.unitCode,
                   unitName: existing.unitName,
@@ -569,8 +580,12 @@ export class PurchaseOrderService {
             taxAmount: money.taxAmount,
             netAmount: money.netAmount,
             deliveryDate: item.deliveryDate ? new Date(item.deliveryDate) : order.deliveryDate,
-            warehouseId: item.warehouseId || order.warehouseId,
-            checkIncoming: item.checkIncoming ?? existing?.checkIncoming ?? true,
+            warehouseId: order.businessType === PurchaseBusinessType.EXPENSE_PURCHASE
+              ? null
+              : item.warehouseId || order.warehouseId,
+            checkIncoming: order.businessType === PurchaseBusinessType.EXPENSE_PURCHASE
+              ? false
+              : item.checkIncoming ?? existing?.checkIncoming ?? true,
             remark: item.remark,
             isDeleted: 0,
           });
@@ -618,6 +633,20 @@ export class PurchaseOrderService {
     if (!order.contractNo?.trim()) throw new BadRequestException('采购订单合同号不能为空');
     if (!order.purchaseOrgId) throw new BadRequestException('采购订单采购组织不能为空');
     if (!order.entries.length) throw new BadRequestException('采购订单至少需要一条明细');
+    for (const entry of order.entries.filter((item) => item.isDeleted === 0)) {
+      if (
+        order.businessType === PurchaseBusinessType.EXPENSE_PURCHASE
+        && !entry.expenseItemName?.trim()
+      ) {
+        throw new BadRequestException(`费用采购订单明细第${entry.lineNo}行费用项目名称不能为空`);
+      }
+      if (
+        order.businessType !== PurchaseBusinessType.EXPENSE_PURCHASE
+        && (!entry.materialId || !entry.materialCode || !entry.materialName || !entry.unitId)
+      ) {
+        throw new BadRequestException(`采购订单明细第${entry.lineNo}行物料和单位不能为空`);
+      }
+    }
     order.status = PurchaseOrderStatus.SUBMITTED;
     await this.orderRepository.save(order);
     return this.present(order);

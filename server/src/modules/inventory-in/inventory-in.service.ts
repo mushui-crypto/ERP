@@ -218,6 +218,7 @@ export class InventoryInService {
       this.assertSameValue(notices.map((notice) => notice.businessType || 'STANDARD'), '禁止混合不同采购业务类型下推采购入库');
       const businessType = notices[0].businessType || 'STANDARD';
       if (businessType === 'ASSET_NO_INBOUND') throw new BadRequestException('资产采购不入库流程禁止生成采购入库单');
+      if (businessType === 'EXPENSE_PURCHASE') throw new BadRequestException('费用采购流程禁止生成采购入库单');
       if (!['STANDARD', 'ASSET_INBOUND'].includes(businessType)) throw new BadRequestException('当前采购业务类型不允许生成采购入库单');
       if (notices.some((notice) => notice.purchaseOrderId !== order.id || notice.supplierId !== order.supplierId)) {
         throw new BadRequestException('收料通知与采购订单的来源或供应商不一致');

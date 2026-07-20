@@ -1,0 +1,148 @@
+{
+  "runTag": "P3FE-1784542486571",
+  "front": "http://127.0.0.1:8099",
+  "api": "http://localhost:3003/api",
+  "startedAt": "2026-07-20T10:14:46.571Z",
+  "checks": [
+    {
+      "id": "P3-FE-ENV-001",
+      "name": "3003 Swagger 可访问且费用验收路由存在",
+      "status": "PASS",
+      "detail": {},
+      "at": "2026-07-20T10:14:46.647Z"
+    },
+    {
+      "id": "P3-FE-DATA-001",
+      "name": "后端存在 P3 浏览器复验基础数据",
+      "status": "PASS",
+      "detail": {
+        "acceptance": "EA20260720181401073932",
+        "request": "PR20260720181446869343",
+        "order": "PO20260720181359974058",
+        "receive": "PRN20260720181400886796"
+      },
+      "at": "2026-07-20T10:14:47.052Z"
+    },
+    {
+      "id": "P3-FE-001",
+      "name": "费用采购申请列表加载真实 API 并展示费用采购类型/项目",
+      "status": "PASS",
+      "detail": {
+        "requests": [
+          "http://localhost:3003/api/purchase-requests?page=1&pageSize=10",
+          "http://localhost:3003/api/purchase-requests/status/0?page=1&pageSize=100",
+          "http://localhost:3003/api/purchase-requests?page=1&pageSize=100",
+          "http://localhost:3003/api/purchase-requests?page=1&pageSize=100",
+          "http://localhost:3003/api/purchase-requests/status/0?page=1&pageSize=100"
+        ],
+        "errors": []
+      },
+      "at": "2026-07-20T10:14:49.498Z"
+    },
+    {
+      "id": "P3-FE-002",
+      "name": "费用采购申请新增/OA导入入口字段可见",
+      "status": "PASS",
+      "detail": {},
+      "at": "2026-07-20T10:14:49.498Z"
+    },
+    {
+      "id": "P3-FE-003",
+      "name": "费用采购订单展示合同号、费用类型并提供下推服务完成",
+      "status": "PASS",
+      "detail": {
+        "requests": [
+          "http://localhost:3003/api/purchase-orders?page=1&pageSize=100",
+          "http://localhost:3003/api/purchase-orders?page=1&pageSize=100",
+          "http://localhost:3003/api/purchase-orders?page=1&pageSize=10",
+          "http://localhost:3003/api/purchase-orders?page=1&pageSize=10",
+          "http://localhost:3003/api/purchase-orders?page=1&pageSize=10"
+        ],
+        "errors": []
+      },
+      "at": "2026-07-20T10:14:50.352Z"
+    },
+    {
+      "id": "P3-FE-004",
+      "name": "服务完成页面展示费用采购服务语义和禁止下游提示",
+      "status": "PASS",
+      "detail": {
+        "requests": [
+          "http://localhost:3003/api/purchase-receive-notices?page=1&pageSize=100",
+          "http://localhost:3003/api/purchase-receive-notices?page=1&pageSize=100",
+          "http://localhost:3003/api/purchase-receive-notices?page=1&pageSize=10",
+          "http://localhost:3003/api/purchase-receive-notices?page=1&pageSize=10",
+          "http://localhost:3003/api/purchase-receive-notices?page=1&pageSize=10"
+        ],
+        "errors": []
+      },
+      "at": "2026-07-20T10:14:51.368Z"
+    },
+    {
+      "id": "P3-FE-009A",
+      "name": "费用采购尝试入库时页面展示后端错误",
+      "status": "PASS",
+      "detail": {
+        "clicked": true,
+        "inboundMsg": "费用采购流程禁止生成采购入库单"
+      },
+      "at": "2026-07-20T10:14:52.575Z"
+    },
+    {
+      "id": "P3-FE-005",
+      "name": "费用验收列表展示来源、数量金额、状态和暂估应付",
+      "status": "PASS",
+      "detail": {
+        "acceptance": "EA20260720181401073932",
+        "requests": [
+          "http://localhost:3003/api/expense-acceptances?page=1&pageSize=100",
+          "http://localhost:3003/api/expense-acceptances?page=1&pageSize=100"
+        ],
+        "errors": []
+      },
+      "at": "2026-07-20T10:14:53.361Z"
+    },
+    {
+      "id": "P3-FE-006",
+      "name": "费用验收详情展示来源链、明细、保存/状态动作",
+      "status": "PASS",
+      "detail": {
+        "errors": []
+      },
+      "at": "2026-07-20T10:14:54.374Z"
+    },
+    {
+      "id": "P3-FE-007",
+      "name": "费用验收详情展示暂估应付状态和重试入口",
+      "status": "PASS",
+      "detail": {},
+      "at": "2026-07-20T10:14:54.374Z"
+    },
+    {
+      "id": "P3-FE-009B",
+      "name": "费用验收页面提供禁止资产建卡提示",
+      "status": "PASS",
+      "detail": {
+        "cardClicked": true,
+        "cardMsg": "费用采购禁止生成资产卡片"
+      },
+      "at": "2026-07-20T10:14:54.878Z"
+    },
+    {
+      "id": "P3-FE-006B",
+      "name": "费用验收新增页可录入来源服务完成和明细创建",
+      "status": "PASS",
+      "detail": {
+        "errors": []
+      },
+      "at": "2026-07-20T10:14:56.380Z"
+    }
+  ],
+  "defects": [],
+  "completedAt": "2026-07-20T10:14:56.490Z",
+  "summary": {
+    "total": 12,
+    "passed": 12,
+    "failed": 0
+  }
+}

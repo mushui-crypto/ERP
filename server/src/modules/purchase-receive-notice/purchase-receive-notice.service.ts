@@ -15,6 +15,7 @@ import {
   generateDocumentNo,
   PURCHASE_RECEIVE_NOTICE_STATUS_META,
   PurchaseOrderStatus,
+  PurchaseBusinessType,
   PurchaseReceiveNoticeStatus,
   PurchaseReturnMode,
   PurchaseReturnStatus,
@@ -267,7 +268,9 @@ export class PurchaseReceiveNoticeService {
         receiveDate: dto.receiveDate ? new Date(dto.receiveDate) : new Date(),
         sendBillNo: dto.sendBillNo,
         ladBillNo: dto.ladBillNo,
-        needCheck: dto.needCheck ?? true,
+        needCheck: order.businessType === PurchaseBusinessType.EXPENSE_PURCHASE
+          ? false
+          : dto.needCheck ?? true,
         receiverId: dto.receiverId,
         receiveDepartmentId: dto.receiveDepartmentId,
         remark: dto.remark,
@@ -287,6 +290,8 @@ export class PurchaseReceiveNoticeService {
             sourceRequestId: source.sourceRequestId,
             sourceRequestNo: source.sourceRequestNo,
             sourceRequestEntryId: source.sourceRequestEntryId,
+            expenseItemCode: source.expenseItemCode,
+            expenseItemName: source.expenseItemName,
             materialId: source.materialId,
             materialCode: source.materialCode,
             materialName: source.materialName,
@@ -301,8 +306,13 @@ export class PurchaseReceiveNoticeService {
             unqualifiedQty: 0,
             stockedQty: 0,
             assetAcceptedQty: 0,
-            checkIncoming: line.checkIncoming ?? source.checkIncoming,
-            warehouseId: line.warehouseId || source.warehouseId || order.warehouseId,
+            expenseAcceptedQty: 0,
+            checkIncoming: order.businessType === PurchaseBusinessType.EXPENSE_PURCHASE
+              ? false
+              : line.checkIncoming ?? source.checkIncoming,
+            warehouseId: order.businessType === PurchaseBusinessType.EXPENSE_PURCHASE
+              ? null
+              : line.warehouseId || source.warehouseId || order.warehouseId,
             unitPrice: money.unitPrice,
             amount: money.amount,
             taxRate: money.taxRate,
@@ -446,7 +456,9 @@ export class PurchaseReceiveNoticeService {
         receiveDate: dto.receiveDate ? new Date(dto.receiveDate) : notice.receiveDate,
         sendBillNo: dto.sendBillNo ?? notice.sendBillNo,
         ladBillNo: dto.ladBillNo ?? notice.ladBillNo,
-        needCheck: dto.needCheck ?? notice.needCheck,
+        needCheck: notice.businessType === PurchaseBusinessType.EXPENSE_PURCHASE
+          ? false
+          : dto.needCheck ?? notice.needCheck,
         receiverId: dto.receiverId ?? notice.receiverId,
         receiveDepartmentId: dto.receiveDepartmentId ?? notice.receiveDepartmentId,
         remark: dto.remark ?? notice.remark,
@@ -518,8 +530,12 @@ export class PurchaseReceiveNoticeService {
             taxRate: money.taxRate,
             taxAmount: money.taxAmount,
             netAmount: money.netAmount,
-            checkIncoming: line.checkIncoming ?? entry.checkIncoming,
-            warehouseId: line.warehouseId ?? entry.warehouseId,
+            checkIncoming: notice.businessType === PurchaseBusinessType.EXPENSE_PURCHASE
+              ? false
+              : line.checkIncoming ?? entry.checkIncoming,
+            warehouseId: notice.businessType === PurchaseBusinessType.EXPENSE_PURCHASE
+              ? null
+              : line.warehouseId ?? entry.warehouseId,
             supplierLot: line.supplierLot ?? entry.supplierLot,
             produceDate: line.produceDate ? new Date(line.produceDate) : entry.produceDate,
             expiryDate: line.expiryDate ? new Date(line.expiryDate) : entry.expiryDate,

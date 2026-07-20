@@ -26,12 +26,14 @@ export enum PurchaseOrderSourceType {
 export enum PurchaseBillType {
   STANDARD_PURCHASE = 'STANDARD_PURCHASE',
   ASSET_PURCHASE = 'ASSET_PURCHASE',
+  EXPENSE_PURCHASE = 'EXPENSE_PURCHASE',
 }
 
 export enum PurchaseBusinessType {
   STANDARD = 'STANDARD',
   ASSET_NO_INBOUND = 'ASSET_NO_INBOUND',
   ASSET_INBOUND = 'ASSET_INBOUND',
+  EXPENSE_PURCHASE = 'EXPENSE_PURCHASE',
 }
 
 export enum PurchaseReceiveNoticeStatus {
