@@ -1,0 +1,539 @@
+{
+  "runTag": "P4FE-1784563077374",
+  "api": "http://localhost:3003/api",
+  "front": "http://127.0.0.1:8099",
+  "startedAt": "2026-07-20T15:57:57.374Z",
+  "tests": [
+    {
+      "id": "P4-FE-ENV-001",
+      "name": "后端Swagger可访问",
+      "status": "PASS",
+      "detail": {
+        "api": "http://localhost:3003/api"
+      },
+      "at": "2026-07-20T15:57:57.435Z"
+    },
+    {
+      "id": "P4-FE-ENV-002",
+      "name": "P4 adapter语法检查已通过",
+      "status": "PASS",
+      "detail": {
+        "file": "/Users/dq/Documents/ERP/hub-erp-v0/traewordp/purchase-p4-api.js"
+      },
+      "at": "2026-07-20T15:57:57.435Z"
+    },
+    {
+      "id": "P4-FE-001",
+      "name": "订单变更页加载P4面板并发起真实API",
+      "status": "PASS",
+      "detail": {
+        "requests": [
+          "http://127.0.0.1:8099/pages/purchase-order-change.html",
+          "http://127.0.0.1:8099/common.css",
+          "http://127.0.0.1:8099/common.js",
+          "http://127.0.0.1:8099/images/logo.png",
+          "http://127.0.0.1:8099/purchase-p4-api.js",
+          "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxNiIgaGVpZ2h0PSIxNSIgdmlld0JveD0iMCAwIDI0IDI0Ij48cGF0aCBmaWxsPSJXaW5kb3dUZXh0IiBkPSJNMjAgM2gtMVYxaC0ydjJIN1YxSDV2Mkg0Yy0xLjEgMC0yIC45LTIgMnYxNmMwIDEuMS45IDIgMiAyaDE2YzEuMSAwIDItLjkgMi0yVjVjMC0xLjEtLjktMi0yLTJ6bTAgMThINFY4aDE2djEzeiIvPjxwYXRoIGZpbGw9Im5vbmUiIGQ9Ik0wIDBoMjR2MjRIMHoiLz48L3N2Zz4=",
+          "http://localhost:3001/api/orgs",
+          "http://localhost:3003/api/purchase-order-changes?page=1&pageSize=100",
+          "http://localhost:3001/api/orgs",
+          "http://localhost:3003/api/purchase-order-changes?page=1&pageSize=100",
+          "http://127.0.0.1:8099/favicon.ico",
+          "http://localhost:3003/api/purchase-orders?page=1&pageSize=200",
+          "http://localhost:3003/api/purchase-orders?page=1&pageSize=200",
+          "http://localhost:3003/api/purchase-orders/6E2E433E-F36B-1410-8B47-0096A7B40922",
+          "http://localhost:3003/api/purchase-orders/6E2E433E-F36B-1410-8B47-0096A7B40922",
+          "http://localhost:3003/api/purchase-order-changes/from-order",
+          "http://localhost:3003/api/purchase-order-changes/from-order",
+          "http://localhost:3003/api/purchase-order-changes?page=1&pageSize=100",
+          "http://localhost:3003/api/purchase-orders?page=1&pageSize=200",
+          "http://localhost:3003/api/purchase-orders/6E2E433E-F36B-1410-8B47-0096A7B40922",
+          "http://localhost:3003/api/purchase-order-changes/from-order",
+          "http://localhost:3003/api/purchase-order-changes/9F2E433E-F36B-1410-8B47-0096A7B40922/submit",
+          "http://localhost:3003/api/purchase-order-changes/9F2E433E-F36B-1410-8B47-0096A7B40922/submit",
+          "http://localhost:3003/api/purchase-order-changes?page=1&pageSize=100",
+          "http://localhost:3003/api/purchase-orders?page=1&pageSize=200",
+          "http://localhost:3003/api/purchase-order-changes/9F2E433E-F36B-1410-8B47-0096A7B40922/approve",
+          "http://localhost:3003/api/purchase-order-changes/9F2E433E-F36B-1410-8B47-0096A7B40922/approve",
+          "http://localhost:3003/api/purchase-order-changes?page=1&pageSize=100",
+          "http://localhost:3003/api/purchase-order-changes?page=1&pageSize=100",
+          "http://localhost:3003/api/purchase-orders?page=1&pageSize=200",
+          "http://localhost:3003/api/purchase-orders?page=1&pageSize=200",
+          "http://localhost:3003/api/purchase-order-changes/9F2E433E-F36B-1410-8B47-0096A7B40922",
+          "http://localhost:3003/api/purchase-order-changes/9F2E433E-F36B-1410-8B47-0096A7B40922"
+        ],
+        "errors": []
+      },
+      "at": "2026-07-20T15:58:02.189Z"
+    },
+    {
+      "id": "P4-FE-002",
+      "name": "订单变更从订单创建成功并落到后端",
+      "status": "PASS",
+      "detail": {
+        "changeNo": "POC20260720235802743744",
+        "status": "DRAFT"
+      },
+      "at": "2026-07-20T15:58:03.945Z"
+    },
+    {
+      "id": "P4-FE-003",
+      "name": "同订单未生效变更后端错误可在页面提示",
+      "status": "PASS",
+      "detail": {
+        "text": "磐枢工业智能平台\n📊\n首页工作台\n业务模块\n📦\n供应链\n▶\n销售管理\n采购管理\n库存管理\n计划管理\n🏭\n生产制造\n▶\n工程数据\n生产管理\n委外管理\n✅\nMES执行\n▶\n智慧车间\n设备云\n✅\n质量管理\n▶\n日常检验\n不良品处理\nMRB评审\n请检管理\n质量报表\n基础资料\n国标资料\n参数设置\n💰\n财务会计\n▶\n总账\n报表\n应收管理\n应付管理\n出纳管理\n费用管理\n合并报表\n存货核算\n成本核算\n固定资产\n会计平台\n▦\nPLM管理\n▶\n编码管理\n研发物料\n项目管理\n工艺设计\n图文档管理\n变更管理\n知识库\n📦\n售后管理\n▶\n售后申请\n派工管理\n服务记录\n售后退货\n售后报表\n💽\n条码管理\n▶\n条码配置\n条码打印\n扫码作业\n条码追溯\n🤝\nCRM管理\n▶\n客户管理\n联系人\n商机管理\n销售管道\n客户360视图\n活动管理\n👥\nHR管理\n▶\n员工管理\n组织架构\n考勤管理\n绩效考核\n薪酬管理\n招聘管理\n合同管理\n社保管理\n个税管理\n培训管理\n🔧\n设备管理\n▶\n设备保养\n设备点检\n设备校准\n设备统计\n综合管理\n📋\n驾驶舱\n⚠\n风险预警中心\n✔\n优化建议中心\n📈\n决策大屏\n▶\n销售决策\n生产决策\n质量决策\n库存决策\n财务决策\n🤖\nAI智能助手\n📈\n智能分析中心\n📊\nBI报表\n▶\n报表设计器\n自定义看板\n报表订阅\n系统\n📂\n基础资料\n▶\n全部资料\n📋\n业务规则\n📂\n辅助资料\n⚙\n系统设置\n💻\n管理端\n管\nP4 采购订单变更\nP4 真实 API：http://localhost:3003/api；只覆盖订单变更/对账/报表。\n刷新\n从订单创建变更\n加载已审核订单默认值\n采购订单 PO20260720235757760818 已存在有效未生效变更单 POC20260720235802743744\n订单ID\n订单明细ID\n新数量\n新单价\n新仓库ID\n变更原因\n供应商ID\n采购组"
+      },
+      "at": "2026-07-20T15:58:04.976Z"
+    },
+    {
+      "id": "P4-FE-004",
+      "name": "订单变更提交/审核按钮调用真实API并反写订单",
+      "status": "PASS",
+      "detail": {
+        "order_qty": 12,
+        "unit_price": 11
+      },
+      "at": "2026-07-20T15:58:07.149Z"
+    },
+    {
+      "id": "P4-FE-005",
+      "name": "订单变更详情/历史追溯可展示来源和原新值",
+      "status": "PASS",
+      "detail": {
+        "state": {
+          "text": "磐枢工业智能平台\n📊\n首页工作台\n业务模块\n📦\n供应链\n▶\n销售管理\n采购管理\n库存管理\n计划管理\n🏭\n生产制造\n▶\n工程数据\n生产管理\n委外管理\n✅\nMES执行\n▶\n智慧车间\n设备云\n✅\n质量管理\n▶\n日常检验\n不良品处理\nMRB评审\n请检管理\n质量报表\n基础资料\n国标资料\n参数设置\n💰\n财务会计\n▶\n总账\n报表\n应收管理\n应付管理\n出纳管理\n费用管理\n合并报表\n存货核算\n成本核算\n固定资产\n会计平台\n▦\nPLM管理\n▶\n编码管理\n研发物料\n项目管理\n工艺设计\n图文档管理\n变更管理\n知识库\n📦\n售后管理\n▶\n售后申请\n派工管理\n服务记录\n售后退货\n售后报表\n💽\n条码管理\n▶\n条码配置\n条码打印\n扫码作业\n条码追溯\n🤝\nCRM管理\n▶\n客户管理\n联系人\n商机管理\n销售管道\n客户360视图\n活动管理\n👥\nHR管理\n▶\n员工管理\n组织架构\n考勤管理\n绩效考核\n薪酬管理\n招聘管理\n合同管理\n社保管理\n个税管理\n培训管理\n🔧\n设备管理\n▶\n设备保养\n设备点检\n设备校准\n设备统计\n综合管理\n📋\n驾驶舱\n⚠\n风险预警中心\n✔\n优化建议中心\n📈\n决策大屏\n▶\n销售决策\n生产决策\n质量决策\n库存决策\n财务决策\n🤖\nAI智能助手\n📈\n智能分析中心\n📊\nBI报表\n▶\n报表设计器\n自定义看板\n报表订阅\n系统\n📂\n基础资料\n▶\n全部资料\n📋\n业务规则\n📂\n辅助资料\n⚙\n系统设置\n💻\n管理端\n管\nP4 采购订单变更详情\nP4 真实 API：http://localhost:3003/api；只覆盖订单变更/对账/报表。\n返回列表\n保存\n提交\n审核\n驳回\n取消\n订单ID\n订单明细ID\n新数量\n新单价\n新仓库ID\n变更原因\n供应商ID\n采购组织ID\n结算组织ID\n币种ID\n期间起\n期间止\n对账订单ID\nPOC20260720235802743744 / 已审核生效 / 来源订单 PO20260720235757760818\n行\t物料/费用\t已收料\t已入库\t数量原→新\t单价原→新\t交期原→新\t仓库原→新\t备注原→新\n1\tP4FEMAT_4563077374\t0\t0\t / 原 10\t / 原 10.00\t→ 2026-07-20\t / 原 492E433E-F36B-1410-8B47-0096A7B40922\t→ P4变更后备注\n☰\n采购订单变更\n首页 > 供应链 > 采购管理 > 订单变更\n磐枢工业集团(总部) (PS-HQ)\n   磐枢智能制造有限公司 (PS-SM)\n   磐枢电子科技有限公司 (PS-ET)\n   磐枢注塑分厂 (PS-IM)\n   磐枢装配分厂 (PS-AS)\n过滤\n刷新\n+ 新增\n删除\n提交\n审核\n关联查询\n导出\n打印\n综合查询\n选项\n全部\n草稿\n待审\n已审\n已关闭\n默认方案\n本周\n本月\n变更单号\n原订单号\n供应商\n包含\n等于\n开头是\n变更类型\n全部\n数量变更\n价格变更\n交期变更\n物料变更\n变更日期\n查询\n保存方案\n重置\n\t变更单号\t原订单号\t供应商\t变更日期\t变更类型\t状态\t操作\n暂无数据\n共 24 条记录，第 1/3 页\n« 首页\n‹ 上页\n1\n2\n3\n下页 ›\n末页 »\n选择\n×\n 搜索\n取消 确定\n✅\n操作成功\n操作成功\n✅\n操作成功\n操作成功",
+          "newQty": "12",
+          "newPrice": "11",
+          "orderEntry": "6F2E433E-F36B-1410-8B47-0096A7B40922"
+        }
+      },
+      "at": "2026-07-20T15:58:07.880Z"
+    },
+    {
+      "id": "P4-FE-006",
+      "name": "采购对账页加载P4面板并发起真实API",
+      "status": "PASS",
+      "detail": {
+        "requests": [
+          "http://127.0.0.1:8099/pages/purchase-reconcile.html",
+          "http://127.0.0.1:8099/common.css",
+          "http://127.0.0.1:8099/common.js",
+          "http://127.0.0.1:8099/images/logo.png",
+          "http://127.0.0.1:8099/purchase-p4-api.js",
+          "http://localhost:3001/api/orgs",
+          "http://localhost:3003/api/purchase-reconciliations?page=1&pageSize=100",
+          "http://localhost:3001/api/orgs",
+          "http://localhost:3003/api/purchase-reconciliations?page=1&pageSize=100",
+          "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxNiIgaGVpZ2h0PSIxNSIgdmlld0JveD0iMCAwIDI0IDI0Ij48cGF0aCBmaWxsPSJXaW5kb3dUZXh0IiBkPSJNMjAgM2gtMVYxaC0ydjJIN1YxSDV2Mkg0Yy0xLjEgMC0yIC45LTIgMnYxNmMwIDEuMS45IDIgMiAyaDE2YzEuMSAwIDItLjkgMi0yVjVjMC0xLjEtLjktMi0yLTJ6bTAgMThINFY4aDE2djEzeiIvPjxwYXRoIGZpbGw9Im5vbmUiIGQ9Ik0wIDBoMjR2MjRIMHoiLz48L3N2Zz4=",
+          "http://127.0.0.1:8099/favicon.ico",
+          "http://localhost:3003/api/purchase-orders?page=1&pageSize=200",
+          "http://localhost:3003/api/purchase-reconciliations/generate",
+          "http://localhost:3003/api/purchase-reconciliations/generate",
+          "http://localhost:3003/api/purchase-reconciliations?page=1&pageSize=100",
+          "http://localhost:3003/api/purchase-orders?page=1&pageSize=200",
+          "http://localhost:3003/api/purchase-reconciliations/A72E433E-F36B-1410-8B47-0096A7B40922",
+          "http://localhost:3003/api/purchase-reconciliations/A72E433E-F36B-1410-8B47-0096A7B40922",
+          "http://localhost:3003/api/purchase-reconciliations/A72E433E-F36B-1410-8B47-0096A7B40922",
+          "http://localhost:3003/api/purchase-reconciliations/A72E433E-F36B-1410-8B47-0096A7B40922/confirm",
+          "http://localhost:3003/api/purchase-reconciliations/A72E433E-F36B-1410-8B47-0096A7B40922/confirm",
+          "http://localhost:3003/api/purchase-reconciliations/A72E433E-F36B-1410-8B47-0096A7B40922",
+          "http://localhost:3003/api/purchase-reconciliations/A72E433E-F36B-1410-8B47-0096A7B40922/confirm",
+          "http://localhost:3003/api/purchase-reconciliations?page=1&pageSize=100",
+          "http://localhost:3003/api/purchase-orders?page=1&pageSize=200",
+          "http://localhost:3003/api/purchase-orders?page=1&pageSize=200",
+          "http://localhost:3003/api/purchase-reconciliations/A72E433E-F36B-1410-8B47-0096A7B40922/cancel",
+          "http://localhost:3003/api/purchase-reconciliations/A72E433E-F36B-1410-8B47-0096A7B40922/cancel"
+        ],
+        "errors": []
+      },
+      "at": "2026-07-20T15:58:09.749Z"
+    },
+    {
+      "id": "P4-FE-007",
+      "name": "采购对账生成/列表真实API成功",
+      "status": "PASS",
+      "detail": {
+        "reconciliationNo": "PREC20260720235809785159"
+      },
+      "at": "2026-07-20T15:58:11.131Z"
+    },
+    {
+      "id": "P4-FE-008",
+      "name": "对账详情展示业务来源/订单/业务与应付差异",
+      "status": "PASS",
+      "detail": {
+        "text": "编辑\n📊\n首页工作台\n业务模块\n📦\n供应链\n▶\n销售管理\n采购管理\n库存管理\n计划管理\n🏭\n生产制造\n▶\n工程数据\n生产管理\n委外管理\n✅\nMES执行\n▶\n智慧车间\n设备云\n✅\n质量管理\n▶\n日常检验\n不良品处理\nMRB评审\n请检管理\n质量报表\n基础资料\n国标资料\n参数设置\n💰\n财务会计\n▶\n总账\n报表\n应收管理\n应付管理\n出纳管理\n费用管理\n合并报表\n存货核算\n成本核算\n固定资产\n会计平台\n▦\nPLM管理\n▶\n编码管理\n研发物料\n项目管理\n工艺设计\n图文档管理\n变更管理\n知识库\n📦\n售后管理\n▶\n售后申请\n派工管理\n服务记录\n售后退货\n售后报表\n💽\n条码管理\n▶\n条码配置\n条码打印\n扫码作业\n条码追溯\n🤝\nCRM管理\n▶\n客户管理\n联系人\n商机管理\n销售管道\n客户360视图\n活动管理\n👥\nHR管理\n▶\n员工管理\n组织架构\n考勤管理\n绩效考核\n薪酬管理\n招聘管理\n合同管理\n社保管理\n个税管理\n培训管理\n🔧\n设备管理\n▶\n设备保养\n设备点检\n设备校准\n设备统计\n综合管理\n📋\n驾驶舱\n⚠\n风险预警中心\n✔\n优化建议中心\n📈\n决策大屏\n▶\n销售决策\n生产决策\n质量决策\n库存决策\n财务决策\n🤖\nAI智能助手\n📈\n智能分析中心\n📊\nBI报表\n▶\n报表设计器\n自定义看板\n报表订阅\n系统\n📂\n基础资料\n▶\n全部资料\n📋\n业务规则\n📂\n辅助资料\n⚙\n系统设置\n💻\n管理端\n删除\nP4 采购对账详情\nP4 真实 API：http://localhost:3003/api；只覆盖订单变更/对账/报表。\n返回列表\n确认\n确认无差异原因\n取消\nPREC20260720235809785159 / 未确认 / 期间 2026-07-19~2026-07-19\n来源\t订单\t物料/费用\t业务数量/金额\t应付数量/金额\t确认数量/金额\t差异\t原因\nPURCHASE_INBOUND PIN20260720235758101607\tPO20260720235757929010\tP4FEMAT_4563077374\t7 / 395.50\t6 / 339.00\t7 / 395.50\t1 / 56.50\t\n☰\n批量操作\n编辑>导入数据?>批量操作>批量操作\n磐枢工业集团(总部) (PS-HQ)\n   磐枢智能制造有限公司 (PS-SM)\n   磐枢电子科技有限公司 (PS-"
+      },
+      "at": "2026-07-20T15:58:11.855Z"
+    },
+    {
+      "id": "P4-FE-009",
+      "name": "对账非零差异原因必填错误可展示",
+      "status": "PASS",
+      "detail": {
+        "text": "编辑\n📊\n首页工作台\n业务模块\n📦\n供应链\n▶\n销售管理\n采购管理\n库存管理\n计划管理\n🏭\n生产制造\n▶\n工程数据\n生产管理\n委外管理\n✅\nMES执行\n▶\n智慧车间\n设备云\n✅\n质量管理\n▶\n日常检验\n不良品处理\nMRB评审\n请检管理\n质量报表\n基础资料\n国标资料\n参数设置\n💰\n财务会计\n▶\n总账\n报表\n应收管理\n应付管理\n出纳管理\n费用管理\n合并报表\n存货核算\n成本核算\n固定资产\n会计平台\n▦\nPLM管理\n▶\n编码管理\n研发物料\n项目管理\n工艺设计\n图文档管理\n变更管理\n知识库\n📦\n售后管理\n▶\n售后申请\n派工管理\n服务记录\n售后退货\n售后报表\n💽\n条码管理\n▶\n条码配置\n条码打印\n扫码作业\n条码追溯\n🤝\nCRM管理\n▶\n客户管理\n联系人\n商机管理\n销售管道\n客户360视图\n活动管理\n👥\nHR管理\n▶\n员工管理\n组织架构\n考勤管理\n绩效考核\n薪酬管理\n招聘管理\n合同管理\n社保管理\n个税管理\n培训管理\n🔧\n设备管理\n▶\n设备保养\n设备点检\n设备校准\n设备统计\n综合管理\n📋\n驾驶舱\n⚠\n风险预警中心\n✔\n优化建议中心\n📈\n决策大屏\n▶\n销售决策\n生产决策\n质量决策\n库存决策\n财务决策\n🤖\nAI智能助手\n📈\n智能分析中心\n📊\nBI报表\n▶\n报表设计器\n自定义看板\n报表订阅\n系统\n📂\n基础资料\n▶\n全部资料\n📋\n业务规则\n📂\n辅助资料\n⚙\n系统设置\n💻\n管理端\n删除\nP4 采购对账详情\nP4 真实 API：http://localhost:3003/api；只覆盖订单变更/对账/报表。\n返回列表\n确认\n确认无差异原因\n取消\n对账明细第1行存在非零差异，差异原因必填\nPREC20260720235809785159 / 未确认 / 期间 2026-07-19~2026-07-19\n来源\t订单\t物料/费用\t业务数量/金额\t应付数量/金额\t确认数量/"
+      },
+      "at": "2026-07-20T15:58:12.736Z"
+    },
+    {
+      "id": "P4-FE-010",
+      "name": "对账确认按钮调用真实API并落库",
+      "status": "PASS",
+      "detail": {
+        "status": 1,
+        "confirmed_qty": 7,
+        "difference_qty": 1
+      },
+      "at": "2026-07-20T15:58:13.917Z"
+    },
+    {
+      "id": "P4-FE-011",
+      "name": "已确认对账取消后端错误可在页面提示",
+      "status": "PASS",
+      "detail": {
+        "text": "编辑\n📊\n首页工作台\n业务模块\n📦\n供应链\n▶\n销售管理\n采购管理\n库存管理\n计划管理\n🏭\n生产制造\n▶\n工程数据\n生产管理\n委外管理\n✅\nMES执行\n▶\n智慧车间\n设备云\n✅\n质量管理\n▶\n日常检验\n不良品处理\nMRB评审\n请检管理\n质量报表\n基础资料\n国标资料\n参数设置\n💰\n财务会计\n▶\n总账\n报表\n应收管理\n应付管理\n出纳管理\n费用管理\n合并报表\n存货核算\n成本核算\n固定资产\n会计平台\n▦\nPLM管理\n▶\n编码管理\n研发物料\n项目管理\n工艺设计\n图文档管理\n变更管理\n知识库\n📦\n售后管理\n▶\n售后申请\n派工管理\n服务记录\n售后退货\n售后报表\n💽\n条码管理\n▶\n条码配置\n条码打印\n扫码作业\n条码追溯\n🤝\nCRM管理\n▶\n客户管理\n联系人\n商机管理\n销售管道\n客户360视图\n活动管理\n👥\nHR管理\n▶\n员工管理\n组织架构\n考勤管理\n绩效考核\n薪酬管理\n招聘管理\n合同管理\n社保管理\n个税管理\n培训管理\n🔧\n设备管理\n▶\n设备保养\n设备点检\n设备校准\n设备统计\n综合管理\n📋\n驾驶舱\n⚠\n风险预警中心\n✔\n优化建议中心\n📈\n决策大屏\n▶\n销售决策\n生产决策\n质量决策\n库存决策\n财务决策\n🤖\nAI智能助手\n📈\n智能分析中心\n📊\nBI报表\n▶\n报表设计器\n自定义看板\n报表订阅\n系统\n📂\n基础资料\n▶\n全部资料\n📋\n业务规则\n📂\n辅助资料\n⚙\n系统设置\n💻\n管理端\n删除\nP4 采购对账\nP4 真实 API：http://localhost:3003/api；只覆盖订单变更/对账/报表。\n刷新\n生成对账\n加载订单默认值\n只有未确认采购对账单允许取消\n订单ID\n订单明细ID\n新数量\n新单价\n新仓库ID\n变更原因\n供应商ID\n采购组织ID\n结算组织ID\n币种ID\n期间起\n期间止\n对账订单ID\n对账只记录差异，不自动调账、不替代应付结算。非零差异确认必须填"
+      },
+      "at": "2026-07-20T15:58:14.757Z"
+    },
+    {
+      "id": "P4-FE-RPT-purchase-report.html",
+      "name": "purchase-report.html 报表页真实API展示",
+      "status": "PASS",
+      "detail": {
+        "requests": [
+          "http://127.0.0.1:8099/pages/purchase-report.html",
+          "http://127.0.0.1:8099/common.css",
+          "http://127.0.0.1:8099/common.js",
+          "http://127.0.0.1:8099/images/logo.png",
+          "http://127.0.0.1:8099/purchase-p4-api.js",
+          "http://localhost:3001/api/orgs",
+          "http://localhost:3003/api/purchase-reports/overview",
+          "http://localhost:3001/api/orgs",
+          "http://localhost:3003/api/purchase-reports/overview",
+          "http://127.0.0.1:8099/favicon.ico"
+        ],
+        "text": "磐枢工业智能平台\n📊\n首页工作台\n业务模块\n📦\n供应链\n▶\n销售管理\n采购管理\n库存管理\n计划管理\n🏭\n生产制造\n▶\n工程数据\n生产管理\n委外管理\n✅\nMES执行\n▶\n智慧车间\n设备云\n✅\n质量管理\n▶\n日常检验\n不良品处理\nMRB评审\n请检管理\n质量报表\n基础资料\n国标资料\n参数设置\n💰\n财务会计\n▶\n总账\n报表\n应收管理\n应付管理\n出纳管理\n费用管理\n合并报表\n存货核算\n成本核算\n固定资产\n会计平台\n▦\nPLM管理\n▶\n编码管理\n研发物料\n项目管理\n工艺设计\n图文档管理\n变更管理\n知识库\n📦\n售后管理\n▶\n售后申请\n派工管理\n服务记录\n售后退货\n售后报表\n💽\n条码管理\n▶\n条码配置\n条码打印\n扫码作业\n条码追溯\n🤝\nCRM管理\n▶\n客户管理\n联系人\n商机管理\n销售管道\n客户360视图\n活动管理\n👥\nHR管理\n▶\n员工管理\n组织架构\n考勤管理\n绩效考核\n薪酬管理\n招聘管理\n合同管理\n社保管理\n个税管理\n培训管理\n🔧\n设备管理\n▶\n设备保养\n设备点检\n设备校准\n设备统计\n综合管理\n📋\n驾驶舱\n⚠\n风险预警中心\n✔\n优化建议中心\n📈\n决策大屏\n▶\n销售决策\n生产决策\n质量决策\n库存决策\n财务决策\n🤖\nAI智能助手\n📈\n智能分析中心\n📊\nBI报表\n▶\n报表设计器\n自定义看板\n报表订阅\n系统\n📂\n基础资料\n▶\n全部资料\n📋\n业务规则\n📂\n辅助资料\n⚙\n系统设置\n💻\n管理端\n管\nP4 采购基础概览\nP4 真实 API：http://localhost:3003/api；只覆盖订单变更/对账/报表。\n刷新\n指标\t值\norderCount\t160.00\ncurrentOrderAmount\t66102.96\nexecutedBusinessAmount\t35181.42\nreturnAmount\t2345.88\nestimatedPayableAmo",
+        "errors": []
+      },
+      "at": "2026-07-20T15:58:16.618Z"
+    },
+    {
+      "id": "P4-FE-RPT-purchase-order-exec-summary.html",
+      "name": "purchase-order-exec-summary.html 报表页真实API展示",
+      "status": "PASS",
+      "detail": {
+        "requests": [
+          "http://127.0.0.1:8099/pages/purchase-order-exec-summary.html",
+          "http://127.0.0.1:8099/common.css",
+          "http://127.0.0.1:8099/common.js",
+          "http://127.0.0.1:8099/images/logo.png",
+          "http://127.0.0.1:8099/purchase-p4-api.js",
+          "http://localhost:3001/api/orgs",
+          "http://localhost:3003/api/purchase-reports/order-execution-summary?page=1&pageSize=50",
+          "http://localhost:3001/api/orgs",
+          "http://localhost:3003/api/purchase-reports/order-execution-summary?page=1&pageSize=50",
+          "http://127.0.0.1:8099/favicon.ico"
+        ],
+        "text": "磐枢工业智能平台\n📊\n首页工作台\n业务模块\n📦\n供应链\n▶\n销售管理\n采购管理\n库存管理\n计划管理\n🏭\n生产制造\n▶\n工程数据\n生产管理\n委外管理\n✅\nMES执行\n▶\n智慧车间\n设备云\n✅\n质量管理\n▶\n日常检验\n不良品处理\nMRB评审\n请检管理\n质量报表\n基础资料\n国标资料\n参数设置\n💰\n财务会计\n▶\n总账\n报表\n应收管理\n应付管理\n出纳管理\n费用管理\n合并报表\n存货核算\n成本核算\n固定资产\n会计平台\n▦\nPLM管理\n▶\n编码管理\n研发物料\n项目管理\n工艺设计\n图文档管理\n变更管理\n知识库\n📦\n售后管理\n▶\n售后申请\n派工管理\n服务记录\n售后退货\n售后报表\n💽\n条码管理\n▶\n条码配置\n条码打印\n扫码作业\n条码追溯\n🤝\nCRM管理\n▶\n客户管理\n联系人\n商机管理\n销售管道\n客户360视图\n活动管理\n👥\nHR管理\n▶\n员工管理\n组织架构\n考勤管理\n绩效考核\n薪酬管理\n招聘管理\n合同管理\n社保管理\n个税管理\n培训管理\n🔧\n设备管理\n▶\n设备保养\n设备点检\n设备校准\n设备统计\n综合管理\n📋\n驾驶舱\n⚠\n风险预警中心\n✔\n优化建议中心\n📈\n决策大屏\n▶\n销售决策\n生产决策\n质量决策\n库存决策\n财务决策\n🤖\nAI智能助手\n📈\n智能分析中心\n📊\nBI报表\n▶\n报表设计器\n自定义看板\n报表订阅\n系统\n📂\n基础资料\n▶\n全部资料\n📋\n业务规则\n📂\n辅助资料\n⚙\n系统设置\n💻\n管理端\n管\nP4 采购订单执行汇总\nP4 真实 API：http://localhost:3003/api；只覆盖订单变更/对账/报表。\n刷新\n订单号\t业务类型\t订单金额\t实际金额\t应付金额\t完成率\t逾期\nPO20260720125120279236\tSTANDARD\t678.00\t0.00\t0.00\t0%\t否\nPO20260720125120628139\tSTANDARD\t678.",
+        "errors": []
+      },
+      "at": "2026-07-20T15:58:18.475Z"
+    },
+    {
+      "id": "P4-FE-RPT-purchase-order-exec-detail.html",
+      "name": "purchase-order-exec-detail.html 报表页真实API展示",
+      "status": "PASS",
+      "detail": {
+        "requests": [
+          "http://127.0.0.1:8099/pages/purchase-order-exec-detail.html",
+          "http://127.0.0.1:8099/common.css",
+          "http://127.0.0.1:8099/common.js",
+          "http://127.0.0.1:8099/images/logo.png",
+          "http://127.0.0.1:8099/purchase-p4-api.js",
+          "http://localhost:3001/api/orgs",
+          "http://localhost:3003/api/purchase-reports/order-execution-detail?page=1&pageSize=50",
+          "http://localhost:3001/api/orgs",
+          "http://localhost:3003/api/purchase-reports/order-execution-detail?page=1&pageSize=50",
+          "http://127.0.0.1:8099/favicon.ico"
+        ],
+        "text": "磐枢工业智能平台\n📊\n首页工作台\n业务模块\n📦\n供应链\n▶\n销售管理\n采购管理\n库存管理\n计划管理\n🏭\n生产制造\n▶\n工程数据\n生产管理\n委外管理\n✅\nMES执行\n▶\n智慧车间\n设备云\n✅\n质量管理\n▶\n日常检验\n不良品处理\nMRB评审\n请检管理\n质量报表\n基础资料\n国标资料\n参数设置\n💰\n财务会计\n▶\n总账\n报表\n应收管理\n应付管理\n出纳管理\n费用管理\n合并报表\n存货核算\n成本核算\n固定资产\n会计平台\n▦\nPLM管理\n▶\n编码管理\n研发物料\n项目管理\n工艺设计\n图文档管理\n变更管理\n知识库\n📦\n售后管理\n▶\n售后申请\n派工管理\n服务记录\n售后退货\n售后报表\n💽\n条码管理\n▶\n条码配置\n条码打印\n扫码作业\n条码追溯\n🤝\nCRM管理\n▶\n客户管理\n联系人\n商机管理\n销售管道\n客户360视图\n活动管理\n👥\nHR管理\n▶\n员工管理\n组织架构\n考勤管理\n绩效考核\n薪酬管理\n招聘管理\n合同管理\n社保管理\n个税管理\n培训管理\n🔧\n设备管理\n▶\n设备保养\n设备点检\n设备校准\n设备统计\n综合管理\n📋\n驾驶舱\n⚠\n风险预警中心\n✔\n优化建议中心\n📈\n决策大屏\n▶\n销售决策\n生产决策\n质量决策\n库存决策\n财务决策\n🤖\nAI智能助手\n📈\n智能分析中心\n📊\nBI报表\n▶\n报表设计器\n自定义看板\n报表订阅\n系统\n📂\n基础资料\n▶\n全部资料\n📋\n业务规则\n📂\n辅助资料\n⚙\n系统设置\n💻\n管理端\n管\nP4 采购订单执行明细\nP4 真实 API：http://localhost:3003/api；只覆盖订单变更/对账/报表。\n刷新\n订单号\t行\t物料/费用\t订单量\t已收料\t已入库\t已退料\t资产验收\t费用验收\t剩余\t执行率\t应付金额\nPO20260720125120279236\t1\tMAT_2004511929dc\t60\t0\t0\t0\t0\t0\t60\t0%\t0.00\nPO202",
+        "errors": []
+      },
+      "at": "2026-07-20T15:58:20.330Z"
+    },
+    {
+      "id": "P4-FE-RPT-purchase-consume-summary.html",
+      "name": "purchase-consume-summary.html 报表页真实API展示",
+      "status": "PASS",
+      "detail": {
+        "requests": [
+          "http://127.0.0.1:8099/pages/purchase-consume-summary.html",
+          "http://127.0.0.1:8099/common.css",
+          "http://127.0.0.1:8099/common.js",
+          "http://127.0.0.1:8099/images/logo.png",
+          "http://127.0.0.1:8099/purchase-p4-api.js",
+          "http://localhost:3001/api/orgs",
+          "http://localhost:3003/api/purchase-reports/consume-summary?page=1&pageSize=50",
+          "http://localhost:3001/api/orgs",
+          "http://localhost:3003/api/purchase-reports/consume-summary?page=1&pageSize=50",
+          "http://127.0.0.1:8099/favicon.ico"
+        ],
+        "text": "磐枢工业智能平台\n📊\n首页工作台\n业务模块\n📦\n供应链\n▶\n销售管理\n采购管理\n库存管理\n计划管理\n🏭\n生产制造\n▶\n工程数据\n生产管理\n委外管理\n✅\nMES执行\n▶\n智慧车间\n设备云\n✅\n质量管理\n▶\n日常检验\n不良品处理\nMRB评审\n请检管理\n质量报表\n基础资料\n国标资料\n参数设置\n💰\n财务会计\n▶\n总账\n报表\n应收管理\n应付管理\n出纳管理\n费用管理\n合并报表\n存货核算\n成本核算\n固定资产\n会计平台\n▦\nPLM管理\n▶\n编码管理\n研发物料\n项目管理\n工艺设计\n图文档管理\n变更管理\n知识库\n📦\n售后管理\n▶\n售后申请\n派工管理\n服务记录\n售后退货\n售后报表\n💽\n条码管理\n▶\n条码配置\n条码打印\n扫码作业\n条码追溯\n🤝\nCRM管理\n▶\n客户管理\n联系人\n商机管理\n销售管道\n客户360视图\n活动管理\n👥\nHR管理\n▶\n员工管理\n组织架构\n考勤管理\n绩效考核\n薪酬管理\n招聘管理\n合同管理\n社保管理\n个税管理\n培训管理\n🔧\n设备管理\n▶\n设备保养\n设备点检\n设备校准\n设备统计\n综合管理\n📋\n驾驶舱\n⚠\n风险预警中心\n✔\n优化建议中心\n📈\n决策大屏\n▶\n销售决策\n生产决策\n质量决策\n库存决策\n财务决策\n🤖\nAI智能助手\n📈\n智能分析中心\n📊\nBI报表\n▶\n报表设计器\n自定义看板\n报表订阅\n系统\n📂\n基础资料\n▶\n全部资料\n📋\n业务规则\n📂\n辅助资料\n⚙\n系统设置\n💻\n管理端\n管\nP4 采购消耗/金额汇总\nP4 真实 API：http://localhost:3003/api；只覆盖订单变更/对账/报表。\n刷新\n组织\t供应商\t业务类型\t物料/费用\t数量\t未税\t税额\t价税合计\n01d0dfa7-01c3-4a0a-8d71-442ba8961678\t9928433E-F36B-1410-8B47-0096A7B40922\tSTANDARD\tP4FEM",
+        "errors": []
+      },
+      "at": "2026-07-20T15:58:22.180Z"
+    },
+    {
+      "id": "P4-FE-SCOPE-purchase-price-list.html",
+      "name": "purchase-price-list.html 仅展示P4范围提示",
+      "status": "PASS",
+      "detail": {
+        "requests": [
+          "http://127.0.0.1:8099/pages/purchase-price-list.html",
+          "http://127.0.0.1:8099/common.css",
+          "http://127.0.0.1:8099/common.js",
+          "http://127.0.0.1:8099/images/logo.png",
+          "http://127.0.0.1:8099/purchase-p4-api.js",
+          "http://localhost:3001/api/orgs",
+          "http://localhost:3001/api/orgs",
+          "http://127.0.0.1:8099/favicon.ico"
+        ],
+        "text": "编辑\n📊\n首页工作台\n业务模块\n📦\n供应链\n▶\n销售管理\n采购管理\n库存管理\n计划管理\n🏭\n生产制造\n▶\n工程数据\n生产管理\n委外管理\n✅\nMES执行\n▶\n智慧车间\n设备云\n✅\n质量管理\n▶\n日常检验\n不良品处理\nMRB评审\n请检管理\n质量报表\n基础资料\n国标资料\n参数设置\n💰\n财务会计\n▶\n总账\n报表\n应收管理\n应付管理\n出纳管理\n费用管理\n合并报表\n存货核算\n成本核算\n固定资产\n会计平台\n▦\nPLM管理\n▶\n编码管理\n研发物料\n项目管理\n工艺设计\n图文档管理\n变更管理\n知识库\n📦\n售后管理\n▶\n售后申请\n派工管理\n服务记录\n售后退货\n售后报表\n💽\n条码管理\n▶\n条码配置\n条码打印\n扫码作业\n条码追溯\n🤝\nCRM管理\n▶\n客户管理\n联系人\n商机管理\n销售管道\n客户360视图\n活动管理\n👥\nHR管理\n▶\n员工管理\n组织架构\n考勤管理\n绩效考核\n薪酬管理\n招聘管理\n合同管理\n社保管理\n个税管理\n培训管理\n🔧\n设备管理\n▶\n设备保养\n设备点检\n设备校准\n设备统计\n综合管理\n📋\n驾驶舱\n⚠\n风险预警中心\n✔\n优化建议中心\n📈\n决策大屏\n▶\n销售决策\n生产决策\n质量决策\n"
+      },
+      "at": "2026-07-20T15:58:24.040Z"
+    },
+    {
+      "id": "P4-FE-SCOPE-purchase-supply-quota.html",
+      "name": "purchase-supply-quota.html 仅展示P4范围提示",
+      "status": "PASS",
+      "detail": {
+        "requests": [
+          "http://127.0.0.1:8099/pages/purchase-supply-quota.html",
+          "http://127.0.0.1:8099/common.css",
+          "http://127.0.0.1:8099/common.js",
+          "http://127.0.0.1:8099/images/logo.png",
+          "http://127.0.0.1:8099/purchase-p4-api.js",
+          "http://localhost:3001/api/orgs",
+          "http://localhost:3001/api/orgs",
+          "http://127.0.0.1:8099/favicon.ico"
+        ],
+        "text": "磐枢工业智能平台\n📊\n首页工作台\n业务模块\n📦\n供应链\n▶\n销售管理\n采购管理\n库存管理\n计划管理\n🏭\n生产制造\n▶\n工程数据\n生产管理\n委外管理\n✅\nMES执行\n▶\n智慧车间\n设备云\n✅\n质量管理\n▶\n日常检验\n不良品处理\nMRB评审\n请检管理\n质量报表\n基础资料\n国标资料\n参数设置\n💰\n财务会计\n▶\n总账\n报表\n应收管理\n应付管理\n出纳管理\n费用管理\n合并报表\n存货核算\n成本核算\n固定资产\n会计平台\n▦\nPLM管理\n▶\n编码管理\n研发物料\n项目管理\n工艺设计\n图文档管理\n变更管理\n知识库\n📦\n售后管理\n▶\n售后申请\n派工管理\n服务记录\n售后退货\n售后报表\n💽\n条码管理\n▶\n条码配置\n条码打印\n扫码作业\n条码追溯\n🤝\nCRM管理\n▶\n客户管理\n联系人\n商机管理\n销售管道\n客户360视图\n活动管理\n👥\nHR管理\n▶\n员工管理\n组织架构\n考勤管理\n绩效考核\n薪酬管理\n招聘管理\n合同管理\n社保管理\n个税管理\n培训管理\n🔧\n设备管理\n▶\n设备保养\n设备点检\n设备校准\n设备统计\n综合管理\n📋\n驾驶舱\n⚠\n风险预警中心\n✔\n优化建议中心\n📈\n决策大屏\n▶\n销售决策\n生产决策"
+      },
+      "at": "2026-07-20T15:58:25.896Z"
+    },
+    {
+      "id": "P4-FE-SCOPE-purchase-supply-quota-table.html",
+      "name": "purchase-supply-quota-table.html 仅展示P4范围提示",
+      "status": "PASS",
+      "detail": {
+        "requests": [
+          "http://127.0.0.1:8099/pages/purchase-supply-quota-table.html",
+          "http://127.0.0.1:8099/common.css",
+          "http://127.0.0.1:8099/common.js",
+          "http://127.0.0.1:8099/images/logo.png",
+          "http://127.0.0.1:8099/purchase-p4-api.js",
+          "http://localhost:3001/api/orgs",
+          "http://localhost:3001/api/orgs",
+          "http://127.0.0.1:8099/favicon.ico"
+        ],
+        "text": "磐枢工业智能平台\n📊\n首页工作台\n业务模块\n📦\n供应链\n▶\n销售管理\n采购管理\n库存管理\n计划管理\n🏭\n生产制造\n▶\n工程数据\n生产管理\n委外管理\n✅\nMES执行\n▶\n智慧车间\n设备云\n✅\n质量管理\n▶\n日常检验\n不良品处理\nMRB评审\n请检管理\n质量报表\n基础资料\n国标资料\n参数设置\n💰\n财务会计\n▶\n总账\n报表\n应收管理\n应付管理\n出纳管理\n费用管理\n合并报表\n存货核算\n成本核算\n固定资产\n会计平台\n▦\nPLM管理\n▶\n编码管理\n研发物料\n项目管理\n工艺设计\n图文档管理\n变更管理\n知识库\n📦\n售后管理\n▶\n售后申请\n派工管理\n服务记录\n售后退货\n售后报表\n💽\n条码管理\n▶\n条码配置\n条码打印\n扫码作业\n条码追溯\n🤝\nCRM管理\n▶\n客户管理\n联系人\n商机管理\n销售管道\n客户360视图\n活动管理\n👥\nHR管理\n▶\n员工管理\n组织架构\n考勤管理\n绩效考核\n薪酬管理\n招聘管理\n合同管理\n社保管理\n个税管理\n培训管理\n🔧\n设备管理\n▶\n设备保养\n设备点检\n设备校准\n设备统计\n综合管理\n📋\n驾驶舱\n⚠\n风险预警中心\n✔\n优化建议中心\n📈\n决策大屏\n▶\n销售决策\n生产决策"
+      },
+      "at": "2026-07-20T15:58:27.749Z"
+    },
+    {
+      "id": "P4-FE-SCOPE-purchase-init.html",
+      "name": "purchase-init.html 仅展示P4范围提示",
+      "status": "PASS",
+      "detail": {
+        "requests": [
+          "http://127.0.0.1:8099/pages/purchase-init.html",
+          "http://127.0.0.1:8099/common.css",
+          "http://127.0.0.1:8099/common.js",
+          "http://127.0.0.1:8099/images/logo.png",
+          "http://127.0.0.1:8099/purchase-p4-api.js",
+          "http://localhost:3001/api/orgs",
+          "http://localhost:3001/api/orgs",
+          "http://127.0.0.1:8099/favicon.ico"
+        ],
+        "text": "磐枢工业智能平台\n📊\n首页工作台\n业务模块\n📦\n供应链\n▶\n销售管理\n采购管理\n库存管理\n计划管理\n🏭\n生产制造\n▶\n工程数据\n生产管理\n委外管理\n✅\nMES执行\n▶\n智慧车间\n设备云\n✅\n质量管理\n▶\n日常检验\n不良品处理\nMRB评审\n请检管理\n质量报表\n基础资料\n国标资料\n参数设置\n💰\n财务会计\n▶\n总账\n报表\n应收管理\n应付管理\n出纳管理\n费用管理\n合并报表\n存货核算\n成本核算\n固定资产\n会计平台\n▦\nPLM管理\n▶\n编码管理\n研发物料\n项目管理\n工艺设计\n图文档管理\n变更管理\n知识库\n📦\n售后管理\n▶\n售后申请\n派工管理\n服务记录\n售后退货\n售后报表\n💽\n条码管理\n▶\n条码配置\n条码打印\n扫码作业\n条码追溯\n🤝\nCRM管理\n▶\n客户管理\n联系人\n商机管理\n销售管道\n客户360视图\n活动管理\n👥\nHR管理\n▶\n员工管理\n组织架构\n考勤管理\n绩效考核\n薪酬管理\n招聘管理\n合同管理\n社保管理\n个税管理\n培训管理\n🔧\n设备管理\n▶\n设备保养\n设备点检\n设备校准\n设备统计\n综合管理\n📋\n驾驶舱\n⚠\n风险预警中心\n✔\n优化建议中心\n📈\n决策大屏\n▶\n销售决策\n生产决策"
+      },
+      "at": "2026-07-20T15:58:29.603Z"
+    },
+    {
+      "id": "P4-FE-SCOPE-purchase-reconcile-scheme.html",
+      "name": "purchase-reconcile-scheme.html 仅展示P4范围提示",
+      "status": "PASS",
+      "detail": {
+        "requests": [
+          "http://127.0.0.1:8099/pages/purchase-reconcile-scheme.html",
+          "http://127.0.0.1:8099/common.css",
+          "http://127.0.0.1:8099/common.js",
+          "http://127.0.0.1:8099/images/logo.png",
+          "http://127.0.0.1:8099/purchase-p4-api.js",
+          "http://localhost:3001/api/orgs",
+          "http://localhost:3001/api/orgs",
+          "http://127.0.0.1:8099/favicon.ico"
+        ],
+        "text": "磐枢工业智能平台\n📊\n首页工作台\n业务模块\n📦\n供应链\n▶\n销售管理\n采购管理\n库存管理\n计划管理\n🏭\n生产制造\n▶\n工程数据\n生产管理\n委外管理\n✅\nMES执行\n▶\n智慧车间\n设备云\n✅\n质量管理\n▶\n日常检验\n不良品处理\nMRB评审\n请检管理\n质量报表\n基础资料\n国标资料\n参数设置\n💰\n财务会计\n▶\n总账\n报表\n应收管理\n应付管理\n出纳管理\n费用管理\n合并报表\n存货核算\n成本核算\n固定资产\n会计平台\n▦\nPLM管理\n▶\n编码管理\n研发物料\n项目管理\n工艺设计\n图文档管理\n变更管理\n知识库\n📦\n售后管理\n▶\n售后申请\n派工管理\n服务记录\n售后退货\n售后报表\n💽\n条码管理\n▶\n条码配置\n条码打印\n扫码作业\n条码追溯\n🤝\nCRM管理\n▶\n客户管理\n联系人\n商机管理\n销售管道\n客户360视图\n活动管理\n👥\nHR管理\n▶\n员工管理\n组织架构\n考勤管理\n绩效考核\n薪酬管理\n招聘管理\n合同管理\n社保管理\n个税管理\n培训管理\n🔧\n设备管理\n▶\n设备保养\n设备点检\n设备校准\n设备统计\n综合管理\n📋\n驾驶舱\n⚠\n风险预警中心\n✔\n优化建议中心\n📈\n决策大屏\n▶\n销售决策\n生产决策"
+      },
+      "at": "2026-07-20T15:58:31.457Z"
+    },
+    {
+      "id": "P4-FE-ERR-001",
+      "name": "P4页面无浏览器运行时异常",
+      "status": "PASS",
+      "detail": {},
+      "at": "2026-07-20T15:58:31.458Z"
+    }
+  ],
+  "defects": [],
+  "pages": {
+    "purchase-order-change.html": {
+      "panel": true,
+      "title": "采购订单变更 — 磐枢工业智能平台",
+      "textSample": "磐枢工业智能平台\n📊\n首页工作台\n业务模块\n📦\n供应链\n▶\n销售管理\n采购管理\n库存管理\n计划管理\n🏭\n生产制造\n▶\n工程数据\n生产管理\n委外管理\n✅\nMES执行\n▶\n智慧车间\n设备云\n✅\n质量管理\n▶\n日常检验\n不良品处理\nMRB评审\n请检管理\n质量报表\n基础资料\n国标资料\n参数设置\n💰\n财务会计\n▶\n总账\n报表\n应收管理\n应付管理\n出纳管理\n费用管理\n合并报表\n存货核算\n成本核算\n固定资产\n会计平台\n▦\nPLM管理\n▶\n编码管理\n研发物料\n项目管理\n工艺设计\n图文档管理\n变更管理\n知识库\n📦\n售后管理\n▶\n售后申请\n派工管理\n服务记录\n售后退货\n售后报表\n💽\n条码管理\n▶\n条码配置\n条码打印\n扫码作业\n条码追溯\n🤝\nCRM管理\n▶\n客户管理\n联系人\n商机管理\n销售管道\n客户360视图\n活动管理\n👥\nHR管理\n▶\n员工管理\n组织架构\n考勤管理\n绩效考核\n薪酬管理\n招聘管理\n合同管理\n社保管理\n个税管理\n培训管理\n🔧\n设备管理\n▶\n设备保养\n设备点检\n设备校准\n设备统计\n综合管理\n📋\n驾驶舱\n⚠\n风险预警中心\n✔\n优化建议中心\n📈\n决策大屏\n▶\n销售决策\n生产决策",
+      "requests": [
+        "http://localhost:3001/api/orgs",
+        "http://localhost:3003/api/purchase-order-changes?page=1&pageSize=100",
+        "http://localhost:3001/api/orgs",
+        "http://localhost:3003/api/purchase-order-changes?page=1&pageSize=100",
+        "http://localhost:3003/api/purchase-orders?page=1&pageSize=200",
+        "http://localhost:3003/api/purchase-orders?page=1&pageSize=200"
+      ],
+      "errors": []
+    },
+    "purchase-reconcile.html": {
+      "panel": true,
+      "title": "批量操作 删除 编辑",
+      "textSample": "编辑\n📊\n首页工作台\n业务模块\n📦\n供应链\n▶\n销售管理\n采购管理\n库存管理\n计划管理\n🏭\n生产制造\n▶\n工程数据\n生产管理\n委外管理\n✅\nMES执行\n▶\n智慧车间\n设备云\n✅\n质量管理\n▶\n日常检验\n不良品处理\nMRB评审\n请检管理\n质量报表\n基础资料\n国标资料\n参数设置\n💰\n财务会计\n▶\n总账\n报表\n应收管理\n应付管理\n出纳管理\n费用管理\n合并报表\n存货核算\n成本核算\n固定资产\n会计平台\n▦\nPLM管理\n▶\n编码管理\n研发物料\n项目管理\n工艺设计\n图文档管理\n变更管理\n知识库\n📦\n售后管理\n▶\n售后申请\n派工管理\n服务记录\n售后退货\n售后报表\n💽\n条码管理\n▶\n条码配置\n条码打印\n扫码作业\n条码追溯\n🤝\nCRM管理\n▶\n客户管理\n联系人\n商机管理\n销售管道\n客户360视图\n活动管理\n👥\nHR管理\n▶\n员工管理\n组织架构\n考勤管理\n绩效考核\n薪酬管理\n招聘管理\n合同管理\n社保管理\n个税管理\n培训管理\n🔧\n设备管理\n▶\n设备保养\n设备点检\n设备校准\n设备统计\n综合管理\n📋\n驾驶舱\n⚠\n风险预警中心\n✔\n优化建议中心\n📈\n决策大屏\n▶\n销售决策\n生产决策\n质量决策\n",
+      "requests": [
+        "http://localhost:3001/api/orgs",
+        "http://localhost:3003/api/purchase-reconciliations?page=1&pageSize=100",
+        "http://localhost:3001/api/orgs",
+        "http://localhost:3003/api/purchase-reconciliations?page=1&pageSize=100",
+        "http://localhost:3003/api/purchase-orders?page=1&pageSize=200"
+      ],
+      "errors": []
+    },
+    "purchase-report.html": {
+      "panel": true,
+      "title": "采购报表 — 磐枢工业智能平台",
+      "textSample": "磐枢工业智能平台\n📊\n首页工作台\n业务模块\n📦\n供应链\n▶\n销售管理\n采购管理\n库存管理\n计划管理\n🏭\n生产制造\n▶\n工程数据\n生产管理\n委外管理\n✅\nMES执行\n▶\n智慧车间\n设备云\n✅\n质量管理\n▶\n日常检验\n不良品处理\nMRB评审\n请检管理\n质量报表\n基础资料\n国标资料\n参数设置\n💰\n财务会计\n▶\n总账\n报表\n应收管理\n应付管理\n出纳管理\n费用管理\n合并报表\n存货核算\n成本核算\n固定资产\n会计平台\n▦\nPLM管理\n▶\n编码管理\n研发物料\n项目管理\n工艺设计\n图文档管理\n变更管理\n知识库\n📦\n售后管理\n▶\n售后申请\n派工管理\n服务记录\n售后退货\n售后报表\n💽\n条码管理\n▶\n条码配置\n条码打印\n扫码作业\n条码追溯\n🤝\nCRM管理\n▶\n客户管理\n联系人\n商机管理\n销售管道\n客户360视图\n活动管理\n👥\nHR管理\n▶\n员工管理\n组织架构\n考勤管理\n绩效考核\n薪酬管理\n招聘管理\n合同管理\n社保管理\n个税管理\n培训管理\n🔧\n设备管理\n▶\n设备保养\n设备点检\n设备校准\n设备统计\n综合管理\n📋\n驾驶舱\n⚠\n风险预警中心\n✔\n优化建议中心\n📈\n决策大屏\n▶\n销售决策\n生产决策",
+      "requests": [
+        "http://localhost:3001/api/orgs",
+        "http://localhost:3003/api/purchase-reports/overview",
+        "http://localhost:3001/api/orgs",
+        "http://localhost:3003/api/purchase-reports/overview"
+      ],
+      "errors": []
+    },
+    "purchase-order-exec-summary.html": {
+      "panel": true,
+      "title": "采购订单执行汇总表 — 磐枢工业智能平台",
+      "textSample": "磐枢工业智能平台\n📊\n首页工作台\n业务模块\n📦\n供应链\n▶\n销售管理\n采购管理\n库存管理\n计划管理\n🏭\n生产制造\n▶\n工程数据\n生产管理\n委外管理\n✅\nMES执行\n▶\n智慧车间\n设备云\n✅\n质量管理\n▶\n日常检验\n不良品处理\nMRB评审\n请检管理\n质量报表\n基础资料\n国标资料\n参数设置\n💰\n财务会计\n▶\n总账\n报表\n应收管理\n应付管理\n出纳管理\n费用管理\n合并报表\n存货核算\n成本核算\n固定资产\n会计平台\n▦\nPLM管理\n▶\n编码管理\n研发物料\n项目管理\n工艺设计\n图文档管理\n变更管理\n知识库\n📦\n售后管理\n▶\n售后申请\n派工管理\n服务记录\n售后退货\n售后报表\n💽\n条码管理\n▶\n条码配置\n条码打印\n扫码作业\n条码追溯\n🤝\nCRM管理\n▶\n客户管理\n联系人\n商机管理\n销售管道\n客户360视图\n活动管理\n👥\nHR管理\n▶\n员工管理\n组织架构\n考勤管理\n绩效考核\n薪酬管理\n招聘管理\n合同管理\n社保管理\n个税管理\n培训管理\n🔧\n设备管理\n▶\n设备保养\n设备点检\n设备校准\n设备统计\n综合管理\n📋\n驾驶舱\n⚠\n风险预警中心\n✔\n优化建议中心\n📈\n决策大屏\n▶\n销售决策\n生产决策",
+      "requests": [
+        "http://localhost:3001/api/orgs",
+        "http://localhost:3003/api/purchase-reports/order-execution-summary?page=1&pageSize=50",
+        "http://localhost:3001/api/orgs",
+        "http://localhost:3003/api/purchase-reports/order-execution-summary?page=1&pageSize=50"
+      ],
+      "errors": []
+    },
+    "purchase-order-exec-detail.html": {
+      "panel": true,
+      "title": "采购订单执行明细表 — 磐枢工业智能平台",
+      "textSample": "磐枢工业智能平台\n📊\n首页工作台\n业务模块\n📦\n供应链\n▶\n销售管理\n采购管理\n库存管理\n计划管理\n🏭\n生产制造\n▶\n工程数据\n生产管理\n委外管理\n✅\nMES执行\n▶\n智慧车间\n设备云\n✅\n质量管理\n▶\n日常检验\n不良品处理\nMRB评审\n请检管理\n质量报表\n基础资料\n国标资料\n参数设置\n💰\n财务会计\n▶\n总账\n报表\n应收管理\n应付管理\n出纳管理\n费用管理\n合并报表\n存货核算\n成本核算\n固定资产\n会计平台\n▦\nPLM管理\n▶\n编码管理\n研发物料\n项目管理\n工艺设计\n图文档管理\n变更管理\n知识库\n📦\n售后管理\n▶\n售后申请\n派工管理\n服务记录\n售后退货\n售后报表\n💽\n条码管理\n▶\n条码配置\n条码打印\n扫码作业\n条码追溯\n🤝\nCRM管理\n▶\n客户管理\n联系人\n商机管理\n销售管道\n客户360视图\n活动管理\n👥\nHR管理\n▶\n员工管理\n组织架构\n考勤管理\n绩效考核\n薪酬管理\n招聘管理\n合同管理\n社保管理\n个税管理\n培训管理\n🔧\n设备管理\n▶\n设备保养\n设备点检\n设备校准\n设备统计\n综合管理\n📋\n驾驶舱\n⚠\n风险预警中心\n✔\n优化建议中心\n📈\n决策大屏\n▶\n销售决策\n生产决策",
+      "requests": [
+        "http://localhost:3001/api/orgs",
+        "http://localhost:3003/api/purchase-reports/order-execution-detail?page=1&pageSize=50",
+        "http://localhost:3001/api/orgs",
+        "http://localhost:3003/api/purchase-reports/order-execution-detail?page=1&pageSize=50"
+      ],
+      "errors": []
+    },
+    "purchase-consume-summary.html": {
+      "panel": true,
+      "title": "消耗汇总查询 — 磐枢工业智能平台",
+      "textSample": "磐枢工业智能平台\n📊\n首页工作台\n业务模块\n📦\n供应链\n▶\n销售管理\n采购管理\n库存管理\n计划管理\n🏭\n生产制造\n▶\n工程数据\n生产管理\n委外管理\n✅\nMES执行\n▶\n智慧车间\n设备云\n✅\n质量管理\n▶\n日常检验\n不良品处理\nMRB评审\n请检管理\n质量报表\n基础资料\n国标资料\n参数设置\n💰\n财务会计\n▶\n总账\n报表\n应收管理\n应付管理\n出纳管理\n费用管理\n合并报表\n存货核算\n成本核算\n固定资产\n会计平台\n▦\nPLM管理\n▶\n编码管理\n研发物料\n项目管理\n工艺设计\n图文档管理\n变更管理\n知识库\n📦\n售后管理\n▶\n售后申请\n派工管理\n服务记录\n售后退货\n售后报表\n💽\n条码管理\n▶\n条码配置\n条码打印\n扫码作业\n条码追溯\n🤝\nCRM管理\n▶\n客户管理\n联系人\n商机管理\n销售管道\n客户360视图\n活动管理\n👥\nHR管理\n▶\n员工管理\n组织架构\n考勤管理\n绩效考核\n薪酬管理\n招聘管理\n合同管理\n社保管理\n个税管理\n培训管理\n🔧\n设备管理\n▶\n设备保养\n设备点检\n设备校准\n设备统计\n综合管理\n📋\n驾驶舱\n⚠\n风险预警中心\n✔\n优化建议中心\n📈\n决策大屏\n▶\n销售决策\n生产决策",
+      "requests": [
+        "http://localhost:3001/api/orgs",
+        "http://localhost:3003/api/purchase-reports/consume-summary?page=1&pageSize=50",
+        "http://localhost:3001/api/orgs",
+        "http://localhost:3003/api/purchase-reports/consume-summary?page=1&pageSize=50"
+      ],
+      "errors": []
+    },
+    "purchase-price-list.html": {
+      "panel": true,
+      "title": "删除 编辑",
+      "textSample": "编辑\n📊\n首页工作台\n业务模块\n📦\n供应链\n▶\n销售管理\n采购管理\n库存管理\n计划管理\n🏭\n生产制造\n▶\n工程数据\n生产管理\n委外管理\n✅\nMES执行\n▶\n智慧车间\n设备云\n✅\n质量管理\n▶\n日常检验\n不良品处理\nMRB评审\n请检管理\n质量报表\n基础资料\n国标资料\n参数设置\n💰\n财务会计\n▶\n总账\n报表\n应收管理\n应付管理\n出纳管理\n费用管理\n合并报表\n存货核算\n成本核算\n固定资产\n会计平台\n▦\nPLM管理\n▶\n编码管理\n研发物料\n项目管理\n工艺设计\n图文档管理\n变更管理\n知识库\n📦\n售后管理\n▶\n售后申请\n派工管理\n服务记录\n售后退货\n售后报表\n💽\n条码管理\n▶\n条码配置\n条码打印\n扫码作业\n条码追溯\n🤝\nCRM管理\n▶\n客户管理\n联系人\n商机管理\n销售管道\n客户360视图\n活动管理\n👥\nHR管理\n▶\n员工管理\n组织架构\n考勤管理\n绩效考核\n薪酬管理\n招聘管理\n合同管理\n社保管理\n个税管理\n培训管理\n🔧\n设备管理\n▶\n设备保养\n设备点检\n设备校准\n设备统计\n综合管理\n📋\n驾驶舱\n⚠\n风险预警中心\n✔\n优化建议中心\n📈\n决策大屏\n▶\n销售决策\n生产决策\n质量决策\n",
+      "requests": [
+        "http://localhost:3001/api/orgs",
+        "http://localhost:3001/api/orgs"
+      ],
+      "errors": []
+    },
+    "purchase-supply-quota.html": {
+      "panel": true,
+      "title": "供应配额订单 — 磐枢工业智能平台",
+      "textSample": "磐枢工业智能平台\n📊\n首页工作台\n业务模块\n📦\n供应链\n▶\n销售管理\n采购管理\n库存管理\n计划管理\n🏭\n生产制造\n▶\n工程数据\n生产管理\n委外管理\n✅\nMES执行\n▶\n智慧车间\n设备云\n✅\n质量管理\n▶\n日常检验\n不良品处理\nMRB评审\n请检管理\n质量报表\n基础资料\n国标资料\n参数设置\n💰\n财务会计\n▶\n总账\n报表\n应收管理\n应付管理\n出纳管理\n费用管理\n合并报表\n存货核算\n成本核算\n固定资产\n会计平台\n▦\nPLM管理\n▶\n编码管理\n研发物料\n项目管理\n工艺设计\n图文档管理\n变更管理\n知识库\n📦\n售后管理\n▶\n售后申请\n派工管理\n服务记录\n售后退货\n售后报表\n💽\n条码管理\n▶\n条码配置\n条码打印\n扫码作业\n条码追溯\n🤝\nCRM管理\n▶\n客户管理\n联系人\n商机管理\n销售管道\n客户360视图\n活动管理\n👥\nHR管理\n▶\n员工管理\n组织架构\n考勤管理\n绩效考核\n薪酬管理\n招聘管理\n合同管理\n社保管理\n个税管理\n培训管理\n🔧\n设备管理\n▶\n设备保养\n设备点检\n设备校准\n设备统计\n综合管理\n📋\n驾驶舱\n⚠\n风险预警中心\n✔\n优化建议中心\n📈\n决策大屏\n▶\n销售决策\n生产决策",
+      "requests": [
+        "http://localhost:3001/api/orgs",
+        "http://localhost:3001/api/orgs"
+      ],
+      "errors": []
+    },
+    "purchase-supply-quota-table.html": {
+      "panel": true,
+      "title": "供应商供货配额表 — 磐枢工业智能平台",
+      "textSample": "磐枢工业智能平台\n📊\n首页工作台\n业务模块\n📦\n供应链\n▶\n销售管理\n采购管理\n库存管理\n计划管理\n🏭\n生产制造\n▶\n工程数据\n生产管理\n委外管理\n✅\nMES执行\n▶\n智慧车间\n设备云\n✅\n质量管理\n▶\n日常检验\n不良品处理\nMRB评审\n请检管理\n质量报表\n基础资料\n国标资料\n参数设置\n💰\n财务会计\n▶\n总账\n报表\n应收管理\n应付管理\n出纳管理\n费用管理\n合并报表\n存货核算\n成本核算\n固定资产\n会计平台\n▦\nPLM管理\n▶\n编码管理\n研发物料\n项目管理\n工艺设计\n图文档管理\n变更管理\n知识库\n📦\n售后管理\n▶\n售后申请\n派工管理\n服务记录\n售后退货\n售后报表\n💽\n条码管理\n▶\n条码配置\n条码打印\n扫码作业\n条码追溯\n🤝\nCRM管理\n▶\n客户管理\n联系人\n商机管理\n销售管道\n客户360视图\n活动管理\n👥\nHR管理\n▶\n员工管理\n组织架构\n考勤管理\n绩效考核\n薪酬管理\n招聘管理\n合同管理\n社保管理\n个税管理\n培训管理\n🔧\n设备管理\n▶\n设备保养\n设备点检\n设备校准\n设备统计\n综合管理\n📋\n驾驶舱\n⚠\n风险预警中心\n✔\n优化建议中心\n📈\n决策大屏\n▶\n销售决策\n生产决策",
+      "requests": [
+        "http://localhost:3001/api/orgs",
+        "http://localhost:3001/api/orgs"
+      ],
+      "errors": []
+    },
+    "purchase-init.html": {
+      "panel": true,
+      "title": "采购期初余额 — 磐枢工业智能平台",
+      "textSample": "磐枢工业智能平台\n📊\n首页工作台\n业务模块\n📦\n供应链\n▶\n销售管理\n采购管理\n库存管理\n计划管理\n🏭\n生产制造\n▶\n工程数据\n生产管理\n委外管理\n✅\nMES执行\n▶\n智慧车间\n设备云\n✅\n质量管理\n▶\n日常检验\n不良品处理\nMRB评审\n请检管理\n质量报表\n基础资料\n国标资料\n参数设置\n💰\n财务会计\n▶\n总账\n报表\n应收管理\n应付管理\n出纳管理\n费用管理\n合并报表\n存货核算\n成本核算\n固定资产\n会计平台\n▦\nPLM管理\n▶\n编码管理\n研发物料\n项目管理\n工艺设计\n图文档管理\n变更管理\n知识库\n📦\n售后管理\n▶\n售后申请\n派工管理\n服务记录\n售后退货\n售后报表\n💽\n条码管理\n▶\n条码配置\n条码打印\n扫码作业\n条码追溯\n🤝\nCRM管理\n▶\n客户管理\n联系人\n商机管理\n销售管道\n客户360视图\n活动管理\n👥\nHR管理\n▶\n员工管理\n组织架构\n考勤管理\n绩效考核\n薪酬管理\n招聘管理\n合同管理\n社保管理\n个税管理\n培训管理\n🔧\n设备管理\n▶\n设备保养\n设备点检\n设备校准\n设备统计\n综合管理\n📋\n驾驶舱\n⚠\n风险预警中心\n✔\n优化建议中心\n📈\n决策大屏\n▶\n销售决策\n生产决策",
+      "requests": [
+        "http://localhost:3001/api/orgs",
+        "http://localhost:3001/api/orgs"
+      ],
+      "errors": []
+    },
+    "purchase-reconcile-scheme.html": {
+      "panel": true,
+      "title": "对账方案 — 磐枢工业智能平台",
+      "textSample": "磐枢工业智能平台\n📊\n首页工作台\n业务模块\n📦\n供应链\n▶\n销售管理\n采购管理\n库存管理\n计划管理\n🏭\n生产制造\n▶\n工程数据\n生产管理\n委外管理\n✅\nMES执行\n▶\n智慧车间\n设备云\n✅\n质量管理\n▶\n日常检验\n不良品处理\nMRB评审\n请检管理\n质量报表\n基础资料\n国标资料\n参数设置\n💰\n财务会计\n▶\n总账\n报表\n应收管理\n应付管理\n出纳管理\n费用管理\n合并报表\n存货核算\n成本核算\n固定资产\n会计平台\n▦\nPLM管理\n▶\n编码管理\n研发物料\n项目管理\n工艺设计\n图文档管理\n变更管理\n知识库\n📦\n售后管理\n▶\n售后申请\n派工管理\n服务记录\n售后退货\n售后报表\n💽\n条码管理\n▶\n条码配置\n条码打印\n扫码作业\n条码追溯\n🤝\nCRM管理\n▶\n客户管理\n联系人\n商机管理\n销售管道\n客户360视图\n活动管理\n👥\nHR管理\n▶\n员工管理\n组织架构\n考勤管理\n绩效考核\n薪酬管理\n招聘管理\n合同管理\n社保管理\n个税管理\n培训管理\n🔧\n设备管理\n▶\n设备保养\n设备点检\n设备校准\n设备统计\n综合管理\n📋\n驾驶舱\n⚠\n风险预警中心\n✔\n优化建议中心\n📈\n决策大屏\n▶\n销售决策\n生产决策",
+      "requests": [
+        "http://localhost:3001/api/orgs",
+        "http://localhost:3001/api/orgs"
+      ],
+      "errors": []
+    }
+  },
+  "ids": {
+    "ctx": {
+      "suffix": "4563077374",
+      "userId": "3D2E433E-F36B-1410-8B47-0096A7B40922",
+      "supplierId": "432E433E-F36B-1410-8B47-0096A7B40922",
+      "warehouseId": "492E433E-F36B-1410-8B47-0096A7B40922",
+      "unitId": "4F2E433E-F36B-1410-8B47-0096A7B40922",
+      "materialId": "552E433E-F36B-1410-8B47-0096A7B40922",
+      "currencyId": "5B2E433E-F36B-1410-8B47-0096A7B40922",
+      "paymentTermId": "612E433E-F36B-1410-8B47-0096A7B40922",
+      "orgId": "2b625146-9d12-4421-b173-91c9fe7efd05",
+      "username": "p4fe_4563077374"
+    },
+    "changeOrderId": "6E2E433E-F36B-1410-8B47-0096A7B40922",
+    "reconciliationOrderId": "772E433E-F36B-1410-8B47-0096A7B40922"
+  },
+  "completedAt": "2026-07-20T15:58:31.458Z",
+  "summary": {
+    "total": 23,
+    "passed": 23,
+    "failed": 0
+  }
+}

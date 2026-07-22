@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>采购申请单 — 磐枢工业智能平台</title>
 <link rel="stylesheet" href="../common.css">
-<script src="../common.js"></script>
+<script src="../common.js?v=20260721-row-actions2"></script>
 <script></script>
 <script src="../doc-data-store.js"></script>
 <script src="../doc-conversion.js"></script>
@@ -18,16 +18,64 @@
 .doc-sidebar-menu li a:hover{background:#002140;color:#fff;}
 .doc-sidebar-menu li a.active{background:#1890ff;color:#fff;}
 .doc-content{flex:1;display:flex;flex-direction:column;overflow:hidden;}
-.doc-header{position:sticky;top:0;z-index:100;background:#fff;border-bottom:1px solid #e8e8e8;padding:16px 20px;display:flex;justify-content:space-between;align-items:center;}
+.doc-header{position:sticky;top:0;z-index:100;background:#fff;border-bottom:1px solid #e8e8e8;padding:14px 20px;display:flex;justify-content:space-between;align-items:flex-start;gap:16px;}
+.doc-header>div:first-child{min-width:190px;flex-shrink:0;}
 .doc-header-title{font-size:20px;font-weight:600;color:#333;margin-bottom:4px;}
 .doc-header-subtitle{font-size:13px;color:#999;}
-.doc-toolbar{display:flex;gap:8px;flex-wrap:wrap;}
-.toolbar-btn{padding:6px 12px;border-radius:4px;font-size:13px;cursor:pointer;border:1px solid #d9d9d9;background:#fff;color:#666;display:flex;align-items:center;gap:6px;transition:all 0.3s;}
+.doc-toolbar{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end;}
+.toolbar-btn{padding:6px 12px;border-radius:4px;font-size:13px;cursor:pointer;border:1px solid #d9d9d9;background:#fff;color:#666;display:flex;align-items:center;gap:6px;transition:all 0.3s;flex:0 0 auto;white-space:nowrap;}
 .toolbar-btn:hover{border-color:#1890ff;color:#1890ff;}
 .toolbar-btn.primary{background:#1890ff;color:#fff;border-color:#1890ff;}
 .toolbar-btn.danger{background:#f5222d;color:#fff;border-color:#f5222d;}
+.toolbar-btn[hidden]{display:none!important;}
 .doc-body{flex:1;padding:16px;overflow-y:auto;}
 .doc-card{background:#fff;border-radius:4px;box-shadow:0 1px 2px rgba(0,0,0,0.05);overflow:hidden;}
+.table-scroll{overflow-x:auto;}
+.business-view-bar{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:12px 14px;margin-bottom:12px;background:#fff;border:1px solid #d9d9d9;border-radius:4px;}
+.business-view-heading{display:flex;align-items:baseline;gap:10px;min-width:210px;}
+.business-view-title{font-size:13px;font-weight:600;color:#262626;white-space:nowrap;}
+.business-view-description{font-size:12px;color:#666;}
+.business-view-tabs{display:inline-flex;padding:2px;background:#f0f2f5;border:1px solid #d9d9d9;border-radius:4px;flex-shrink:0;}
+.business-view-tab{min-height:30px;padding:5px 14px;border:0;background:transparent;color:#595959;font-size:13px;cursor:pointer;border-radius:2px;transition:background .15s ease,color .15s ease,box-shadow .15s ease;}
+.business-view-tab:hover{color:#0958d9;background:#fff;}
+.business-view-tab:focus-visible{outline:2px solid rgba(9,88,217,.2);outline-offset:1px;}
+.business-view-tab[aria-selected="true"]{background:#fff;color:#0958d9;font-weight:600;box-shadow:0 1px 2px rgba(0,0,0,.08);}
+.business-view-count{font-size:12px;color:#666;white-space:nowrap;min-width:84px;text-align:right;}
+.business-view-count strong{color:#262626;font-variant-numeric:tabular-nums;}
+.business-context{display:flex;align-items:flex-start;gap:10px;padding:10px 12px;margin-bottom:12px;border:1px solid #d6e4ff;background:#f6f9fd;color:#434343;font-size:12px;line-height:1.6;}
+.business-context strong{display:block;color:#262626;font-size:13px;}
+.business-type-badge{display:inline-flex;align-items:center;padding:1px 7px;border-radius:3px;border:1px solid #d9d9d9;background:#fafafa;color:#434343;font-size:12px;white-space:nowrap;}
+.business-type-badge.asset{border-color:#91caff;background:#e6f4ff;color:#0958d9;}
+.business-type-badge.expense{border-color:#ffd591;background:#fff7e6;color:#874d00;}
+#purchaseBusinessExtension:empty{display:none;}
+#purchaseBusinessExtension .p2-panel,#purchaseBusinessExtension .p3-panel{margin:0 0 12px;background:#fff;border:1px solid #d9d9d9;color:#333;box-shadow:none;}
+#purchaseBusinessExtension .p2-panel h3,#purchaseBusinessExtension .p3-panel h3{font-size:14px;color:#262626;}
+#purchaseBusinessExtension .p3-actions button,#purchaseBusinessExtension .p3-mini-btn{border-color:#d9d9d9;color:#434343;}
+#purchaseBusinessExtension .p3-actions button:hover,#purchaseBusinessExtension .p3-mini-btn:hover{border-color:#1677ff;color:#0958d9;}
+#purchaseBusinessExtension .p3-panel[data-expanded="false"] .p3-detail-action{display:none;}
+.purchase-drawer-layer{position:fixed;inset:0;z-index:3200;display:none;justify-content:flex-end;}
+.purchase-drawer-layer.show{display:flex;}
+.purchase-drawer-backdrop{position:absolute;inset:0;border:0;background:rgba(0,0,0,.38);cursor:default;}
+.purchase-drawer{position:relative;display:flex;flex-direction:column;width:min(560px,calc(100vw - 24px));height:100%;background:#fff;box-shadow:-8px 0 24px rgba(0,0,0,.16);animation:drawer-in .18s ease-out;}
+.purchase-drawer-header{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;padding:18px 20px;border-bottom:1px solid #e8e8e8;}
+.purchase-drawer-title{font-size:16px;font-weight:600;color:#262626;}
+.purchase-drawer-subtitle{margin-top:3px;color:#8c8c8c;font-size:12px;}
+.purchase-drawer-close{display:inline-flex;align-items:center;justify-content:center;width:32px;height:32px;border:1px solid transparent;background:transparent;color:#595959;font-size:22px;line-height:1;cursor:pointer;border-radius:4px;}
+.purchase-drawer-close:hover{background:#f5f5f5;color:#262626;}
+.purchase-drawer-body{flex:1;overflow-y:auto;padding:20px;}
+.purchase-drawer .p3-form{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;margin:0;}
+.purchase-drawer .p3-form label{font-size:12px;font-weight:500;color:#595959;}
+.purchase-drawer .p3-form input{margin-top:6px;padding:8px 10px;border-color:#d9d9d9;color:#262626;}
+.purchase-drawer .p3-form input:focus{outline:none;border-color:#1677ff;box-shadow:0 0 0 2px rgba(22,119,255,.12);}
+.purchase-drawer-footer{display:flex;justify-content:flex-end;gap:8px;padding:14px 20px;border-top:1px solid #e8e8e8;background:#fafafa;}
+.purchase-drawer-footer button{min-width:76px;padding:7px 14px;border:1px solid #d9d9d9;background:#fff;color:#434343;border-radius:4px;cursor:pointer;}
+.purchase-drawer-footer .primary{border-color:#1677ff;background:#1677ff;color:#fff;}
+@keyframes drawer-in{from{transform:translateX(24px);opacity:.7}to{transform:translateX(0);opacity:1}}
+@media (prefers-reduced-motion:reduce){.purchase-drawer{animation:none}}
+@media (max-width:1100px){.doc-header{flex-direction:column}.doc-toolbar{justify-content:flex-start}.business-view-bar{align-items:flex-start;flex-wrap:wrap}.business-view-tabs{order:3;width:100%;overflow-x:auto}.business-view-tab{flex:1;min-width:max-content}.business-view-count{margin-left:auto}}
+@media (max-width:720px){.doc-sidebar{width:168px}.doc-body{padding:12px}.business-view-heading{display:block;min-width:0}.business-view-description{margin-top:2px}.toolbar-btn{padding:6px 9px}.business-view-count{display:none}}
+@media (max-width:640px){.doc-sidebar{display:none}.doc-header{padding:12px}.doc-header>div:first-child{min-width:0}.doc-toolbar{width:100%;flex-wrap:nowrap;overflow-x:auto;padding-bottom:2px}.doc-body{padding:10px}.business-view-bar{padding:10px}.business-context{margin-bottom:10px}}
+@media (max-width:560px){.purchase-drawer{width:100vw}.purchase-drawer .p3-form{grid-template-columns:1fr}}
 .data-table{width:100%;border-collapse:collapse;}
 .data-table th{background:#fafafa;padding:12px 16px;text-align:left;font-weight:600;font-size:13px;color:#333;border-bottom:2px solid #e8e8e8;}
 .data-table td{padding:12px 16px;border-bottom:1px solid #e8e8e8;font-size:13px;color:#333;}
@@ -127,17 +175,17 @@
   <div class="doc-content">
     <header class="doc-header">
       <div>
-        <div class="doc-header-title">采购申请单</div>
-        <div class="doc-header-subtitle">管理采购申请单信息</div>
+        <div class="doc-header-title" id="purchaseRequestPageTitle">采购申请单</div>
+        <div class="doc-header-subtitle" id="purchaseRequestPageSubtitle">统一管理标准、资产与费用采购申请</div>
       </div>
       <div class="doc-toolbar">
         <button class="toolbar-btn" onclick="openFilterModal()"><span class="icon">🔍</span> 过滤</button>
-        <button class="toolbar-btn primary" onclick="location.href='purchase-request-create.html'"><span class="icon">+</span> 新增</button>
+        <button class="toolbar-btn primary" id="purchaseRequestAddButton" onclick="location.href='purchase-request-create.html'"><span class="icon">+</span> 新增</button>
         <button class="toolbar-btn" onclick="batchSubmit()"><span class="icon">✓</span> 批量提交</button>
         <button class="toolbar-btn" onclick="batchApprove()"><span class="icon">✓</span> 批量审核</button>
-        <button class="toolbar-btn" onclick="batchReverseApprove()"><span class="icon">↩️</span> 批量反审核</button>
+        <button class="toolbar-btn" onclick="batchReverseApprove()" hidden><span class="icon">↩️</span> 批量反审核</button>
         <button class="toolbar-btn" onclick="batchClose()"><span class="icon">🔒</span> 关闭</button>
-          <button class="toolbar-btn" onclick="batchReverseClose()"><span class="icon">🔓</span> 反关闭</button>
+          <button class="toolbar-btn" onclick="batchReverseClose()" hidden><span class="icon">🔓</span> 反关闭</button>
         <button class="toolbar-btn danger" onclick="batchDelete()"><span class="icon">🗑️</span> 批量删除</button>
         <div style="width:1px;height:24px;background:#e8e8e8;margin:0 8px;"></div>
         <button class="toolbar-btn" onclick="openColumnSettings()"><span class="icon">⚙️</span> 显示/隐藏列</button>
@@ -145,8 +193,26 @@
       </div>
     </header>
     <div class="doc-body">
+      <section class="business-view-bar" aria-label="采购业务类型视图">
+        <div class="business-view-heading">
+          <span class="business-view-title">业务类型</span>
+          <span class="business-view-description" id="businessViewDescription">标准采购主链申请</span>
+        </div>
+        <div class="business-view-tabs" role="tablist" aria-label="筛选采购业务类型">
+          <button class="business-view-tab" type="button" role="tab" data-business-view="ALL" aria-selected="false" onclick="setPurchaseRequestBusinessView('ALL')">全部</button>
+          <button class="business-view-tab" type="button" role="tab" data-business-view="STANDARD_PURCHASE" aria-selected="true" onclick="setPurchaseRequestBusinessView('STANDARD_PURCHASE')">标准采购</button>
+          <button class="business-view-tab" type="button" role="tab" data-business-view="ASSET_PURCHASE" aria-selected="false" onclick="setPurchaseRequestBusinessView('ASSET_PURCHASE')">资产采购</button>
+          <button class="business-view-tab" type="button" role="tab" data-business-view="EXPENSE_PURCHASE" aria-selected="false" onclick="setPurchaseRequestBusinessView('EXPENSE_PURCHASE')">费用采购</button>
+        </div>
+        <div class="business-view-count" id="businessViewCount" aria-live="polite">当前 <strong>0</strong> 条</div>
+      </section>
+      <div class="business-context" id="businessContext" role="status">
+        <span aria-hidden="true">i</span>
+        <div><strong id="businessContextTitle">标准采购</strong><span id="businessContextText">按采购申请、采购订单、收料、检验、入库和暂估应付主链执行。</span></div>
+      </div>
+      <div id="purchaseBusinessExtension"></div>
       <div class="doc-card">
-        <table class="data-table">
+        <div class="table-scroll"><table class="data-table">
           <thead>
             <tr>
               <th><input type="checkbox" onclick="selectAll()"></th>
@@ -154,7 +220,7 @@
             </tr>
           </thead>
           <tbody id="dataBody"></tbody>
-        </table>
+        </table></div>
         <div class="pagination">
           <button class="btn" onclick="prevPage()">上一页</button>
           <span id="pageInfo">第 1 页 / 共 0 页</span>
@@ -274,27 +340,6 @@
         <button class="btn" onclick="resetFilter()">重置</button>
         <button class="btn btn-primary" onclick="executeFilter()">确定</button>
       </div>
-    </div>
-  </div>
-</div>
-      <button class="filter-close" onclick="closeFilterModal()">×</button>
-    </div>
-    <div class="filter-body">
-      <div class="form-row">
-        <div class="form-group"><label>单据编号</label><input type="text" id="filterDocNo" placeholder="请输入单据编号"></div>
-        <div class="form-group"><label>供应商</label><input type="text" id="filterPartner" placeholder="请输入供应商"></div>
-        <div class="form-group"><label>组织</label><input type="text" id="filterOrg" placeholder="请输入组织"></div>
-      </div>
-      <div class="form-row">
-        <div class="form-group"><label>状态</label><select id="filterStatus"><option value="">全部状态</option><option value="draft">草稿</option><option value="pending">待审核</option><option value="approved">已审核</option><option value="closed">已关闭</option></select></div>
-        <div class="form-group"><label>开始日期</label><input type="date" id="filterStartDate"></div>
-        <div class="form-group"><label>结束日期</label><input type="date" id="filterEndDate"></div>
-      </div>
-    </div>
-    <div class="filter-footer">
-      <button class="btn btn-cancel" onclick="closeFilterModal()">取消</button>
-      <button class="btn" onclick="resetFilter()">重置</button>
-      <button class="btn btn-primary" onclick="searchData()">确定</button>
     </div>
   </div>
 </div>
@@ -705,9 +750,6 @@ function renderTable(list) {
     tbody.appendChild(row);
   });
 }
-function openFilterModal() { document.getElementById('filterModal').classList.add('show'); }
-function closeFilterModal() { document.getElementById('filterModal').classList.remove('show'); }
-function resetFilter() { document.getElementById('filterDocNo').value = ''; document.getElementById('filterPartner').value = ''; document.getElementById('filterOrg').value = ''; document.getElementById('filterStatus').value = ''; document.getElementById('filterStartDate').value = ''; document.getElementById('filterEndDate').value = ''; }
 function selectAll() { document.querySelectorAll('.data-checkbox').forEach(function(cb) { cb.checked = document.querySelector('.data-table th input').checked; }); }
 function getSelectedIds() { return Array.from(document.querySelectorAll('.data-checkbox:checked')).map(function(cb) { return cb.value; }); }
 function batchSubmit() {
@@ -806,8 +848,8 @@ function exitPage() { showConfirm("确认退出？", function() { window.locatio
 document.addEventListener('DOMContentLoaded', init);
 </script>
 <script>window.PURCHASE_P0_API_BASE=window.PURCHASE_P0_API_BASE||'http://localhost:3003/api';</script>
-<script src="../purchase-p0-api.js"></script>
-<script src="../purchase-p2-asset-api.js"></script>
-<script src="../purchase-p3-expense-api.js"></script>
+<script src="../purchase-p0-api.js?v=20260721-row-actions1"></script>
+<script src="../purchase-p2-asset-api.js?v=20260721-row-actions1"></script>
+<script src="../purchase-p3-expense-api.js?v=20260721-row-actions1"></script>
 </body>
 </html>

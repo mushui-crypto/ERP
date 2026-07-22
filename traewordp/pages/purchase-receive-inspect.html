@@ -5,9 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>采购收货检验 — 磐枢工业智能平台</title>
 <link rel="stylesheet" href="../common.css">
-<script src="../common.js"></script>
+<script src="../common.js?v=20260721-row-actions2"></script>
 <script></script>
-<script src="../doc-data-store.js"></script>
 <style>
 .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:1000;justify-content:center;align-items:flex-start;padding-top:36px;opacity:1;pointer-events:none;}
 .modal-overlay.show{display:flex;pointer-events:all;}
@@ -294,62 +293,6 @@
     </div>
   </div>
 </div>
-      <button class="filter-close" onclick="closeFilterModal()">×</button>
-    </div>
-    <div class="filter-body">
-      <div class="form-row">
-        <div class="form-group">
-          <label>单据编号</label>
-          <input type="text" id="filterDocNo" placeholder="请输入单据编号">
-        </div>
-        <div class="form-group">
-          <label>客户/供应商</label>
-          <input type="text" id="filterPartner" placeholder="请输入客户或供应商">
-        </div>
-        <div class="form-group">
-          <label>组织</label>
-          <input type="text" id="filterOrg" placeholder="请输入组织">
-        </div>
-      </div>
-      <div class="form-row">
-        <div class="form-group">
-          <label>状态</label>
-          <select id="filterStatus">
-            <option value="">全部状态</option>
-            <option value="draft">草稿</option>
-            <option value="pending">待审核</option>
-            <option value="approved">已审核</option>
-            <option value="closed">已关闭</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label>开始日期</label>
-          <input type="date" id="filterStartDate">
-        </div>
-        <div class="form-group">
-          <label>结束日期</label>
-          <input type="date" id="filterEndDate">
-        </div>
-      </div>
-      <div class="form-row">
-        <div class="form-group">
-          <label>最小金额</label>
-          <input type="number" id="filterMinAmount" placeholder="最小金额">
-        </div>
-        <div class="form-group">
-          <label>最大金额</label>
-          <input type="number" id="filterMaxAmount" placeholder="最大金额">
-        </div>
-      </div>
-    </div>
-    <div class="filter-footer">
-      <button class="btn btn-cancel" onclick="closeFilterModal()">取消</button>
-      <button class="btn btn-default" onclick="resetFilter()">重置</button>
-      <button class="btn btn-primary" onclick="searchData()">确定</button>
-    </div>
-  </div>
-</div>
-
 <script>
 var currentPage = 1;
 var pageSize = 10;
@@ -758,17 +701,6 @@ function closeFilterModal() {
   document.getElementById('filterModal').classList.remove('show');
 }
 
-function resetFilter() { loadDefaultFilter(); } {
-  document.getElementById('filterDocNo').value = '';
-  document.getElementById('filterPartner').value = '';
-  document.getElementById('filterOrg').value = '';
-  document.getElementById('filterStatus').value = '';
-  document.getElementById('filterStartDate').value = '';
-  document.getElementById('filterEndDate').value = '';
-  document.getElementById('filterMinAmount').value = '';
-  document.getElementById('filterMaxAmount').value = '';
-}
-
 function selectAll() {
   var master = document.querySelector('.data-table th input');
   var checkboxes = document.querySelectorAll('.data-checkbox');
@@ -793,7 +725,7 @@ function batchSubmit() {
       if (ids.includes(item.id) && item.status === 'draft') {
         item.status = 'pending';
         count++;
-      });
+      }
     });
     localStorage.setItem('erp_' + docType + '_list', JSON.stringify(list));
     showToast('已提交 ' + count + ' 条单据', 'success');
@@ -814,7 +746,7 @@ function batchApprove() {
       if (ids.includes(item.id) && item.status === 'pending') {
         item.status = 'approved';
         count++;
-      });
+      }
     });
     localStorage.setItem('erp_' + docType + '_list', JSON.stringify(list));
     showToast('已审核 ' + count + ' 条单据', 'success');
@@ -835,7 +767,7 @@ function batchReverseApprove() {
       if (ids.includes(item.id) && item.status === 'approved') {
         item.status = 'pending';
         count++;
-      });
+      }
     });
     localStorage.setItem('erp_' + docType + '_list', JSON.stringify(list));
     showToast('已反审核 ' + count + ' 条单据', 'success');
@@ -856,7 +788,7 @@ function batchClose() {
       if (ids.includes(item.id) && item.status === 'approved') {
         item.status = 'closed';
         count++;
-      });
+      }
     });
     localStorage.setItem('erp_' + docType + '_list', JSON.stringify(list));
     showToast('已关闭 ' + count + ' 条单据', 'success');
@@ -877,7 +809,7 @@ function batchReverseClose() {
       if (ids.includes(item.id) && item.status === 'closed') {
         item.status = 'approved';
         count++;
-      });
+      }
     });
     localStorage.setItem('erp_' + docType + '_list', JSON.stringify(list));
     showToast('已反关闭 ' + count + ' 条单据', 'success');
@@ -915,8 +847,7 @@ function exportData() {
   link.click();
   showToast('导出成功', 'success');
 }
-function exitPage() { showConfirm("确认退出？", function() { window.location.href = "../index.html"; }); });
-}
+function exitPage() { showConfirm("确认退出？", function() { window.location.href = "../index.html"; }); }
 
 function openColumnSettings() {
   var container = document.getElementById('columnCheckboxes');

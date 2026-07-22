@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>收料通知单 — 磐枢工业智能平台</title>
 <link rel="stylesheet" href="../common.css">
-<script src="../common.js"></script>
+<script src="../common.js?v=20260721-row-actions2"></script>
 <script></script>
 <script src="../doc-data-store.js"></script>
 <script src="../doc-conversion.js"></script>
@@ -274,27 +274,6 @@
         <button class="btn" onclick="resetFilter()">重置</button>
         <button class="btn btn-primary" onclick="executeFilter()">确定</button>
       </div>
-    </div>
-  </div>
-</div>
-      <button class="filter-close" onclick="closeFilterModal()">×</button>
-    </div>
-    <div class="filter-body">
-      <div class="form-row">
-        <div class="form-group"><label>单据编号</label><input type="text" id="filterDocNo" placeholder="请输入单据编号"></div>
-        <div class="form-group"><label>供应商</label><input type="text" id="filterPartner" placeholder="请输入供应商"></div>
-        <div class="form-group"><label>组织</label><input type="text" id="filterOrg" placeholder="请输入组织"></div>
-      </div>
-      <div class="form-row">
-        <div class="form-group"><label>状态</label><select id="filterStatus"><option value="">全部状态</option><option value="draft">草稿</option><option value="pending">待审核</option><option value="approved">已审核</option><option value="closed">已关闭</option></select></div>
-        <div class="form-group"><label>开始日期</label><input type="date" id="filterStartDate"></div>
-        <div class="form-group"><label>结束日期</label><input type="date" id="filterEndDate"></div>
-      </div>
-    </div>
-    <div class="filter-footer">
-      <button class="btn btn-cancel" onclick="closeFilterModal()">取消</button>
-      <button class="btn" onclick="resetFilter()">重置</button>
-      <button class="btn btn-primary" onclick="searchData()">确定</button>
     </div>
   </div>
 </div>
@@ -705,9 +684,6 @@ function renderTable(list) {
     tbody.appendChild(row);
   });
 }
-function openFilterModal() { document.getElementById('filterModal').classList.add('show'); }
-function closeFilterModal() { document.getElementById('filterModal').classList.remove('show'); }
-function resetFilter() { document.getElementById('filterDocNo').value = ''; document.getElementById('filterPartner').value = ''; document.getElementById('filterOrg').value = ''; document.getElementById('filterStatus').value = ''; document.getElementById('filterStartDate').value = ''; document.getElementById('filterEndDate').value = ''; }
 function selectAll() { document.querySelectorAll('.data-checkbox').forEach(function(cb) { cb.checked = document.querySelector('.data-table th input').checked; }); }
 function getSelectedIds() { return Array.from(document.querySelectorAll('.data-checkbox:checked')).map(function(cb) { return cb.value; }); }
 function batchSubmit() {
@@ -806,8 +782,8 @@ function exitPage() { showConfirm("确认退出？", function() { window.locatio
 document.addEventListener('DOMContentLoaded', init);
 </script>
 <script>window.PURCHASE_P0_API_BASE=window.PURCHASE_P0_API_BASE||'http://localhost:3003/api';</script>
-<script src="../purchase-p0-api.js"></script>
-<script src="../purchase-p2-asset-api.js"></script>
-<script src="../purchase-p3-expense-api.js"></script>
+<script src="../purchase-p0-api.js?v=20260721-row-actions1"></script>
+<script src="../purchase-p2-asset-api.js?v=20260721-row-actions1"></script>
+<script src="../purchase-p3-expense-api.js?v=20260721-row-actions1"></script>
 </body>
 </html>

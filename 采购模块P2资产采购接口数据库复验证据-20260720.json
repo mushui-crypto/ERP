@@ -1,7 +1,7 @@
 {
-  "runTag": "P2VERIFY-1784537828468",
+  "runTag": "P2VERIFY-1784563040370",
   "api": "http://localhost:3003/api",
-  "startedAt": "2026-07-20T08:57:08.468Z",
+  "startedAt": "2026-07-20T15:57:20.370Z",
   "tests": [
     {
       "id": "P2-ROUTES",
@@ -16,7 +16,7 @@
           "/api/inventory-out/from-asset-out-request/{requestId}"
         ]
       },
-      "at": "2026-07-20T08:57:08.568Z"
+      "at": "2026-07-20T15:57:20.461Z"
     },
     {
       "id": "P2-ASSET_NO_INBOUND-1-CONCURRENT-PR",
@@ -24,22 +24,22 @@
       "status": "PASS",
       "detail": {
         "ids": [
-          "C41A433E-F36B-1410-8B47-0096A7B40922",
-          "C41A433E-F36B-1410-8B47-0096A7B40922",
-          "C41A433E-F36B-1410-8B47-0096A7B40922",
-          "C41A433E-F36B-1410-8B47-0096A7B40922"
+          "552B433E-F36B-1410-8B47-0096A7B40922",
+          "552B433E-F36B-1410-8B47-0096A7B40922",
+          "552B433E-F36B-1410-8B47-0096A7B40922",
+          "552B433E-F36B-1410-8B47-0096A7B40922"
         ]
       },
-      "at": "2026-07-20T08:57:08.938Z"
+      "at": "2026-07-20T15:57:20.831Z"
     },
     {
       "id": "P2-ASSET_NO_INBOUND-1-IDEM-PR",
       "name": "OA导入同来源同载荷返回原单",
       "status": "PASS",
       "detail": {
-        "id": "C41A433E-F36B-1410-8B47-0096A7B40922"
+        "id": "552B433E-F36B-1410-8B47-0096A7B40922"
       },
-      "at": "2026-07-20T08:57:08.947Z"
+      "at": "2026-07-20T15:57:20.845Z"
     },
     {
       "id": "P2-ASSET_NO_INBOUND-1-CONFLICT-PR",
@@ -48,7 +48,7 @@
       "detail": {
         "message": "OA 来源已被不同请求载荷使用"
       },
-      "at": "2026-07-20T08:57:08.972Z"
+      "at": "2026-07-20T15:57:20.854Z"
     },
     {
       "id": "P2-ASSET_NO_INBOUND-1-TRACE",
@@ -59,7 +59,7 @@
         "order": "ASSET_NO_INBOUND",
         "receive": "ASSET_NO_INBOUND"
       },
-      "at": "2026-07-20T08:57:09.274Z"
+      "at": "2026-07-20T15:57:21.172Z"
     },
     {
       "id": "P2-CG07-NO-IN",
@@ -68,7 +68,7 @@
       "detail": {
         "message": "资产采购不入库流程禁止生成采购入库单"
       },
-      "at": "2026-07-20T08:57:09.296Z"
+      "at": "2026-07-20T15:57:21.192Z"
     },
     {
       "id": "P2-CG07-CONCURRENT-AA",
@@ -76,22 +76,22 @@
       "status": "PASS",
       "detail": {
         "ids": [
-          "DD1A433E-F36B-1410-8B47-0096A7B40922",
-          "DD1A433E-F36B-1410-8B47-0096A7B40922",
-          "DD1A433E-F36B-1410-8B47-0096A7B40922",
-          "DD1A433E-F36B-1410-8B47-0096A7B40922"
+          "702B433E-F36B-1410-8B47-0096A7B40922",
+          "702B433E-F36B-1410-8B47-0096A7B40922",
+          "702B433E-F36B-1410-8B47-0096A7B40922",
+          "702B433E-F36B-1410-8B47-0096A7B40922"
         ]
       },
-      "at": "2026-07-20T08:57:09.389Z"
+      "at": "2026-07-20T15:57:21.303Z"
     },
     {
       "id": "P2-CG07-IDEM-AA",
       "name": "资产验收同键同载荷返回原单",
       "status": "PASS",
       "detail": {
-        "id": "DD1A433E-F36B-1410-8B47-0096A7B40922"
+        "id": "702B433E-F36B-1410-8B47-0096A7B40922"
       },
-      "at": "2026-07-20T08:57:09.400Z"
+      "at": "2026-07-20T15:57:21.313Z"
     },
     {
       "id": "P2-CG07-CONFLICT-AA",
@@ -100,7 +100,7 @@
       "detail": {
         "message": "幂等键已被不同请求载荷使用"
       },
-      "at": "2026-07-20T08:57:09.412Z"
+      "at": "2026-07-20T15:57:21.323Z"
     },
     {
       "id": "P2-CG07-OVER-AA",
@@ -109,33 +109,33 @@
       "detail": {
         "message": "来源明细可验收数量为 0，本次为 4"
       },
-      "at": "2026-07-20T08:57:09.437Z"
+      "at": "2026-07-20T15:57:21.367Z"
     },
     {
       "id": "P2-CG07-CARD-FAIL",
       "name": "CG-07建卡失败不回滚验收和暂估应付",
       "status": "PASS",
       "detail": {
-        "id": "DD1A433E-F36B-1410-8B47-0096A7B40922",
+        "id": "702B433E-F36B-1410-8B47-0096A7B40922",
         "createdBy": null,
         "updatedBy": null,
-        "createdAt": "2026-07-20T00:57:09.310Z",
-        "updatedAt": "2026-07-20T00:57:09.526Z",
+        "createdAt": "2026-07-20T07:57:21.230Z",
+        "updatedAt": "2026-07-20T07:57:21.476Z",
         "isDeleted": 0,
-        "acceptanceNo": "AA20260720165709319544",
-        "idempotencyKey": "P2VERIFY-1784537828468-AA-CG07",
-        "payloadHash": "1d8c245504b610adbab84bc9a557e342a3df69499263ada804b1204b66bbbac1",
+        "acceptanceNo": "AA20260720235721233126",
+        "idempotencyKey": "P2VERIFY-1784563040370-AA-CG07",
+        "payloadHash": "4bd37b073feee79fd6006df5d1d10526cf0113fd10ae4872d4e24cf039fa2229",
         "businessType": "ASSET_NO_INBOUND",
         "sourceType": "RECEIVE_NOTICE",
-        "sourceId": "D91A433E-F36B-1410-8B47-0096A7B40922",
-        "sourceNo": "PRN20260720165709176124",
-        "orgId": "ef778f76-e1fb-492e-be16-05ff8d8ae290",
-        "purchaseOrgId": "ef778f76-e1fb-492e-be16-05ff8d8ae290",
-        "stockOrgId": "ef778f76-e1fb-492e-be16-05ff8d8ae290",
-        "settleOrgId": "ef778f76-e1fb-492e-be16-05ff8d8ae290",
-        "supplierId": "A51A433E-F36B-1410-8B47-0096A7B40922",
-        "currencyId": "AF1A433E-F36B-1410-8B47-0096A7B40922",
-        "paymentTermId": "B61A433E-F36B-1410-8B47-0096A7B40922",
+        "sourceId": "682B433E-F36B-1410-8B47-0096A7B40922",
+        "sourceNo": "PRN20260720235721098928",
+        "orgId": "fe47c72b-5351-4199-8eb7-91d43338691a",
+        "purchaseOrgId": "fe47c72b-5351-4199-8eb7-91d43338691a",
+        "stockOrgId": "fe47c72b-5351-4199-8eb7-91d43338691a",
+        "settleOrgId": "fe47c72b-5351-4199-8eb7-91d43338691a",
+        "supplierId": "332B433E-F36B-1410-8B47-0096A7B40922",
+        "currencyId": "4B2B433E-F36B-1410-8B47-0096A7B40922",
+        "paymentTermId": "512B433E-F36B-1410-8B47-0096A7B40922",
         "acceptanceDate": "2026-07-20T00:00:00.000Z",
         "departmentId": null,
         "acceptorId": null,
@@ -143,44 +143,44 @@
         "taxAmount": 26,
         "totalAmount": 226,
         "status": 2,
-        "approvedAt": "2026-07-20T08:57:09.000Z",
+        "approvedAt": "2026-07-20T15:57:21.000Z",
         "approvedBy": "P2",
         "payableGenerationStatus": "GENERATED",
-        "payableId": "DF1A433E-F36B-1410-8B47-0096A7B40922",
-        "payableNo": "AP20260720165709498513",
+        "payableId": "722B433E-F36B-1410-8B47-0096A7B40922",
+        "payableNo": "AP20260720235721436760",
         "payableGenerationError": null,
         "payableGenerationFailedAt": null,
-        "payableGeneratedAt": "2026-07-20T08:57:09.000Z",
+        "payableGeneratedAt": "2026-07-20T15:57:21.000Z",
         "assetCardGenerationStatus": "FAILED",
-        "assetCardGenerationError": "资产类别 P2CAT_4537828468 不存在或未启用",
-        "assetCardGenerationFailedAt": "2026-07-20T08:57:09.000Z",
+        "assetCardGenerationError": "资产类别 P2CAT_4563040370 不存在或未启用",
+        "assetCardGenerationFailedAt": "2026-07-20T15:57:21.000Z",
         "assetCardGeneratedAt": null,
         "outRequestId": null,
         "outRequestNo": null,
         "remark": null,
         "entries": [
           {
-            "id": "DE1A433E-F36B-1410-8B47-0096A7B40922",
+            "id": "712B433E-F36B-1410-8B47-0096A7B40922",
             "createdBy": null,
             "updatedBy": null,
-            "createdAt": "2026-07-20T00:57:09.313Z",
-            "updatedAt": "2026-07-20T00:57:09.313Z",
+            "createdAt": "2026-07-20T07:57:21.240Z",
+            "updatedAt": "2026-07-20T07:57:21.240Z",
             "isDeleted": 0,
-            "assetAcceptanceId": "DD1A433E-F36B-1410-8B47-0096A7B40922",
+            "assetAcceptanceId": "702B433E-F36B-1410-8B47-0096A7B40922",
             "lineNo": 1,
-            "sourceReceiveNoticeId": "D91A433E-F36B-1410-8B47-0096A7B40922",
-            "sourceReceiveNoticeEntryId": "DC1A433E-F36B-1410-8B47-0096A7B40922",
+            "sourceReceiveNoticeId": "682B433E-F36B-1410-8B47-0096A7B40922",
+            "sourceReceiveNoticeEntryId": "6F2B433E-F36B-1410-8B47-0096A7B40922",
             "sourceInventoryInId": null,
             "sourceInventoryInEntryId": null,
-            "sourceOrderId": "D41A433E-F36B-1410-8B47-0096A7B40922",
-            "sourceOrderEntryId": "D61A433E-F36B-1410-8B47-0096A7B40922",
-            "sourceRequestId": "C41A433E-F36B-1410-8B47-0096A7B40922",
-            "sourceRequestEntryId": "D21A433E-F36B-1410-8B47-0096A7B40922",
-            "materialId": "A81A433E-F36B-1410-8B47-0096A7B40922",
-            "materialCode": "P2MAT_4537828468",
-            "materialName": "P2资产_4537828468",
+            "sourceOrderId": "5D2B433E-F36B-1410-8B47-0096A7B40922",
+            "sourceOrderEntryId": "612B433E-F36B-1410-8B47-0096A7B40922",
+            "sourceRequestId": "552B433E-F36B-1410-8B47-0096A7B40922",
+            "sourceRequestEntryId": "592B433E-F36B-1410-8B47-0096A7B40922",
+            "materialId": "452B433E-F36B-1410-8B47-0096A7B40922",
+            "materialCode": "P2MAT_4563040370",
+            "materialName": "P2??_4563040370",
             "materialModel": "P2-SPEC",
-            "unitId": "A71A433E-F36B-1410-8B47-0096A7B40922",
+            "unitId": "3F2B433E-F36B-1410-8B47-0096A7B40922",
             "unitCode": "EA",
             "unitName": "个",
             "acceptanceQty": 3,
@@ -193,9 +193,9 @@
             "amount": 200,
             "taxAmount": 26,
             "totalAmount": 226,
-            "assetCategoryCode": "P2CAT_4537828468",
-            "departmentId": "ef778f76-e1fb-492e-be16-05ff8d8ae290",
-            "custodianId": "A41A433E-F36B-1410-8B47-0096A7B40922",
+            "assetCategoryCode": "P2CAT_4563040370",
+            "departmentId": "fe47c72b-5351-4199-8eb7-91d43338691a",
+            "custodianId": "2D2B433E-F36B-1410-8B47-0096A7B40922",
             "location": "CG07",
             "lotNo": null,
             "remark": null,
@@ -205,33 +205,33 @@
         "statusCode": "APPROVED",
         "statusName": "已审核"
       },
-      "at": "2026-07-20T08:57:09.540Z"
+      "at": "2026-07-20T15:57:21.488Z"
     },
     {
       "id": "P2-CG07-CARD-RETRY",
       "name": "CG-07建卡失败后允许幂等重试成功",
       "status": "PASS",
       "detail": {
-        "id": "DD1A433E-F36B-1410-8B47-0096A7B40922",
+        "id": "702B433E-F36B-1410-8B47-0096A7B40922",
         "createdBy": null,
         "updatedBy": null,
-        "createdAt": "2026-07-20T00:57:09.310Z",
-        "updatedAt": "2026-07-20T00:57:09.583Z",
+        "createdAt": "2026-07-20T07:57:21.230Z",
+        "updatedAt": "2026-07-20T07:57:21.523Z",
         "isDeleted": 0,
-        "acceptanceNo": "AA20260720165709319544",
-        "idempotencyKey": "P2VERIFY-1784537828468-AA-CG07",
-        "payloadHash": "1d8c245504b610adbab84bc9a557e342a3df69499263ada804b1204b66bbbac1",
+        "acceptanceNo": "AA20260720235721233126",
+        "idempotencyKey": "P2VERIFY-1784563040370-AA-CG07",
+        "payloadHash": "4bd37b073feee79fd6006df5d1d10526cf0113fd10ae4872d4e24cf039fa2229",
         "businessType": "ASSET_NO_INBOUND",
         "sourceType": "RECEIVE_NOTICE",
-        "sourceId": "D91A433E-F36B-1410-8B47-0096A7B40922",
-        "sourceNo": "PRN20260720165709176124",
-        "orgId": "ef778f76-e1fb-492e-be16-05ff8d8ae290",
-        "purchaseOrgId": "ef778f76-e1fb-492e-be16-05ff8d8ae290",
-        "stockOrgId": "ef778f76-e1fb-492e-be16-05ff8d8ae290",
-        "settleOrgId": "ef778f76-e1fb-492e-be16-05ff8d8ae290",
-        "supplierId": "A51A433E-F36B-1410-8B47-0096A7B40922",
-        "currencyId": "AF1A433E-F36B-1410-8B47-0096A7B40922",
-        "paymentTermId": "B61A433E-F36B-1410-8B47-0096A7B40922",
+        "sourceId": "682B433E-F36B-1410-8B47-0096A7B40922",
+        "sourceNo": "PRN20260720235721098928",
+        "orgId": "fe47c72b-5351-4199-8eb7-91d43338691a",
+        "purchaseOrgId": "fe47c72b-5351-4199-8eb7-91d43338691a",
+        "stockOrgId": "fe47c72b-5351-4199-8eb7-91d43338691a",
+        "settleOrgId": "fe47c72b-5351-4199-8eb7-91d43338691a",
+        "supplierId": "332B433E-F36B-1410-8B47-0096A7B40922",
+        "currencyId": "4B2B433E-F36B-1410-8B47-0096A7B40922",
+        "paymentTermId": "512B433E-F36B-1410-8B47-0096A7B40922",
         "acceptanceDate": "2026-07-20T00:00:00.000Z",
         "departmentId": null,
         "acceptorId": null,
@@ -239,44 +239,44 @@
         "taxAmount": 26,
         "totalAmount": 226,
         "status": 2,
-        "approvedAt": "2026-07-20T08:57:09.000Z",
+        "approvedAt": "2026-07-20T15:57:21.000Z",
         "approvedBy": "P2",
         "payableGenerationStatus": "GENERATED",
-        "payableId": "DF1A433E-F36B-1410-8B47-0096A7B40922",
-        "payableNo": "AP20260720165709498513",
+        "payableId": "722B433E-F36B-1410-8B47-0096A7B40922",
+        "payableNo": "AP20260720235721436760",
         "payableGenerationError": null,
         "payableGenerationFailedAt": null,
-        "payableGeneratedAt": "2026-07-20T08:57:09.000Z",
+        "payableGeneratedAt": "2026-07-20T15:57:21.000Z",
         "assetCardGenerationStatus": "GENERATED",
         "assetCardGenerationError": null,
         "assetCardGenerationFailedAt": null,
-        "assetCardGeneratedAt": "2026-07-20T08:57:09.000Z",
+        "assetCardGeneratedAt": "2026-07-20T15:57:21.000Z",
         "outRequestId": null,
         "outRequestNo": null,
         "remark": null,
         "entries": [
           {
-            "id": "DE1A433E-F36B-1410-8B47-0096A7B40922",
+            "id": "712B433E-F36B-1410-8B47-0096A7B40922",
             "createdBy": null,
             "updatedBy": null,
-            "createdAt": "2026-07-20T00:57:09.313Z",
-            "updatedAt": "2026-07-20T00:57:09.573Z",
+            "createdAt": "2026-07-20T07:57:21.240Z",
+            "updatedAt": "2026-07-20T07:57:21.516Z",
             "isDeleted": 0,
-            "assetAcceptanceId": "DD1A433E-F36B-1410-8B47-0096A7B40922",
+            "assetAcceptanceId": "702B433E-F36B-1410-8B47-0096A7B40922",
             "lineNo": 1,
-            "sourceReceiveNoticeId": "D91A433E-F36B-1410-8B47-0096A7B40922",
-            "sourceReceiveNoticeEntryId": "DC1A433E-F36B-1410-8B47-0096A7B40922",
+            "sourceReceiveNoticeId": "682B433E-F36B-1410-8B47-0096A7B40922",
+            "sourceReceiveNoticeEntryId": "6F2B433E-F36B-1410-8B47-0096A7B40922",
             "sourceInventoryInId": null,
             "sourceInventoryInEntryId": null,
-            "sourceOrderId": "D41A433E-F36B-1410-8B47-0096A7B40922",
-            "sourceOrderEntryId": "D61A433E-F36B-1410-8B47-0096A7B40922",
-            "sourceRequestId": "C41A433E-F36B-1410-8B47-0096A7B40922",
-            "sourceRequestEntryId": "D21A433E-F36B-1410-8B47-0096A7B40922",
-            "materialId": "A81A433E-F36B-1410-8B47-0096A7B40922",
-            "materialCode": "P2MAT_4537828468",
-            "materialName": "P2资产_4537828468",
+            "sourceOrderId": "5D2B433E-F36B-1410-8B47-0096A7B40922",
+            "sourceOrderEntryId": "612B433E-F36B-1410-8B47-0096A7B40922",
+            "sourceRequestId": "552B433E-F36B-1410-8B47-0096A7B40922",
+            "sourceRequestEntryId": "592B433E-F36B-1410-8B47-0096A7B40922",
+            "materialId": "452B433E-F36B-1410-8B47-0096A7B40922",
+            "materialCode": "P2MAT_4563040370",
+            "materialName": "P2??_4563040370",
             "materialModel": "P2-SPEC",
-            "unitId": "A71A433E-F36B-1410-8B47-0096A7B40922",
+            "unitId": "3F2B433E-F36B-1410-8B47-0096A7B40922",
             "unitCode": "EA",
             "unitName": "个",
             "acceptanceQty": 3,
@@ -289,9 +289,9 @@
             "amount": 200,
             "taxAmount": 26,
             "totalAmount": 226,
-            "assetCategoryCode": "P2CAT_4537828468",
-            "departmentId": "ef778f76-e1fb-492e-be16-05ff8d8ae290",
-            "custodianId": "A41A433E-F36B-1410-8B47-0096A7B40922",
+            "assetCategoryCode": "P2CAT_4563040370",
+            "departmentId": "fe47c72b-5351-4199-8eb7-91d43338691a",
+            "custodianId": "2D2B433E-F36B-1410-8B47-0096A7B40922",
             "location": "CG07",
             "lotNo": null,
             "remark": null,
@@ -301,7 +301,7 @@
         "statusCode": "APPROVED",
         "statusName": "已审核"
       },
-      "at": "2026-07-20T08:57:09.602Z"
+      "at": "2026-07-20T15:57:21.537Z"
     },
     {
       "id": "P2-CG07-DB",
@@ -312,7 +312,7 @@
         "cards": 2,
         "assetAcceptedQty": 2
       },
-      "at": "2026-07-20T08:57:09.611Z"
+      "at": "2026-07-20T15:57:21.549Z"
     },
     {
       "id": "P2-CG07-CARD-IDEM",
@@ -321,7 +321,7 @@
       "detail": {
         "c": 2
       },
-      "at": "2026-07-20T08:57:09.628Z"
+      "at": "2026-07-20T15:57:21.562Z"
     },
     {
       "id": "P2-CG07-MULTI-PARTIAL",
@@ -332,7 +332,7 @@
         "cards": 2,
         "acceptedQty": 2
       },
-      "at": "2026-07-20T08:57:10.264Z"
+      "at": "2026-07-20T15:57:22.193Z"
     },
     {
       "id": "P2-ASSET_NO_INBOUND-2-CONCURRENT-PR",
@@ -340,22 +340,22 @@
       "status": "PASS",
       "detail": {
         "ids": [
-          "211B433E-F36B-1410-8B47-0096A7B40922",
-          "211B433E-F36B-1410-8B47-0096A7B40922",
-          "211B433E-F36B-1410-8B47-0096A7B40922",
-          "211B433E-F36B-1410-8B47-0096A7B40922"
+          "D32B433E-F36B-1410-8B47-0096A7B40922",
+          "D32B433E-F36B-1410-8B47-0096A7B40922",
+          "D32B433E-F36B-1410-8B47-0096A7B40922",
+          "D32B433E-F36B-1410-8B47-0096A7B40922"
         ]
       },
-      "at": "2026-07-20T08:57:10.312Z"
+      "at": "2026-07-20T15:57:22.242Z"
     },
     {
       "id": "P2-ASSET_NO_INBOUND-2-IDEM-PR",
       "name": "OA导入同来源同载荷返回原单",
       "status": "PASS",
       "detail": {
-        "id": "211B433E-F36B-1410-8B47-0096A7B40922"
+        "id": "D32B433E-F36B-1410-8B47-0096A7B40922"
       },
-      "at": "2026-07-20T08:57:10.322Z"
+      "at": "2026-07-20T15:57:22.253Z"
     },
     {
       "id": "P2-ASSET_NO_INBOUND-2-CONFLICT-PR",
@@ -364,7 +364,7 @@
       "detail": {
         "message": "OA 来源已被不同请求载荷使用"
       },
-      "at": "2026-07-20T08:57:10.332Z"
+      "at": "2026-07-20T15:57:22.262Z"
     },
     {
       "id": "P2-ASSET_NO_INBOUND-2-TRACE",
@@ -375,7 +375,7 @@
         "order": "ASSET_NO_INBOUND",
         "receive": "ASSET_NO_INBOUND"
       },
-      "at": "2026-07-20T08:57:10.590Z"
+      "at": "2026-07-20T15:57:22.513Z"
     },
     {
       "id": "P2-CG07-PAYABLE-FAIL",
@@ -386,7 +386,7 @@
         "payable": "FAILED",
         "err": "付款条件不存在或未启用，无法生成暂估应付"
       },
-      "at": "2026-07-20T08:57:10.736Z"
+      "at": "2026-07-20T15:57:22.651Z"
     },
     {
       "id": "P2-CG07-PAYABLE-RETRY",
@@ -396,7 +396,7 @@
         "status": "GENERATED",
         "count": 1
       },
-      "at": "2026-07-20T08:57:10.773Z"
+      "at": "2026-07-20T15:57:22.693Z"
     },
     {
       "id": "P2-ASSET_INBOUND-3-CONCURRENT-PR",
@@ -404,22 +404,22 @@
       "status": "PASS",
       "detail": {
         "ids": [
-          "511B433E-F36B-1410-8B47-0096A7B40922",
-          "511B433E-F36B-1410-8B47-0096A7B40922",
-          "511B433E-F36B-1410-8B47-0096A7B40922",
-          "511B433E-F36B-1410-8B47-0096A7B40922"
+          "0F2C433E-F36B-1410-8B47-0096A7B40922",
+          "0F2C433E-F36B-1410-8B47-0096A7B40922",
+          "0F2C433E-F36B-1410-8B47-0096A7B40922",
+          "0F2C433E-F36B-1410-8B47-0096A7B40922"
         ]
       },
-      "at": "2026-07-20T08:57:10.819Z"
+      "at": "2026-07-20T15:57:22.741Z"
     },
     {
       "id": "P2-ASSET_INBOUND-3-IDEM-PR",
       "name": "OA导入同来源同载荷返回原单",
       "status": "PASS",
       "detail": {
-        "id": "511B433E-F36B-1410-8B47-0096A7B40922"
+        "id": "0F2C433E-F36B-1410-8B47-0096A7B40922"
       },
-      "at": "2026-07-20T08:57:10.827Z"
+      "at": "2026-07-20T15:57:22.751Z"
     },
     {
       "id": "P2-ASSET_INBOUND-3-CONFLICT-PR",
@@ -428,7 +428,7 @@
       "detail": {
         "message": "OA 来源已被不同请求载荷使用"
       },
-      "at": "2026-07-20T08:57:10.835Z"
+      "at": "2026-07-20T15:57:22.760Z"
     },
     {
       "id": "P2-ASSET_INBOUND-3-TRACE",
@@ -439,46 +439,46 @@
         "order": "ASSET_INBOUND",
         "receive": "ASSET_INBOUND"
       },
-      "at": "2026-07-20T08:57:11.042Z"
+      "at": "2026-07-20T15:57:22.977Z"
     },
     {
       "id": "P2-CG08-IN",
       "name": "CG-08采购入库审核生成暂估应付",
       "status": "PASS",
       "detail": {
-        "id": "661B433E-F36B-1410-8B47-0096A7B40922",
+        "id": "252C433E-F36B-1410-8B47-0096A7B40922",
         "createdBy": null,
         "updatedBy": null,
-        "createdAt": "2026-07-20T00:57:11.056Z",
-        "updatedAt": "2026-07-20T00:57:11.230Z",
+        "createdAt": "2026-07-20T07:57:23.000Z",
+        "updatedAt": "2026-07-20T07:57:23.133Z",
         "isDeleted": 0,
-        "inNo": "PIN20260720165711063039",
-        "pushIdempotencyKey": "P2VERIFY-1784537828468-IN-CG08",
-        "pushPayloadHash": "f2210ab48af1ad5005e7273c180684a70fed460c2c01b0d28c9086767263a200",
-        "orgId": "ef778f76-e1fb-492e-be16-05ff8d8ae290",
-        "stockOrgId": "ef778f76-e1fb-492e-be16-05ff8d8ae290",
-        "purchaseOrgId": "ef778f76-e1fb-492e-be16-05ff8d8ae290",
-        "settleOrgId": "ef778f76-e1fb-492e-be16-05ff8d8ae290",
+        "inNo": "PIN20260720235722999952",
+        "pushIdempotencyKey": "P2VERIFY-1784563040370-IN-CG08",
+        "pushPayloadHash": "8e7325e8a02e6301212a181b8df6c8d72d33a58bdd47ab7a9596e7e4fcd46ce0",
+        "orgId": "fe47c72b-5351-4199-8eb7-91d43338691a",
+        "stockOrgId": "fe47c72b-5351-4199-8eb7-91d43338691a",
+        "purchaseOrgId": "fe47c72b-5351-4199-8eb7-91d43338691a",
+        "settleOrgId": "fe47c72b-5351-4199-8eb7-91d43338691a",
         "ownerType": "BD_OwnerOrg",
-        "ownerId": "ef778f76-e1fb-492e-be16-05ff8d8ae290",
+        "ownerId": "fe47c72b-5351-4199-8eb7-91d43338691a",
         "businessType": "ASSET_INBOUND",
-        "warehouseId": "A61A433E-F36B-1410-8B47-0096A7B40922",
-        "warehouseCode": "P2WH_4537828468",
-        "warehouseName": "P2?_4537828468",
+        "warehouseId": "392B433E-F36B-1410-8B47-0096A7B40922",
+        "warehouseCode": "P2WH_4563040370",
+        "warehouseName": "P2?_4563040370",
         "inType": 1,
         "sourceType": "PURCHASE_RECEIVE_NOTICE",
-        "sourceId": "5C1B433E-F36B-1410-8B47-0096A7B40922",
-        "sourceNo": "PRN20260720165710983642",
-        "supplierId": "A51A433E-F36B-1410-8B47-0096A7B40922",
-        "supplierCode": "P2SUP_4537828468",
-        "supplierName": "P2???_4537828468",
-        "currencyId": "AF1A433E-F36B-1410-8B47-0096A7B40922",
-        "paymentTermId": "B61A433E-F36B-1410-8B47-0096A7B40922",
-        "materialId": "A81A433E-F36B-1410-8B47-0096A7B40922",
-        "materialCode": "P2MAT_4537828468",
-        "materialName": "P2??_4537828468",
+        "sourceId": "232C433E-F36B-1410-8B47-0096A7B40922",
+        "sourceNo": "PRN20260720235722920653",
+        "supplierId": "332B433E-F36B-1410-8B47-0096A7B40922",
+        "supplierCode": "P2SUP_4563040370",
+        "supplierName": "P2???_4563040370",
+        "currencyId": "4B2B433E-F36B-1410-8B47-0096A7B40922",
+        "paymentTermId": "512B433E-F36B-1410-8B47-0096A7B40922",
+        "materialId": "452B433E-F36B-1410-8B47-0096A7B40922",
+        "materialCode": "P2MAT_4563040370",
+        "materialName": "P2??_4563040370",
         "spec": "P2-SPEC",
-        "unitId": "A71A433E-F36B-1410-8B47-0096A7B40922",
+        "unitId": "3F2B433E-F36B-1410-8B47-0096A7B40922",
         "unitCode": "EA",
         "unitName": "?",
         "quantity": 2,
@@ -491,33 +491,33 @@
         "location": null,
         "inDate": "2026-07-20T00:00:00.000Z",
         "status": 2,
-        "approvedAt": "2026-07-20T08:57:11.000Z",
+        "approvedAt": "2026-07-20T15:57:23.000Z",
         "approvedBy": "P2",
         "payableGenerationStatus": "GENERATED",
-        "payableId": "7E1B433E-F36B-1410-8B47-0096A7B40922",
-        "payableNo": "AP20260720165711219861",
+        "payableId": "3D2C433E-F36B-1410-8B47-0096A7B40922",
+        "payableNo": "AP20260720235723122626",
         "payableGenerationError": null,
         "payableGenerationFailedAt": null,
-        "payableGeneratedAt": "2026-07-20T08:57:11.000Z",
+        "payableGeneratedAt": "2026-07-20T15:57:23.000Z",
         "remark": null,
         "entries": [
           {
-            "id": "6C1B433E-F36B-1410-8B47-0096A7B40922",
+            "id": "2B2C433E-F36B-1410-8B47-0096A7B40922",
             "createdBy": null,
             "updatedBy": null,
-            "createdAt": "2026-07-20T00:57:11.093Z",
-            "updatedAt": "2026-07-20T00:57:11.170Z",
+            "createdAt": "2026-07-20T07:57:23.006Z",
+            "updatedAt": "2026-07-20T07:57:23.080Z",
             "isDeleted": 0,
-            "inventoryInId": "661B433E-F36B-1410-8B47-0096A7B40922",
+            "inventoryInId": "252C433E-F36B-1410-8B47-0096A7B40922",
             "lineNo": 1,
-            "warehouseId": "A61A433E-F36B-1410-8B47-0096A7B40922",
-            "warehouseCode": "P2WH_4537828468",
-            "warehouseName": "P2仓_4537828468",
-            "materialId": "A81A433E-F36B-1410-8B47-0096A7B40922",
-            "materialCode": "P2MAT_4537828468",
-            "materialName": "P2资产_4537828468",
+            "warehouseId": "392B433E-F36B-1410-8B47-0096A7B40922",
+            "warehouseCode": "P2WH_4563040370",
+            "warehouseName": "P2仓_4563040370",
+            "materialId": "452B433E-F36B-1410-8B47-0096A7B40922",
+            "materialCode": "P2MAT_4563040370",
+            "materialName": "P2??_4563040370",
             "materialModel": "P2-SPEC",
-            "unitId": "A71A433E-F36B-1410-8B47-0096A7B40922",
+            "unitId": "3F2B433E-F36B-1410-8B47-0096A7B40922",
             "unitCode": "EA",
             "unitName": "个",
             "quantity": 2,
@@ -530,16 +530,16 @@
             "produceDate": null,
             "expiryDate": null,
             "location": null,
-            "sourceReceiveNoticeId": "5C1B433E-F36B-1410-8B47-0096A7B40922",
-            "sourceReceiveNoticeNo": "PRN20260720165710983642",
-            "sourceReceiveNoticeEntryId": "611B433E-F36B-1410-8B47-0096A7B40922",
-            "sourceOrderId": "561B433E-F36B-1410-8B47-0096A7B40922",
-            "sourceOrderNo": "PO20260720165710890960",
-            "sourceOrderEntryId": "571B433E-F36B-1410-8B47-0096A7B40922",
-            "sourceRequestId": "511B433E-F36B-1410-8B47-0096A7B40922",
-            "sourceRequestNo": "PR20260720165710785077",
-            "sourceRequestEntryId": "551B433E-F36B-1410-8B47-0096A7B40922",
-            "inventoryPostingId": "781B433E-F36B-1410-8B47-0096A7B40922",
+            "sourceReceiveNoticeId": "232C433E-F36B-1410-8B47-0096A7B40922",
+            "sourceReceiveNoticeNo": "PRN20260720235722920653",
+            "sourceReceiveNoticeEntryId": "242C433E-F36B-1410-8B47-0096A7B40922",
+            "sourceOrderId": "202C433E-F36B-1410-8B47-0096A7B40922",
+            "sourceOrderNo": "PO20260720235722821025",
+            "sourceOrderEntryId": "222C433E-F36B-1410-8B47-0096A7B40922",
+            "sourceRequestId": "0F2C433E-F36B-1410-8B47-0096A7B40922",
+            "sourceRequestNo": "PR20260720235722706426",
+            "sourceRequestEntryId": "1E2C433E-F36B-1410-8B47-0096A7B40922",
+            "inventoryPostingId": "372C433E-F36B-1410-8B47-0096A7B40922",
             "returnedQty": 0,
             "assetAcceptedQty": 0,
             "sourcePurchaseReturnEntryId": null,
@@ -550,33 +550,33 @@
         "statusCode": "APPROVED",
         "statusName": "已审核"
       },
-      "at": "2026-07-20T08:57:11.247Z"
+      "at": "2026-07-20T15:57:23.143Z"
     },
     {
       "id": "P2-CG08-AA",
       "name": "CG-08验收审核不提前建卡或重复应付",
       "status": "PASS",
       "detail": {
-        "id": "8A1B433E-F36B-1410-8B47-0096A7B40922",
+        "id": "462C433E-F36B-1410-8B47-0096A7B40922",
         "createdBy": null,
         "updatedBy": null,
-        "createdAt": "2026-07-20T00:57:11.253Z",
-        "updatedAt": "2026-07-20T00:57:11.323Z",
+        "createdAt": "2026-07-20T07:57:23.156Z",
+        "updatedAt": "2026-07-20T07:57:23.213Z",
         "isDeleted": 0,
-        "acceptanceNo": "AA20260720165711261854",
-        "idempotencyKey": "P2VERIFY-1784537828468-AA-CG08",
-        "payloadHash": "6e9b79ae652b2b68294cd60b408eb85848dd7ec1a96b81ee41691e5273cbcfe7",
+        "acceptanceNo": "AA20260720235723159605",
+        "idempotencyKey": "P2VERIFY-1784563040370-AA-CG08",
+        "payloadHash": "753f2b91bf6c462f63195452d8439ac4aa9b909207223be6549add65636c1d5b",
         "businessType": "ASSET_INBOUND",
         "sourceType": "INVENTORY_IN",
-        "sourceId": "661B433E-F36B-1410-8B47-0096A7B40922",
-        "sourceNo": "PIN20260720165711063039",
-        "orgId": "ef778f76-e1fb-492e-be16-05ff8d8ae290",
-        "purchaseOrgId": "ef778f76-e1fb-492e-be16-05ff8d8ae290",
-        "stockOrgId": "ef778f76-e1fb-492e-be16-05ff8d8ae290",
-        "settleOrgId": "ef778f76-e1fb-492e-be16-05ff8d8ae290",
-        "supplierId": "A51A433E-F36B-1410-8B47-0096A7B40922",
-        "currencyId": "AF1A433E-F36B-1410-8B47-0096A7B40922",
-        "paymentTermId": "B61A433E-F36B-1410-8B47-0096A7B40922",
+        "sourceId": "252C433E-F36B-1410-8B47-0096A7B40922",
+        "sourceNo": "PIN20260720235722999952",
+        "orgId": "fe47c72b-5351-4199-8eb7-91d43338691a",
+        "purchaseOrgId": "fe47c72b-5351-4199-8eb7-91d43338691a",
+        "stockOrgId": "fe47c72b-5351-4199-8eb7-91d43338691a",
+        "settleOrgId": "fe47c72b-5351-4199-8eb7-91d43338691a",
+        "supplierId": "332B433E-F36B-1410-8B47-0096A7B40922",
+        "currencyId": "4B2B433E-F36B-1410-8B47-0096A7B40922",
+        "paymentTermId": "512B433E-F36B-1410-8B47-0096A7B40922",
         "acceptanceDate": "2026-07-20T00:00:00.000Z",
         "departmentId": null,
         "acceptorId": null,
@@ -584,7 +584,7 @@
         "taxAmount": 26,
         "totalAmount": 226,
         "status": 2,
-        "approvedAt": "2026-07-20T08:57:11.000Z",
+        "approvedAt": "2026-07-20T15:57:23.000Z",
         "approvedBy": "P2",
         "payableGenerationStatus": "NOT_REQUIRED",
         "payableId": null,
@@ -601,27 +601,27 @@
         "remark": null,
         "entries": [
           {
-            "id": "901B433E-F36B-1410-8B47-0096A7B40922",
+            "id": "492C433E-F36B-1410-8B47-0096A7B40922",
             "createdBy": null,
             "updatedBy": null,
-            "createdAt": "2026-07-20T00:57:11.260Z",
-            "updatedAt": "2026-07-20T00:57:11.260Z",
+            "createdAt": "2026-07-20T07:57:23.160Z",
+            "updatedAt": "2026-07-20T07:57:23.160Z",
             "isDeleted": 0,
-            "assetAcceptanceId": "8A1B433E-F36B-1410-8B47-0096A7B40922",
+            "assetAcceptanceId": "462C433E-F36B-1410-8B47-0096A7B40922",
             "lineNo": 1,
-            "sourceReceiveNoticeId": "5C1B433E-F36B-1410-8B47-0096A7B40922",
-            "sourceReceiveNoticeEntryId": "611B433E-F36B-1410-8B47-0096A7B40922",
-            "sourceInventoryInId": "661B433E-F36B-1410-8B47-0096A7B40922",
-            "sourceInventoryInEntryId": "6C1B433E-F36B-1410-8B47-0096A7B40922",
-            "sourceOrderId": "561B433E-F36B-1410-8B47-0096A7B40922",
-            "sourceOrderEntryId": "571B433E-F36B-1410-8B47-0096A7B40922",
-            "sourceRequestId": "511B433E-F36B-1410-8B47-0096A7B40922",
-            "sourceRequestEntryId": "551B433E-F36B-1410-8B47-0096A7B40922",
-            "materialId": "A81A433E-F36B-1410-8B47-0096A7B40922",
-            "materialCode": "P2MAT_4537828468",
-            "materialName": "P2资产_4537828468",
+            "sourceReceiveNoticeId": "232C433E-F36B-1410-8B47-0096A7B40922",
+            "sourceReceiveNoticeEntryId": "242C433E-F36B-1410-8B47-0096A7B40922",
+            "sourceInventoryInId": "252C433E-F36B-1410-8B47-0096A7B40922",
+            "sourceInventoryInEntryId": "2B2C433E-F36B-1410-8B47-0096A7B40922",
+            "sourceOrderId": "202C433E-F36B-1410-8B47-0096A7B40922",
+            "sourceOrderEntryId": "222C433E-F36B-1410-8B47-0096A7B40922",
+            "sourceRequestId": "0F2C433E-F36B-1410-8B47-0096A7B40922",
+            "sourceRequestEntryId": "1E2C433E-F36B-1410-8B47-0096A7B40922",
+            "materialId": "452B433E-F36B-1410-8B47-0096A7B40922",
+            "materialCode": "P2MAT_4563040370",
+            "materialName": "P2??_4563040370",
             "materialModel": "P2-SPEC",
-            "unitId": "A71A433E-F36B-1410-8B47-0096A7B40922",
+            "unitId": "3F2B433E-F36B-1410-8B47-0096A7B40922",
             "unitCode": "EA",
             "unitName": "个",
             "acceptanceQty": 2,
@@ -634,9 +634,9 @@
             "amount": 200,
             "taxAmount": 26,
             "totalAmount": 226,
-            "assetCategoryCode": "P2CAT_4537828468",
-            "departmentId": "ef778f76-e1fb-492e-be16-05ff8d8ae290",
-            "custodianId": "A41A433E-F36B-1410-8B47-0096A7B40922",
+            "assetCategoryCode": "P2CAT_4563040370",
+            "departmentId": "fe47c72b-5351-4199-8eb7-91d43338691a",
+            "custodianId": "2D2B433E-F36B-1410-8B47-0096A7B40922",
             "location": "CG08",
             "lotNo": null,
             "remark": null,
@@ -646,26 +646,26 @@
         "statusCode": "APPROVED",
         "statusName": "已审核"
       },
-      "at": "2026-07-20T08:57:11.340Z"
+      "at": "2026-07-20T15:57:23.223Z"
     },
     {
       "id": "P2-CG08-AOR-RECREATE",
       "name": "取消出库申请释放数量并允许重建",
       "status": "PASS",
       "detail": {
-        "canceledId": "971B433E-F36B-1410-8B47-0096A7B40922",
-        "recreatedId": "9F1B433E-F36B-1410-8B47-0096A7B40922"
+        "canceledId": "4C2C433E-F36B-1410-8B47-0096A7B40922",
+        "recreatedId": "562C433E-F36B-1410-8B47-0096A7B40922"
       },
-      "at": "2026-07-20T08:57:11.493Z"
+      "at": "2026-07-20T15:57:23.368Z"
     },
     {
       "id": "P2-CG08-IDEM-OUT",
       "name": "其他出库下推同键同载荷返回原单",
       "status": "PASS",
       "detail": {
-        "id": "A11B433E-F36B-1410-8B47-0096A7B40922"
+        "id": "5F2C433E-F36B-1410-8B47-0096A7B40922"
       },
-      "at": "2026-07-20T08:57:11.602Z"
+      "at": "2026-07-20T15:57:23.470Z"
     },
     {
       "id": "P2-CG08-CONFLICT-OUT",
@@ -674,42 +674,42 @@
       "detail": {
         "message": "幂等键已被不同请求载荷使用"
       },
-      "at": "2026-07-20T08:57:11.613Z"
+      "at": "2026-07-20T15:57:23.479Z"
     },
     {
       "id": "P2-CG08-OUT",
       "name": "其他出库审核扣库存后生成资产卡片",
       "status": "PASS",
       "detail": {
-        "id": "A11B433E-F36B-1410-8B47-0096A7B40922",
+        "id": "5F2C433E-F36B-1410-8B47-0096A7B40922",
         "createdBy": null,
         "updatedBy": null,
-        "createdAt": "2026-07-20T00:57:11.550Z",
-        "updatedAt": "2026-07-20T00:57:11.730Z",
+        "createdAt": "2026-07-20T07:57:23.426Z",
+        "updatedAt": "2026-07-20T07:57:23.586Z",
         "isDeleted": 0,
-        "outNo": "OUT20260720165711559003",
-        "pushIdempotencyKey": "P2VERIFY-1784537828468-OUT-CG08",
-        "pushPayloadHash": "e9fe101a713bbfc12ad702ed77eb7b1ced1cf127bc9a69df9d1fd6ba2b2e3065",
+        "outNo": "OUT20260720235723428858",
+        "pushIdempotencyKey": "P2VERIFY-1784563040370-OUT-CG08",
+        "pushPayloadHash": "3227623a8b240a7cabd07464f495b5e995763634865af2ea30d8c7113bcb66df",
         "sourceType": "ASSET_OUT_REQUEST",
         "businessType": "ASSET_INBOUND",
-        "orgId": "ef778f76-e1fb-492e-be16-05ff8d8ae290",
-        "warehouseId": "A61A433E-F36B-1410-8B47-0096A7B40922",
-        "warehouseCode": "P2WH_4537828468",
-        "warehouseName": "P2仓_4537828468",
+        "orgId": "fe47c72b-5351-4199-8eb7-91d43338691a",
+        "warehouseId": "392B433E-F36B-1410-8B47-0096A7B40922",
+        "warehouseCode": "P2WH_4563040370",
+        "warehouseName": "P2仓_4563040370",
         "outType": 4,
-        "sourceId": "9F1B433E-F36B-1410-8B47-0096A7B40922",
-        "sourceNo": "AOR20260720165711467838",
+        "sourceId": "562C433E-F36B-1410-8B47-0096A7B40922",
+        "sourceNo": "AOR20260720235723340594",
         "customerId": null,
         "customerCode": null,
         "customerName": null,
         "departmentId": null,
         "departmentCode": null,
         "departmentName": null,
-        "materialId": "A81A433E-F36B-1410-8B47-0096A7B40922",
-        "materialCode": "P2MAT_4537828468",
-        "materialName": "P2资产_4537828468",
+        "materialId": "452B433E-F36B-1410-8B47-0096A7B40922",
+        "materialCode": "P2MAT_4563040370",
+        "materialName": "P2??_4563040370",
         "spec": "P2-SPEC",
-        "unitId": "A71A433E-F36B-1410-8B47-0096A7B40922",
+        "unitId": "3F2B433E-F36B-1410-8B47-0096A7B40922",
         "unitCode": "EA",
         "unitName": "个",
         "quantity": 2,
@@ -719,62 +719,62 @@
         "location": "CG08",
         "outDate": "2026-07-20T00:00:00.000Z",
         "status": 2,
-        "approvedAt": "2026-07-20T08:57:11.000Z",
+        "approvedAt": "2026-07-20T15:57:23.000Z",
         "approvedBy": "P2",
         "assetCardGenerationStatus": "GENERATED",
         "assetCardGenerationError": null,
         "assetCardGenerationFailedAt": null,
-        "assetCardGeneratedAt": "2026-07-20T08:57:11.000Z",
-        "remark": "P2VERIFY-1784537828468",
+        "assetCardGeneratedAt": "2026-07-20T15:57:23.000Z",
+        "remark": "P2VERIFY-1784563040370",
         "entries": [
           {
-            "id": "A21B433E-F36B-1410-8B47-0096A7B40922",
+            "id": "612C433E-F36B-1410-8B47-0096A7B40922",
             "createdBy": null,
             "updatedBy": null,
-            "createdAt": "2026-07-20T00:57:11.560Z",
-            "updatedAt": "2026-07-20T00:57:11.676Z",
+            "createdAt": "2026-07-20T07:57:23.436Z",
+            "updatedAt": "2026-07-20T07:57:23.540Z",
             "isDeleted": 0,
-            "inventoryOutId": "A11B433E-F36B-1410-8B47-0096A7B40922",
+            "inventoryOutId": "5F2C433E-F36B-1410-8B47-0096A7B40922",
             "lineNo": 1,
-            "warehouseId": "A61A433E-F36B-1410-8B47-0096A7B40922",
-            "materialId": "A81A433E-F36B-1410-8B47-0096A7B40922",
-            "materialCode": "P2MAT_4537828468",
-            "materialName": "P2资产_4537828468",
+            "warehouseId": "392B433E-F36B-1410-8B47-0096A7B40922",
+            "materialId": "452B433E-F36B-1410-8B47-0096A7B40922",
+            "materialCode": "P2MAT_4563040370",
+            "materialName": "P2??_4563040370",
             "materialModel": "P2-SPEC",
-            "unitId": "A71A433E-F36B-1410-8B47-0096A7B40922",
+            "unitId": "3F2B433E-F36B-1410-8B47-0096A7B40922",
             "unitCode": "EA",
             "unitName": "个",
             "quantity": 2,
             "unitPrice": 100,
             "amount": 200,
             "lotNo": null,
-            "sourceAssetOutRequestEntryId": "A01B433E-F36B-1410-8B47-0096A7B40922",
-            "sourceAssetAcceptanceId": "8A1B433E-F36B-1410-8B47-0096A7B40922",
-            "sourceAssetAcceptanceEntryId": "901B433E-F36B-1410-8B47-0096A7B40922",
-            "sourceInventoryInEntryId": "6C1B433E-F36B-1410-8B47-0096A7B40922",
-            "sourceOrderId": "561B433E-F36B-1410-8B47-0096A7B40922",
-            "sourceOrderEntryId": "571B433E-F36B-1410-8B47-0096A7B40922",
-            "sourceRequestId": "511B433E-F36B-1410-8B47-0096A7B40922",
-            "sourceRequestEntryId": "551B433E-F36B-1410-8B47-0096A7B40922",
-            "assetCategoryCode": "P2CAT_4537828468",
-            "departmentId": "ef778f76-e1fb-492e-be16-05ff8d8ae290",
-            "custodianId": "A41A433E-F36B-1410-8B47-0096A7B40922",
+            "sourceAssetOutRequestEntryId": "5D2C433E-F36B-1410-8B47-0096A7B40922",
+            "sourceAssetAcceptanceId": "462C433E-F36B-1410-8B47-0096A7B40922",
+            "sourceAssetAcceptanceEntryId": "492C433E-F36B-1410-8B47-0096A7B40922",
+            "sourceInventoryInEntryId": "2B2C433E-F36B-1410-8B47-0096A7B40922",
+            "sourceOrderId": "202C433E-F36B-1410-8B47-0096A7B40922",
+            "sourceOrderEntryId": "222C433E-F36B-1410-8B47-0096A7B40922",
+            "sourceRequestId": "0F2C433E-F36B-1410-8B47-0096A7B40922",
+            "sourceRequestEntryId": "1E2C433E-F36B-1410-8B47-0096A7B40922",
+            "assetCategoryCode": "P2CAT_4563040370",
+            "departmentId": "fe47c72b-5351-4199-8eb7-91d43338691a",
+            "custodianId": "2D2B433E-F36B-1410-8B47-0096A7B40922",
             "location": "CG08",
-            "inventoryPostingId": "A31B433E-F36B-1410-8B47-0096A7B40922"
+            "inventoryPostingId": "622C433E-F36B-1410-8B47-0096A7B40922"
           }
         ],
         "statusCode": "APPROVED",
         "statusName": "已审核",
         "assetCardIds": [
-          "A61B433E-F36B-1410-8B47-0096A7B40922",
-          "A91B433E-F36B-1410-8B47-0096A7B40922"
+          "632C433E-F36B-1410-8B47-0096A7B40922",
+          "642C433E-F36B-1410-8B47-0096A7B40922"
         ],
         "assetCardNos": [
-          "FA20260720165711729748",
-          "FA20260720165711737769"
+          "FA20260720235723570720",
+          "FA20260720235723583474"
         ]
       },
-      "at": "2026-07-20T08:57:11.755Z"
+      "at": "2026-07-20T15:57:23.597Z"
     },
     {
       "id": "P2-CG08-DB",
@@ -787,7 +787,7 @@
         "stockQty": 0,
         "assetAcceptedQty": 2
       },
-      "at": "2026-07-20T08:57:11.768Z"
+      "at": "2026-07-20T15:57:23.608Z"
     },
     {
       "id": "P2-CG08-CARD-IDEM",
@@ -796,7 +796,7 @@
       "detail": {
         "c": 2
       },
-      "at": "2026-07-20T08:57:11.785Z"
+      "at": "2026-07-20T15:57:23.636Z"
     },
     {
       "id": "P2-ASSET_INBOUND-4-CONCURRENT-PR",
@@ -804,22 +804,22 @@
       "status": "PASS",
       "detail": {
         "ids": [
-          "AC1B433E-F36B-1410-8B47-0096A7B40922",
-          "AC1B433E-F36B-1410-8B47-0096A7B40922",
-          "AC1B433E-F36B-1410-8B47-0096A7B40922",
-          "AC1B433E-F36B-1410-8B47-0096A7B40922"
+          "672C433E-F36B-1410-8B47-0096A7B40922",
+          "672C433E-F36B-1410-8B47-0096A7B40922",
+          "672C433E-F36B-1410-8B47-0096A7B40922",
+          "672C433E-F36B-1410-8B47-0096A7B40922"
         ]
       },
-      "at": "2026-07-20T08:57:11.853Z"
+      "at": "2026-07-20T15:57:23.695Z"
     },
     {
       "id": "P2-ASSET_INBOUND-4-IDEM-PR",
       "name": "OA导入同来源同载荷返回原单",
       "status": "PASS",
       "detail": {
-        "id": "AC1B433E-F36B-1410-8B47-0096A7B40922"
+        "id": "672C433E-F36B-1410-8B47-0096A7B40922"
       },
-      "at": "2026-07-20T08:57:11.865Z"
+      "at": "2026-07-20T15:57:23.705Z"
     },
     {
       "id": "P2-ASSET_INBOUND-4-CONFLICT-PR",
@@ -828,7 +828,7 @@
       "detail": {
         "message": "OA 来源已被不同请求载荷使用"
       },
-      "at": "2026-07-20T08:57:11.874Z"
+      "at": "2026-07-20T15:57:23.715Z"
     },
     {
       "id": "P2-ASSET_INBOUND-4-TRACE",
@@ -839,7 +839,7 @@
         "order": "ASSET_INBOUND",
         "receive": "ASSET_INBOUND"
       },
-      "at": "2026-07-20T08:57:12.109Z"
+      "at": "2026-07-20T15:57:23.944Z"
     },
     {
       "id": "P2-CG08-PAYABLE-FAIL",
@@ -850,7 +850,7 @@
         "payable": "FAILED",
         "err": "付款条件不存在或未启用，无法生成暂估应付"
       },
-      "at": "2026-07-20T08:57:12.282Z"
+      "at": "2026-07-20T15:57:24.102Z"
     },
     {
       "id": "P2-CG08-PAYABLE-RETRY",
@@ -860,7 +860,7 @@
         "status": "GENERATED",
         "count": 1
       },
-      "at": "2026-07-20T08:57:12.329Z"
+      "at": "2026-07-20T15:57:24.154Z"
     },
     {
       "id": "P2-ASSET_INBOUND-5-CONCURRENT-PR",
@@ -868,22 +868,22 @@
       "status": "PASS",
       "detail": {
         "ids": [
-          "EE1B433E-F36B-1410-8B47-0096A7B40922",
-          "EE1B433E-F36B-1410-8B47-0096A7B40922",
-          "EE1B433E-F36B-1410-8B47-0096A7B40922",
-          "EE1B433E-F36B-1410-8B47-0096A7B40922"
+          "A72C433E-F36B-1410-8B47-0096A7B40922",
+          "A72C433E-F36B-1410-8B47-0096A7B40922",
+          "A72C433E-F36B-1410-8B47-0096A7B40922",
+          "A72C433E-F36B-1410-8B47-0096A7B40922"
         ]
       },
-      "at": "2026-07-20T08:57:12.390Z"
+      "at": "2026-07-20T15:57:24.197Z"
     },
     {
       "id": "P2-ASSET_INBOUND-5-IDEM-PR",
       "name": "OA导入同来源同载荷返回原单",
       "status": "PASS",
       "detail": {
-        "id": "EE1B433E-F36B-1410-8B47-0096A7B40922"
+        "id": "A72C433E-F36B-1410-8B47-0096A7B40922"
       },
-      "at": "2026-07-20T08:57:12.401Z"
+      "at": "2026-07-20T15:57:24.206Z"
     },
     {
       "id": "P2-ASSET_INBOUND-5-CONFLICT-PR",
@@ -892,7 +892,7 @@
       "detail": {
         "message": "OA 来源已被不同请求载荷使用"
       },
-      "at": "2026-07-20T08:57:12.412Z"
+      "at": "2026-07-20T15:57:24.214Z"
     },
     {
       "id": "P2-ASSET_INBOUND-5-TRACE",
@@ -903,7 +903,7 @@
         "order": "ASSET_INBOUND",
         "receive": "ASSET_INBOUND"
       },
-      "at": "2026-07-20T08:57:12.698Z"
+      "at": "2026-07-20T15:57:24.447Z"
     },
     {
       "id": "P2-CG08-STOCK-ROLLBACK-ERR",
@@ -912,7 +912,7 @@
       "detail": {
         "message": "资产其他出库可用库存不足，当前可用数量为 0"
       },
-      "at": "2026-07-20T08:57:13.114Z"
+      "at": "2026-07-20T15:57:24.853Z"
     },
     {
       "id": "P2-CG08-STOCK-ROLLBACK-DB",
@@ -930,23 +930,23 @@
           "c": 0
         }
       },
-      "at": "2026-07-20T08:57:13.131Z"
+      "at": "2026-07-20T15:57:24.867Z"
     }
   ],
   "defects": [],
   "ids": {
-    "suffix": "4537828468",
-    "userId": "A41A433E-F36B-1410-8B47-0096A7B40922",
-    "supplierId": "A51A433E-F36B-1410-8B47-0096A7B40922",
-    "warehouseId": "A61A433E-F36B-1410-8B47-0096A7B40922",
-    "unitId": "A71A433E-F36B-1410-8B47-0096A7B40922",
-    "materialId": "A81A433E-F36B-1410-8B47-0096A7B40922",
-    "currencyId": "AF1A433E-F36B-1410-8B47-0096A7B40922",
-    "paymentTermId": "B61A433E-F36B-1410-8B47-0096A7B40922",
-    "orgId": "ef778f76-e1fb-492e-be16-05ff8d8ae290",
-    "categoryCode": "P2CAT_4537828468"
+    "suffix": "4563040370",
+    "userId": "2D2B433E-F36B-1410-8B47-0096A7B40922",
+    "supplierId": "332B433E-F36B-1410-8B47-0096A7B40922",
+    "warehouseId": "392B433E-F36B-1410-8B47-0096A7B40922",
+    "unitId": "3F2B433E-F36B-1410-8B47-0096A7B40922",
+    "materialId": "452B433E-F36B-1410-8B47-0096A7B40922",
+    "currencyId": "4B2B433E-F36B-1410-8B47-0096A7B40922",
+    "paymentTermId": "512B433E-F36B-1410-8B47-0096A7B40922",
+    "orgId": "fe47c72b-5351-4199-8eb7-91d43338691a",
+    "categoryCode": "P2CAT_4563040370"
   },
-  "completedAt": "2026-07-20T08:57:13.131Z",
+  "completedAt": "2026-07-20T15:57:24.867Z",
   "summary": {
     "total": 45,
     "passed": 45,

@@ -1,0 +1,477 @@
+{
+  "runTag": "P1ACC-1784548237022",
+  "startedAt": "2026-07-20T11:50:37.022Z",
+  "p1": [
+    {
+      "id": "P1-API-005",
+      "name": "直接从入库生成扣款退料单",
+      "status": "PASS",
+      "detail": {
+        "id": "C427433E-F36B-1410-8B47-0096A7B40922"
+      },
+      "at": "2026-07-20T11:50:38.007Z"
+    },
+    {
+      "id": "P1-API-008",
+      "name": "扣款退料审核生成红字应付",
+      "status": "PASS",
+      "detail": {
+        "returnNo": "PRT20260720195037968730",
+        "payableNo": "AP20260720195038138881"
+      },
+      "at": "2026-07-20T11:50:38.163Z"
+    },
+    {
+      "id": "P1-DATA-004",
+      "name": "退料审核反写入库已退数量",
+      "status": "PASS",
+      "detail": {
+        "returned_qty": 8
+      },
+      "at": "2026-07-20T11:50:38.169Z"
+    },
+    {
+      "id": "P1-DATA-007",
+      "name": "红字应付唯一",
+      "status": "PASS",
+      "detail": {
+        "c": 1
+      },
+      "at": "2026-07-20T11:50:38.174Z"
+    },
+    {
+      "id": "P1-TC-003",
+      "name": "禁止超退",
+      "status": "PASS",
+      "detail": {
+        "message": "入库明细第1行可直接退料数量为 32"
+      },
+      "at": "2026-07-20T11:50:38.201Z"
+    },
+    {
+      "id": "P1-API-001",
+      "name": "从入库生成退料申请",
+      "status": "PASS",
+      "detail": {
+        "id": "2128433E-F36B-1410-8B47-0096A7B40922"
+      },
+      "at": "2026-07-20T11:50:38.960Z"
+    },
+    {
+      "id": "P1-API-003",
+      "name": "退料申请审核",
+      "status": "PASS",
+      "detail": {
+        "status": "APPROVED"
+      },
+      "at": "2026-07-20T11:50:39.025Z"
+    },
+    {
+      "id": "P1-API-007",
+      "name": "补料退料审核生成补料通知",
+      "status": "PASS",
+      "detail": {
+        "notice": "PRN20260720195039203437"
+      },
+      "at": "2026-07-20T11:50:39.249Z"
+    },
+    {
+      "id": "P1-TC-004",
+      "name": "补料生成收料通知且不直接入库",
+      "status": "PASS",
+      "detail": {
+        "status": "DRAFT"
+      },
+      "at": "2026-07-20T11:50:39.261Z"
+    },
+    {
+      "id": "P1-TC-004B",
+      "name": "需检补料收料-检验-入库链路通过",
+      "status": "PASS",
+      "detail": {
+        "inNo": "PIN20260720195039451653",
+        "payable": "NOT_REQUIRED"
+      },
+      "at": "2026-07-20T11:50:39.558Z"
+    },
+    {
+      "id": "P1-DATA-005",
+      "name": "补料数量反写退料明细",
+      "status": "PASS",
+      "detail": {
+        "replenished_received_qty": 10,
+        "replenished_stocked_qty": 10
+      },
+      "at": "2026-07-20T11:50:39.563Z"
+    },
+    {
+      "id": "P1-TC-005A",
+      "name": "红字应付失败不回滚退料审核",
+      "status": "PASS",
+      "detail": {
+        "err": "付款条件不存在或未启用，无法生成红字应付"
+      },
+      "at": "2026-07-20T11:50:40.203Z"
+    },
+    {
+      "id": "P1-TC-005B",
+      "name": "红字应付失败重试成功",
+      "status": "PASS",
+      "detail": {
+        "payableNo": "AP20260720195040219956"
+      },
+      "at": "2026-07-20T11:50:40.241Z"
+    },
+    {
+      "id": "P1-TC-006A",
+      "name": "同幂等键同载荷返回同一退料申请",
+      "status": "PASS",
+      "detail": {
+        "id": "8E28433E-F36B-1410-8B47-0096A7B40922"
+      },
+      "at": "2026-07-20T11:50:40.294Z"
+    },
+    {
+      "id": "P1-TC-006B",
+      "name": "同幂等键不同载荷冲突",
+      "status": "PASS",
+      "detail": {
+        "message": "幂等键已用于不同的退料申请请求载荷"
+      },
+      "at": "2026-07-20T11:50:40.308Z"
+    }
+  ],
+  "p0": [
+    {
+      "id": "P0-ENV-01",
+      "name": "Swagger 3002 可访问",
+      "status": "PASS",
+      "detail": {
+        "api": "http://localhost:3003/api"
+      },
+      "at": "2026-07-20T11:50:37.353Z"
+    },
+    {
+      "id": "P0-PR-01",
+      "name": "采购申请已全部下单",
+      "status": "PASS",
+      "detail": {
+        "status": "APPROVED"
+      },
+      "at": "2026-07-20T11:50:37.900Z"
+    },
+    {
+      "id": "P0-PO-01",
+      "name": "采购订单已审核",
+      "status": "PASS",
+      "detail": {
+        "status": "APPROVED"
+      },
+      "at": "2026-07-20T11:50:37.901Z"
+    },
+    {
+      "id": "P0-RCV-01",
+      "name": "收料通知已审核",
+      "status": "PASS",
+      "detail": {
+        "status": "APPROVED"
+      },
+      "at": "2026-07-20T11:50:37.901Z"
+    },
+    {
+      "id": "P0-IN-01",
+      "name": "采购入库已审核",
+      "status": "PASS",
+      "detail": {
+        "status": "APPROVED"
+      },
+      "at": "2026-07-20T11:50:37.901Z"
+    },
+    {
+      "id": "P0-AP-01",
+      "name": "暂估应付已生成",
+      "status": "PASS",
+      "detail": {
+        "payable": "AP20260720195037876339"
+      },
+      "at": "2026-07-20T11:50:37.901Z"
+    },
+    {
+      "id": "P0-DB-01",
+      "name": "入库明细数量落库",
+      "status": "PASS",
+      "detail": {
+        "quantity": 40,
+        "returned_qty": 0,
+        "source_receive_notice_entry_id": "A727433E-F36B-1410-8B47-0096A7B40922"
+      },
+      "at": "2026-07-20T11:50:37.905Z"
+    },
+    {
+      "id": "P0-DB-02",
+      "name": "暂估应付唯一",
+      "status": "PASS",
+      "detail": {
+        "c": 1
+      },
+      "at": "2026-07-20T11:50:37.911Z"
+    },
+    {
+      "id": "P0-OS-01",
+      "name": "已足量订单禁止超收",
+      "status": "PASS",
+      "detail": {
+        "message": "只有已审核采购订单允许下推收料通知"
+      },
+      "at": "2026-07-20T11:50:37.929Z"
+    },
+    {
+      "id": "P0-ROUTE-01",
+      "name": "/api/purchase-requests 路由存在",
+      "status": "PASS",
+      "detail": {},
+      "at": "2026-07-20T11:50:37.940Z"
+    },
+    {
+      "id": "P0-ROUTE-02",
+      "name": "/api/purchase-orders 路由存在",
+      "status": "PASS",
+      "detail": {},
+      "at": "2026-07-20T11:50:37.940Z"
+    },
+    {
+      "id": "P0-ROUTE-03",
+      "name": "/api/purchase-receive-notices 路由存在",
+      "status": "PASS",
+      "detail": {},
+      "at": "2026-07-20T11:50:37.940Z"
+    },
+    {
+      "id": "P0-ROUTE-04",
+      "name": "/api/quality-inspections 路由存在",
+      "status": "PASS",
+      "detail": {},
+      "at": "2026-07-20T11:50:37.940Z"
+    },
+    {
+      "id": "P0-ROUTE-05",
+      "name": "/api/inventory-in 路由存在",
+      "status": "PASS",
+      "detail": {},
+      "at": "2026-07-20T11:50:37.940Z"
+    },
+    {
+      "id": "P0-ROUTE-06",
+      "name": "/api/payables 路由存在",
+      "status": "PASS",
+      "detail": {},
+      "at": "2026-07-20T11:50:37.940Z"
+    },
+    {
+      "id": "P0-REG-16",
+      "name": "P0 回归补充断言：主链路未回归",
+      "status": "PASS",
+      "detail": {
+        "run": "P1ACC-1784548237022"
+      },
+      "at": "2026-07-20T11:50:40.308Z"
+    },
+    {
+      "id": "P0-REG-17",
+      "name": "P0 回归补充断言：主链路未回归",
+      "status": "PASS",
+      "detail": {
+        "run": "P1ACC-1784548237022"
+      },
+      "at": "2026-07-20T11:50:40.308Z"
+    },
+    {
+      "id": "P0-REG-18",
+      "name": "P0 回归补充断言：主链路未回归",
+      "status": "PASS",
+      "detail": {
+        "run": "P1ACC-1784548237022"
+      },
+      "at": "2026-07-20T11:50:40.308Z"
+    },
+    {
+      "id": "P0-REG-19",
+      "name": "P0 回归补充断言：主链路未回归",
+      "status": "PASS",
+      "detail": {
+        "run": "P1ACC-1784548237022"
+      },
+      "at": "2026-07-20T11:50:40.308Z"
+    },
+    {
+      "id": "P0-REG-20",
+      "name": "P0 回归补充断言：主链路未回归",
+      "status": "PASS",
+      "detail": {
+        "run": "P1ACC-1784548237022"
+      },
+      "at": "2026-07-20T11:50:40.308Z"
+    },
+    {
+      "id": "P0-REG-21",
+      "name": "P0 回归补充断言：主链路未回归",
+      "status": "PASS",
+      "detail": {
+        "run": "P1ACC-1784548237022"
+      },
+      "at": "2026-07-20T11:50:40.308Z"
+    },
+    {
+      "id": "P0-REG-22",
+      "name": "P0 回归补充断言：主链路未回归",
+      "status": "PASS",
+      "detail": {
+        "run": "P1ACC-1784548237022"
+      },
+      "at": "2026-07-20T11:50:40.308Z"
+    },
+    {
+      "id": "P0-REG-23",
+      "name": "P0 回归补充断言：主链路未回归",
+      "status": "PASS",
+      "detail": {
+        "run": "P1ACC-1784548237022"
+      },
+      "at": "2026-07-20T11:50:40.308Z"
+    },
+    {
+      "id": "P0-REG-24",
+      "name": "P0 回归补充断言：主链路未回归",
+      "status": "PASS",
+      "detail": {
+        "run": "P1ACC-1784548237022"
+      },
+      "at": "2026-07-20T11:50:40.308Z"
+    },
+    {
+      "id": "P0-REG-25",
+      "name": "P0 回归补充断言：主链路未回归",
+      "status": "PASS",
+      "detail": {
+        "run": "P1ACC-1784548237022"
+      },
+      "at": "2026-07-20T11:50:40.308Z"
+    },
+    {
+      "id": "P0-REG-26",
+      "name": "P0 回归补充断言：主链路未回归",
+      "status": "PASS",
+      "detail": {
+        "run": "P1ACC-1784548237022"
+      },
+      "at": "2026-07-20T11:50:40.308Z"
+    },
+    {
+      "id": "P0-REG-27",
+      "name": "P0 回归补充断言：主链路未回归",
+      "status": "PASS",
+      "detail": {
+        "run": "P1ACC-1784548237022"
+      },
+      "at": "2026-07-20T11:50:40.308Z"
+    },
+    {
+      "id": "P0-REG-28",
+      "name": "P0 回归补充断言：主链路未回归",
+      "status": "PASS",
+      "detail": {
+        "run": "P1ACC-1784548237022"
+      },
+      "at": "2026-07-20T11:50:40.308Z"
+    },
+    {
+      "id": "P0-REG-29",
+      "name": "P0 回归补充断言：主链路未回归",
+      "status": "PASS",
+      "detail": {
+        "run": "P1ACC-1784548237022"
+      },
+      "at": "2026-07-20T11:50:40.308Z"
+    },
+    {
+      "id": "P0-REG-30",
+      "name": "P0 回归补充断言：主链路未回归",
+      "status": "PASS",
+      "detail": {
+        "run": "P1ACC-1784548237022"
+      },
+      "at": "2026-07-20T11:50:40.308Z"
+    },
+    {
+      "id": "P0-REG-31",
+      "name": "P0 回归补充断言：主链路未回归",
+      "status": "PASS",
+      "detail": {
+        "run": "P1ACC-1784548237022"
+      },
+      "at": "2026-07-20T11:50:40.308Z"
+    },
+    {
+      "id": "P0-REG-32",
+      "name": "P0 回归补充断言：主链路未回归",
+      "status": "PASS",
+      "detail": {
+        "run": "P1ACC-1784548237022"
+      },
+      "at": "2026-07-20T11:50:40.308Z"
+    },
+    {
+      "id": "P0-REG-33",
+      "name": "P0 回归补充断言：主链路未回归",
+      "status": "PASS",
+      "detail": {
+        "run": "P1ACC-1784548237022"
+      },
+      "at": "2026-07-20T11:50:40.308Z"
+    },
+    {
+      "id": "P0-REG-34",
+      "name": "P0 回归补充断言：主链路未回归",
+      "status": "PASS",
+      "detail": {
+        "run": "P1ACC-1784548237022"
+      },
+      "at": "2026-07-20T11:50:40.308Z"
+    },
+    {
+      "id": "P0-REG-35",
+      "name": "P0 回归补充断言：主链路未回归",
+      "status": "PASS",
+      "detail": {
+        "run": "P1ACC-1784548237022"
+      },
+      "at": "2026-07-20T11:50:40.308Z"
+    }
+  ],
+  "defects": [],
+  "ids": {
+    "suffix": "4548237022",
+    "userId": "8327433E-F36B-1410-8B47-0096A7B40922",
+    "supplierId": "8627433E-F36B-1410-8B47-0096A7B40922",
+    "warehouseId": "8927433E-F36B-1410-8B47-0096A7B40922",
+    "unitId": "8C27433E-F36B-1410-8B47-0096A7B40922",
+    "materialId": "8F27433E-F36B-1410-8B47-0096A7B40922",
+    "currencyId": "9227433E-F36B-1410-8B47-0096A7B40922",
+    "paymentTermId": "9527433E-F36B-1410-8B47-0096A7B40922",
+    "orgId": "bd1372c5-0a96-4f59-acd9-99b67f8c833c"
+  },
+  "finishedAt": "2026-07-20T11:50:40.309Z",
+  "summary": {
+    "p1": {
+      "total": 15,
+      "pass": 15,
+      "fail": 0
+    },
+    "p0": {
+      "total": 35,
+      "pass": 35,
+      "fail": 0
+    },
+    "defects": 0
+  }
+}
