@@ -1,45 +1,45 @@
 {
-  "runTag": "P1FEFIX2-1784534037699",
+  "runTag": "P1FEFIX2-1784563020557",
   "checks": [
     {
       "id": "P1-FE-purchase-return-request.html",
       "status": "PASS",
       "detail": {
-        "base": "http://127.0.0.1:3002/api",
+        "base": "http://127.0.0.1:3003/api",
         "banner": true,
         "fetches": [
           "http://localhost:3001/api/orgs",
-          "http://127.0.0.1:3002/api/purchase-return-requests?page=1&pageSize=10",
-          "http://127.0.0.1:3002/api/purchase-return-requests?page=1&pageSize=10",
+          "http://127.0.0.1:3003/api/purchase-return-requests?page=1&pageSize=10",
+          "http://127.0.0.1:3003/api/purchase-return-requests?page=1&pageSize=10",
           "http://127.0.0.1:8099/common.css",
           "http://127.0.0.1:8099/common.js",
           "http://127.0.0.1:8099/doc-data-store.js",
-          "http://127.0.0.1:8099/purchase-p1-return-api.js",
           "http://127.0.0.1:8099/doc-conversion.js",
+          "http://127.0.0.1:8099/purchase-p1-return-api.js",
           "http://localhost:3001/api/orgs",
-          "http://127.0.0.1:3002/api/purchase-return-requests?page=1&pageSize=10",
-          "http://127.0.0.1:3002/api/purchase-return-requests?page=1&pageSize=10",
+          "http://127.0.0.1:3003/api/purchase-return-requests?page=1&pageSize=10",
+          "http://127.0.0.1:3003/api/purchase-return-requests?page=1&pageSize=10",
           "http://127.0.0.1:8099/favicon.ico"
         ],
-        "text": "业务导航\n📋\n采购退货申请单列表\n✚\n采购退货申请单新增\n采购退货申请单\n管理采购退货申请单信息\n🔍\n过滤\n+\n新增\n✓\n批量提交\n✓\n批量审核\n↩️\n批量反审核\n🔒\n关闭\n🔓\n反关闭\n🗑️\n批量删除\n⚙️\n显示/隐藏列\n✖️\n退出\nP1 采购退换货：当前页面已接入真实 API，状态/可退数量/红字应付以后端返回为准。\n\t单据编号\t日期\t供应商\t组织\t退料方式\t退料原因\t申请退料数量\t已下推退料数量\t状态\t创建时间\n\tPRR20260720154804107487\t2026-07-20\t\t\tREPLENISH\t并发\t2\t0\t草稿\t2026/7/20 07:48:04\n\tPRR20260720154803626432\t2026-07-20\t\t\tREPLENISH\t同载荷\t1\t0\t草稿\t2026/7/20 07:48:03\n\tPRR20260720154752673522\t2026-07-20\t\t\tREPLENISH\t同载荷\t1\t0\t草稿\t2026/7/20 07:47:52\n\tPRR20260720154449900537\t2026-07-20\t\t\tREPLENISH\t并发\t1\t0\t已取消\t2026/7/20 07:44:49\n\tPRR20260720154435972333\t2026-07-20\t\t\tREPLENISH\t同载荷\t1\t0\t已取消\t2026/7/20 07:44:36\n\tPRR20260720152850792797\t2026-07-20\t\t\tREPLENISH\t幂等\t1\t0\t草稿\t2026/7/20 07:28:50\n\tPRR20260720152848912582\t2026-07-20\t\t\tREPLENISH\tP1补料申请\t10\t10\t已审核\t2026/7/20 07:28:48\n\tPRR20260720152835738799\t2026-07-2"
+        "text": "业务导航\n📋\n采购退货申请单列表\n✚\n采购退货申请单新增\n采购退货申请单\n管理采购退货申请单信息\n🔍\n过滤\n+\n新增\n✓\n批量提交\n✓\n批量审核\n↩️\n批量反审核\n🔒\n关闭\n🔓\n反关闭\n🗑️\n批量删除\n⚙️\n显示/隐藏列\n✖️\n退出\nP1 采购退换货：当前页面已接入真实 API，状态/可退数量/红字应付以后端返回为准。\n\t单据编号\t日期\t供应商\t组织\t退料方式\t退料原因\t申请退料数量\t已下推退料数量\t状态\t创建时间\n\tPRR20260720235700250247\t2026-07-20\t\t\tREPLENISH\t幂等\t1\t0\t草稿\t2026/7/20 15:57:00\n\tPRR20260720235658793413\t2026-07-20\t\t\tREPLENISH\tP1补料申请\t10\t10\t已审核\t2026/7/20 15:56:58\n\tPRR20260720195040260531\t2026-07-20\t\t\tREPLENISH\t幂等\t1\t0\t草稿\t2026/7/20 11:50:40\n\tPRR20260720195038929536\t2026-07-20\t\t\tREPLENISH\tP1补料申请\t10\t10\t已审核\t2026/7/20 11:50:38\n\tPRR20260720175709399112\t2026-07-20\t\t\tREPLENISH\t幂等\t1\t0\t草稿\t2026/7/20 09:57:09\n\tPRR20260720175708262568\t2026-07-20\t\t\tREPLENISH\tP1补料申请\t10\t10\t已审核\t2026/7/20 09:57:08\n\tPRR20260720175135865928\t2026-07-20\t\t\tREPLENISH\t幂等\t1\t0\t草稿\t2026/7/20 09:51:35\n\tPRR20260720175134498180\t"
       }
     },
     {
       "id": "P1-FE-purchase-return-request-create.html",
       "status": "PASS",
       "detail": {
-        "base": "http://127.0.0.1:3002/api",
+        "base": "http://127.0.0.1:3003/api",
         "banner": true,
         "fetches": [
           "http://localhost:3001/api/orgs",
-          "http://127.0.0.1:3002/api/purchase-return-requests?page=1&pageSize=1",
+          "http://127.0.0.1:3003/api/purchase-return-requests?page=1&pageSize=1",
           "http://127.0.0.1:8099/common.css",
           "http://127.0.0.1:8099/common.js",
           "http://127.0.0.1:8099/doc-data-store.js",
           "http://127.0.0.1:8099/doc-conversion.js",
           "http://127.0.0.1:8099/purchase-p1-return-api.js",
           "http://localhost:3001/api/orgs",
-          "http://127.0.0.1:3002/api/purchase-return-requests?page=1&pageSize=1",
+          "http://127.0.0.1:3003/api/purchase-return-requests?page=1&pageSize=1",
           "http://127.0.0.1:8099/favicon.ico"
         ],
         "text": "业务导航\n📋\n采购退货申请单列表\n✚\n采购退货申请单新增\n采购退货申请单 - 新增\n新建采购退货申请单\n📋\n复制\n✓\n保存\n✓\n提交\n✓\n审核\n↩️\n反审核\n🔗\n选单\n⬇️\n下推\n⬅️\n上查\n➡️\n下查\n🔒\n关闭\n🔓\n反关闭\n📋\n列表\n⚙️\n打印设置\n🖨️\n打印\n✖️\n退出\nP1 采购退换货：当前页面已接入真实 API，状态/可退数量/红字应付以后端返回为准。\n基本信息\n单据编号\n*日期\n供应商\n...\n组织\n...\n退货部门\n...\n申请人\n...\n币别\n请选择\n人民币\n美元\n欧元\n汇率\n请选择\n金额\n退货原因\n请选择\n质量问题\n库存积压\n采购错误\n其他\n状态\n创建时间\n备注\n明细信息\n+\n新增行\n删除选中行\n\t序号\t物料编码\t物料名称\t规格型号\t单位\t数量\t单价\t金额\t税率\t税额\t备注\n\t1\t\n...\n\t\t\t\t\t\t\t\n0%\n3%\n6%\n9%\n13%\n\t\t\n合计金额\t0.00\n合计金额:\n0.00\nⓘ\n系统提示\nP1 退料单据请从采购入库/退料申请下推生成；新增页已切换真实 API 模式"
@@ -49,41 +49,41 @@
       "id": "P1-FE-purchase-return.html",
       "status": "PASS",
       "detail": {
-        "base": "http://127.0.0.1:3002/api",
+        "base": "http://127.0.0.1:3003/api",
         "banner": true,
         "fetches": [
           "http://localhost:3001/api/orgs",
-          "http://127.0.0.1:3002/api/purchase-returns?page=1&pageSize=10",
-          "http://127.0.0.1:3002/api/purchase-returns?page=1&pageSize=10",
+          "http://127.0.0.1:3003/api/purchase-returns?page=1&pageSize=10",
+          "http://127.0.0.1:3003/api/purchase-returns?page=1&pageSize=10",
           "http://127.0.0.1:8099/common.css",
           "http://127.0.0.1:8099/common.js",
           "http://127.0.0.1:8099/doc-data-store.js",
           "http://127.0.0.1:8099/doc-conversion.js",
           "http://127.0.0.1:8099/purchase-p1-return-api.js",
           "http://localhost:3001/api/orgs",
-          "http://127.0.0.1:3002/api/purchase-returns?page=1&pageSize=10",
-          "http://127.0.0.1:3002/api/purchase-returns?page=1&pageSize=10",
+          "http://127.0.0.1:3003/api/purchase-returns?page=1&pageSize=10",
+          "http://127.0.0.1:3003/api/purchase-returns?page=1&pageSize=10",
           "http://127.0.0.1:8099/favicon.ico"
         ],
-        "text": "业务导航\n📋\n采购退货单列表\n✚\n采购退货单新增\n采购退货单\n管理采购退货单信息\n↻\n重试红字应付\n🔍\n过滤\n+\n新增\n✓\n批量提交\n✓\n批量审核\n↩️\n批量反审核\n🗑️\n批量删除\n⚙️\n显示/隐藏列\n✖️\n退出\nP1 采购退换货：当前页面已接入真实 API，状态/可退数量/红字应付以后端返回为准。\n\t单据编号\t日期\t供应商\t组织\t来源入库单\t退料方式\t退料数量\t金额\t红字应付状态\t红字应付单号\t状态\t创建时间\n\tPRT20260720152850515619\t2026-07-20\t\t\tPIN20260720152850053936\tDEDUCTION\t5\t56.50\t已生成\tAP20260720152850731463\t已审核\t2026/7/20 07:28:50\n\tPRT20260720152849043173\t2026-07-20\t\t\tPIN20260720152848735879\tREPLENISH\t10\t113.00\t不需要\t\t已审核\t2026/7/20 07:28:49\n\tPRT20260720152847910567\t2026-07-20\t\t\tPIN20260720152847406060\tDEDUCTION\t8\t90.40\t已生成\tAP20260720152848100581\t已审核\t2026/7/20 07:28:47\n\tPRT20260720152835880740\t2026-07-20\t\t\tPIN20260720152835524331\tREPLENISH\t10\t113.00\t不需要\t\t已审核\t2026/7/20 07:28:35\n\tPRT20260720152834787111\t2026-07-20\t\t\tPIN20260720152834473475\tDEDUCTION\t8\t90.40\t已生成\tAP20260720152834933727\t已审"
+        "text": "业务导航\n📋\n采购退货单列表\n✚\n采购退货单新增\n采购退货单\n管理采购退货单信息\n↻\n重试红字应付\n🔍\n过滤\n+\n新增\n✓\n批量提交\n✓\n批量审核\n↩️\n批量反审核\n🗑️\n批量删除\n⚙️\n显示/隐藏列\n✖️\n退出\nP1 采购退换货：当前页面已接入真实 API，状态/可退数量/红字应付以后端返回为准。\n\t单据编号\t日期\t供应商\t组织\t来源入库单\t退料方式\t退料数量\t金额\t红字应付状态\t红字应付单号\t状态\t创建时间\n\tPRT20260720235659891025\t2026-07-20\t\t\tPIN20260720235659690676\tDEDUCTION\t5\t56.50\t已生成\tAP20260720235700183116\t已审核\t2026/7/20 15:56:59\n\tPRT20260720235658903351\t2026-07-20\t\t\tPIN20260720235658629043\tREPLENISH\t10\t113.00\t不需要\t\t已审核\t2026/7/20 15:56:58\n\tPRT20260720235657980206\t2026-07-20\t\t\tPIN20260720235657742783\tDEDUCTION\t8\t90.40\t已生成\tAP20260720235658150442\t已审核\t2026/7/20 15:56:57\n\tPRT20260720195040028177\t2026-07-20\t\t\tPIN20260720195039870796\tDEDUCTION\t5\t56.50\t已生成\tAP20260720195040219956\t已审核\t2026/7/20 11:50:40\n\tPRT20260720195039056927\t2026-07-20\t\t\tPIN20260720195038742638\tREPLENISH\t10\t113.00\t不需要\t\t已审"
       }
     },
     {
       "id": "P1-FE-purchase-return-create.html",
       "status": "PASS",
       "detail": {
-        "base": "http://127.0.0.1:3002/api",
+        "base": "http://127.0.0.1:3003/api",
         "banner": true,
         "fetches": [
           "http://localhost:3001/api/orgs",
-          "http://127.0.0.1:3002/api/purchase-returns?page=1&pageSize=1",
+          "http://127.0.0.1:3003/api/purchase-returns?page=1&pageSize=1",
           "http://127.0.0.1:8099/common.css",
           "http://127.0.0.1:8099/common.js",
           "http://127.0.0.1:8099/doc-data-store.js",
           "http://127.0.0.1:8099/doc-conversion.js",
           "http://127.0.0.1:8099/purchase-p1-return-api.js",
           "http://localhost:3001/api/orgs",
-          "http://127.0.0.1:3002/api/purchase-returns?page=1&pageSize=1",
+          "http://127.0.0.1:3003/api/purchase-returns?page=1&pageSize=1",
           "http://127.0.0.1:8099/favicon.ico"
         ],
         "text": "业务导航\n📋\n采购退货单列表\n✚\n采购退货单新增\n采购退货单 - 新增\n新建采购退货单\n↻\n重试红字应付\n📋\n复制\n✓\n保存\n✓\n提交\n✓\n审核\n↩️\n反审核\n🔗\n选单\n⬇️\n下推\n⬅️\n上查\n➡️\n下查\n📋\n列表\n⚙️\n打印设置\n🖨️\n打印\n✖️\n退出\nP1 采购退换货：当前页面已接入真实 API，状态/可退数量/红字应付以后端返回为准。\n基本信息\n单据编号\n*日期\n供应商\n...\n组织\n...\n退货仓库\n退货人员\n币别\n请选择\n人民币\n美元\n欧元\n汇率\n请选择\n金额\n退货原因\n请选择\n质量问题\n库存积压\n采购错误\n其他\n状态\n创建时间\n备注\n明细信息\n+\n新增行\n删除选中行\n\t序号\t物料编码\t物料名称\t规格型号\t单位\t数量\t单价\t金额\t税率\t税额\t备注\n\t1\t\n...\n\t\t\t\t\t\t\t\n0%\n3%\n6%\n9%\n13%\n\t\t\n合计金额\t0.00\n合计金额:\n0.00\nⓘ\n系统提示\nP1 退料单据请从采购入库/退料申请下推生成；新增页已切换真实 API 模式"

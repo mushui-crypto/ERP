@@ -1,8 +1,8 @@
 {
-  "runTag": "P4VERIFY-1784548196480",
+  "runTag": "P4VERIFY-1784563074664",
   "api": "http://localhost:3003/api",
   "branch": "codex/purchase-p4-change-reconcile-report",
-  "startedAt": "2026-07-20T11:49:56.480Z",
+  "startedAt": "2026-07-20T15:57:54.664Z",
   "p4": [
     {
       "id": "P4-ROUTE-01",
@@ -11,17 +11,17 @@
       "detail": {
         "missing": []
       },
-      "at": "2026-07-20T11:49:56.579Z"
+      "at": "2026-07-20T15:57:54.739Z"
     },
     {
       "id": "P4-CHG-01",
       "name": "订单变更创建及同键同载荷幂等",
       "status": "PASS",
       "detail": {
-        "id": "7224433E-F36B-1410-8B47-0096A7B40922",
+        "id": "A02D433E-F36B-1410-8B47-0096A7B40922",
         "status": "DRAFT"
       },
-      "at": "2026-07-20T11:49:57.138Z"
+      "at": "2026-07-20T15:57:55.281Z"
     },
     {
       "id": "P4-CHG-02",
@@ -31,17 +31,17 @@
         "message": "相同幂等键对应的采购订单变更载荷不一致",
         "status": 409
       },
-      "at": "2026-07-20T11:49:57.147Z"
+      "at": "2026-07-20T15:57:55.294Z"
     },
     {
       "id": "P4-CHG-03",
       "name": "同采购订单只允许一个未生效变更",
       "status": "PASS",
       "detail": {
-        "message": "采购订单 PO20260720194956949134 已存在有效未生效变更单 POC20260720194957102600",
+        "message": "采购订单 PO20260720235755066816 已存在有效未生效变更单 POC20260720235755194805",
         "status": 409
       },
-      "at": "2026-07-20T11:49:57.178Z"
+      "at": "2026-07-20T15:57:55.486Z"
     },
     {
       "id": "P4-CHG-04",
@@ -51,7 +51,7 @@
         "status": "APPROVED",
         "effectiveStatus": "EFFECTIVE"
       },
-      "at": "2026-07-20T11:49:57.311Z"
+      "at": "2026-07-20T15:57:55.601Z"
     },
     {
       "id": "P4-CHG-05",
@@ -64,14 +64,14 @@
           "amount": 132,
           "tax_amount": 17.16,
           "net_amount": 149.16,
-          "warehouse_id": "dda231b1-cf5c-41d7-9699-493dc2e161a3",
+          "warehouse_id": "3f0a5b58-cc10-4129-baca-e2b2beaee049",
           "remark": "P4变更后备注"
         },
         "prEntry": {
           "purchased_qty": 12
         }
       },
-      "at": "2026-07-20T11:49:57.323Z"
+      "at": "2026-07-20T15:57:55.608Z"
     },
     {
       "id": "P4-CHG-06",
@@ -80,17 +80,17 @@
       "detail": {
         "count": 1
       },
-      "at": "2026-07-20T11:49:57.377Z"
+      "at": "2026-07-20T15:57:55.618Z"
     },
     {
       "id": "P4-CHG-07",
       "name": "取消未生效变更释放唯一约束并可重建",
       "status": "PASS",
       "detail": {
-        "canceled": "7C24433E-F36B-1410-8B47-0096A7B40922",
-        "recreated": "8324433E-F36B-1410-8B47-0096A7B40922"
+        "canceled": "AA2D433E-F36B-1410-8B47-0096A7B40922",
+        "recreated": "B82D433E-F36B-1410-8B47-0096A7B40922"
       },
-      "at": "2026-07-20T11:49:57.476Z"
+      "at": "2026-07-20T15:57:55.709Z"
     },
     {
       "id": "P4-CHG-08",
@@ -100,17 +100,17 @@
         "message": "采购订单第1行新数量不得小于已收料/已入库数量 6",
         "status": 400
       },
-      "at": "2026-07-20T11:49:57.835Z"
+      "at": "2026-07-20T15:57:56.041Z"
     },
     {
       "id": "P4-REC-01",
       "name": "对账生成及同键同载荷幂等",
       "status": "PASS",
       "detail": {
-        "id": "D024433E-F36B-1410-8B47-0096A7B40922",
+        "id": "122E433E-F36B-1410-8B47-0096A7B40922",
         "entries": 1
       },
-      "at": "2026-07-20T11:49:58.539Z"
+      "at": "2026-07-20T15:57:56.694Z"
     },
     {
       "id": "P4-REC-02",
@@ -118,32 +118,32 @@
       "status": "PASS",
       "detail": {
         "entry": {
-          "purchaseReconciliationId": "D024433E-F36B-1410-8B47-0096A7B40922",
+          "purchaseReconciliationId": "122E433E-F36B-1410-8B47-0096A7B40922",
           "lineNo": 1,
           "businessSourceType": "PURCHASE_INBOUND",
-          "businessSourceId": "B924433E-F36B-1410-8B47-0096A7B40922",
-          "businessSourceNo": "PIN20260720194958173799",
-          "businessSourceEntryId": "BA24433E-F36B-1410-8B47-0096A7B40922",
+          "businessSourceId": "EE2D433E-F36B-1410-8B47-0096A7B40922",
+          "businessSourceNo": "PIN20260720235756415471",
+          "businessSourceEntryId": "F32D433E-F36B-1410-8B47-0096A7B40922",
           "businessDate": "2026-07-20T00:00:00.000Z",
-          "sourceOrderId": "AD24433E-F36B-1410-8B47-0096A7B40922",
-          "sourceOrderNo": "PO20260720194957936623",
-          "sourceOrderEntryId": "B424433E-F36B-1410-8B47-0096A7B40922",
-          "sourceRequestId": "9F24433E-F36B-1410-8B47-0096A7B40922",
-          "sourceRequestEntryId": "A624433E-F36B-1410-8B47-0096A7B40922",
-          "payableId": "C624433E-F36B-1410-8B47-0096A7B40922",
-          "payableNo": "AP20260720194958363573",
-          "payableEntryId": "CB24433E-F36B-1410-8B47-0096A7B40922",
+          "sourceOrderId": "E32D433E-F36B-1410-8B47-0096A7B40922",
+          "sourceOrderNo": "PO20260720235756128740",
+          "sourceOrderEntryId": "E52D433E-F36B-1410-8B47-0096A7B40922",
+          "sourceRequestId": "DF2D433E-F36B-1410-8B47-0096A7B40922",
+          "sourceRequestEntryId": "E12D433E-F36B-1410-8B47-0096A7B40922",
+          "payableId": "042E433E-F36B-1410-8B47-0096A7B40922",
+          "payableNo": "AP20260720235756586293",
+          "payableEntryId": "0B2E433E-F36B-1410-8B47-0096A7B40922",
           "payableType": "ESTIMATED",
           "expenseItemCode": null,
           "expenseItemName": null,
-          "materialId": "5A24433E-F36B-1410-8B47-0096A7B40922",
-          "materialCode": "P4MAT_4548196480",
-          "materialName": "P4??_4548196480",
+          "materialId": "7C2D433E-F36B-1410-8B47-0096A7B40922",
+          "materialCode": "P4MAT_4563074664",
+          "materialName": "P4??_4563074664",
           "materialModel": null,
-          "unitId": "5624433E-F36B-1410-8B47-0096A7B40922",
+          "unitId": "752D433E-F36B-1410-8B47-0096A7B40922",
           "unitCode": null,
           "unitName": "个",
-          "warehouseId": "5224433E-F36B-1410-8B47-0096A7B40922",
+          "warehouseId": "6E2D433E-F36B-1410-8B47-0096A7B40922",
           "businessQty": 7,
           "businessUnitPrice": 50,
           "businessTaxRate": 13,
@@ -169,13 +169,13 @@
           "confirmedTotalAmount": null,
           "differenceReason": null,
           "confirmRemark": null,
-          "id": "D524433E-F36B-1410-8B47-0096A7B40922",
-          "createdAt": "2026-07-20T03:49:58.506Z",
-          "updatedAt": "2026-07-20T03:49:58.506Z",
+          "id": "192E433E-F36B-1410-8B47-0096A7B40922",
+          "createdAt": "2026-07-20T07:57:56.663Z",
+          "updatedAt": "2026-07-20T07:57:56.663Z",
           "isDeleted": 0
         }
       },
-      "at": "2026-07-20T11:49:58.539Z"
+      "at": "2026-07-20T15:57:56.695Z"
     },
     {
       "id": "P4-REC-03",
@@ -185,26 +185,26 @@
         "message": "相同幂等键对应的采购对账载荷不一致",
         "status": 409
       },
-      "at": "2026-07-20T11:49:58.550Z"
+      "at": "2026-07-20T15:57:56.704Z"
     },
     {
       "id": "P4-REC-04",
       "name": "同维度有效对账未取消前返回同一有效单",
       "status": "PASS",
       "detail": {
-        "id": "D024433E-F36B-1410-8B47-0096A7B40922"
+        "id": "122E433E-F36B-1410-8B47-0096A7B40922"
       },
-      "at": "2026-07-20T11:49:58.586Z"
+      "at": "2026-07-20T15:57:56.722Z"
     },
     {
       "id": "P4-REC-05",
       "name": "对账取消后释放范围并可重建",
       "status": "PASS",
       "detail": {
-        "oldId": "D024433E-F36B-1410-8B47-0096A7B40922",
-        "newId": "D724433E-F36B-1410-8B47-0096A7B40922"
+        "oldId": "122E433E-F36B-1410-8B47-0096A7B40922",
+        "newId": "202E433E-F36B-1410-8B47-0096A7B40922"
       },
-      "at": "2026-07-20T11:49:58.681Z"
+      "at": "2026-07-20T15:57:56.796Z"
     },
     {
       "id": "P4-REC-06",
@@ -214,7 +214,7 @@
         "message": "对账明细第1行存在非零差异，差异原因必填",
         "status": 400
       },
-      "at": "2026-07-20T11:49:58.695Z"
+      "at": "2026-07-20T15:57:56.811Z"
     },
     {
       "id": "P4-REC-07",
@@ -222,10 +222,10 @@
       "status": "PASS",
       "detail": {
         "status": "CONFIRMED",
-        "before": 101,
-        "after": 101
+        "before": 135,
+        "after": 135
       },
-      "at": "2026-07-20T11:49:58.739Z"
+      "at": "2026-07-20T15:57:56.846Z"
     },
     {
       "id": "P4-REC-08",
@@ -236,7 +236,7 @@
         "confirmed_qty": 8,
         "difference_qty": 1
       },
-      "at": "2026-07-20T11:49:58.746Z"
+      "at": "2026-07-20T15:57:56.848Z"
     },
     {
       "id": "P4-REC-09",
@@ -245,7 +245,7 @@
       "detail": {
         "total": 2
       },
-      "at": "2026-07-20T11:49:58.779Z"
+      "at": "2026-07-20T15:57:56.857Z"
     },
     {
       "id": "P4-RPT-ORDER-EXECUTION-SUMMARY",
@@ -255,13 +255,13 @@
         "sample": {
           "total": 3,
           "first": {
-            "purchaseOrderId": "6924433E-F36B-1410-8B47-0096A7B40922",
-            "orderNo": "PO20260720194956949134",
+            "purchaseOrderId": "992D433E-F36B-1410-8B47-0096A7B40922",
+            "orderNo": "PO20260720235755066816",
             "orderDate": "2026-07-20T00:00:00.000Z",
-            "supplierId": "4E24433E-F36B-1410-8B47-0096A7B40922",
-            "purchaseOrgId": "e54167b2-cec4-4d7a-911f-34c60b4b338a",
+            "supplierId": "6C2D433E-F36B-1410-8B47-0096A7B40922",
+            "purchaseOrgId": "b2379d1b-eabf-48c6-a220-e2d4e7ef038b",
             "buyerId": null,
-            "currencyId": "5E24433E-F36B-1410-8B47-0096A7B40922",
+            "currencyId": "832D433E-F36B-1410-8B47-0096A7B40922",
             "billType": "STANDARD_PURCHASE",
             "businessType": "STANDARD",
             "status": 2,
@@ -274,7 +274,7 @@
             "overdue": false,
             "unitGroups": [
               {
-                "unitId": "5624433E-F36B-1410-8B47-0096A7B40922",
+                "unitId": "752D433E-F36B-1410-8B47-0096A7B40922",
                 "unitCode": null,
                 "unitName": "个",
                 "orderQty": 12,
@@ -288,7 +288,7 @@
           }
         }
       },
-      "at": "2026-07-20T11:49:58.848Z"
+      "at": "2026-07-20T15:57:56.892Z"
     },
     {
       "id": "P4-RPT-ORDER-EXECUTION-DETAIL",
@@ -298,32 +298,32 @@
         "sample": {
           "total": 3,
           "first": {
-            "purchaseOrderId": "6924433E-F36B-1410-8B47-0096A7B40922",
-            "orderNo": "PO20260720194956949134",
+            "purchaseOrderId": "992D433E-F36B-1410-8B47-0096A7B40922",
+            "orderNo": "PO20260720235755066816",
             "orderDate": "2026-07-20T00:00:00.000Z",
-            "purchaseOrgId": "e54167b2-cec4-4d7a-911f-34c60b4b338a",
-            "supplierId": "4E24433E-F36B-1410-8B47-0096A7B40922",
+            "purchaseOrgId": "b2379d1b-eabf-48c6-a220-e2d4e7ef038b",
+            "supplierId": "6C2D433E-F36B-1410-8B47-0096A7B40922",
             "buyerId": null,
-            "currencyId": "5E24433E-F36B-1410-8B47-0096A7B40922",
+            "currencyId": "832D433E-F36B-1410-8B47-0096A7B40922",
             "billType": "STANDARD_PURCHASE",
             "businessType": "STANDARD",
             "orderStatus": 2,
-            "orderEntryId": "6E24433E-F36B-1410-8B47-0096A7B40922",
+            "orderEntryId": "9D2D433E-F36B-1410-8B47-0096A7B40922",
             "lineNo": 1,
-            "sourceRequestId": "6324433E-F36B-1410-8B47-0096A7B40922",
-            "sourceRequestNo": "PR20260720194956831798",
-            "sourceRequestEntryId": "6424433E-F36B-1410-8B47-0096A7B40922",
-            "materialId": "5A24433E-F36B-1410-8B47-0096A7B40922",
-            "materialCode": "P4MAT_4548196480",
-            "materialName": "P4??_4548196480",
+            "sourceRequestId": "912D433E-F36B-1410-8B47-0096A7B40922",
+            "sourceRequestNo": "PR20260720235754974096",
+            "sourceRequestEntryId": "952D433E-F36B-1410-8B47-0096A7B40922",
+            "materialId": "7C2D433E-F36B-1410-8B47-0096A7B40922",
+            "materialCode": "P4MAT_4563074664",
+            "materialName": "P4??_4563074664",
             "materialModel": null,
             "expenseItemCode": null,
             "expenseItemName": null,
-            "unitId": "5624433E-F36B-1410-8B47-0096A7B40922",
+            "unitId": "752D433E-F36B-1410-8B47-0096A7B40922",
             "unitCode": null,
             "unitName": "个",
             "deliveryDate": "2026-08-01T00:00:00.000Z",
-            "warehouseId": "dda231b1-cf5c-41d7-9699-493dc2e161a3",
+            "warehouseId": "3f0a5b58-cc10-4129-baca-e2b2beaee049",
             "orderQty": 12,
             "receivedQty": 0,
             "stockedQty": 0,
@@ -357,7 +357,7 @@
           }
         }
       },
-      "at": "2026-07-20T11:49:58.899Z"
+      "at": "2026-07-20T15:57:56.917Z"
     },
     {
       "id": "P4-RPT-CONSUME-SUMMARY",
@@ -367,16 +367,16 @@
         "sample": {
           "total": 1,
           "first": {
-            "purchaseOrgId": "e54167b2-cec4-4d7a-911f-34c60b4b338a",
-            "supplierId": "4E24433E-F36B-1410-8B47-0096A7B40922",
+            "purchaseOrgId": "b2379d1b-eabf-48c6-a220-e2d4e7ef038b",
+            "supplierId": "6C2D433E-F36B-1410-8B47-0096A7B40922",
             "businessType": "STANDARD",
-            "currencyId": "5E24433E-F36B-1410-8B47-0096A7B40922",
-            "materialId": "5A24433E-F36B-1410-8B47-0096A7B40922",
-            "materialCode": "P4MAT_4548196480",
-            "materialName": "P4??_4548196480",
+            "currencyId": "832D433E-F36B-1410-8B47-0096A7B40922",
+            "materialId": "7C2D433E-F36B-1410-8B47-0096A7B40922",
+            "materialCode": "P4MAT_4563074664",
+            "materialName": "P4??_4563074664",
             "expenseItemCode": null,
             "expenseItemName": null,
-            "unitId": "5624433E-F36B-1410-8B47-0096A7B40922",
+            "unitId": "752D433E-F36B-1410-8B47-0096A7B40922",
             "unitCode": null,
             "unitName": "个",
             "quantity": 7,
@@ -386,7 +386,7 @@
           }
         }
       },
-      "at": "2026-07-20T11:49:58.955Z"
+      "at": "2026-07-20T15:57:56.933Z"
     },
     {
       "id": "P4-RPT-OVERVIEW",
@@ -405,7 +405,7 @@
           "overdueOrderCount": 0
         }
       },
-      "at": "2026-07-20T11:49:59.004Z"
+      "at": "2026-07-20T15:57:56.957Z"
     }
   ],
   "regression": [
@@ -414,37 +414,37 @@
       "name": "P0标准采购入库暂估应付回归",
       "status": "PASS",
       "detail": {
-        "inNo": "PIN20260720194958173799",
-        "payableNo": "AP20260720194958363573"
+        "inNo": "PIN20260720235756415471",
+        "payableNo": "AP20260720235756586293"
       },
-      "at": "2026-07-20T11:49:58.400Z"
+      "at": "2026-07-20T15:57:56.617Z"
     },
     {
       "id": "P1-REG-01",
       "name": "P1直接退料扣款红字应付回归",
       "status": "PASS",
       "detail": {
-        "returnNo": "PRT20260720194959048062",
-        "payableNo": "AP20260720194959237179"
+        "returnNo": "PRT20260720235756976598",
+        "payableNo": "AP20260720235757110101"
       },
-      "at": "2026-07-20T11:49:59.265Z"
+      "at": "2026-07-20T15:57:57.130Z"
     }
   ],
   "defects": [],
   "ids": {
-    "suffix": "4548196480",
-    "userId": "4A24433E-F36B-1410-8B47-0096A7B40922",
-    "supplierId": "4E24433E-F36B-1410-8B47-0096A7B40922",
-    "warehouseId": "5224433E-F36B-1410-8B47-0096A7B40922",
-    "unitId": "5624433E-F36B-1410-8B47-0096A7B40922",
-    "materialId": "5A24433E-F36B-1410-8B47-0096A7B40922",
-    "currencyId": "5E24433E-F36B-1410-8B47-0096A7B40922",
-    "paymentTermId": "6224433E-F36B-1410-8B47-0096A7B40922",
-    "orgId": "e54167b2-cec4-4d7a-911f-34c60b4b338a",
-    "changeOrderId": "6924433E-F36B-1410-8B47-0096A7B40922",
-    "reconciliationOrderId": "AD24433E-F36B-1410-8B47-0096A7B40922"
+    "suffix": "4563074664",
+    "userId": "6A2D433E-F36B-1410-8B47-0096A7B40922",
+    "supplierId": "6C2D433E-F36B-1410-8B47-0096A7B40922",
+    "warehouseId": "6E2D433E-F36B-1410-8B47-0096A7B40922",
+    "unitId": "752D433E-F36B-1410-8B47-0096A7B40922",
+    "materialId": "7C2D433E-F36B-1410-8B47-0096A7B40922",
+    "currencyId": "832D433E-F36B-1410-8B47-0096A7B40922",
+    "paymentTermId": "8A2D433E-F36B-1410-8B47-0096A7B40922",
+    "orgId": "b2379d1b-eabf-48c6-a220-e2d4e7ef038b",
+    "changeOrderId": "992D433E-F36B-1410-8B47-0096A7B40922",
+    "reconciliationOrderId": "E32D433E-F36B-1410-8B47-0096A7B40922"
   },
-  "completedAt": "2026-07-20T11:49:59.265Z",
+  "completedAt": "2026-07-20T15:57:57.130Z",
   "summary": {
     "p4": {
       "total": 22,

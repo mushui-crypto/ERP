@@ -1,16 +1,20 @@
 (function () {
   'use strict';
 
-  var API_BASE = window.PURCHASE_P0_API_BASE || 'http://localhost:3001/api';
+  var API_BASE = window.PURCHASE_P0_API_BASE || window.PURCHASE_API_BASE || 'http://localhost:3003/api';
   var P0_TYPES = ['purchase_request', 'purchase_order', 'purchase_receive', 'purchase_inspect', 'purchase_inbound'];
   var currentDoc = null;
   var currentList = [];
+  var requestAllList = [];
+  var requestBusinessView = 'STANDARD_PURCHASE';
   var p0Busy = false;
+  var p0ListInitialized = false;
+  var p0DocInitialized = Object.create(null);
 
   var CONFIG = {
     purchase_request: {
       name: '采购申请单', listPage: 'purchase-request.html', createPage: 'purchase-request-create.html', endpoint: '/purchase-requests', noField: 'requestNo', dateField: 'requestDate', orgField: 'orgId', partnerField: 'supplierName', amountField: 'totalAmount',
-      listColumns: ['单据编号', '日期', '供应商', '组织', '申请数量', '批准数量', '已下推数量', '剩余可下推', '状态', '创建时间'],
+      listColumns: ['单据编号', '业务类型', '日期', '供应商', '组织', '申请数量', '批准数量', '已下推数量', '剩余可下推', '状态', '创建时间'],
       actions: ['submit', 'approve', 'reject', 'cancel', 'close'], target: 'purchase_order'
     },
     purchase_order: {
@@ -62,16 +66,27 @@
   function fmtDate(v) { if (!v) return ''; return String(v).slice(0, 10); }
   function nowKey(prefix) { return prefix + '-' + Date.now() + '-' + Math.random().toString(16).slice(2, 8); }
 
+  function redirectToLogin() {
+    localStorage.removeItem('accessToken');
+    localStorage.removeItem('erpAuthMode');
+    if (window.__purchaseAuthRedirecting) return;
+    window.__purchaseAuthRedirecting = true;
+    setTimeout(function () { location.href = '../login.html?redirect=' + encodeURIComponent(location.href); }, 120);
+  }
+
   async function api(path, options) {
     options = options || {};
+    var method = options.method || 'GET';
     var headers = Object.assign({ 'Content-Type': 'application/json' }, options.headers || {});
     if (token()) headers.Authorization = 'Bearer ' + token();
-    var res = await fetch(API_BASE + path, Object.assign({}, options, { headers: headers }));
+    var res;
+    try { res = await fetch(API_BASE + path, Object.assign({}, options, { headers: headers })); }
+    catch (e) { throw new Error(formatApiErrorMessage('无法连接采购服务，请确认后端 3003 已启动', { path: path, method: method, action: options.action || '' })); }
     var json = null;
     try { json = await res.json(); } catch (e) { json = null; }
+    if (res.status === 401) { redirectToLogin(); throw createApiError(path, method, res.status, json, '登录已失效，正在跳转登录页', options.action); }
     if (!res.ok || (json && json.code && Number(json.code) >= 400)) {
-      var msg = (json && (json.message || json.error)) || ('接口请求失败：HTTP ' + res.status);
-      throw new Error(msg);
+      throw createApiError(path, method, res.status, json, '接口请求失败', options.action);
     }
     return json && Object.prototype.hasOwnProperty.call(json, 'data') ? json.data : json;
   }
@@ -130,7 +145,7 @@
     if (!document.getElementById(styleId)) {
       var style = document.createElement('style');
       style.id = styleId;
-      style.textContent = '.p0-api-banner{margin:12px 16px 0;padding:10px 12px;border:1px solid #91caff;background:#e6f4ff;color:#0958d9;border-radius:4px;font-size:13px}.p0-trace{margin:0 0 16px;background:#fff;border:1px solid #e8e8e8;border-radius:4px}.p0-trace-title{padding:10px 14px;background:#fafafa;border-bottom:1px solid #e8e8e8;font-weight:600}.p0-trace-body{padding:12px 14px;font-size:13px;color:#555;line-height:1.8}.toolbar-btn[disabled],.btn[disabled]{opacity:.55;cursor:not-allowed}.badge-info{background:#e6f4ff;color:#1677ff}.badge-muted{background:#f5f5f5;color:#8c8c8c}.badge-error{background:#fff2f0;color:#cf1322}';
+      style.textContent = '.p0-api-banner{margin:12px 16px 0;padding:10px 12px;border:1px solid #91caff;background:#e6f4ff;color:#0958d9;border-radius:4px;font-size:13px}.p0-trace{margin:0 0 16px;background:#fff;border:1px solid #e8e8e8;border-radius:4px}.p0-order-api-detail{margin:16px 24px}.p0-order-detail-active>.main-content>.doc-header,.p0-order-detail-active>.main-content>.page-body,.p0-order-detail-active>.main-content>.bottom-bar{display:none!important}.p0-detail-heading{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 14px;background:#fafafa;border-bottom:1px solid #e8e8e8}.p0-detail-heading strong{font-size:15px}.p0-detail-heading a{font-size:13px}.p0-detail-summary{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin-bottom:16px}.p0-detail-field{padding:10px 12px;background:#fafafa;border-radius:4px}.p0-detail-label{font-size:12px;color:#8c8c8c}.p0-detail-value{margin-top:2px;color:#262626;font-weight:500;overflow-wrap:anywhere}.p0-detail-section-title{margin:14px 0 8px;font-size:13px;font-weight:600;color:#262626}.p0-trace-title{padding:10px 14px;background:#fafafa;border-bottom:1px solid #e8e8e8;font-weight:600}.p0-trace-body{padding:12px 14px;font-size:13px;color:#555;line-height:1.8}.toolbar-btn[disabled],.btn[disabled]{opacity:.55;cursor:not-allowed}.badge-info{background:#e6f4ff;color:#1677ff}.badge-muted{background:#f5f5f5;color:#8c8c8c}.badge-error{background:#fff2f0;color:#cf1322}.doc-header>div:first-child{min-width:180px;flex-shrink:0}.doc-toolbar{justify-content:flex-end}.toolbar-btn{flex:0 0 auto;white-space:nowrap}.purchase-table-scroll{width:100%;overflow-x:auto}.purchase-table-scroll>.data-table{min-width:max-content}@media(max-width:1100px){.doc-header{align-items:flex-start;gap:12px}.doc-toolbar{justify-content:flex-start}}@media(max-width:640px){.doc-sidebar{display:none!important}.doc-header{flex-direction:column;padding:12px}.doc-header>div:first-child{min-width:0}.doc-toolbar{width:100%;flex-wrap:nowrap;overflow-x:auto;padding-bottom:3px}.doc-body{padding:10px!important}.p0-order-api-detail{margin:10px}.p0-detail-heading{align-items:flex-start}.p0-detail-summary{grid-template-columns:1fr 1fr}}@media(max-width:420px){.p0-detail-summary{grid-template-columns:1fr}}';
       document.head.appendChild(style);
     }
     var body = document.querySelector('.doc-body');
@@ -138,9 +153,11 @@
       var banner = document.createElement('div');
       banner.id = 'p0ApiBanner';
       banner.className = 'p0-api-banner';
-      banner.textContent = 'P0 标准采购主链：当前页面已切换为真实 API 驱动；数量、状态、错误提示以后端返回为准。';
+      banner.textContent = defaultApiBannerText();
+      banner.hidden = true;
       body.insertBefore(banner, body.firstChild);
     }
+    ensureP0Layout();
     if (window.docType === 'purchase_order') ensureHeaderField('采购合同号', '采购合同号', 'text', true, false);
     if (window.docType === 'purchase_receive') ensureHeaderField('是否需要检验', '是否需要检验', 'text', false, false);
     if (window.docType === 'purchase_inbound') {
@@ -149,6 +166,20 @@
       ensureHeaderField('应付失败原因', '应付失败原因', 'text', false, true);
       ensureRetryPayableButton();
     }
+  }
+
+  function ensureP0Layout() {
+    document.querySelectorAll('.doc-card > .data-table').forEach(function (table) {
+      var wrapper = document.createElement('div');
+      wrapper.className = 'purchase-table-scroll';
+      table.parentNode.insertBefore(wrapper, table);
+      wrapper.appendChild(table);
+    });
+  }
+
+  function defaultApiBannerText() {
+    if (isPurchaseRequestList()) return '正在加载采购申请...';
+    return '正在加载采购数据...';
   }
 
   function ensureRetryPayableButton() {
@@ -189,6 +220,7 @@
 
   function listValue(item, col) {
     if (col === '单据编号') return docNo(item);
+    if (col === '业务类型') return businessTypeName(item);
     if (col === '日期') return dateOf(item);
     if (col === '供应商') return item.supplierName || item.partnerName || ((item.entries || [])[0] || {}).supplierName || '';
     if (col === '组织') return item.orgName || item.purchaseOrgName || item.stockOrgName || item.orgId || item.purchaseOrgId || item.stockOrgId || '';
@@ -232,13 +264,135 @@
     return map[s] || s || '';
   }
 
+  function isPurchaseRequestList() {
+    return window.docType === 'purchase_request' && location.pathname.split('/').pop() === 'purchase-request.html';
+  }
+
+  function rawBusinessType(item) {
+    return String((item && (item.businessType || item.billType || item.requestType)) || '').toUpperCase();
+  }
+
+  function businessViewOf(item) {
+    var type = rawBusinessType(item);
+    if (type === 'EXPENSE_PURCHASE') return 'EXPENSE_PURCHASE';
+    if (type === 'ASSET_PURCHASE' || type === 'ASSET_NO_INBOUND' || type === 'ASSET_INBOUND') return 'ASSET_PURCHASE';
+    return 'STANDARD_PURCHASE';
+  }
+
+  function businessTypeName(item) {
+    var type = rawBusinessType(item);
+    if (type === 'ASSET_NO_INBOUND') return '资产采购（不入库）';
+    if (type === 'ASSET_INBOUND') return '资产采购（入库）';
+    if (type === 'ASSET_PURCHASE') return '资产采购';
+    if (type === 'EXPENSE_PURCHASE') return '费用采购';
+    return '标准采购';
+  }
+
+  function requestViewMeta(view) {
+    return {
+      ALL: { title: '全部采购申请', description: '按业务类型统一查询', context: '当前显示共享上游的全部采购申请；资产与费用采购不会混合下推到同一订单。' },
+      STANDARD_PURCHASE: { title: '标准采购申请', description: '标准采购主链申请', context: '按采购申请、采购订单、收料、检验、入库和暂估应付主链执行。' },
+      ASSET_PURCHASE: { title: '资产采购申请', description: 'CG-07 / CG-08 资产采购', context: '不入库资产采购从收料进入资产验收；入库资产采购从采购入库进入资产验收。' },
+      EXPENSE_PURCHASE: { title: '费用采购申请', description: 'CG-09 费用采购', context: '费用采购以服务完成和费用验收为下游，禁止采购入库和资产建卡。' }
+    }[view] || {};
+  }
+
+  function requestViewList() {
+    if (requestBusinessView === 'ALL') return requestAllList.slice();
+    return requestAllList.filter(function (item) { return businessViewOf(item) === requestBusinessView; });
+  }
+
+  function updateRequestViewUi(filtered) {
+    var meta = requestViewMeta(requestBusinessView);
+    document.querySelectorAll('[data-business-view]').forEach(function (button) {
+      button.setAttribute('aria-selected', button.getAttribute('data-business-view') === requestBusinessView ? 'true' : 'false');
+    });
+    var title = document.getElementById('purchaseRequestPageTitle');
+    var subtitle = document.getElementById('purchaseRequestPageSubtitle');
+    var description = document.getElementById('businessViewDescription');
+    var contextTitle = document.getElementById('businessContextTitle');
+    var contextText = document.getElementById('businessContextText');
+    var count = document.getElementById('businessViewCount');
+    var addButton = document.getElementById('purchaseRequestAddButton');
+    if (title) title.textContent = meta.title || '采购申请单';
+    if (subtitle) subtitle.textContent = meta.description || '';
+    if (description) description.textContent = meta.description || '';
+    if (contextTitle) contextTitle.textContent = meta.title || '';
+    if (contextText) contextText.textContent = meta.context || '';
+    if (count) count.innerHTML = '当前 <strong>' + filtered.length + '</strong> 条';
+    if (addButton) {
+      if (requestBusinessView === 'EXPENSE_PURCHASE') {
+        addButton.innerHTML = '<span class="icon">+</span> 新增费用申请';
+        addButton.onclick = function () { if (window.P3Expense && window.P3Expense.openRequestDrawer) window.P3Expense.openRequestDrawer('manual'); };
+      } else {
+        addButton.innerHTML = '<span class="icon">+</span> 新增';
+        addButton.onclick = function () { location.href = 'purchase-request-create.html'; };
+      }
+    }
+  }
+
+  function renderRequestView() {
+    var filtered = requestViewList();
+    var size = Number(window.pageSize || 10);
+    var pages = Math.max(1, Math.ceil(filtered.length / size));
+    window.currentPage = Math.min(Math.max(1, Number(window.currentPage || 1)), pages);
+    var start = (window.currentPage - 1) * size;
+    updateRequestViewUi(filtered);
+    window.renderTable(filtered.slice(start, start + size));
+    var info = document.getElementById('pageInfo');
+    if (info) info.textContent = '第 ' + window.currentPage + ' / ' + pages + ' 页 · 共 ' + filtered.length + ' 条';
+    var buttons = document.querySelectorAll('.pagination button');
+    if (buttons[0]) buttons[0].disabled = window.currentPage <= 1;
+    if (buttons[1]) buttons[1].disabled = window.currentPage >= pages;
+  }
+
+  async function fetchAllPurchaseRequests(endpoint) {
+    var all = [], page = 1, pageSize = 200, total = 0;
+    do {
+      var data = await api(endpoint + '?page=' + page + '&pageSize=' + pageSize);
+      var list = data.list || data || [];
+      all = all.concat(list);
+      total = Number(data.total == null ? all.length : data.total);
+      page += 1;
+    } while (all.length < total && page <= 50);
+    return all;
+  }
+
+  window.getPurchaseRequestBusinessView = function () { return requestBusinessView; };
+  window.setPurchaseRequestBusinessView = function (view) {
+    if (['ALL', 'STANDARD_PURCHASE', 'ASSET_PURCHASE', 'EXPENSE_PURCHASE'].indexOf(view) < 0) return;
+    requestBusinessView = view;
+    window.currentPage = 1;
+    var url = new URL(location.href);
+    url.searchParams.set('view', view.toLowerCase().replace('_purchase', '').replace('_', '-'));
+    history.replaceState(null, '', url.pathname + url.search + url.hash);
+    renderRequestView();
+    document.dispatchEvent(new CustomEvent('purchase-request-view-change', { detail: { view: view } }));
+  };
+
+  if (isPurchaseRequestList()) {
+    var initialView = new URLSearchParams(location.search).get('view');
+    var initialMap = { all: 'ALL', standard: 'STANDARD_PURCHASE', asset: 'ASSET_PURCHASE', expense: 'EXPENSE_PURCHASE' };
+    requestBusinessView = initialMap[initialView] || requestBusinessView;
+    window.prevPage = function () { if (window.currentPage > 1) { window.currentPage -= 1; renderRequestView(); } };
+    window.nextPage = function () { var pages = Math.max(1, Math.ceil(requestViewList().length / Number(window.pageSize || 10))); if (window.currentPage < pages) { window.currentPage += 1; renderRequestView(); } };
+  }
+
   window.loadData = async function loadDataApi() {
+    p0ListInitialized = true;
     var c = cfg();
     if (!c) return;
     ensureP0Ui();
     await loadLookupData();
     try {
       setBusy(true, '加载中...');
+      if (isPurchaseRequestList()) {
+        requestAllList = await fetchAllPurchaseRequests(c.endpoint);
+        currentList = requestAllList.slice();
+        window.purchaseRequestApiList = requestAllList.slice();
+        renderRequestView();
+        return;
+      }
       var params = '?page=' + (window.currentPage || 1) + '&pageSize=' + (window.pageSize || 10);
       if (window.docType === 'purchase_inspect') params += '&inspectionType=1';
       if (window.docType === 'purchase_inbound') params += '&inType=1';
@@ -249,7 +403,7 @@
     } catch (e) {
       toast(e.message || '加载失败', 'error');
       var tbody = document.getElementById('dataBody');
-      if (tbody) tbody.innerHTML = '<tr><td colspan="12" style="text-align:center;padding:40px;color:#cf1322;">真实 API 加载失败：' + escapeHtml(e.message) + '</td></tr>';
+      if (tbody) tbody.innerHTML = '<tr><td colspan="12" style="text-align:center;padding:40px;color:#cf1322;">加载失败：' + escapeHtml(e.message) + '</td></tr>';
     } finally { setBusy(false); }
   };
 
@@ -259,10 +413,10 @@
     if (!tbody || !c) return;
     var columns = c.listColumns;
     var theadRow = document.querySelector('.data-table thead tr');
-    if (theadRow) theadRow.innerHTML = '<th><input type="checkbox" onclick="selectAll()"></th>' + columns.map(function (x) { return '<th>' + x + '</th>'; }).join('');
+    if (theadRow) theadRow.innerHTML = '<th><input type="checkbox" onclick="selectAll()"></th>' + columns.map(function (x) { return '<th>' + x + '</th>'; }).join('') + '<th class="purchase-row-action-cell">操作</th>';
     tbody.innerHTML = '';
     if (!list || !list.length) {
-      tbody.innerHTML = '<tr><td colspan="' + (columns.length + 1) + '" style="text-align:center;padding:40px;color:#999;">暂无真实 API 数据</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="' + (columns.length + 2) + '" style="text-align:center;padding:40px;color:#999;">暂无数据</td></tr>';
       return;
     }
     list.forEach(function (item) {
@@ -272,14 +426,29 @@
         var v = listValue(item, col);
         if (v === '__STATUS__') html += '<td>' + getStatusBadge(item) + '</td>';
         else if (col === '单据编号') html += '<td><a href="' + (c.detailPage || c.createPage) + '?id=' + item.id + '">' + escapeHtml(v) + '</a></td>';
+        else if (col === '业务类型') html += '<td><span class="business-type-badge ' + (businessViewOf(item) === 'ASSET_PURCHASE' ? 'asset' : businessViewOf(item) === 'EXPENSE_PURCHASE' ? 'expense' : '') + '">' + escapeHtml(v) + '</span></td>';
         else if (col.indexOf('金额') >= 0) html += '<td style="color:#f5222d;font-weight:600;">' + escapeHtml(v) + '</td>';
         else if (col === '暂估应付状态') html += '<td><span class="badge ' + (String(v).indexOf('失败') >= 0 ? 'badge-danger' : String(v).indexOf('已生成') >= 0 ? 'badge-success' : 'badge-muted') + '">' + escapeHtml(v) + '</span></td>';
         else html += '<td>' + escapeHtml(v) + '</td>';
       });
+      html += '<td class="purchase-row-action-cell">' + listRowActionMenu(item, c) + '</td>';
       tr.innerHTML = html;
       tbody.appendChild(tr);
     });
   };
+
+  function listRowActionMenu(item, c) {
+    var href = (c.detailPage || c.createPage) + '?id=' + encodeURIComponent(item.id);
+    var actions = '<a href="' + escapeHtml(href) + '">查看</a>';
+    var available = item.availableActions || [];
+    var code = statusCodeOf(item);
+    var editable = available.indexOf('EDIT') >= 0 || (!available.length && ['DRAFT', 'REJECTED'].indexOf(code) >= 0);
+    if (editable) actions += '<a href="' + escapeHtml(href) + '">编辑</a>';
+    if (window.docType === 'purchase_inbound' && (item.payableGenerationStatus === 'FAILED' || item.payableGenerationStatus === 'AP_FAILED')) {
+      actions += '<a href="' + escapeHtml(href) + '">处理应付失败</a>';
+    }
+    return typeof renderPurchaseRowActionMenu === 'function' ? renderPurchaseRowActionMenu(actions, '单据操作') : actions;
+  }
 
   function updatePagination(data) {
     var info = document.querySelector('.pagination span');
@@ -290,6 +459,7 @@
   function isOrderDetailPage() { return location.pathname.split('/').pop() === 'purchase-order-detail.html'; }
 
   window.loadDoc = async function loadDocApi(id) {
+    p0DocInitialized[id] = true;
     var c = cfg();
     if (!c || !id) return;
     ensureP0Ui();
@@ -415,7 +585,7 @@
     if (doc.sourceReceiveNoticeNo) lines.push('来源收料通知：' + doc.sourceReceiveNoticeNo);
     if (doc.inNo) lines.push('采购入库：' + doc.inNo);
     if (doc.payableGenerationStatus) lines.push('暂估应付：' + payableStatusName(doc.payableGenerationStatus) + (doc.payableNo ? ' / ' + doc.payableNo : ''));
-    box.innerHTML = '<div class="p0-trace-title">P0 来源追溯 / 状态</div><div class="p0-trace-body">' + lines.map(escapeHtml).join('<br>') + '</div>';
+    box.innerHTML = '<div class="p0-trace-title">来源追溯 / 状态</div><div class="p0-trace-body">' + lines.map(escapeHtml).join('<br>') + '</div>';
   }
 
   function rowInput(row, key) { return row.querySelector('[data-field="' + key + '"]'); }
@@ -619,8 +789,8 @@
   window.rejectDoc = function () { doAction('reject', '驳回'); };
   window.closeDoc = function () { doAction('close', '关闭'); };
   window.cancelDoc = function () { doAction('cancel', '取消'); };
-  window.reverseApproveDoc = function () { toast('P0 不开放前端反审核；是否允许由后端动作返回决定', 'warning'); };
-  window.reverseCloseDoc = function () { toast('P0 不开放前端反关闭；是否允许由后端动作返回决定', 'warning'); };
+  window.reverseApproveDoc = function () { toast('当前单据不支持反审核', 'warning'); };
+  window.reverseCloseDoc = function () { toast('当前单据不支持反关闭', 'warning'); };
 
   window.pushDownDoc = async function pushDownDocApi() {
     if (!currentDoc || !window.editingId) return toast('请先打开已审核单据', 'warning');
@@ -633,7 +803,7 @@
       else if (window.docType === 'purchase_receive') await pushReceiveNext();
       else if (window.docType === 'purchase_inspect') await pushInspectionToInbound();
       else if (window.docType === 'purchase_inbound') await retryPayable();
-      else toast('此单据不支持 P0 下推', 'warning');
+      else toast('此单据不支持下推', 'warning');
     } catch (e) { toast(e.message || '下推失败', 'error'); }
     finally { setBusy(false); }
   };
@@ -715,8 +885,11 @@
       else b.removeAttribute('disabled');
     });
     var banner = document.getElementById('p0ApiBanner');
-    if (banner && text) banner.textContent = text;
-    if (banner && !flag) banner.textContent = 'P0 标准采购主链：当前页面已切换为真实 API 驱动；数量、状态、错误提示以后端返回为准。';
+    if (banner && flag) {
+      banner.hidden = false;
+      banner.textContent = text || defaultApiBannerText();
+    }
+    if (banner && !flag) banner.hidden = true;
     if (!flag) {
       if (currentDoc) updateActionButtons(currentDoc);
       else if (isCreatePage()) updateActionButtons({ statusCode: 'DRAFT', statusName: '草稿' });
@@ -762,7 +935,7 @@
     ensureP0Ui();
     var id = new URLSearchParams(location.search).get('id');
     if (!id) {
-      renderOrderDetailCard(null, '请从采购订单列表点击单据编号进入真实 API 详情。');
+      renderOrderDetailCard(null, '请从采购订单列表点击单据编号进入详情。');
       return;
     }
     try {
@@ -776,28 +949,36 @@
   }
 
   function renderOrderDetailCard(doc, error) {
+    document.body.classList.add('p0-order-detail-active');
     var host = document.querySelector('.main-content') || document.body;
     var card = document.getElementById('p0OrderDetailCard');
     if (!card) {
       card = document.createElement('div');
       card.id = 'p0OrderDetailCard';
-      card.className = 'p0-trace';
-      card.style.margin = '16px';
-      host.insertBefore(card, host.firstChild);
+      card.className = 'p0-trace p0-order-api-detail';
+      var pageHeader = host.querySelector('.page-header');
+      if (pageHeader && pageHeader.parentNode === host) pageHeader.parentNode.insertBefore(card, pageHeader.nextSibling);
+      else host.insertBefore(card, host.firstChild);
     }
+    if (!doc && !error) error = '未找到采购订单，单据可能已删除或无权访问。';
     if (error) {
-      card.innerHTML = '<div class="p0-trace-title">P0 采购订单真实 API 详情</div><div class="p0-trace-body" style="color:#cf1322;">' + escapeHtml(error) + '</div>';
+      document.title = '采购订单详情 — 磐枢工业智能平台';
+      card.innerHTML = '<div class="p0-detail-heading"><strong>采购订单详情</strong><a href="purchase-order.html">返回订单列表</a></div><div class="p0-trace-body" style="color:#a8071a;">' + escapeHtml(error) + '</div>';
       return;
     }
+    document.title = escapeHtml(doc.orderNo || '采购订单详情') + ' — 采购订单 — 磐枢工业智能平台';
     var rows = (doc.entries || []).map(function(e, i){
       return '<tr><td>' + (i + 1) + '</td><td>' + escapeHtml(e.materialCode) + '</td><td>' + escapeHtml(e.materialName) + '</td><td>' + qty(e.orderQty) + '</td><td>' + qty(e.receivedQty) + '</td><td>' + qty(e.remainingReceiveQty) + '</td><td>' + qty(e.stockedQty) + '</td><td>' + escapeHtml(e.sourceRequestNo || e.sourceRequestEntryId || '') + '</td></tr>';
     }).join('');
-    card.innerHTML = '<div class="p0-trace-title">P0 采购订单真实 API 详情 / 来源追溯</div>' +
-      '<div class="p0-trace-body">' +
-      '<b>订单号：</b>' + escapeHtml(doc.orderNo) + '　<b>状态：</b>' + escapeHtml(doc.statusName || doc.statusCode) + '　<b>供应商：</b>' + escapeHtml(doc.supplierName || '') + '　<b>采购合同号：</b>' + escapeHtml(doc.contractNo || '') + '<br>' +
-      '<b>价税合计：</b>' + money(doc.totalAmount || doc.amount) + '　<b>创建时间：</b>' + escapeHtml(doc.createdAt ? new Date(doc.createdAt).toLocaleString() : '') +
-      '<div style="overflow:auto;margin-top:12px;"><table class="data-table"><thead><tr><th>行号</th><th>物料编码</th><th>物料名称</th><th>订单数量</th><th>已收料</th><th>剩余可收</th><th>已入库</th><th>来源申请</th></tr></thead><tbody>' + (rows || '<tr><td colspan="8" style="text-align:center;color:#999;">暂无明细</td></tr>') + '</tbody></table></div>' +
-      '</div>';
+    var fields = [
+      ['订单号', doc.orderNo], ['状态', doc.statusName || doc.statusCode], ['供应商', doc.supplierName || doc.supplierId],
+      ['采购组织', doc.purchaseOrgName || doc.purchaseOrgId], ['采购合同号', doc.contractNo], ['币种', doc.currencyName || doc.currencyCode || doc.currencyId],
+      ['价税合计', money(doc.totalAmount || doc.amount)], ['订单日期', fmtDate(doc.orderDate)], ['创建时间', doc.createdAt ? new Date(doc.createdAt).toLocaleString() : '']
+    ].map(function(item){return '<div class="p0-detail-field"><div class="p0-detail-label">'+escapeHtml(item[0])+'</div><div class="p0-detail-value">'+escapeHtml(item[1] || '-')+'</div></div>';}).join('');
+    card.innerHTML = '<div class="p0-detail-heading"><strong>采购订单详情</strong><a href="purchase-order.html">返回订单列表</a></div>' +
+      '<div class="p0-trace-body"><div class="p0-detail-summary">' + fields + '</div>' +
+      '<div class="p0-detail-section-title">订单明细与来源追溯</div>' +
+      '<div class="purchase-table-scroll"><table class="data-table"><thead><tr><th>行号</th><th>物料编码</th><th>物料名称</th><th>订单数量</th><th>已收料</th><th>剩余可收</th><th>已入库</th><th>来源申请</th></tr></thead><tbody>' + (rows || '<tr><td colspan="8" style="text-align:center;color:#8c8c8c;">暂无明细</td></tr>') + '</tbody></table></div></div>';
   }
 
   function getSelectedIds() { return Array.from(document.querySelectorAll('.data-checkbox:checked')).map(function (cb) { return cb.value; }); }
@@ -827,8 +1008,8 @@
     catch (e) { toast(e.message || '删除失败', 'error'); }
     finally { setBusy(false); }
   };
-  window.batchReverseApprove = function () { toast('P0 不开放批量反审核', 'warning'); };
-  window.batchReverseClose = function () { toast('P0 不开放批量反关闭', 'warning'); };
+  window.batchReverseApprove = function () { toast('当前不支持批量反审核', 'warning'); };
+  window.batchReverseClose = function () { toast('当前不支持批量反关闭', 'warning'); };
 
   function escapeHtml(s) {
     return String(s === undefined || s === null ? '' : s).replace(/[&<>"]/g, function (m) { return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[m]; });
@@ -841,16 +1022,18 @@
     await loadLookupData();
     var params = new URLSearchParams(location.search);
     var id = params.get('id');
-    if (isCreatePage() && id) {
-      await window.loadDoc(id);
-    } else if (!isCreatePage()) {
-      await window.loadData();
-    } else {
+    if (isCreatePage()) {
+      if (id) {
+        if (!p0DocInitialized[id]) await window.loadDoc(id);
+        return;
+      }
       updateActionButtons({ statusCode: 'DRAFT', statusName: '草稿' });
       if (window.docType === 'purchase_order') setField('采购合同号', '');
       if (window.docType === 'purchase_receive' || window.docType === 'purchase_inspect' || window.docType === 'purchase_inbound') {
         toast(CONFIG[window.docType].name + '必须从上游单据下推生成；请先在上游已审核单据点击“下推”。', 'warning');
       }
+      return;
     }
+    if (!p0ListInitialized) await window.loadData();
   });
 })();

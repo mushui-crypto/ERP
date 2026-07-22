@@ -16,11 +16,36 @@ var decimalConfig = {
   qty: 4
 };
 
+function isPurchasePage() {
+  return /^purchase-.*\.html$/i.test(window.location.pathname.split('/').pop() || '');
+}
+
+function getCommonApiBase() {
+  if (isPurchasePage()) {
+    return window.PURCHASE_API_BASE || window.PURCHASE_P4_API_BASE || window.PURCHASE_P3_API_BASE || window.PURCHASE_P2_API_BASE || window.PURCHASE_P1_API_BASE || window.PURCHASE_P0_API_BASE || 'http://localhost:3003/api';
+  }
+  return window.ERP_API_BASE || 'http://localhost:3001/api';
+}
+
+function handleCommonAuthFailure(response) {
+  if (!isPurchasePage() || !response || response.status !== 401) return false;
+  localStorage.removeItem('accessToken');
+  localStorage.removeItem('erpAuthMode');
+  if (!window.__purchaseAuthRedirecting) {
+    window.__purchaseAuthRedirecting = true;
+    setTimeout(function() {
+      window.location.href = '../login.html?redirect=' + encodeURIComponent(window.location.href);
+    }, 120);
+  }
+  return true;
+}
+
 async function loadOrganizations() {
   try {
-    var response = await fetch('http://localhost:3001/api/orgs', {
+    var response = await fetch(getCommonApiBase() + '/orgs', {
       headers: { 'Authorization': 'Bearer ' + (localStorage.getItem('accessToken') || '') }
     });
+    if (handleCommonAuthFailure(response)) return;
     var data = await response.json();
     if (data.code === 200 && data.data) {
       organizations = data.data.list || data.data;
@@ -174,9 +199,10 @@ async function loadMasterData(type) {
   var storageKey = storageMap[type];
   if (!apiPath || !storageKey) return [];
   try {
-    var response = await fetch('http://localhost:3001/api' + apiPath + '?pageSize=1000', {
+    var response = await fetch(getCommonApiBase() + apiPath + '?pageSize=1000', {
       headers: { 'Authorization': 'Bearer ' + localStorage.getItem('accessToken') }
     });
+    if (handleCommonAuthFailure(response)) return [];
     var data = await response.json();
     if (data.code === 200 && data.data) {
       masterDataCache[type] = data.data.list || data.data || [];
@@ -303,18 +329,78 @@ function showToast(message, type) {
     container.className = 'toast-container';
     document.body.appendChild(container);
   }
-  var icons = { success: '&#9989;', warning: '&#9888;', error: '&#10060;', info: '&#9432;' };
+  var icons = { success: '✓', warning: '!', error: '×', info: 'i' };
   var titles = { success: '操作成功', warning: '温馨提示', error: '系统提示', info: '系统提示' };
-  var t = type || 'info';
+  var t = icons[type] ? type : 'info';
+  var messageText = message == null ? '' : (typeof message === 'string' ? message : JSON.stringify(message));
   var toast = document.createElement('div');
   toast.className = 'toast toast-' + t;
-  toast.innerHTML = '<div class="toast-icon">' + icons[t] + '</div><div class="toast-content"><div class="toast-title">' + titles[t] + '</div><div class="toast-message">' + message + '</div></div>';
+
+  var iconEl = document.createElement('div');
+  iconEl.className = 'toast-icon';
+  iconEl.textContent = icons[t];
+
+  var contentEl = document.createElement('div');
+  contentEl.className = 'toast-content';
+
+  var titleEl = document.createElement('div');
+  titleEl.className = 'toast-title';
+  titleEl.textContent = titles[t];
+
+  var messageEl = document.createElement('div');
+  messageEl.className = 'toast-message';
+  messageEl.textContent = messageText;
+
+  contentEl.appendChild(titleEl);
+  contentEl.appendChild(messageEl);
+  toast.appendChild(iconEl);
+  toast.appendChild(contentEl);
   container.appendChild(toast);
+
   setTimeout(function() {
     toast.style.opacity = '0';
-    toast.style.transform = 'translateX(100%)';
-    setTimeout(function() { toast.remove(); }, 300);
-  }, 3000);
+    toast.style.transform = 'translateX(18px)';
+    setTimeout(function() { toast.remove(); }, 180);
+  }, t === 'error' ? 9000 : 3000);
+}
+
+
+
+function stringifyApiErrorReason(input) {
+  if (input == null || input === '') return '';
+  if (Array.isArray(input)) return input.map(stringifyApiErrorReason).filter(Boolean).join('；');
+  if (typeof input === 'object') {
+    try { return JSON.stringify(input); } catch (e) { return String(input); }
+  }
+  return String(input);
+}
+
+function formatApiErrorMessage(input, context) {
+  context = context || {};
+  var method = context.method || 'GET';
+  var path = context.path || '';
+  var status = context.status ? ('HTTP ' + context.status) : '';
+  var requestId = context.requestId ? ('请求ID：' + context.requestId) : '';
+  var raw = stringifyApiErrorReason(input);
+  var parts = [];
+  if (context.action) parts.push('动作：' + context.action);
+  if (path) parts.push('接口：' + method + ' ' + path);
+  if (status) parts.push(status);
+  if (raw) parts.push('原因：' + raw);
+  if (requestId) parts.push(requestId);
+  return parts.join('\n');
+}
+
+function createApiError(path, method, status, payload, fallback, action) {
+  var message = payload && (payload.message || payload.error || payload.detail);
+  var requestId = payload && payload.requestId;
+  return new Error(formatApiErrorMessage(message || fallback || '接口请求失败', {
+    path: path,
+    method: method || 'GET',
+    status: status,
+    requestId: requestId,
+    action: action
+  }));
 }
 
 function showConfirm(message, type, callback) {
@@ -977,6 +1063,113 @@ function handleActionBtn(el) {
   }
 }
 
+function initPurchaseSidebarExit() {
+  var pageName = window.location.pathname.split('/').pop() || '';
+  if (!/^purchase-.*\.html$/i.test(pageName)) return;
+
+  var sidebar = document.querySelector('.doc-sidebar, .sidebar');
+  if (!sidebar || sidebar.querySelector('.purchase-sidebar-exit')) return;
+
+  var background = window.getComputedStyle(sidebar).backgroundColor.match(/[\d.]+/g) || [];
+  var red = Number(background[0] || 0);
+  var green = Number(background[1] || 0);
+  var blue = Number(background[2] || 0);
+  if ((red * 299 + green * 587 + blue * 114) / 1000 > 160) {
+    sidebar.classList.add('purchase-sidebar-light');
+  }
+
+  var exitLink = document.createElement('a');
+  exitLink.className = 'purchase-sidebar-exit';
+  exitLink.href = '../index.html';
+  exitLink.setAttribute('aria-label', '返回 ERP 工作台');
+  exitLink.innerHTML = '<span class="purchase-sidebar-exit-icon" aria-hidden="true">&larr;</span><span>返回 ERP 工作台</span>';
+
+  var userPanel = sidebar.querySelector(':scope > .sidebar-user');
+  if (userPanel) {
+    sidebar.insertBefore(exitLink, userPanel);
+  } else {
+    sidebar.appendChild(exitLink);
+  }
+}
+
+var purchaseRowActionSequence = 0;
+var purchaseOpenRowActionMenu = null;
+
+function renderPurchaseRowActionMenu(actionHtml, label) {
+  if (!actionHtml || !String(actionHtml).trim()) return '';
+  purchaseRowActionSequence += 1;
+  var id = 'purchaseRowActionMenu-' + purchaseRowActionSequence;
+  return '<div class="purchase-row-actions">' +
+    '<button class="purchase-row-action-trigger" type="button" aria-label="' + (label || '更多操作') + '" aria-haspopup="menu" aria-expanded="false" aria-controls="' + id + '" title="' + (label || '更多操作') + '" onclick="togglePurchaseRowActionMenu(event,this)"><span aria-hidden="true">&#8942;</span></button>' +
+    '<div class="purchase-row-action-menu" id="' + id + '" role="menu">' + actionHtml + '</div>' +
+    '</div>';
+}
+
+function closePurchaseRowActionMenu(restoreFocus) {
+  var menu = purchaseOpenRowActionMenu;
+  if (!menu) return;
+  var owner = menu._purchaseOwner;
+  var trigger = owner && owner.querySelector('.purchase-row-action-trigger');
+  menu.classList.remove('show');
+  menu.removeAttribute('style');
+  if (owner) owner.appendChild(menu);
+  if (trigger) trigger.setAttribute('aria-expanded', 'false');
+  purchaseOpenRowActionMenu = null;
+  if (restoreFocus && trigger) trigger.focus();
+}
+
+function togglePurchaseRowActionMenu(event, trigger) {
+  if (event) {
+    event.preventDefault();
+    event.stopPropagation();
+  }
+  var owner = trigger && trigger.closest('.purchase-row-actions');
+  var menu = owner && (owner._purchaseMenu || owner.querySelector('.purchase-row-action-menu'));
+  if (!owner || !menu) return;
+  if (purchaseOpenRowActionMenu === menu) return closePurchaseRowActionMenu(false);
+  closePurchaseRowActionMenu(false);
+  owner._purchaseMenu = menu;
+  menu._purchaseOwner = owner;
+  document.body.appendChild(menu);
+  menu.classList.add('show');
+  trigger.setAttribute('aria-expanded', 'true');
+  purchaseOpenRowActionMenu = menu;
+
+  var rect = trigger.getBoundingClientRect();
+  var menuRect = menu.getBoundingClientRect();
+  var left = Math.max(8, Math.min(window.innerWidth - menuRect.width - 8, rect.right - menuRect.width));
+  var top = rect.bottom + 4;
+  if (top + menuRect.height > window.innerHeight - 8) top = Math.max(8, rect.top - menuRect.height - 4);
+  menu.style.left = left + 'px';
+  menu.style.top = top + 'px';
+
+  var items = menu.querySelectorAll('button,a');
+  items.forEach(function(item) {
+    item.setAttribute('role', 'menuitem');
+    if (/删除|取消|关闭|驳回/.test(item.textContent || '')) item.classList.add('danger');
+  });
+}
+
+document.addEventListener('click', function(event) {
+  if (!purchaseOpenRowActionMenu) return;
+  if (event.target.closest('.purchase-row-action-menu')) {
+    if (event.target.closest('button,a')) setTimeout(function() { closePurchaseRowActionMenu(false); }, 0);
+    return;
+  }
+  if (!event.target.closest('.purchase-row-action-trigger')) closePurchaseRowActionMenu(false);
+});
+
+document.addEventListener('keydown', function(event) {
+  if (event.key === 'Escape' && purchaseOpenRowActionMenu) {
+    event.preventDefault();
+    closePurchaseRowActionMenu(true);
+  }
+});
+
+window.addEventListener('resize', function() { closePurchaseRowActionMenu(false); });
+window.addEventListener('scroll', function() { closePurchaseRowActionMenu(false); }, true);
+
 document.addEventListener('DOMContentLoaded', function() {
   initCommon();
+  initPurchaseSidebarExit();
 });

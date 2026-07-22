@@ -236,8 +236,30 @@ body::after {
 </div>
 
 <script>
-var LOGIN_API = 'http://localhost:3001/api/auth/login';
+var LOGIN_API = (localStorage.getItem('ERP_API_BASE') || window.ERP_API_BASE || 'http://localhost:3003/api') + '/auth/login';
 var loginType = 'admin';
+
+function getSafeRedirect() {
+  var redirect = new URLSearchParams(window.location.search).get('redirect');
+  if (!redirect) return '';
+  try {
+    var target = new URL(redirect, window.location.href);
+    return target.origin === window.location.origin ? target.href : '';
+  } catch (error) {
+    return '';
+  }
+}
+
+function finishLogin() {
+  var redirect = getSafeRedirect();
+  if (redirect) {
+    window.location.href = redirect;
+  } else if (loginType === 'admin') {
+    window.location.href = 'admin/index.html';
+  } else {
+    window.location.href = 'select-data-center.html';
+  }
+}
 
 function setLoginType(type, element) {
   loginType = type;
@@ -266,7 +288,13 @@ document.getElementById('loginForm').addEventListener('submit', async function(e
   btn.textContent = '正在验证...';
 
   var loggedIn = false;
-  
+  var backendUnavailable = false;
+
+  var staleToken = localStorage.getItem('accessToken') || '';
+  if (staleToken.indexOf('offline_') === 0) {
+    localStorage.removeItem('accessToken');
+  }
+
   // 尝试后端API登录
   try {
     var response = await fetch(LOGIN_API, {
@@ -275,30 +303,31 @@ document.getElementById('loginForm').addEventListener('submit', async function(e
       body: JSON.stringify({ username: username, password: password })
     });
 
-    var data = await response.json();
+    var data = null;
+    try {
+      data = await response.json();
+    } catch (parseError) {
+      data = {};
+    }
 
-    if (data.code === 200 && data.data) {
+    if (response.ok && data.code === 200 && data.data && data.data.accessToken) {
       localStorage.setItem('accessToken', data.data.accessToken);
       localStorage.setItem('user', JSON.stringify(data.data.user));
       localStorage.setItem('loginType', loginType);
+      localStorage.setItem('erpAuthMode', 'online');
       loggedIn = true;
-
-      if (loginType === 'admin') {
-        window.location.href = 'admin/index.html';
-      } else {
-        window.location.href = 'select-data-center.html';
-      }
+      finishLogin();
     } else {
       errorEl.textContent = data.message || '登录失败，请检查用户名和密码';
       errorEl.classList.add('show');
     }
   } catch (error) {
-    // 后端不可用，使用本地离线登录
+    backendUnavailable = true;
     console.warn('后端服务不可用，启用离线登录模式');
   }
 
-  // 离线登录模式（后端不可用时）
-  if (!loggedIn) {
+  // 仅网络不可达时保留原型离线模式，后端拒绝登录时不得伪造 Token。
+  if (!loggedIn && backendUnavailable) {
     var localUsers = {
       'admin': { password: 'admin123', username: 'admin', name: '系统管理员', roleIds: ['role-admin'], roleName: '系统管理员' },
       'demo': { password: 'demo123', username: 'demo', name: '演示用户', roleIds: ['role-user'], roleName: '普通用户' },
@@ -310,13 +339,9 @@ document.getElementById('loginForm').addEventListener('submit', async function(e
       localStorage.setItem('user', JSON.stringify({ username: localUser.username, name: localUser.name, roleIds: localUser.roleIds, roleName: localUser.roleName }));
       localStorage.setItem('loginType', loginType);
       localStorage.setItem('savedUsername', username);
+      localStorage.setItem('erpAuthMode', 'offline');
       loggedIn = true;
-      
-      if (loginType === 'admin') {
-        window.location.href = 'admin/index.html';
-      } else {
-        window.location.href = 'select-data-center.html';
-      }
+      finishLogin();
     } else if (!loggedIn) {
       errorEl.textContent = '登录失败，请检查用户名和密码（离线模式：admin/admin123 或 demo/demo123）';
       errorEl.classList.add('show');

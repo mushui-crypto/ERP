@@ -382,8 +382,9 @@ export class PurchaseReconciliationService {
     if (active) return this.present(active);
     try {
       return await this.dataSource.transaction(async (manager) => {
+        const lockOption = this.dataSource.options.type === 'sqlite' ? {} : { lock: { mode: 'pessimistic_write' as const } };
         const retry = await manager.findOne(PurchaseReconciliation, {
-          where: { idempotencyKey: dto.idempotencyKey, isDeleted: 0 }, lock: { mode: 'pessimistic_write' },
+          where: { idempotencyKey: dto.idempotencyKey, isDeleted: 0 }, ...lockOption,
         });
         if (retry) return this.assertIdempotent(retry, payloadHash);
         const current = await manager.findOne(PurchaseReconciliation, { where: { activeScopeKey: scopeKey, isDeleted: 0 } });

@@ -1,7 +1,7 @@
 {
-  "runTag": "P3VERIFY-1784548218882",
+  "runTag": "P3VERIFY-1784563062221",
   "api": "http://localhost:3003/api",
-  "startedAt": "2026-07-20T11:50:18.882Z",
+  "startedAt": "2026-07-20T15:57:42.221Z",
   "tests": [
     {
       "id": "P3-ROUTE-01",
@@ -16,17 +16,17 @@
           "/api/expense-acceptances/{id}/generate-estimated-payable"
         ]
       },
-      "at": "2026-07-20T11:50:18.971Z"
+      "at": "2026-07-20T15:57:42.302Z"
     },
     {
       "id": "P3-QUERY-01",
       "name": "unfiltered purchase request query includes expense requests",
       "status": "PASS",
       "detail": {
-        "total": 92,
-        "requestId": "EE26433E-F36B-1410-8B47-0096A7B40922"
+        "total": 93,
+        "requestId": "F02C433E-F36B-1410-8B47-0096A7B40922"
       },
-      "at": "2026-07-20T11:50:19.845Z"
+      "at": "2026-07-20T15:57:42.913Z"
     },
     {
       "id": "P3-TYPE-01",
@@ -37,27 +37,27 @@
         "order": "EXPENSE_PURCHASE",
         "notice": "EXPENSE_PURCHASE"
       },
-      "at": "2026-07-20T11:50:19.845Z"
+      "at": "2026-07-20T15:57:42.913Z"
     },
     {
       "id": "P3-FIELD-01",
       "name": "text expense item propagated with nullable material and unit",
       "status": "PASS",
       "detail": {
-        "id": "FE26433E-F36B-1410-8B47-0096A7B40922",
+        "id": "F92C433E-F36B-1410-8B47-0096A7B40922",
         "createdBy": null,
         "updatedBy": null,
-        "createdAt": "2026-07-20T03:50:19.603Z",
-        "updatedAt": "2026-07-20T03:50:19.603Z",
+        "createdAt": "2026-07-20T07:57:42.750Z",
+        "updatedAt": "2026-07-20T07:57:42.750Z",
         "isDeleted": 0,
-        "purchaseReceiveNoticeId": "FC26433E-F36B-1410-8B47-0096A7B40922",
+        "purchaseReceiveNoticeId": "F82C433E-F36B-1410-8B47-0096A7B40922",
         "lineNo": 1,
-        "sourceOrderId": "F726433E-F36B-1410-8B47-0096A7B40922",
-        "sourceOrderNo": "PO20260720195019334983",
-        "sourceOrderEntryId": "FA26433E-F36B-1410-8B47-0096A7B40922",
-        "sourceRequestId": "EE26433E-F36B-1410-8B47-0096A7B40922",
-        "sourceRequestNo": "PR20260720195019220946",
-        "sourceRequestEntryId": "F426433E-F36B-1410-8B47-0096A7B40922",
+        "sourceOrderId": "F42C433E-F36B-1410-8B47-0096A7B40922",
+        "sourceOrderNo": "PO20260720235742628784",
+        "sourceOrderEntryId": "F72C433E-F36B-1410-8B47-0096A7B40922",
+        "sourceRequestId": "F02C433E-F36B-1410-8B47-0096A7B40922",
+        "sourceRequestNo": "PR20260720235742515526",
+        "sourceRequestEntryId": "F12C433E-F36B-1410-8B47-0096A7B40922",
         "sourcePurchaseReturnEntryId": null,
         "expenseItemCode": "EXP-MANUAL",
         "expenseItemName": "Service-MANUAL",
@@ -92,7 +92,7 @@
         "remainingInspectQty": 0,
         "availableInboundQty": 10
       },
-      "at": "2026-07-20T11:50:19.845Z"
+      "at": "2026-07-20T15:57:42.913Z"
     },
     {
       "id": "P3-SERVICE-01",
@@ -103,7 +103,7 @@
         "checkIncoming": false,
         "warehouseId": null
       },
-      "at": "2026-07-20T11:50:19.845Z"
+      "at": "2026-07-20T15:57:42.913Z"
     },
     {
       "id": "P3-QTY-01",
@@ -113,7 +113,7 @@
         "purchasedQty": 10,
         "receivedQty": 10
       },
-      "at": "2026-07-20T11:50:19.845Z"
+      "at": "2026-07-20T15:57:42.913Z"
     },
     {
       "id": "P3-BOUNDARY-01",
@@ -122,7 +122,7 @@
       "detail": {
         "message": "该收料明细为免检，无需生成来料检验单"
       },
-      "at": "2026-07-20T11:50:19.869Z"
+      "at": "2026-07-20T15:57:42.934Z"
     },
     {
       "id": "P3-BOUNDARY-02",
@@ -131,16 +131,16 @@
       "detail": {
         "message": "费用采购流程禁止生成采购入库单"
       },
-      "at": "2026-07-20T11:50:19.891Z"
+      "at": "2026-07-20T15:57:42.956Z"
     },
     {
       "id": "P3-IDEM-01",
       "name": "same idempotency key and payload returns same acceptance",
       "status": "PASS",
       "detail": {
-        "id": "0427433E-F36B-1410-8B47-0096A7B40922"
+        "id": "002D433E-F36B-1410-8B47-0096A7B40922"
       },
-      "at": "2026-07-20T11:50:19.952Z"
+      "at": "2026-07-20T15:57:43.055Z"
     },
     {
       "id": "P3-IDEM-02",
@@ -149,7 +149,7 @@
       "detail": {
         "message": "幂等键已被不同请求载荷使用"
       },
-      "at": "2026-07-20T11:50:19.968Z"
+      "at": "2026-07-20T15:57:43.066Z"
     },
     {
       "id": "P3-ACCEPT-01",
@@ -158,9 +158,9 @@
       "detail": {
         "statusCode": "APPROVED",
         "payableGenerationStatus": "GENERATED",
-        "payableNo": "AP20260720195020094548"
+        "payableNo": "AP20260720235743138639"
       },
-      "at": "2026-07-20T11:50:20.134Z"
+      "at": "2026-07-20T15:57:43.172Z"
     },
     {
       "id": "P3-QTY-02",
@@ -169,28 +169,28 @@
       "detail": {
         "expense_accepted_qty": 6
       },
-      "at": "2026-07-20T11:50:20.140Z"
+      "at": "2026-07-20T15:57:43.177Z"
     },
     {
       "id": "P3-PAYABLE-01",
       "name": "one estimated payable traces to expense acceptance",
       "status": "PASS",
       "detail": {
-        "id": "0C27433E-F36B-1410-8B47-0096A7B40922",
+        "id": "0B2D433E-F36B-1410-8B47-0096A7B40922",
         "source_type": "EXPENSE_ACCEPTANCE",
-        "source_id": "0427433E-F36B-1410-8B47-0096A7B40922",
+        "source_id": "002D433E-F36B-1410-8B47-0096A7B40922",
         "amount": 678,
-        "payable_date": "2026-07-20T19:50:20.000Z",
-        "due_date": "2026-08-19T19:50:20.000Z"
+        "payable_date": "2026-07-20T23:57:43.000Z",
+        "due_date": "2026-08-19T23:57:43.000Z"
       },
-      "at": "2026-07-20T11:50:20.151Z"
+      "at": "2026-07-20T15:57:43.243Z"
     },
     {
       "id": "P3-TRACE-01",
       "name": "payable entry keeps expense item and source with nullable material",
       "status": "PASS",
       "detail": {
-        "expense_acceptance_entry_id": "0A27433E-F36B-1410-8B47-0096A7B40922",
+        "expense_acceptance_entry_id": "072D433E-F36B-1410-8B47-0096A7B40922",
         "expense_item_code": "EXP-MANUAL",
         "expense_item_name": "Service-MANUAL",
         "material_id": null,
@@ -198,7 +198,7 @@
         "quantity": 6,
         "total_amount": 678
       },
-      "at": "2026-07-20T11:50:20.156Z"
+      "at": "2026-07-20T15:57:43.257Z"
     },
     {
       "id": "P3-PAYABLE-02",
@@ -207,17 +207,17 @@
       "detail": {
         "dueDays": 30
       },
-      "at": "2026-07-20T11:50:20.156Z"
+      "at": "2026-07-20T15:57:43.257Z"
     },
     {
       "id": "P3-PAYABLE-03",
       "name": "estimated payable retry is idempotent",
       "status": "PASS",
       "detail": {
-        "payableId": "0C27433E-F36B-1410-8B47-0096A7B40922",
+        "payableId": "0B2D433E-F36B-1410-8B47-0096A7B40922",
         "count": 1
       },
-      "at": "2026-07-20T11:50:20.175Z"
+      "at": "2026-07-20T15:57:43.292Z"
     },
     {
       "id": "P3-OVER-01",
@@ -226,25 +226,25 @@
       "detail": {
         "message": "服务完成明细可验收数量为 4，本次为 5"
       },
-      "at": "2026-07-20T11:50:20.214Z"
+      "at": "2026-07-20T15:57:43.333Z"
     },
     {
       "id": "P3-PARTIAL-01",
       "name": "remaining quantity can be accepted separately",
       "status": "PASS",
       "detail": {
-        "id": "0F27433E-F36B-1410-8B47-0096A7B40922"
+        "id": "142D433E-F36B-1410-8B47-0096A7B40922"
       },
-      "at": "2026-07-20T11:50:20.360Z"
+      "at": "2026-07-20T15:57:43.453Z"
     },
     {
       "id": "P3-OA-01",
       "name": "OA expense request import is idempotent",
       "status": "PASS",
       "detail": {
-        "id": "2327433E-F36B-1410-8B47-0096A7B40922"
+        "id": "222D433E-F36B-1410-8B47-0096A7B40922"
       },
-      "at": "2026-07-20T11:50:20.400Z"
+      "at": "2026-07-20T15:57:43.487Z"
     },
     {
       "id": "P3-OA-02",
@@ -253,7 +253,7 @@
       "detail": {
         "message": "OA 来源已被不同请求载荷使用"
       },
-      "at": "2026-07-20T11:50:20.410Z"
+      "at": "2026-07-20T15:57:43.497Z"
     },
     {
       "id": "P3-CONCURRENT-01",
@@ -261,12 +261,12 @@
       "status": "PASS",
       "detail": {
         "ids": [
-          "4E27433E-F36B-1410-8B47-0096A7B40922",
-          "4E27433E-F36B-1410-8B47-0096A7B40922"
+          "352D433E-F36B-1410-8B47-0096A7B40922",
+          "352D433E-F36B-1410-8B47-0096A7B40922"
         ],
         "count": 1
       },
-      "at": "2026-07-20T11:50:20.819Z"
+      "at": "2026-07-20T15:57:43.849Z"
     },
     {
       "id": "P3-RETRY-01",
@@ -277,7 +277,7 @@
         "payableGenerationStatus": "FAILED",
         "error": "付款条件不存在或未启用，无法生成暂估应付"
       },
-      "at": "2026-07-20T11:50:21.270Z"
+      "at": "2026-07-20T15:57:44.254Z"
     },
     {
       "id": "P3-RETRY-02",
@@ -286,7 +286,7 @@
       "detail": {
         "expense_accepted_qty": 3
       },
-      "at": "2026-07-20T11:50:21.273Z"
+      "at": "2026-07-20T15:57:44.257Z"
     },
     {
       "id": "P3-RETRY-03",
@@ -295,21 +295,21 @@
       "detail": {
         "statusCode": "APPROVED",
         "payableGenerationStatus": "GENERATED",
-        "payableNo": "AP20260720195021288102"
+        "payableNo": "AP20260720235744270232"
       },
-      "at": "2026-07-20T11:50:21.320Z"
+      "at": "2026-07-20T15:57:44.290Z"
     }
   ],
   "defects": [],
   "ids": {
-    "suffix": "4548218882",
-    "userId": "D926433E-F36B-1410-8B47-0096A7B40922",
-    "supplierId": "DE26433E-F36B-1410-8B47-0096A7B40922",
-    "currencyId": "E326433E-F36B-1410-8B47-0096A7B40922",
-    "paymentTermId": "E826433E-F36B-1410-8B47-0096A7B40922",
-    "orgId": "05ab0729-3ce1-48fd-ad7f-0f66987dc050"
+    "suffix": "4563062221",
+    "userId": "DD2C433E-F36B-1410-8B47-0096A7B40922",
+    "supplierId": "E32C433E-F36B-1410-8B47-0096A7B40922",
+    "currencyId": "E92C433E-F36B-1410-8B47-0096A7B40922",
+    "paymentTermId": "EF2C433E-F36B-1410-8B47-0096A7B40922",
+    "orgId": "d879223e-494d-4db9-8f44-b8204f2ff50b"
   },
-  "completedAt": "2026-07-20T11:50:21.321Z",
+  "completedAt": "2026-07-20T15:57:44.290Z",
   "summary": {
     "total": 24,
     "passed": 24,

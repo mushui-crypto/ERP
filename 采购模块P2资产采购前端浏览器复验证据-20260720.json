@@ -1,8 +1,8 @@
 {
-  "runTag": "P2FE-1784538619594",
+  "runTag": "P2FE-1784563045271",
   "front": "http://127.0.0.1:8099",
   "api": "http://localhost:3003/api",
-  "startedAt": "2026-07-20T09:10:19.594Z",
+  "startedAt": "2026-07-20T15:57:25.271Z",
   "checks": [
     {
       "id": "P2-FE-ENV-001",
@@ -11,7 +11,7 @@
       "detail": {
         "status": 200
       },
-      "at": "2026-07-20T09:10:19.656Z"
+      "at": "2026-07-20T15:57:25.295Z"
     },
     {
       "id": "P2-FE-PUR-purchase-request.html",
@@ -22,11 +22,13 @@
         "requests": [
           "http://localhost:3003/api/purchase-requests?page=1&pageSize=10",
           "http://localhost:3003/api/purchase-requests?page=1&pageSize=10",
-          "http://localhost:3003/api/purchase-requests?page=1&pageSize=10"
+          "http://localhost:3003/api/purchase-requests?page=1&pageSize=10",
+          "http://localhost:3003/api/purchase-requests/status/0?page=1&pageSize=100",
+          "http://localhost:3003/api/purchase-requests?page=1&pageSize=100"
         ],
         "errors": []
       },
-      "at": "2026-07-20T09:10:22.413Z"
+      "at": "2026-07-20T15:57:27.675Z"
     },
     {
       "id": "P2-FE-PUR-purchase-request-create.html",
@@ -34,10 +36,16 @@
       "status": "PASS",
       "detail": {
         "file": "purchase-request-create.html",
-        "requests": [],
+        "requests": [
+          "http://localhost:3003/api/purchase-requests?page=1&pageSize=100",
+          "http://localhost:3003/api/purchase-requests/status/0?page=1&pageSize=100",
+          "http://localhost:3003/api/purchase-requests/status/1?page=1&pageSize=100",
+          "http://localhost:3003/api/purchase-requests/status/2?page=1&pageSize=100",
+          "http://localhost:3003/api/purchase-requests/status/3?page=1&pageSize=100"
+        ],
         "errors": []
       },
-      "at": "2026-07-20T09:10:23.269Z"
+      "at": "2026-07-20T15:57:28.656Z"
     },
     {
       "id": "P2-FE-PUR-purchase-order.html",
@@ -46,13 +54,15 @@
       "detail": {
         "file": "purchase-order.html",
         "requests": [
+          "http://localhost:3003/api/purchase-orders?page=1&pageSize=100",
           "http://localhost:3003/api/purchase-orders?page=1&pageSize=10",
+          "http://localhost:3003/api/purchase-orders?page=1&pageSize=100",
           "http://localhost:3003/api/purchase-orders?page=1&pageSize=10",
           "http://localhost:3003/api/purchase-orders?page=1&pageSize=10"
         ],
         "errors": []
       },
-      "at": "2026-07-20T09:10:24.262Z"
+      "at": "2026-07-20T15:57:29.671Z"
     },
     {
       "id": "P2-FE-PUR-purchase-order-create.html",
@@ -60,10 +70,12 @@
       "status": "PASS",
       "detail": {
         "file": "purchase-order-create.html",
-        "requests": [],
+        "requests": [
+          "http://localhost:3003/api/purchase-orders?page=1&pageSize=100"
+        ],
         "errors": []
       },
-      "at": "2026-07-20T09:10:25.264Z"
+      "at": "2026-07-20T15:57:30.677Z"
     },
     {
       "id": "P2-FE-PUR-purchase-order-detail.html",
@@ -71,12 +83,14 @@
       "status": "PASS",
       "detail": {
         "file": "purchase-order-detail.html",
-        "requests": [],
+        "requests": [
+          "http://localhost:3003/api/purchase-orders?page=1&pageSize=100"
+        ],
         "errors": [
           "Unexpected token '}'"
         ]
       },
-      "at": "2026-07-20T09:10:26.247Z"
+      "at": "2026-07-20T15:57:31.666Z"
     },
     {
       "id": "P2-FE-PUR-purchase-receive.html",
@@ -85,13 +99,15 @@
       "detail": {
         "file": "purchase-receive.html",
         "requests": [
+          "http://localhost:3003/api/purchase-receive-notices?page=1&pageSize=100",
           "http://localhost:3003/api/purchase-receive-notices?page=1&pageSize=10",
           "http://localhost:3003/api/purchase-receive-notices?page=1&pageSize=10",
+          "http://localhost:3003/api/purchase-receive-notices?page=1&pageSize=100",
           "http://localhost:3003/api/purchase-receive-notices?page=1&pageSize=10"
         ],
         "errors": []
       },
-      "at": "2026-07-20T09:10:27.259Z"
+      "at": "2026-07-20T15:57:32.683Z"
     },
     {
       "id": "P2-FE-PUR-purchase-receive-create.html",
@@ -99,10 +115,12 @@
       "status": "PASS",
       "detail": {
         "file": "purchase-receive-create.html",
-        "requests": [],
+        "requests": [
+          "http://localhost:3003/api/purchase-receive-notices?page=1&pageSize=100"
+        ],
         "errors": []
       },
-      "at": "2026-07-20T09:10:28.261Z"
+      "at": "2026-07-20T15:57:33.682Z"
     },
     {
       "id": "P2-FE-PUR-purchase-inbound.html",
@@ -117,7 +135,7 @@
         ],
         "errors": []
       },
-      "at": "2026-07-20T09:10:29.263Z"
+      "at": "2026-07-20T15:57:34.681Z"
     },
     {
       "id": "P2-FE-PUR-purchase-inbound-create.html",
@@ -128,7 +146,7 @@
         "requests": [],
         "errors": []
       },
-      "at": "2026-07-20T09:10:30.267Z"
+      "at": "2026-07-20T15:57:35.683Z"
     },
     {
       "id": "P2-FE-AA-001",
@@ -140,14 +158,14 @@
           "http://localhost:3003/api/asset-acceptances?page=1&pageSize=20"
         ]
       },
-      "at": "2026-07-20T09:10:31.221Z"
+      "at": "2026-07-20T15:57:36.630Z"
     },
     {
       "id": "P2-FE-AA-002",
       "name": "资产验收页面展示业务类型/状态/下游生成状态",
       "status": "PASS",
       "detail": {},
-      "at": "2026-07-20T09:10:31.221Z"
+      "at": "2026-07-20T15:57:36.631Z"
     },
     {
       "id": "P2-FE-CARD-001",
@@ -159,17 +177,17 @@
           "http://localhost:3003/api/fixed-asset?page=1&pageSize=20"
         ]
       },
-      "at": "2026-07-20T09:10:32.304Z"
+      "at": "2026-07-20T15:57:37.683Z"
     },
     {
       "id": "P2-FE-CARD-002",
       "name": "资产卡片页面展示后端 purchasePrice 原值",
       "status": "PASS",
       "detail": {
-        "assetNo": "FA20260720165711737769",
+        "assetNo": "FA20260720235723583474",
         "purchasePrice": 100
       },
-      "at": "2026-07-20T09:10:32.315Z"
+      "at": "2026-07-20T15:57:37.684Z"
     },
     {
       "id": "P2-FE-AOR-001",
@@ -181,17 +199,17 @@
           "http://localhost:3003/api/asset-out-requests?page=1&pageSize=20"
         ]
       },
-      "at": "2026-07-20T09:10:33.280Z"
+      "at": "2026-07-20T15:57:38.669Z"
     },
     {
       "id": "P2-FE-AOR-002",
       "name": "资产出库申请页面展示来源资产验收单号",
       "status": "PASS",
       "detail": {
-        "requestNo": "AOR20260720165712964008",
-        "sourceAssetAcceptanceNo": "AA20260720165712882669"
+        "requestNo": "AOR20260720235724706083",
+        "sourceAssetAcceptanceNo": "AA20260720235724624882"
       },
-      "at": "2026-07-20T09:10:33.280Z"
+      "at": "2026-07-20T15:57:38.669Z"
     },
     {
       "id": "P2-FE-AOR-LIST-001",
@@ -203,7 +221,7 @@
           "http://localhost:3003/api/asset-out-requests?page=1&pageSize=20"
         ]
       },
-      "at": "2026-07-20T09:10:34.271Z"
+      "at": "2026-07-20T15:57:39.680Z"
     },
     {
       "id": "P2-FE-OUT-001",
@@ -215,7 +233,7 @@
           "http://localhost:3003/api/inventory-out?page=1&pageSize=20&outType=4"
         ]
       },
-      "at": "2026-07-20T09:10:35.276Z"
+      "at": "2026-07-20T15:57:40.690Z"
     },
     {
       "id": "P2-FE-OUT-002",
@@ -223,10 +241,10 @@
       "status": "PASS",
       "detail": {
         "apiWithoutFilterTotal": 0,
-        "apiP2Total": 8,
-        "expectedOutNo": "OUT20260720165713044249"
+        "apiP2Total": 16,
+        "expectedOutNo": "OUT20260720235724791794"
       },
-      "at": "2026-07-20T09:10:35.276Z"
+      "at": "2026-07-20T15:57:40.690Z"
     },
     {
       "id": "P2-FE-OUT-CREATE-001",
@@ -237,11 +255,11 @@
           "http://localhost:3003/api/inventory-out?page=1&pageSize=20&outType=4"
         ]
       },
-      "at": "2026-07-20T09:10:36.256Z"
+      "at": "2026-07-20T15:57:41.678Z"
     }
   ],
   "defects": [],
-  "completedAt": "2026-07-20T09:10:36.421Z",
+  "completedAt": "2026-07-20T15:57:41.784Z",
   "summary": {
     "total": 20,
     "passed": 20,

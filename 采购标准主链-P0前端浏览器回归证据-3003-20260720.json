@@ -1,0 +1,1912 @@
+{
+  "runTag": "P0FRONT-20260720155556-4d9d",
+  "startedAt": "2026-07-20T15:55:56.948Z",
+  "checks": [
+    {
+      "id": "ENV-FE-001",
+      "name": "前端静态服务 8099 可访问",
+      "status": "PASS",
+      "detail": {
+        "url": "http://127.0.0.1:8099/pages/purchase-request.html"
+      },
+      "at": "2026-07-20T15:55:57.045Z"
+    },
+    {
+      "id": "ENV-BE-001",
+      "name": "后端 Swagger JSON 可访问",
+      "status": "PASS",
+      "detail": {
+        "url": "http://127.0.0.1:3003/api/docs-json"
+      },
+      "at": "2026-07-20T15:55:57.068Z"
+    },
+    {
+      "id": "FE-LIST-PR",
+      "name": "采购申请列表真实 API 加载，无 401/加载失败",
+      "status": "PASS",
+      "detail": {
+        "rows": 10,
+        "text": "\tPR20260720200222808418\t2026-07-20\t\tfc2b5378-52bb-4742-99de-aa4414084abc\t7\t7\t7\t0\t已全部下单\t2026/7/20 12:02:22\n\tPR20260720200222541793\t2026-07-20\t\tfc2b5378-52bb-4742-99de-aa4414084abc\t20\t20\t12\t8\t已批准\t2026/7",
+        "errors": []
+      },
+      "at": "2026-07-20T15:56:02.149Z"
+    },
+    {
+      "id": "FE-CREATE-PR-INIT",
+      "name": "采购申请新增页注入 P0 API 横幅与按钮矩阵",
+      "status": "PASS",
+      "detail": {
+        "status": "草稿",
+        "buttons": [
+          {
+            "text": "✓\n保存",
+            "disabled": false,
+            "onclick": "saveDoc()",
+            "display": "flex"
+          },
+          {
+            "text": "✓\n提交",
+            "disabled": false,
+            "onclick": "submitDoc()",
+            "display": "flex"
+          },
+          {
+            "text": "✓\n审核",
+            "disabled": true,
+            "onclick": "approveDoc()",
+            "display": "flex"
+          },
+          {
+            "text": "↩️\n反审核",
+            "disabled": true,
+            "onclick": "reverseApproveDoc()",
+            "display": "flex"
+          },
+          {
+            "text": "⬇️\n下推",
+            "disabled": true,
+            "onclick": "pushDownDoc()",
+            "display": "flex"
+          }
+        ]
+      },
+      "at": "2026-07-20T15:56:04.038Z"
+    },
+    {
+      "id": "FE-CREATE-PR-SAVE",
+      "name": "采购申请页面保存真实 API 成功并获得后端 ID",
+      "status": "PASS",
+      "detail": {
+        "editingId": "012A433E-F36B-1410-8B47-0096A7B40922",
+        "status": "草稿",
+        "toasts": [
+          {
+            "msg": "保存成功",
+            "type": "success",
+            "at": 1784562964203
+          }
+        ],
+        "errors": []
+      },
+      "at": "2026-07-20T15:56:05.117Z"
+    },
+    {
+      "id": "FE-CREATE-PR-SUBMIT",
+      "name": "采购申请页面提交成功，状态变为待审核",
+      "status": "PASS",
+      "detail": {
+        "status": "待审核",
+        "toasts": [
+          {
+            "msg": "保存成功",
+            "type": "success",
+            "at": 1784562964203
+          },
+          {
+            "msg": "提交成功",
+            "type": "success",
+            "at": 1784562965187
+          }
+        ]
+      },
+      "at": "2026-07-20T15:56:06.023Z"
+    },
+    {
+      "id": "FE-CREATE-PR-APPROVE",
+      "name": "采购申请页面审核成功，状态变为已批准/已审核",
+      "status": "PASS",
+      "detail": {
+        "status": "已批准",
+        "toasts": [
+          {
+            "msg": "保存成功",
+            "type": "success",
+            "at": 1784562964203
+          },
+          {
+            "msg": "提交成功",
+            "type": "success",
+            "at": 1784562965187
+          },
+          {
+            "msg": "审核成功",
+            "type": "success",
+            "at": 1784562966073
+          }
+        ]
+      },
+      "at": "2026-07-20T15:56:06.928Z"
+    },
+    {
+      "id": "FE-BTN-PR-APPROVED",
+      "name": "已审核采购申请按钮状态：保存/提交/审核禁用，下推可用",
+      "status": "PASS",
+      "detail": {
+        "buttons": [
+          {
+            "text": "✓\n保存",
+            "disabled": true,
+            "onclick": "saveDoc()",
+            "display": "flex"
+          },
+          {
+            "text": "✓\n提交",
+            "disabled": true,
+            "onclick": "submitDoc()",
+            "display": "flex"
+          },
+          {
+            "text": "✓\n审核",
+            "disabled": true,
+            "onclick": "approveDoc()",
+            "display": "flex"
+          },
+          {
+            "text": "↩️\n反审核",
+            "disabled": true,
+            "onclick": "reverseApproveDoc()",
+            "display": "flex"
+          },
+          {
+            "text": "⬇️\n下推",
+            "disabled": false,
+            "onclick": "pushDownDoc()",
+            "display": "flex"
+          },
+          {
+            "text": "🔒\n关闭",
+            "disabled": false,
+            "onclick": "closeDoc()",
+            "display": "flex"
+          },
+          {
+            "text": "🔓\n反关闭",
+            "disabled": true,
+            "onclick": "reverseCloseDoc()",
+            "display": "flex"
+          }
+        ]
+      },
+      "at": "2026-07-20T15:56:06.929Z"
+    },
+    {
+      "id": "FE-PUSH-PR-PO",
+      "name": "采购申请下推采购订单，页面跳转到采购订单编辑页",
+      "status": "PASS",
+      "detail": {
+        "url": "http://127.0.0.1:8099/pages/purchase-order-create.html?id=052A433E-F36B-1410-8B47-0096A7B40922",
+        "trace": "P0 来源追溯 / 状态\n当前状态：草稿\n采购订单：PO20260720235606982026 / 合同号：FHT-P0FRONT-20260720155556-4d9d-NEEDCHECK",
+        "toasts": []
+      },
+      "at": "2026-07-20T15:56:08.351Z"
+    },
+    {
+      "id": "FE-TRACE-PO",
+      "name": "采购订单详情页显示合同号与来源追溯",
+      "status": "PASS",
+      "detail": {
+        "trace": "P0 来源追溯 / 状态\n当前状态：草稿\n采购订单：PO20260720235606982026 / 合同号：FHT-P0FRONT-20260720155556-4d9d-NEEDCHECK"
+      },
+      "at": "2026-07-20T15:56:08.352Z"
+    },
+    {
+      "id": "FE-PO-SUBMIT",
+      "name": "采购订单页面提交成功",
+      "status": "PASS",
+      "detail": {
+        "status": "待审核",
+        "toasts": []
+      },
+      "at": "2026-07-20T15:56:09.258Z"
+    },
+    {
+      "id": "FE-PO-APPROVE",
+      "name": "采购订单页面审核成功",
+      "status": "PASS",
+      "detail": {
+        "status": "已审核",
+        "toasts": []
+      },
+      "at": "2026-07-20T15:56:10.166Z"
+    },
+    {
+      "id": "FE-PUSH-PO-RCV-CHECK",
+      "name": "采购订单下推需检收料通知，页面跳转收料通知编辑页",
+      "status": "PASS",
+      "detail": {
+        "url": "http://127.0.0.1:8099/pages/purchase-receive-create.html?id=0D2A433E-F36B-1410-8B47-0096A7B40922",
+        "trace": "P0 来源追溯 / 状态\n当前状态：草稿\n来源采购订单：PO20260720235606982026\n收料通知：PRN20260720235610769496",
+        "toasts": []
+      },
+      "at": "2026-07-20T15:56:12.103Z"
+    },
+    {
+      "id": "FE-RCV-SUBMIT",
+      "name": "收料通知页面提交成功",
+      "status": "PASS",
+      "detail": {
+        "status": "待审核",
+        "toasts": []
+      },
+      "at": "2026-07-20T15:56:13.008Z"
+    },
+    {
+      "id": "FE-RCV-APPROVE",
+      "name": "收料通知页面审核成功",
+      "status": "PASS",
+      "detail": {
+        "status": "已审核",
+        "trace": "P0 来源追溯 / 状态\n当前状态：已审核\n来源采购订单：PO20260720235606982026\n收料通知：PRN20260720235610769496",
+        "toasts": []
+      },
+      "at": "2026-07-20T15:56:13.912Z"
+    },
+    {
+      "id": "FE-PUSH-RCV-QI",
+      "name": "需检收料通知下推来料检验，页面跳转检验编辑页",
+      "status": "PASS",
+      "detail": {
+        "url": "http://127.0.0.1:8099/pages/purchase-inspect-create.html?id=132A433E-F36B-1410-8B47-0096A7B40922",
+        "trace": "P0 来源追溯 / 状态\n当前状态：草稿\n来源收料通知：PRN20260720235610769496",
+        "fields": [
+          "物料编码",
+          "物料名称",
+          "规格型号",
+          "单位",
+          "送检数量",
+          "合格数量",
+          "让步接收数量",
+          "不合格数量",
+          "检验结果",
+          "备注",
+          "id",
+          "sourceReceiveNoticeEntryId",
+          "availableInboundQty"
+        ],
+        "toasts": []
+      },
+      "at": "2026-07-20T15:56:15.272Z"
+    },
+    {
+      "id": "FE-QI-FIELDS",
+      "name": "来料检验页面展示可编辑检验数量字段",
+      "status": "PASS",
+      "detail": {
+        "fields": [
+          "物料编码",
+          "物料名称",
+          "规格型号",
+          "单位",
+          "送检数量",
+          "合格数量",
+          "让步接收数量",
+          "不合格数量",
+          "检验结果",
+          "备注",
+          "id",
+          "sourceReceiveNoticeEntryId",
+          "availableInboundQty"
+        ]
+      },
+      "at": "2026-07-20T15:56:15.273Z"
+    },
+    {
+      "id": "FE-QI-SAVE",
+      "name": "来料检验结果保存成功或页面无错误且检验字段保持有效",
+      "status": "PASS",
+      "detail": {
+        "status": "草稿",
+        "fields": [
+          "物料编码",
+          "物料名称",
+          "规格型号",
+          "单位",
+          "送检数量",
+          "合格数量",
+          "让步接收数量",
+          "不合格数量",
+          "检验结果",
+          "备注",
+          "id",
+          "sourceReceiveNoticeEntryId",
+          "availableInboundQty"
+        ],
+        "toasts": [
+          {
+            "msg": "保存成功",
+            "type": "success",
+            "at": 1784562975335
+          }
+        ],
+        "errors": []
+      },
+      "at": "2026-07-20T15:56:16.240Z"
+    },
+    {
+      "id": "FE-ERR-CONTRACT",
+      "name": "采购订单合同号必填错误可在页面提示",
+      "status": "PASS",
+      "detail": {
+        "toasts": [
+          {
+            "msg": "采购合同号必填",
+            "type": "error",
+            "at": 1784562978131
+          }
+        ],
+        "editingId": ""
+      },
+      "at": "2026-07-20T15:56:18.835Z"
+    },
+    {
+      "id": "FE-PUSH-PO-RCV-NOCHECK",
+      "name": "采购订单下推免检收料通知成功",
+      "status": "PASS",
+      "detail": {
+        "url": "http://127.0.0.1:8099/pages/purchase-receive-create.html?id=262A433E-F36B-1410-8B47-0096A7B40922",
+        "trace": "P0 来源追溯 / 状态\n当前状态：草稿\n来源采购订单：PO20260720235623548820\n收料通知：PRN20260720235626749254",
+        "toasts": []
+      },
+      "at": "2026-07-20T15:56:28.089Z"
+    },
+    {
+      "id": "FE-PUSH-RCV-IN-NOCHECK",
+      "name": "免检收料通知下推采购入库成功",
+      "status": "PASS",
+      "detail": {
+        "url": "http://127.0.0.1:8099/pages/purchase-inbound-create.html?id=302A433E-F36B-1410-8B47-0096A7B40922",
+        "trace": "P0 来源追溯 / 状态\n当前状态：草稿\n采购入库：PIN20260720235629944302\n暂估应付：未生成",
+        "toasts": []
+      },
+      "at": "2026-07-20T15:56:31.307Z"
+    },
+    {
+      "id": "FE-IN-SUBMIT",
+      "name": "采购入库页面提交成功",
+      "status": "PASS",
+      "detail": {
+        "status": "待审核",
+        "trace": "P0 来源追溯 / 状态\n当前状态：待审核\n采购入库：PIN20260720235629944302\n暂估应付：未生成",
+        "toasts": [
+          {
+            "msg": "提交成功",
+            "type": "success",
+            "at": 1784562991369
+          }
+        ],
+        "errors": []
+      },
+      "at": "2026-07-20T15:56:32.313Z"
+    },
+    {
+      "id": "FE-IN-APPROVE-PAYABLE",
+      "name": "采购入库审核成功并展示暂估应付状态/单号",
+      "status": "PASS",
+      "detail": {
+        "status": "已审核",
+        "trace": "P0 来源追溯 / 状态\n当前状态：已审核\n采购入库：PIN20260720235629944302\n暂估应付：已生成 / AP20260720235632470999",
+        "toasts": [
+          {
+            "msg": "提交成功",
+            "type": "success",
+            "at": 1784562991369
+          },
+          {
+            "msg": "审核成功",
+            "type": "success",
+            "at": 1784562992516
+          }
+        ],
+        "errors": []
+      },
+      "at": "2026-07-20T15:56:33.917Z"
+    },
+    {
+      "id": "FE-LIST-PO",
+      "name": "/pages/purchase-order.html 列表真实 API 加载无 Unauthorized/加载失败",
+      "status": "PASS",
+      "detail": {
+        "rows": 10,
+        "text": "\tPO20260720235623548820\t2026-07-20\t\td4b04006-1ecf-4fb6-9145-0663dcff79d5\tFHT-P0FRONT-20260720155556-4d9d-NOCHECK\t40\t40\t0\t40\t已全部入库\t2026/7/20 15:56:23\n\tPO20260720235606982026\t2026-07-20\t\td4b04006-1ecf-4fb6-9145-0663dcff79d5\tFHT-P0FRONT-202607",
+        "errors": []
+      },
+      "at": "2026-07-20T15:56:35.789Z"
+    },
+    {
+      "id": "FE-LIST-RCV",
+      "name": "/pages/purchase-receive.html 列表真实 API 加载无 Unauthorized/加载失败",
+      "status": "PASS",
+      "detail": {
+        "rows": 10,
+        "text": "\tPRN20260720235626749254\t2026-07-20\t\td4b04006-1ecf-4fb6-9145-0663dcff79d5\tPO20260720235623548820\t否\t40\t0\t0\t40\t已审核\t2026/7/20 15:56:26\n\tPRN20260720235610769496\t2026-07-20\t\td4b04006-1ecf-4fb6-9145-0663dcff79d5\tPO20260720235606982026\t是\t100\t0\t0\t0",
+        "errors": []
+      },
+      "at": "2026-07-20T15:56:37.682Z"
+    },
+    {
+      "id": "FE-LIST-QI",
+      "name": "/pages/purchase-inspect.html 列表真实 API 加载无 Unauthorized/加载失败",
+      "status": "PASS",
+      "detail": {
+        "rows": 10,
+        "text": "\tQI20260720235613942077\t2026-07-20\t\tPRN20260720235610769496\t100\t90\t0\t10\t90\t待定\t草稿\t2026/7/20 15:56:13\n\tQI20260720195039337460\t2026-07-20\t\tPRN20260720195039203437\t10\t10\t0\t0\t10\t合格\t已审核\t2026/7/20 11:50:39\n\tQI20260720195038587996\t2026-07-20\t\tPRN20",
+        "errors": []
+      },
+      "at": "2026-07-20T15:56:39.535Z"
+    },
+    {
+      "id": "FE-LIST-IN",
+      "name": "/pages/purchase-inbound.html 列表真实 API 加载无 Unauthorized/加载失败",
+      "status": "PASS",
+      "detail": {
+        "rows": 10,
+        "text": "\tPIN20260720235629944302\t2026-07-20\tP0?????_201555564d9d\td4b04006-1ecf-4fb6-9145-0663dcff79d5\tPRN20260720235626749254\tP0???_201555564d9d\t40\t452.00\t已审核\t已生成\tAP20260720235632470999\t2026/7/20 15:56:29\n\tPIN20260720200223123485\t2026-07-20\tP4FE???",
+        "errors": []
+      },
+      "at": "2026-07-20T15:56:41.394Z"
+    }
+  ],
+  "defects": [],
+  "pages": [
+    {
+      "path": "/pages/purchase-request.html",
+      "url": "http://127.0.0.1:8099/pages/purchase-request.html",
+      "title": "采购申请单 — 磐枢工业智能平台",
+      "ready": "complete",
+      "banner": true,
+      "status": null,
+      "docNo": null,
+      "editingId": "",
+      "rows": 10,
+      "detailRows": 0,
+      "tableText": "\tPR20260720200222808418\t2026-07-20\t\tfc2b5378-52bb-4742-99de-aa4414084abc\t7\t7\t7\t0\t已全部下单\t2026/7/20 12:02:22\n\tPR20260720200222541793\t2026-07-20\t\tfc2b5378-52bb-4742-99de-aa4414084abc\t20\t20\t12\t8\t已批准\t2026/7/20 12:02:22\n\tPR20260720200110703008\t2026-07-20\t\t0cf0da8f-27ff-46f1-855a-446e48a14dff\t7\t7\t7\t0\t已全部下单\t2026/7/20 12:01:10\n\tPR20260720200110407420\t2026-07-20\t\t0cf0da8f-27ff-46f1-855a-446e48a14dff\t20\t20\t12\t8\t已批准\t2026/7/20 12:01:10\n\tPR20260720195956302023\t2026-07-20\t\t01d0dfa7-01c3-4a0a-8d71-442ba8961678\t7\t7\t7\t0\t已全部下单\t2026/7/20 11:59:56\n\tPR20260720195956020293\t2026-07-20\t\t01d0dfa7-01c3-4a0a-8d71-442ba8961678\t20\t20\t12\t8\t已批准\t2026/7/20 11:59:56\n\tPR20260720195039568643\t2026-07-20\t\tbd1372c5-0a96-4f59-acd9-99b67f8c833c\t12\t12\t12\t0\t已全部下单\t2026/7/20 11:50:39\n\tPR20260720195038206780\t2026-07-20\t\tbd1372c5-0a96-4f59-acd9-99b67f8c833c\t30\t30\t30\t0\t已全部下单\t2026/7/20 11:50:38\n\tPR20260720195037372367\t2026-07-20\t\tbd1372c5-0a96-4f59-acd9-99b67f8c833c\t40\t40\t40\t0\t已全部下单\t2026/7/20 11:50:37\n\tPR20260720195020831631\t2026-07-20",
+      "trace": "",
+      "toasts": [],
+      "errors": [],
+      "buttons": [
+        {
+          "text": "🔍\n过滤",
+          "disabled": false,
+          "onclick": "openFilterModal()",
+          "display": "flex"
+        },
+        {
+          "text": "+\n新增",
+          "disabled": false,
+          "onclick": "location.href='purchase-request-create.html'",
+          "display": "flex"
+        },
+        {
+          "text": "✓\n批量提交",
+          "disabled": false,
+          "onclick": "batchSubmit()",
+          "display": "flex"
+        },
+        {
+          "text": "✓\n批量审核",
+          "disabled": false,
+          "onclick": "batchApprove()",
+          "display": "flex"
+        },
+        {
+          "text": "↩️\n批量反审核",
+          "disabled": false,
+          "onclick": "batchReverseApprove()",
+          "display": "flex"
+        },
+        {
+          "text": "🔒\n关闭",
+          "disabled": false,
+          "onclick": "batchClose()",
+          "display": "flex"
+        },
+        {
+          "text": "🔓\n反关闭",
+          "disabled": false,
+          "onclick": "batchReverseClose()",
+          "display": "flex"
+        },
+        {
+          "text": "🗑️\n批量删除",
+          "disabled": false,
+          "onclick": "batchDelete()",
+          "display": "flex"
+        },
+        {
+          "text": "⚙️\n显示/隐藏列",
+          "disabled": false,
+          "onclick": "openColumnSettings()",
+          "display": "flex"
+        },
+        {
+          "text": "✖️\n退出",
+          "disabled": false,
+          "onclick": "exitPage()",
+          "display": "flex"
+        },
+        {
+          "text": "上一页",
+          "disabled": false,
+          "onclick": "prevPage()",
+          "display": "flex"
+        },
+        {
+          "text": "下一页",
+          "disabled": false,
+          "onclick": "nextPage()",
+          "display": "flex"
+        },
+        {
+          "text": "取消",
+          "disabled": false,
+          "onclick": "closeLookup()",
+          "display": "inline-flex"
+        },
+        {
+          "text": "确定",
+          "disabled": false,
+          "onclick": "confirmLookup()",
+          "display": "inline-flex"
+        },
+        {
+          "text": "取消",
+          "disabled": false,
+          "onclick": "closeColumnSettings()",
+          "display": "flex"
+        },
+        {
+          "text": "确定",
+          "disabled": false,
+          "onclick": "saveColumnSettings()",
+          "display": "flex"
+        },
+        {
+          "text": "新增行",
+          "disabled": false,
+          "onclick": "addFilterRow()",
+          "display": "flex"
+        },
+        {
+          "text": "删除行",
+          "disabled": false,
+          "onclick": "deleteFilterRow()",
+          "display": "flex"
+        },
+        {
+          "text": "全部删除",
+          "disabled": false,
+          "onclick": "deleteAllFilterRows()",
+          "display": "flex"
+        },
+        {
+          "text": "插入行",
+          "disabled": false,
+          "onclick": "insertFilterRow()",
+          "display": "flex"
+        },
+        {
+          "text": "复制行",
+          "disabled": false,
+          "onclick": "copyFilterRow()",
+          "display": "flex"
+        },
+        {
+          "text": "保存方案",
+          "disabled": false,
+          "onclick": "saveFilterPlan()",
+          "display": "inline-flex"
+        },
+        {
+          "text": "删除方案",
+          "disabled": false,
+          "onclick": "deleteFilterPlan()",
+          "display": "inline-flex"
+        },
+        {
+          "text": "默认方案",
+          "disabled": false,
+          "onclick": "loadDefaultFilter()",
+          "display": "flex"
+        },
+        {
+          "text": "取消",
+          "disabled": false,
+          "onclick": "closeFilterModal()",
+          "display": "flex"
+        },
+        {
+          "text": "重置",
+          "disabled": false,
+          "onclick": "resetFilter()",
+          "display": "flex"
+        },
+        {
+          "text": "确定",
+          "disabled": false,
+          "onclick": "executeFilter()",
+          "display": "flex"
+        },
+        {
+          "text": "取消",
+          "disabled": false,
+          "onclick": "closeFilterModal()",
+          "display": "flex"
+        },
+        {
+          "text": "重置",
+          "disabled": false,
+          "onclick": "resetFilter()",
+          "display": "flex"
+        },
+        {
+          "text": "确定",
+          "disabled": false,
+          "onclick": "searchData()",
+          "display": "flex"
+        }
+      ],
+      "detailFields": []
+    },
+    {
+      "path": "/pages/purchase-request-create.html",
+      "url": "http://127.0.0.1:8099/pages/purchase-request-create.html",
+      "title": "采购申请单 - 新增/编辑",
+      "ready": "complete",
+      "banner": true,
+      "status": "草稿",
+      "docNo": "PURCHASEREQUEST2607200001",
+      "editingId": "",
+      "rows": 0,
+      "detailRows": 1,
+      "tableText": "",
+      "trace": "",
+      "toasts": [],
+      "errors": [],
+      "buttons": [
+        {
+          "text": "📋\n复制",
+          "disabled": false,
+          "onclick": "copyDoc()",
+          "display": "flex"
+        },
+        {
+          "text": "✓\n保存",
+          "disabled": false,
+          "onclick": "saveDoc()",
+          "display": "flex"
+        },
+        {
+          "text": "✓\n提交",
+          "disabled": false,
+          "onclick": "submitDoc()",
+          "display": "flex"
+        },
+        {
+          "text": "✓\n审核",
+          "disabled": true,
+          "onclick": "approveDoc()",
+          "display": "flex"
+        },
+        {
+          "text": "↩️\n反审核",
+          "disabled": true,
+          "onclick": "reverseApproveDoc()",
+          "display": "flex"
+        },
+        {
+          "text": "🔗\n选单",
+          "disabled": false,
+          "onclick": "selectSourceDoc()",
+          "display": "flex"
+        },
+        {
+          "text": "⬇️\n下推",
+          "disabled": true,
+          "onclick": "pushDownDoc()",
+          "display": "flex"
+        },
+        {
+          "text": "⬅️\n上查",
+          "disabled": false,
+          "onclick": "prevDoc()",
+          "display": "flex"
+        },
+        {
+          "text": "➡️\n下查",
+          "disabled": false,
+          "onclick": "nextDoc()",
+          "display": "flex"
+        },
+        {
+          "text": "🔒\n关闭",
+          "disabled": true,
+          "onclick": "closeDoc()",
+          "display": "flex"
+        },
+        {
+          "text": "🔓\n反关闭",
+          "disabled": true,
+          "onclick": "reverseCloseDoc()",
+          "display": "flex"
+        },
+        {
+          "text": "📋\n列表",
+          "disabled": false,
+          "onclick": "goToList()",
+          "display": "flex"
+        },
+        {
+          "text": "⚙️\n打印设置",
+          "disabled": false,
+          "onclick": "printSettings()",
+          "display": "flex"
+        },
+        {
+          "text": "🖨️\n打印",
+          "disabled": false,
+          "onclick": "printDoc()",
+          "display": "flex"
+        },
+        {
+          "text": "✖️\n退出",
+          "disabled": false,
+          "onclick": "exitDoc()",
+          "display": "flex"
+        },
+        {
+          "text": "+\n新增行",
+          "disabled": false,
+          "onclick": "addDetailRow()",
+          "display": "flex"
+        },
+        {
+          "text": "删除选中行",
+          "disabled": false,
+          "onclick": "deleteSelectedRows()",
+          "display": "flex"
+        },
+        {
+          "text": "取消",
+          "disabled": false,
+          "onclick": "closeLookup()",
+          "display": "flex"
+        },
+        {
+          "text": "确定",
+          "disabled": false,
+          "onclick": "confirmLookup()",
+          "display": "flex"
+        }
+      ],
+      "detailFields": [
+        "物料编码",
+        "物料名称",
+        "规格型号",
+        "单位",
+        "数量",
+        "未订货数量",
+        "单价",
+        "金额",
+        "税率",
+        "税额",
+        "备注"
+      ]
+    },
+    {
+      "path": "/pages/purchase-order-create.html",
+      "url": "http://127.0.0.1:8099/pages/purchase-order-create.html",
+      "title": "采购订单 - 新增/编辑",
+      "ready": "complete",
+      "banner": true,
+      "status": "草稿",
+      "docNo": "PURCHASEORDER2607200001",
+      "editingId": "",
+      "rows": 0,
+      "detailRows": 1,
+      "tableText": "",
+      "trace": "",
+      "toasts": [],
+      "errors": [],
+      "buttons": [
+        {
+          "text": "📋\n复制",
+          "disabled": false,
+          "onclick": "copyDoc()",
+          "display": "flex"
+        },
+        {
+          "text": "✓\n保存",
+          "disabled": false,
+          "onclick": "saveDoc()",
+          "display": "flex"
+        },
+        {
+          "text": "✓\n提交",
+          "disabled": false,
+          "onclick": "submitDoc()",
+          "display": "flex"
+        },
+        {
+          "text": "✓\n审核",
+          "disabled": true,
+          "onclick": "approveDoc()",
+          "display": "flex"
+        },
+        {
+          "text": "↩️\n反审核",
+          "disabled": true,
+          "onclick": "reverseApproveDoc()",
+          "display": "flex"
+        },
+        {
+          "text": "🔗\n选单",
+          "disabled": false,
+          "onclick": "selectSourceDoc()",
+          "display": "flex"
+        },
+        {
+          "text": "⬇️\n下推",
+          "disabled": true,
+          "onclick": "pushDownDoc()",
+          "display": "flex"
+        },
+        {
+          "text": "⬅️\n上查",
+          "disabled": false,
+          "onclick": "prevDoc()",
+          "display": "flex"
+        },
+        {
+          "text": "➡️\n下查",
+          "disabled": false,
+          "onclick": "nextDoc()",
+          "display": "flex"
+        },
+        {
+          "text": "🔒\n关闭",
+          "disabled": true,
+          "onclick": "closeDoc()",
+          "display": "flex"
+        },
+        {
+          "text": "🔓\n反关闭",
+          "disabled": true,
+          "onclick": "reverseCloseDoc()",
+          "display": "flex"
+        },
+        {
+          "text": "📋\n列表",
+          "disabled": false,
+          "onclick": "goToList()",
+          "display": "flex"
+        },
+        {
+          "text": "⚙️\n打印设置",
+          "disabled": false,
+          "onclick": "printSettings()",
+          "display": "flex"
+        },
+        {
+          "text": "🖨️\n打印",
+          "disabled": false,
+          "onclick": "printDoc()",
+          "display": "flex"
+        },
+        {
+          "text": "✖️\n退出",
+          "disabled": false,
+          "onclick": "exitDoc()",
+          "display": "flex"
+        },
+        {
+          "text": "+\n新增行",
+          "disabled": false,
+          "onclick": "addDetailRow()",
+          "display": "flex"
+        },
+        {
+          "text": "删除选中行",
+          "disabled": false,
+          "onclick": "deleteSelectedRows()",
+          "display": "flex"
+        },
+        {
+          "text": "取消",
+          "disabled": false,
+          "onclick": "closeLookup()",
+          "display": "flex"
+        },
+        {
+          "text": "确定",
+          "disabled": false,
+          "onclick": "confirmLookup()",
+          "display": "flex"
+        }
+      ],
+      "detailFields": [
+        "物料编码",
+        "物料名称",
+        "规格型号",
+        "单位",
+        "数量",
+        "单价",
+        "金额",
+        "税率",
+        "税额",
+        "备注"
+      ]
+    },
+    {
+      "path": "/pages/purchase-request-create.html",
+      "url": "http://127.0.0.1:8099/pages/purchase-request-create.html",
+      "title": "采购申请单 - 新增/编辑",
+      "ready": "complete",
+      "banner": true,
+      "status": "草稿",
+      "docNo": "PURCHASEREQUEST2607200001",
+      "editingId": "",
+      "rows": 0,
+      "detailRows": 1,
+      "tableText": "",
+      "trace": "",
+      "toasts": [],
+      "errors": [],
+      "buttons": [
+        {
+          "text": "📋\n复制",
+          "disabled": false,
+          "onclick": "copyDoc()",
+          "display": "flex"
+        },
+        {
+          "text": "✓\n保存",
+          "disabled": false,
+          "onclick": "saveDoc()",
+          "display": "flex"
+        },
+        {
+          "text": "✓\n提交",
+          "disabled": false,
+          "onclick": "submitDoc()",
+          "display": "flex"
+        },
+        {
+          "text": "✓\n审核",
+          "disabled": true,
+          "onclick": "approveDoc()",
+          "display": "flex"
+        },
+        {
+          "text": "↩️\n反审核",
+          "disabled": true,
+          "onclick": "reverseApproveDoc()",
+          "display": "flex"
+        },
+        {
+          "text": "🔗\n选单",
+          "disabled": false,
+          "onclick": "selectSourceDoc()",
+          "display": "flex"
+        },
+        {
+          "text": "⬇️\n下推",
+          "disabled": true,
+          "onclick": "pushDownDoc()",
+          "display": "flex"
+        },
+        {
+          "text": "⬅️\n上查",
+          "disabled": false,
+          "onclick": "prevDoc()",
+          "display": "flex"
+        },
+        {
+          "text": "➡️\n下查",
+          "disabled": false,
+          "onclick": "nextDoc()",
+          "display": "flex"
+        },
+        {
+          "text": "🔒\n关闭",
+          "disabled": true,
+          "onclick": "closeDoc()",
+          "display": "flex"
+        },
+        {
+          "text": "🔓\n反关闭",
+          "disabled": true,
+          "onclick": "reverseCloseDoc()",
+          "display": "flex"
+        },
+        {
+          "text": "📋\n列表",
+          "disabled": false,
+          "onclick": "goToList()",
+          "display": "flex"
+        },
+        {
+          "text": "⚙️\n打印设置",
+          "disabled": false,
+          "onclick": "printSettings()",
+          "display": "flex"
+        },
+        {
+          "text": "🖨️\n打印",
+          "disabled": false,
+          "onclick": "printDoc()",
+          "display": "flex"
+        },
+        {
+          "text": "✖️\n退出",
+          "disabled": false,
+          "onclick": "exitDoc()",
+          "display": "flex"
+        },
+        {
+          "text": "+\n新增行",
+          "disabled": false,
+          "onclick": "addDetailRow()",
+          "display": "flex"
+        },
+        {
+          "text": "删除选中行",
+          "disabled": false,
+          "onclick": "deleteSelectedRows()",
+          "display": "flex"
+        },
+        {
+          "text": "取消",
+          "disabled": false,
+          "onclick": "closeLookup()",
+          "display": "flex"
+        },
+        {
+          "text": "确定",
+          "disabled": false,
+          "onclick": "confirmLookup()",
+          "display": "flex"
+        }
+      ],
+      "detailFields": [
+        "物料编码",
+        "物料名称",
+        "规格型号",
+        "单位",
+        "数量",
+        "未订货数量",
+        "单价",
+        "金额",
+        "税率",
+        "税额",
+        "备注"
+      ]
+    },
+    {
+      "path": "/pages/purchase-order.html",
+      "url": "http://127.0.0.1:8099/pages/purchase-order.html",
+      "title": "采购订单 — 磐枢工业智能平台",
+      "ready": "complete",
+      "banner": true,
+      "status": null,
+      "docNo": null,
+      "editingId": "",
+      "rows": 10,
+      "detailRows": 0,
+      "tableText": "\tPO20260720235623548820\t2026-07-20\t\td4b04006-1ecf-4fb6-9145-0663dcff79d5\tFHT-P0FRONT-20260720155556-4d9d-NOCHECK\t40\t40\t0\t40\t已全部入库\t2026/7/20 15:56:23\n\tPO20260720235606982026\t2026-07-20\t\td4b04006-1ecf-4fb6-9145-0663dcff79d5\tFHT-P0FRONT-20260720155556-4d9d-NEEDCHECK\t100\t100\t0\t0\t已审核\t2026/7/20 15:56:06\n\tPO20260720200222909905\t2026-07-20\t\tfc2b5378-52bb-4742-99de-aa4414084abc\tHT-P4FE-1784548942073-FE-REC\t7\t7\t0\t7\t已全部入库\t2026/7/20 12:02:22\n\tPO20260720200222680908\t2026-07-20\t\tfc2b5378-52bb-4742-99de-aa4414084abc\tHT-P4FE-1784548942073-FE-CHG\t12\t0\t12\t0\t已审核\t2026/7/20 12:02:22\n\tPO20260720200110828504\t2026-07-20\t\t0cf0da8f-27ff-46f1-855a-446e48a14dff\tHT-P4FE-1784548870052-FE-REC\t7\t7\t0\t7\t已全部入库\t2026/7/20 12:01:10\n\tPO20260720200110534033\t2026-07-20\t\t0cf0da8f-27ff-46f1-855a-446e48a14dff\tHT-P4FE-1784548870052-FE-CHG\t12\t0\t12\t0\t已审核\t2026/7/20 12:01:10\n\tPO20260720195956454154\t2026-07-20\t\t01d0dfa7-01c3-4a0a-8d71-442ba8961678\tHT-P4FE-1784548795617-FE-REC\t7\t7\t0\t7\t已全部入库\t2026/7/20 11:59:56\n\tPO20260720195956160526\t20",
+      "trace": "",
+      "toasts": [],
+      "errors": [],
+      "buttons": [
+        {
+          "text": "🔍\n过滤",
+          "disabled": false,
+          "onclick": "openFilterModal()",
+          "display": "flex"
+        },
+        {
+          "text": "+\n新增",
+          "disabled": false,
+          "onclick": "location.href='purchase-order-create.html'",
+          "display": "flex"
+        },
+        {
+          "text": "✓\n批量提交",
+          "disabled": false,
+          "onclick": "batchSubmit()",
+          "display": "flex"
+        },
+        {
+          "text": "✓\n批量审核",
+          "disabled": false,
+          "onclick": "batchApprove()",
+          "display": "flex"
+        },
+        {
+          "text": "↩️\n批量反审核",
+          "disabled": false,
+          "onclick": "batchReverseApprove()",
+          "display": "flex"
+        },
+        {
+          "text": "🔒\n关闭",
+          "disabled": false,
+          "onclick": "batchClose()",
+          "display": "flex"
+        },
+        {
+          "text": "🔓\n反关闭",
+          "disabled": false,
+          "onclick": "batchReverseClose()",
+          "display": "flex"
+        },
+        {
+          "text": "🗑️\n批量删除",
+          "disabled": false,
+          "onclick": "batchDelete()",
+          "display": "flex"
+        },
+        {
+          "text": "⚙️\n显示/隐藏列",
+          "disabled": false,
+          "onclick": "openColumnSettings()",
+          "display": "flex"
+        },
+        {
+          "text": "✖️\n退出",
+          "disabled": false,
+          "onclick": "exitPage()",
+          "display": "flex"
+        },
+        {
+          "text": "上一页",
+          "disabled": false,
+          "onclick": "prevPage()",
+          "display": "flex"
+        },
+        {
+          "text": "下一页",
+          "disabled": false,
+          "onclick": "nextPage()",
+          "display": "flex"
+        },
+        {
+          "text": "取消",
+          "disabled": false,
+          "onclick": "closeLookup()",
+          "display": "inline-flex"
+        },
+        {
+          "text": "确定",
+          "disabled": false,
+          "onclick": "confirmLookup()",
+          "display": "inline-flex"
+        },
+        {
+          "text": "取消",
+          "disabled": false,
+          "onclick": "closeColumnSettings()",
+          "display": "flex"
+        },
+        {
+          "text": "确定",
+          "disabled": false,
+          "onclick": "saveColumnSettings()",
+          "display": "flex"
+        },
+        {
+          "text": "新增行",
+          "disabled": false,
+          "onclick": "addFilterRow()",
+          "display": "flex"
+        },
+        {
+          "text": "删除行",
+          "disabled": false,
+          "onclick": "deleteFilterRow()",
+          "display": "flex"
+        },
+        {
+          "text": "全部删除",
+          "disabled": false,
+          "onclick": "deleteAllFilterRows()",
+          "display": "flex"
+        },
+        {
+          "text": "插入行",
+          "disabled": false,
+          "onclick": "insertFilterRow()",
+          "display": "flex"
+        },
+        {
+          "text": "复制行",
+          "disabled": false,
+          "onclick": "copyFilterRow()",
+          "display": "flex"
+        },
+        {
+          "text": "保存方案",
+          "disabled": false,
+          "onclick": "saveFilterPlan()",
+          "display": "inline-flex"
+        },
+        {
+          "text": "删除方案",
+          "disabled": false,
+          "onclick": "deleteFilterPlan()",
+          "display": "inline-flex"
+        },
+        {
+          "text": "默认方案",
+          "disabled": false,
+          "onclick": "loadDefaultFilter()",
+          "display": "flex"
+        },
+        {
+          "text": "取消",
+          "disabled": false,
+          "onclick": "closeFilterModal()",
+          "display": "flex"
+        },
+        {
+          "text": "重置",
+          "disabled": false,
+          "onclick": "resetFilter()",
+          "display": "flex"
+        },
+        {
+          "text": "确定",
+          "disabled": false,
+          "onclick": "executeFilter()",
+          "display": "flex"
+        },
+        {
+          "text": "取消",
+          "disabled": false,
+          "onclick": "closeFilterModal()",
+          "display": "flex"
+        },
+        {
+          "text": "重置",
+          "disabled": false,
+          "onclick": "resetFilter()",
+          "display": "flex"
+        },
+        {
+          "text": "确定",
+          "disabled": false,
+          "onclick": "searchData()",
+          "display": "flex"
+        }
+      ],
+      "detailFields": []
+    },
+    {
+      "path": "/pages/purchase-receive.html",
+      "url": "http://127.0.0.1:8099/pages/purchase-receive.html",
+      "title": "收料通知单 — 磐枢工业智能平台",
+      "ready": "complete",
+      "banner": true,
+      "status": null,
+      "docNo": null,
+      "editingId": "",
+      "rows": 10,
+      "detailRows": 0,
+      "tableText": "\tPRN20260720235626749254\t2026-07-20\t\td4b04006-1ecf-4fb6-9145-0663dcff79d5\tPO20260720235623548820\t否\t40\t0\t0\t40\t已审核\t2026/7/20 15:56:26\n\tPRN20260720235610769496\t2026-07-20\t\td4b04006-1ecf-4fb6-9145-0663dcff79d5\tPO20260720235606982026\t是\t100\t0\t0\t0\t已审核\t2026/7/20 15:56:10\n\tPRN20260720200223028123\t2026-07-20\t\tfc2b5378-52bb-4742-99de-aa4414084abc\tPO20260720200222909905\t否\t7\t0\t0\t7\t已审核\t2026/7/20 12:02:23\n\tPRN20260720200111075178\t2026-07-20\t\t0cf0da8f-27ff-46f1-855a-446e48a14dff\tPO20260720200110828504\t否\t7\t0\t0\t7\t已审核\t2026/7/20 12:01:11\n\tPRN20260720195956637430\t2026-07-20\t\t01d0dfa7-01c3-4a0a-8d71-442ba8961678\tPO20260720195956454154\t否\t7\t0\t0\t7\t已审核\t2026/7/20 11:59:56\n\tPRN20260720195039790274\t2026-07-20\t\tbd1372c5-0a96-4f59-acd9-99b67f8c833c\tPO20260720195039687967\t否\t12\t0\t0\t12\t已审核\t2026/7/20 11:50:39\n\tPRN20260720195039203437\t2026-07-20\t\tbd1372c5-0a96-4f59-acd9-99b67f8c833c\tPO20260720195038286978\t是\t10\t10\t0\t10\t已审核\t2026/7/20 11:50:39\n\tPRN20260720195038399762\t2026-07-20\t\tbd1372c5-0a96-4f59-acd9-99b67f8c833c\tPO20260",
+      "trace": "",
+      "toasts": [],
+      "errors": [],
+      "buttons": [
+        {
+          "text": "🔍\n过滤",
+          "disabled": false,
+          "onclick": "openFilterModal()",
+          "display": "flex"
+        },
+        {
+          "text": "+\n新增",
+          "disabled": false,
+          "onclick": "location.href='purchase-receive-create.html'",
+          "display": "flex"
+        },
+        {
+          "text": "✓\n批量提交",
+          "disabled": false,
+          "onclick": "batchSubmit()",
+          "display": "flex"
+        },
+        {
+          "text": "✓\n批量审核",
+          "disabled": false,
+          "onclick": "batchApprove()",
+          "display": "flex"
+        },
+        {
+          "text": "↩️\n批量反审核",
+          "disabled": false,
+          "onclick": "batchReverseApprove()",
+          "display": "flex"
+        },
+        {
+          "text": "🔒\n关闭",
+          "disabled": false,
+          "onclick": "batchClose()",
+          "display": "flex"
+        },
+        {
+          "text": "🔓\n反关闭",
+          "disabled": false,
+          "onclick": "batchReverseClose()",
+          "display": "flex"
+        },
+        {
+          "text": "🗑️\n批量删除",
+          "disabled": false,
+          "onclick": "batchDelete()",
+          "display": "flex"
+        },
+        {
+          "text": "⚙️\n显示/隐藏列",
+          "disabled": false,
+          "onclick": "openColumnSettings()",
+          "display": "flex"
+        },
+        {
+          "text": "✖️\n退出",
+          "disabled": false,
+          "onclick": "exitPage()",
+          "display": "flex"
+        },
+        {
+          "text": "上一页",
+          "disabled": false,
+          "onclick": "prevPage()",
+          "display": "flex"
+        },
+        {
+          "text": "下一页",
+          "disabled": false,
+          "onclick": "nextPage()",
+          "display": "flex"
+        },
+        {
+          "text": "取消",
+          "disabled": false,
+          "onclick": "closeLookup()",
+          "display": "inline-flex"
+        },
+        {
+          "text": "确定",
+          "disabled": false,
+          "onclick": "confirmLookup()",
+          "display": "inline-flex"
+        },
+        {
+          "text": "取消",
+          "disabled": false,
+          "onclick": "closeColumnSettings()",
+          "display": "flex"
+        },
+        {
+          "text": "确定",
+          "disabled": false,
+          "onclick": "saveColumnSettings()",
+          "display": "flex"
+        },
+        {
+          "text": "新增行",
+          "disabled": false,
+          "onclick": "addFilterRow()",
+          "display": "flex"
+        },
+        {
+          "text": "删除行",
+          "disabled": false,
+          "onclick": "deleteFilterRow()",
+          "display": "flex"
+        },
+        {
+          "text": "全部删除",
+          "disabled": false,
+          "onclick": "deleteAllFilterRows()",
+          "display": "flex"
+        },
+        {
+          "text": "插入行",
+          "disabled": false,
+          "onclick": "insertFilterRow()",
+          "display": "flex"
+        },
+        {
+          "text": "复制行",
+          "disabled": false,
+          "onclick": "copyFilterRow()",
+          "display": "flex"
+        },
+        {
+          "text": "保存方案",
+          "disabled": false,
+          "onclick": "saveFilterPlan()",
+          "display": "inline-flex"
+        },
+        {
+          "text": "删除方案",
+          "disabled": false,
+          "onclick": "deleteFilterPlan()",
+          "display": "inline-flex"
+        },
+        {
+          "text": "默认方案",
+          "disabled": false,
+          "onclick": "loadDefaultFilter()",
+          "display": "flex"
+        },
+        {
+          "text": "取消",
+          "disabled": false,
+          "onclick": "closeFilterModal()",
+          "display": "flex"
+        },
+        {
+          "text": "重置",
+          "disabled": false,
+          "onclick": "resetFilter()",
+          "display": "flex"
+        },
+        {
+          "text": "确定",
+          "disabled": false,
+          "onclick": "executeFilter()",
+          "display": "flex"
+        },
+        {
+          "text": "取消",
+          "disabled": false,
+          "onclick": "closeFilterModal()",
+          "display": "flex"
+        },
+        {
+          "text": "重置",
+          "disabled": false,
+          "onclick": "resetFilter()",
+          "display": "flex"
+        },
+        {
+          "text": "确定",
+          "disabled": false,
+          "onclick": "searchData()",
+          "display": "flex"
+        }
+      ],
+      "detailFields": []
+    },
+    {
+      "path": "/pages/purchase-inspect.html",
+      "url": "http://127.0.0.1:8099/pages/purchase-inspect.html",
+      "title": "采购检验单 — 磐枢工业智能平台",
+      "ready": "complete",
+      "banner": true,
+      "status": null,
+      "docNo": null,
+      "editingId": "",
+      "rows": 10,
+      "detailRows": 0,
+      "tableText": "\tQI20260720235613942077\t2026-07-20\t\tPRN20260720235610769496\t100\t90\t0\t10\t90\t待定\t草稿\t2026/7/20 15:56:13\n\tQI20260720195039337460\t2026-07-20\t\tPRN20260720195039203437\t10\t10\t0\t0\t10\t合格\t已审核\t2026/7/20 11:50:39\n\tQI20260720195038587996\t2026-07-20\t\tPRN20260720195038399762\t30\t30\t0\t0\t30\t合格\t已审核\t2026/7/20 11:50:38\n\tQI20260720175708561153\t2026-07-20\t\tPRN20260720175708464565\t10\t10\t0\t0\t10\t合格\t已审核\t2026/7/20 09:57:08\n\tQI20260720175707925020\t2026-07-20\t\tPRN20260720175707829535\t30\t30\t0\t0\t30\t合格\t已审核\t2026/7/20 09:57:07\n\tQI20260720175134975772\t2026-07-20\t\tPRN20260720175134848680\t10\t10\t0\t0\t10\t合格\t已审核\t2026/7/20 09:51:34\n\tQI20260720175134133465\t2026-07-20\t\tPRN20260720175134057107\t30\t30\t0\t0\t30\t合格\t已审核\t2026/7/20 09:51:34\n\tQI20260720165631617003\t2026-07-20\t\tPRN20260720165631505809\t10\t10\t0\t0\t10\t合格\t已审核\t2026/7/20 08:56:31\n\tQI20260720165630995667\t2026-07-20\t\tPRN20260720165630877059\t30\t30\t0\t0\t30\t合格\t已审核\t2026/7/20 08:56:30\n\tQI20260720164647393756\t2026-07-20\t\tPRN20260720164647239864\t10\t10\t0\t0\t10\t合格\t已审核\t2026/7/20 08:46:47",
+      "trace": "",
+      "toasts": [],
+      "errors": [],
+      "buttons": [
+        {
+          "text": "🔍\n过滤",
+          "disabled": false,
+          "onclick": "openFilterModal()",
+          "display": "flex"
+        },
+        {
+          "text": "+\n新增",
+          "disabled": false,
+          "onclick": "location.href='purchase-inspect-create.html'",
+          "display": "flex"
+        },
+        {
+          "text": "✓\n批量提交",
+          "disabled": false,
+          "onclick": "batchSubmit()",
+          "display": "flex"
+        },
+        {
+          "text": "✓\n批量审核",
+          "disabled": false,
+          "onclick": "batchApprove()",
+          "display": "flex"
+        },
+        {
+          "text": "↩️\n批量反审核",
+          "disabled": false,
+          "onclick": "batchReverseApprove()",
+          "display": "flex"
+        },
+        {
+          "text": "🗑️\n批量删除",
+          "disabled": false,
+          "onclick": "batchDelete()",
+          "display": "flex"
+        },
+        {
+          "text": "⚙️\n显示/隐藏列",
+          "disabled": false,
+          "onclick": "openColumnSettings()",
+          "display": "flex"
+        },
+        {
+          "text": "✖️\n退出",
+          "disabled": false,
+          "onclick": "exitPage()",
+          "display": "flex"
+        },
+        {
+          "text": "上一页",
+          "disabled": false,
+          "onclick": "prevPage()",
+          "display": "flex"
+        },
+        {
+          "text": "下一页",
+          "disabled": false,
+          "onclick": "nextPage()",
+          "display": "flex"
+        },
+        {
+          "text": "取消",
+          "disabled": false,
+          "onclick": "closeLookup()",
+          "display": "inline-flex"
+        },
+        {
+          "text": "确定",
+          "disabled": false,
+          "onclick": "confirmLookup()",
+          "display": "inline-flex"
+        },
+        {
+          "text": "取消",
+          "disabled": false,
+          "onclick": "closeColumnSettings()",
+          "display": "flex"
+        },
+        {
+          "text": "确定",
+          "disabled": false,
+          "onclick": "saveColumnSettings()",
+          "display": "flex"
+        },
+        {
+          "text": "新增行",
+          "disabled": false,
+          "onclick": "addFilterRow()",
+          "display": "flex"
+        },
+        {
+          "text": "删除行",
+          "disabled": false,
+          "onclick": "deleteFilterRow()",
+          "display": "flex"
+        },
+        {
+          "text": "全部删除",
+          "disabled": false,
+          "onclick": "deleteAllFilterRows()",
+          "display": "flex"
+        },
+        {
+          "text": "插入行",
+          "disabled": false,
+          "onclick": "insertFilterRow()",
+          "display": "flex"
+        },
+        {
+          "text": "复制行",
+          "disabled": false,
+          "onclick": "copyFilterRow()",
+          "display": "flex"
+        },
+        {
+          "text": "保存方案",
+          "disabled": false,
+          "onclick": "saveFilterPlan()",
+          "display": "inline-flex"
+        },
+        {
+          "text": "删除方案",
+          "disabled": false,
+          "onclick": "deleteFilterPlan()",
+          "display": "inline-flex"
+        },
+        {
+          "text": "默认方案",
+          "disabled": false,
+          "onclick": "loadDefaultFilter()",
+          "display": "flex"
+        },
+        {
+          "text": "取消",
+          "disabled": false,
+          "onclick": "closeFilterModal()",
+          "display": "flex"
+        },
+        {
+          "text": "重置",
+          "disabled": false,
+          "onclick": "resetFilter()",
+          "display": "flex"
+        },
+        {
+          "text": "确定",
+          "disabled": false,
+          "onclick": "executeFilter()",
+          "display": "flex"
+        },
+        {
+          "text": "取消",
+          "disabled": false,
+          "onclick": "closeFilterModal()",
+          "display": "flex"
+        },
+        {
+          "text": "重置",
+          "disabled": false,
+          "onclick": "resetFilter()",
+          "display": "flex"
+        },
+        {
+          "text": "确定",
+          "disabled": false,
+          "onclick": "searchData()",
+          "display": "flex"
+        }
+      ],
+      "detailFields": []
+    },
+    {
+      "path": "/pages/purchase-inbound.html",
+      "url": "http://127.0.0.1:8099/pages/purchase-inbound.html",
+      "title": "采购入库单 — 磐枢工业智能平台",
+      "ready": "complete",
+      "banner": true,
+      "status": null,
+      "docNo": null,
+      "editingId": "",
+      "rows": 10,
+      "detailRows": 0,
+      "tableText": "\tPIN20260720235629944302\t2026-07-20\tP0?????_201555564d9d\td4b04006-1ecf-4fb6-9145-0663dcff79d5\tPRN20260720235626749254\tP0???_201555564d9d\t40\t452.00\t已审核\t已生成\tAP20260720235632470999\t2026/7/20 15:56:29\n\tPIN20260720200223123485\t2026-07-20\tP4FE???_4548942073\tfc2b5378-52bb-4742-99de-aa4414084abc\tPRN20260720200223028123\tP4FE?_4548942073\t7\t396.00\t已审核\t已生成\tAP20260720200223268410\t2026/7/20 12:02:23\n\tPIN20260720200111193416\t2026-07-20\tP4FE???_4548870052\t0cf0da8f-27ff-46f1-855a-446e48a14dff\tPRN20260720200111075178\tP4FE?_4548870052\t7\t396.00\t已审核\t已生成\tAP20260720200111339253\t2026/7/20 12:01:11\n\tPIN20260720195956780636\t2026-07-20\tP4FE???_4548795617\t01d0dfa7-01c3-4a0a-8d71-442ba8961678\tPRN20260720195956637430\tP4FE?_4548795617\t7\t396.00\t已审核\t已生成\tAP20260720195956927234\t2026/7/20 11:59:56\n\tPIN20260720195039870796\t2026-07-20\tP1???_4548237022\tbd1372c5-0a96-4f59-acd9-99b67f8c833c\tPRN20260720195039790274\tP1?_4548237022\t12\t136.00\t已审核\t已生成\tAP20260720195039985264\t2026/7/20 11:50:39\n\tPIN20260720195039451653\t2026-07-20\tP1",
+      "trace": "",
+      "toasts": [],
+      "errors": [],
+      "buttons": [
+        {
+          "text": "↻\n重试应付",
+          "disabled": false,
+          "onclick": "",
+          "display": "flex"
+        },
+        {
+          "text": "🔍\n过滤",
+          "disabled": false,
+          "onclick": "openFilterModal()",
+          "display": "flex"
+        },
+        {
+          "text": "+\n新增",
+          "disabled": false,
+          "onclick": "location.href='purchase-inbound-create.html'",
+          "display": "flex"
+        },
+        {
+          "text": "✓\n批量提交",
+          "disabled": false,
+          "onclick": "batchSubmit()",
+          "display": "flex"
+        },
+        {
+          "text": "✓\n批量审核",
+          "disabled": false,
+          "onclick": "batchApprove()",
+          "display": "flex"
+        },
+        {
+          "text": "↩️\n批量反审核",
+          "disabled": false,
+          "onclick": "batchReverseApprove()",
+          "display": "flex"
+        },
+        {
+          "text": "🗑️\n批量删除",
+          "disabled": false,
+          "onclick": "batchDelete()",
+          "display": "flex"
+        },
+        {
+          "text": "⚙️\n显示/隐藏列",
+          "disabled": false,
+          "onclick": "openColumnSettings()",
+          "display": "flex"
+        },
+        {
+          "text": "✖️\n退出",
+          "disabled": false,
+          "onclick": "exitPage()",
+          "display": "flex"
+        },
+        {
+          "text": "上一页",
+          "disabled": false,
+          "onclick": "prevPage()",
+          "display": "flex"
+        },
+        {
+          "text": "下一页",
+          "disabled": false,
+          "onclick": "nextPage()",
+          "display": "flex"
+        },
+        {
+          "text": "取消",
+          "disabled": false,
+          "onclick": "closeLookup()",
+          "display": "inline-flex"
+        },
+        {
+          "text": "确定",
+          "disabled": false,
+          "onclick": "confirmLookup()",
+          "display": "inline-flex"
+        },
+        {
+          "text": "取消",
+          "disabled": false,
+          "onclick": "closeColumnSettings()",
+          "display": "flex"
+        },
+        {
+          "text": "确定",
+          "disabled": false,
+          "onclick": "saveColumnSettings()",
+          "display": "flex"
+        },
+        {
+          "text": "新增行",
+          "disabled": false,
+          "onclick": "addFilterRow()",
+          "display": "flex"
+        },
+        {
+          "text": "删除行",
+          "disabled": false,
+          "onclick": "deleteFilterRow()",
+          "display": "flex"
+        },
+        {
+          "text": "全部删除",
+          "disabled": false,
+          "onclick": "deleteAllFilterRows()",
+          "display": "flex"
+        },
+        {
+          "text": "插入行",
+          "disabled": false,
+          "onclick": "insertFilterRow()",
+          "display": "flex"
+        },
+        {
+          "text": "复制行",
+          "disabled": false,
+          "onclick": "copyFilterRow()",
+          "display": "flex"
+        },
+        {
+          "text": "保存方案",
+          "disabled": false,
+          "onclick": "saveFilterPlan()",
+          "display": "inline-flex"
+        },
+        {
+          "text": "删除方案",
+          "disabled": false,
+          "onclick": "deleteFilterPlan()",
+          "display": "inline-flex"
+        },
+        {
+          "text": "默认方案",
+          "disabled": false,
+          "onclick": "loadDefaultFilter()",
+          "display": "flex"
+        },
+        {
+          "text": "取消",
+          "disabled": false,
+          "onclick": "closeFilterModal()",
+          "display": "flex"
+        },
+        {
+          "text": "重置",
+          "disabled": false,
+          "onclick": "resetFilter()",
+          "display": "flex"
+        },
+        {
+          "text": "确定",
+          "disabled": false,
+          "onclick": "executeFilter()",
+          "display": "flex"
+        },
+        {
+          "text": "取消",
+          "disabled": false,
+          "onclick": "closeFilterModal()",
+          "display": "flex"
+        },
+        {
+          "text": "重置",
+          "disabled": false,
+          "onclick": "resetFilter()",
+          "display": "flex"
+        },
+        {
+          "text": "确定",
+          "disabled": false,
+          "onclick": "searchData()",
+          "display": "flex"
+        }
+      ],
+      "detailFields": []
+    }
+  ],
+  "ids": {
+    "suffix": "201555564d9d",
+    "userId": "EB29433E-F36B-1410-8B47-0096A7B40922",
+    "supplierId": "F129433E-F36B-1410-8B47-0096A7B40922",
+    "supplierCode": "FSUP_201555564d9d",
+    "supplierName": "P0前端供应商_201555564d9d",
+    "warehouseId": "F729433E-F36B-1410-8B47-0096A7B40922",
+    "warehouseCode": "FWH_201555564d9d",
+    "warehouseName": "P0前端仓_201555564d9d",
+    "unitId": "FD29433E-F36B-1410-8B47-0096A7B40922",
+    "unitCode": "FEA_201555564d9d",
+    "unitName": "个",
+    "materialId": "FE29433E-F36B-1410-8B47-0096A7B40922",
+    "materialCode": "FMAT_201555564d9d",
+    "materialName": "P0前端物料_201555564d9d",
+    "currencyId": "FF29433E-F36B-1410-8B47-0096A7B40922",
+    "paymentTermId": "002A433E-F36B-1410-8B47-0096A7B40922",
+    "orgId": "d4b04006-1ecf-4fb6-9145-0663dcff79d5",
+    "orgCode": "FORG_201555564d9d",
+    "orgName": "P0前端组织_201555564d9d"
+  },
+  "files": [],
+  "summary": {
+    "total": 27,
+    "pass": 27,
+    "fail": 0,
+    "warn": 0
+  },
+  "finishedAt": "2026-07-20T15:56:41.397Z"
+}
